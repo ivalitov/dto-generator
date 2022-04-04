@@ -1,7 +1,7 @@
 package laoruga.factory;
 
 import laoruga.CharSet;
-import laoruga.custom.ChBusinessRule;
+import laoruga.custom.ArrearsBusinessRule;
 import laoruga.dto.Arrears;
 import laoruga.dto.DtoVer1;
 import laoruga.markup.ICustomGenerator;
@@ -9,6 +9,7 @@ import laoruga.markup.CustomRules;
 import laoruga.markup.IGenerator;
 import laoruga.markup.bounds.*;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.math3.util.Precision;
 import org.apache.commons.text.RandomStringGenerator;
@@ -25,7 +26,7 @@ public class DtoBuilder {
 
 
     public static void main(String[] args) throws IllegalAccessException {
-        GenerationFactory.getInstance().registerCustomGenerator(ChBusinessRule.class, ArrearsGenerator.class);
+        GenerationFactory.getInstance().registerCustomGenerator(ArrearsBusinessRule.class, ArrearsGenerator.class);
         generateDto(DtoVer1.class);
     }
 
@@ -103,9 +104,16 @@ public class DtoBuilder {
             GenerationFactory genFactory = GenerationFactory.getInstance();
             for (Annotation generatorMarker : customGenerators) {
                 if (genFactory.isCustomGeneratorExists(generatorMarker.annotationType())) {
-                    return genFactory.getCustomGenerator(generatorMarker.annotationType());
-//                    ICustomGenerator customGenerator = genFactory.getCustomGenerator(generatorMarker.annotationType());
-//                    Object generate = customGenerator.generate(generatorMarker);
+                    try {
+                        Class<? extends ICustomGenerator<?, ? extends Annotation>> customGenerator = genFactory.getCustomGenerator(generatorMarker.annotationType());
+                        ICustomGenerator customGeneratorInstance = customGenerator.newInstance();
+                        customGeneratorInstance.prepareGenerator(generatorMarker);
+                        return customGeneratorInstance;
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     throw new RuntimeException();
                 }
@@ -219,21 +227,24 @@ public class DtoBuilder {
     /*
      * Custom
      */
+    
+    @NoArgsConstructor
+    static class ArrearsGenerator implements ICustomGenerator<Arrears, ArrearsBusinessRule> {
 
-    @AllArgsConstructor
-    static class ArrearsGenerator implements ICustomGenerator<Arrears, ChBusinessRule> {
-
-//        private final long maxValue;
-//        private final long minValue;
+        int arrearsCount;
 
         @Override
-        public void prepareGenerator(ChBusinessRule rules) {
-
+        public void prepareGenerator(ArrearsBusinessRule rules) {
+            arrearsCount = rules.arrearsCount();
         }
 
         @Override
         public Arrears generate() {
-            return null;
+            Arrears arrears = new Arrears();
+            for (int i = 0; i < arrearsCount; i++) {
+                arrears.addArrear(i);
+            }
+            return arrears;
         }
     }
 

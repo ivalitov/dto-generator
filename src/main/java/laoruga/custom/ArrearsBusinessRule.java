@@ -12,8 +12,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @CustomRules
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface ChBusinessRule {
+public @interface ArrearsBusinessRule {
 
-    ChField value();
+    int arrearsCount();
 
 }
