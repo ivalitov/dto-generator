@@ -3,11 +3,9 @@ package laoruga.dto;
 
 import laoruga.ChField;
 import laoruga.CharSet;
-import laoruga.markup.bounds.DecimalFieldBounds;
-import laoruga.markup.bounds.EnumFieldBounds;
-import laoruga.markup.bounds.IntFieldBounds;
-import laoruga.markup.bounds.StringFieldBounds;
-import laoruga.markup.FieldBusinessType;
+import laoruga.SystemType;
+import laoruga.custom.ChBusinessRule;
+import laoruga.markup.bounds.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -15,28 +13,25 @@ import java.time.LocalDateTime;
 @Data
 public class DtoVer1 {
 
+    @LocalDateTimeFieldBounds(leftShiftDays = 365 * 3, rightShiftDays = 0)
     LocalDateTime openDate;
 
-    @FieldBusinessType(ChField.CLOSED_DATE)
+    @ChBusinessRule(ChField.CLOSED_DATE)
     LocalDateTime closedDate;
 
-    @StringFieldBounds(maxSymbols = 25, charset = CharSet.ENG_NUM)
+    @StringFieldBounds(maxSymbols = 25, charset = {CharSet.ENG, CharSet.NUM})
     String fieldString;
 
-    @IntFieldBounds(minSymbols = 1, maxSymbols = 10)
-    Integer fieldInteger;
+    @LongFieldBounds(minValue = 1, maxValue = 10)
+    Long fieldInteger;
 
-    @DecimalFieldBounds(minSymbols = 0, maxSymbols = 100000)
+    @DecimalFieldBounds(minValue = 0, maxValue = 100000)
     Double fieldDecimal;
 
-    @FieldBusinessType(ChField.ARREARS)
+    @ChBusinessRule(ChField.ARREARS)
     Arrears arrearsBlock;
 
-    @EnumFieldBounds(possibleValues = {"NBCH", "EI", "GP", "ASSD"})
-    System system;
-
-    class Arrears {
-
-    }
+    @EnumFieldBounds(possibleValues = {"NBCH", "EI", "GP", "ASSD"}, className = "laoruga.SystemType")
+    SystemType system;
 
 }

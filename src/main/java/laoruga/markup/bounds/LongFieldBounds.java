@@ -8,9 +8,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface EnumFieldBounds {
+public @interface LongFieldBounds {
 
-    String[] possibleValues();
+    long maxValue() default 999999999999999999L;
 
-    String className();
+    long minValue() default 0L;
 }

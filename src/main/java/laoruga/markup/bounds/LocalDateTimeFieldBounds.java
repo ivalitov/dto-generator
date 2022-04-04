@@ -8,9 +8,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface EnumFieldBounds {
+public @interface LocalDateTimeFieldBounds {
 
-    String[] possibleValues();
+    int leftShiftDays() default 365 * 5;
 
-    String className();
+    int rightShiftDays() default 365 * 5;
+
 }

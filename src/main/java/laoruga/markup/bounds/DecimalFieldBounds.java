@@ -1,15 +1,19 @@
 package laoruga.markup.bounds;
 
-import laoruga.CharSet;
-
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+@Retention(RUNTIME)
+@Target(FIELD)
 public @interface DecimalFieldBounds {
 
-    long maxSymbols() default 999999999999999999L;
-    long minSymbols() default 0L;
-    int symbolsAfterDot() default 2;
+    double maxValue() default 999999999999999999D;
+
+    double minValue() default 0D;
+
+    int precision() default 2;
 
 }
