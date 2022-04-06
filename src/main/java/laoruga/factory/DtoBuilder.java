@@ -4,7 +4,7 @@ import laoruga.CharSet;
 import laoruga.custom.ArrearsBusinessRule;
 import laoruga.dto.Arrears;
 import laoruga.dto.DtoVer1;
-import laoruga.markup.ICustomGenerator;
+import laoruga.markup.ISimpleCustomGenerator;
 import laoruga.markup.CustomRules;
 import laoruga.markup.IGenerator;
 import laoruga.markup.bounds.*;
@@ -105,8 +105,8 @@ public class DtoBuilder {
             for (Annotation generatorMarker : customGenerators) {
                 if (genFactory.isCustomGeneratorExists(generatorMarker.annotationType())) {
                     try {
-                        Class<? extends ICustomGenerator<?, ? extends Annotation>> customGenerator = genFactory.getCustomGenerator(generatorMarker.annotationType());
-                        ICustomGenerator customGeneratorInstance = customGenerator.newInstance();
+                        Class<? extends ISimpleCustomGenerator<?, ? extends Annotation>> customGenerator = genFactory.getCustomGenerator(generatorMarker.annotationType());
+                        ISimpleCustomGenerator customGeneratorInstance = customGenerator.newInstance();
                         customGeneratorInstance.prepareGenerator(generatorMarker);
                         return customGeneratorInstance;
                     } catch (InstantiationException e) {
@@ -227,9 +227,9 @@ public class DtoBuilder {
     /*
      * Custom
      */
-    
+
     @NoArgsConstructor
-    static class ArrearsGenerator implements ICustomGenerator<Arrears, ArrearsBusinessRule> {
+    static class ArrearsGenerator implements ISimpleCustomGenerator<Arrears, ArrearsBusinessRule> {
 
         int arrearsCount;
 

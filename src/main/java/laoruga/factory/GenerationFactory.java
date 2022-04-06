@@ -1,6 +1,6 @@
 package laoruga.factory;
 
-import laoruga.markup.ICustomGenerator;
+import laoruga.markup.ISimpleCustomGenerator;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -14,10 +14,9 @@ public class GenerationFactory {
         return INSTANCE;
     }
 
-    private final Map<Class<? extends Annotation>, Class<? extends ICustomGenerator<?, ? extends Annotation>> > customGeneratorsMap = new HashMap<>();
+    private final Map<Class<? extends Annotation>, Class<? extends ISimpleCustomGenerator<?, ? extends Annotation>> > customGeneratorsMap = new HashMap<>();
 
-//    public void registerCustomGenerator(Class<? extends Annotation> generatorMarker, ICustomGenerator<?, ? extends Annotation> customGenerator) {
-    public void registerCustomGenerator(Class<? extends Annotation> generatorMarker, Class<? extends ICustomGenerator<?, ? extends Annotation>> customGenerator) {
+    public void registerCustomGenerator(Class<? extends Annotation> generatorMarker, Class<? extends ISimpleCustomGenerator<?, ? extends Annotation>> customGenerator) {
         if (!customGeneratorsMap.containsKey(generatorMarker)) {
             customGeneratorsMap.putIfAbsent(generatorMarker, customGenerator);
         } else {
@@ -25,7 +24,7 @@ public class GenerationFactory {
         }
     }
 
-    Class<? extends ICustomGenerator<?, ? extends Annotation>> getCustomGenerator(Class<? extends Annotation> generator) {
+    Class<? extends ISimpleCustomGenerator<?, ? extends Annotation>> getCustomGenerator(Class<? extends Annotation> generator) {
         if (customGeneratorsMap.containsKey(generator)) {
             return customGeneratorsMap.get(generator);
         } else {
