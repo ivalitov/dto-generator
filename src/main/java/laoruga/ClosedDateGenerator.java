@@ -2,7 +2,7 @@ package laoruga;
 
 import laoruga.dto.DtoVer1;
 import laoruga.markup.ICustomGenerator;
-import laoruga.markup.IDtoDependentCustomGenerator;
+import laoruga.markup.IObjectDependentCustomGenerator;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ClosedDateGenerator implements
         ICustomGenerator<LocalDateTime>,
-        IDtoDependentCustomGenerator<LocalDateTime, DtoVer1> {
+        IObjectDependentCustomGenerator<LocalDateTime, DtoVer1> {
     DtoVer1 dtoVer1;
     String[] args;
 
@@ -26,7 +26,8 @@ public class ClosedDateGenerator implements
 
     @Override
     public boolean isObjectReady() {
-        return dtoVer1.getOpenDate() != null;
+        return false;
+//        return dtoVer1.getOpenDate() != null;
     }
 
     @Override
