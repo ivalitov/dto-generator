@@ -1,4 +1,4 @@
-package laoruga.markup.bounds;
+package laoruga.markup.rules;
 
 import laoruga.CharSet;
 
@@ -10,7 +10,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface StringFieldBounds {
+public @interface StringFieldRules {
 
     int maxSymbols() default 999999999;
 

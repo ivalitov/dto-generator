@@ -1,53 +1,110 @@
 package laoruga.factory;
 
-import laoruga.CharSet;
 import laoruga.custom.ArrearsBusinessRule;
 import laoruga.dto.Arrears;
 import laoruga.dto.DtoVer1;
-import laoruga.markup.ISimpleCustomGenerator;
-import laoruga.markup.CustomRules;
-import laoruga.markup.IGenerator;
-import laoruga.markup.bounds.*;
-import lombok.AllArgsConstructor;
+import laoruga.markup.*;
+import laoruga.markup.rules.*;
 import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
-import org.apache.commons.math3.util.Precision;
-import org.apache.commons.text.RandomStringGenerator;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class DtoBuilder {
 
 
     public static void main(String[] args) throws IllegalAccessException {
         GenerationFactory.getInstance().registerCustomGenerator(ArrearsBusinessRule.class, ArrearsGenerator.class);
-        generateDto(DtoVer1.class);
+        new DtoBuilder().generateDto(DtoVer1.class);
     }
 
-    @SneakyThrows
-    static void generateDto(Class dtoClass) {
-        Object dtoInstance = dtoClass.newInstance();
-        for (Field field : dtoInstance.getClass().getDeclaredFields()) {
-            IGenerator<?> generator = selectGenerator(field);
-            field.setAccessible(true);
-            field.set(dtoInstance, generator.generate());
-            field.setAccessible(false);
+    private final List<Exception> errors = new ArrayList<>();
+    private final Map<Field, IGenerator<?>> fieldIGeneratorMap = new LinkedHashMap<>();
+
+
+    void generateDto(Class<?> dtoClass) {
+        Object dtoInstance;
+
+        try {
+            dtoInstance = dtoClass.newInstance();
+        } catch (Exception e) {
+         throw new RuntimeException(e);
         }
+
+        prepareGenerators(dtoInstance);
+        applyGenerators(dtoInstance);
+
         System.out.println(dtoInstance);
     }
 
-    static IGenerator<?> selectGenerator(Field field) {
+
+
+
+    void applyGenerators(Object dtoInstance) {
+        int attempts = 0;
+        int maxAttempts = 500;
+        while (!fieldIGeneratorMap.isEmpty() && attempts < maxAttempts) {
+            attempts++;
+            log.debug("Attempt {} to generate field values", attempts);
+            for (Map.Entry<Field, IGenerator<?>> fieldAndGenerator : fieldIGeneratorMap.entrySet()) {
+                Field field = fieldAndGenerator.getKey();
+                IGenerator<?> generator = fieldAndGenerator.getValue();
+                if (generator instanceof IDtoDependentCustomGenerator) {
+                    if (!((IDtoDependentCustomGenerator<?, ?>) generator).isObjectReady()) {
+                        log.debug("Object is not ready to generate dependent field value");
+                        continue;
+                    }
+                }
+                try {
+                    field.setAccessible(true);
+                    field.set(dtoInstance, generator.generate());
+                } catch (IllegalAccessException e) {
+                    log.error("Error while generation value for a field: " + field, e);
+                    fieldIGeneratorMap.remove(field);
+                } finally {
+                    field.setAccessible(false);
+                }
+            }
+        }
+    }
+
+    void prepareGenerators(Object dtoInstance){
+        for (Field field : dtoInstance.getClass().getDeclaredFields()) {
+            IGenerator<?> generator = prepareGenerator(field, dtoInstance);
+            if (generator != null) {
+                fieldIGeneratorMap.put(field, generator);
+            }
+        }
+    }
+
+    IGenerator<?> prepareGenerator(Field field, Object dtoInstance) {
+        IGenerator<?> generator = null;
+        try {
+            generator = selectGenerator(field);
+            if (generator instanceof IDtoDependentCustomGenerator) {
+                try {
+                    ((IDtoDependentCustomGenerator) generator).setDependentObject(dtoInstance);
+                } catch (Exception e) {
+                    throw e;
+                }
+            }
+        } catch (Exception e) {
+            errors.add(e);
+        }
+        return generator;
+    }
+
+    IGenerator<?> selectGenerator(Field field) {
 
         if (field.getType() == Double.class) {
-            DecimalFieldBounds decimalBounds = field.getAnnotation(DecimalFieldBounds.class);
+            DecimalFieldRules decimalBounds = field.getAnnotation(DecimalFieldRules.class);
             if (decimalBounds != null) {
-                return new DecimalFieldGenerator(
+                return new BasicGenerators.DecimalFieldGenerator(
                         decimalBounds.maxValue(),
                         decimalBounds.minValue(),
                         decimalBounds.precision()
@@ -56,9 +113,9 @@ public class DtoBuilder {
         }
 
         if (field.getType() == String.class) {
-            StringFieldBounds stringBounds = field.getAnnotation(StringFieldBounds.class);
+            StringFieldRules stringBounds = field.getAnnotation(StringFieldRules.class);
             if (stringBounds != null) {
-                return new StringFieldGenerator(
+                return new BasicGenerators.StringFieldGenerator(
                         stringBounds.maxSymbols(),
                         stringBounds.minSymbols(),
                         stringBounds.charset()
@@ -67,9 +124,9 @@ public class DtoBuilder {
         }
 
         if (field.getType() == Long.class) {
-            LongFieldBounds stringBounds = field.getAnnotation(LongFieldBounds.class);
+            LongFieldRules stringBounds = field.getAnnotation(LongFieldRules.class);
             if (stringBounds != null) {
-                return new IntegerFieldGenerator(
+                return new BasicGenerators.IntegerFieldGenerator(
                         stringBounds.maxValue(),
                         stringBounds.minValue()
                 );
@@ -77,9 +134,9 @@ public class DtoBuilder {
         }
 
         if (field.getType().isEnum()) {
-            EnumFieldBounds enumBounds = field.getAnnotation(EnumFieldBounds.class);
+            EnumFieldRules enumBounds = field.getAnnotation(EnumFieldRules.class);
             if (enumBounds != null) {
-                return new EnumFieldGenerator(
+                return new BasicGenerators.EnumFieldGenerator(
                         enumBounds.possibleValues(),
                         enumBounds.className()
                 );
@@ -87,14 +144,18 @@ public class DtoBuilder {
         }
 
         if (field.getType() == LocalDateTime.class) {
-            LocalDateTimeFieldBounds enumBounds = field.getAnnotation(LocalDateTimeFieldBounds.class);
+            LocalDateTimeFieldRules enumBounds = field.getAnnotation(LocalDateTimeFieldRules.class);
             if (enumBounds != null) {
-                return new LocalDateTimeFieldGenerator(
+                return new BasicGenerators.LocalDateTimeFieldGenerator(
                         enumBounds.leftShiftDays(),
                         enumBounds.rightShiftDays()
                 );
             }
         }
+
+        /*
+         * Custom generator 1st ver
+         */
 
         List<Annotation> customGenerators = Arrays.stream(field.getAnnotations())
                 .filter(a -> a.annotationType().getAnnotation(CustomRules.class) != null)
@@ -102,12 +163,12 @@ public class DtoBuilder {
 
         if (!customGenerators.isEmpty()) {
             GenerationFactory genFactory = GenerationFactory.getInstance();
-            for (Annotation generatorMarker : customGenerators) {
-                if (genFactory.isCustomGeneratorExists(generatorMarker.annotationType())) {
+            for (Annotation generationRules : customGenerators) {
+                if (genFactory.isCustomGeneratorExists(generationRules.annotationType())) {
                     try {
-                        Class<? extends ISimpleCustomGenerator<?, ? extends Annotation>> customGenerator = genFactory.getCustomGenerator(generatorMarker.annotationType());
-                        ISimpleCustomGenerator customGeneratorInstance = customGenerator.newInstance();
-                        customGeneratorInstance.prepareGenerator(generatorMarker);
+                        Class<? extends IRulesDependentCustomGenerator<?, ? extends Annotation>> customGenerator = genFactory.getCustomGenerator(generationRules.annotationType());
+                        IRulesDependentCustomGenerator customGeneratorInstance = customGenerator.newInstance();
+                        customGeneratorInstance.prepareGenerator(generationRules);
                         return customGeneratorInstance;
                     } catch (InstantiationException e) {
                         e.printStackTrace();
@@ -120,108 +181,35 @@ public class DtoBuilder {
             }
         }
 
-        return new NullGenerator();
-    }
+        /*
+         * custom generator 2nd var
+         */
 
-    @AllArgsConstructor
-    static class DecimalFieldGenerator implements IGenerator<Double> {
+        CustomGenerator customGeneratorRules = field.getAnnotation(CustomGenerator.class);
 
-        private final double maxValue;
-        private final double minValue;
-        private final int precision;
-
-        @Override
-        public Double generate() {
-            double generated = minValue + new Random().nextDouble() * (maxValue - minValue);
-            return Precision.round(generated, precision);
-        }
-    }
-
-    @AllArgsConstructor
-    static class StringFieldGenerator implements IGenerator<String> {
-
-        private final int maxLength;
-        private final int minLength;
-        private final CharSet[] charset;
-
-        @Override
-        public String generate() {
-            int length = minLength + (int) (Math.random() * (maxLength - minLength));
-            Integer charsCount = Arrays.stream(charset).map(s -> s.getChars().length).reduce(Integer::sum).get();
-            char[] chars = new char[charsCount];
-            int nextCopyPos = 0;
-            for (CharSet charSet : charset) {
-                char[] toCopy = charSet.getChars();
-                System.arraycopy(toCopy, 0, chars, nextCopyPos, toCopy.length);
-                nextCopyPos += toCopy.length;
-            }
-            return new RandomStringGenerator.Builder()
-                    .selectFrom(chars)
-                    .build().generate(length);
-        }
-    }
-
-    @AllArgsConstructor
-    static class IntegerFieldGenerator implements IGenerator<Long> {
-
-        private final long maxValue;
-        private final long minValue;
-
-        @Override
-        public Long generate() {
-            return minValue + (long) (Math.random() * (maxValue - minValue));
-        }
-    }
-
-    @AllArgsConstructor
-    static class EnumFieldGenerator implements IGenerator<Enum<?>> {
-
-        private final String[] possibleValues;
-        private final String className;
-
-        @Override
-        @SneakyThrows
-        public Enum<?> generate() {
-            int count = possibleValues.length;
-            String enumInstanceName = possibleValues[new Random().nextInt(count)];
-            Class<?> aClass;
+        if (customGeneratorRules != null) {
+            String generatorClassName = customGeneratorRules.className();
             try {
-                aClass = Class.forName(className);
-            } catch (ClassNotFoundException e) {
-                throw e;
-            }
-            if (aClass.isEnum()) {
-                for (Object enumConstant : aClass.getEnumConstants()) {
-                    if (((Enum<?>) enumConstant).name().equals(enumInstanceName)) {
-                        return (Enum<?>) enumConstant;
-                    }
+                Class<?> aClass = Class.forName(generatorClassName);
+                Object generatorInstance = aClass.newInstance();
+                if (generatorInstance instanceof ICustomGenerator) {
+                    ((ICustomGenerator<?>) generatorInstance).setArgs(customGeneratorRules.args());
                 }
-                throw new RuntimeException();
-            } else {
-                throw new RuntimeException();
+                if (generatorInstance instanceof IGenerator) {
+                    return (IGenerator<?>) generatorInstance;
+                } else {
+                    throw new RuntimeException();
+                }
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+
+            } catch (InstantiationException e) {
+                e.printStackTrace();
             }
         }
-    }
 
-    @AllArgsConstructor
-    static class LocalDateTimeFieldGenerator implements IGenerator<LocalDateTime> {
-
-        private final int leftShiftDays;
-        private final int rightShiftDays;
-
-        @Override
-        public LocalDateTime generate() {
-            LocalDateTime minDate = LocalDateTime.now().minusDays(leftShiftDays);
-            int randomInt = new Random().nextInt(leftShiftDays + rightShiftDays + 1);
-            return minDate.plusDays(randomInt);
-        }
-    }
-
-    static class NullGenerator implements IGenerator<Object> {
-        @Override
-        public String generate() {
-            return null;
-        }
+        return new BasicGenerators.NullGenerator();
     }
 
     /*
@@ -229,7 +217,7 @@ public class DtoBuilder {
      */
 
     @NoArgsConstructor
-    static class ArrearsGenerator implements ISimpleCustomGenerator<Arrears, ArrearsBusinessRule> {
+    static class ArrearsGenerator implements IRulesDependentCustomGenerator<Arrears, ArrearsBusinessRule> {
 
         int arrearsCount;
 
@@ -247,6 +235,5 @@ public class DtoBuilder {
             return arrears;
         }
     }
-
 
 }

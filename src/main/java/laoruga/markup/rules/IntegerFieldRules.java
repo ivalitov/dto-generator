@@ -1,9 +1,7 @@
-package laoruga.markup.bounds;
+package laoruga.markup.rules;
 
 import laoruga.markup.BoundType;
 import laoruga.markup.Marker;
-import lombok.SneakyThrows;
-import lombok.Value;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -13,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface IntegerFieldBounds {
+public @interface IntegerFieldRules {
 
     @BoundType(Marker.MAX_VALUE)
     int maxValue() default 999999999;

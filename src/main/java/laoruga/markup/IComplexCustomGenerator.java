@@ -2,7 +2,6 @@ package laoruga.markup;
 
 import java.lang.annotation.Annotation;
 
-public interface IComplexCustomGenerator<GENERATED_TYPE, GENERATOR_MARKER extends Annotation, DTO_TYPE>
-        extends ISimpleCustomGenerator<GENERATED_TYPE, GENERATOR_MARKER> {
-    void prepareGenerator(DTO_TYPE generationRules);
+public interface IComplexCustomGenerator<GENERATED_TYPE, GENERATION_RULES extends Annotation, GENERATED_DTO> extends IRulesDependentCustomGenerator<GENERATED_TYPE, GENERATION_RULES> {
+    void setGeneratedDto(GENERATED_DTO generatedDto);
 }
