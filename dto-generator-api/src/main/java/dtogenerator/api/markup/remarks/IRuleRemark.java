@@ -1,5 +1,3 @@
 package dtogenerator.api.markup.remarks;
 
-public interface IRuleRemark {
-
-}
+public interface IRuleRemark {}

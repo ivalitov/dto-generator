@@ -10,16 +10,11 @@ import java.util.Set;
 
 public class DtoGeneratorBuilder {
 
-    protected final Set<IRuleRemark> ruleRemarks = new HashSet<>();
+    protected IRuleRemark ruleRemark = RuleRemark.RANDOM_VALUE;
     protected final Map<String, IRuleRemark> fieldRuleRemarkMap = new HashMap<>();
 
-    public DtoGeneratorBuilder addRuleRemarks(RuleRemark ruleRemark, IRuleRemark... ruleRemarks) {
-        this.ruleRemarks.add(ruleRemark);
-        if (ruleRemarks.length > 0) {
-            for (IRuleRemark remark : ruleRemarks) {
-                this.ruleRemarks.add(remark);
-            }
-        }
+    public DtoGeneratorBuilder setRuleRemark(RuleRemark ruleRemark) {
+        this.ruleRemark = ruleRemark;
         return this;
     }
 
@@ -29,6 +24,6 @@ public class DtoGeneratorBuilder {
     }
 
     public DtoGenerator build() {
-        return new DtoGenerator(ruleRemarks, fieldRuleRemarkMap);
+        return new DtoGenerator(ruleRemark, fieldRuleRemarkMap);
     }
 }

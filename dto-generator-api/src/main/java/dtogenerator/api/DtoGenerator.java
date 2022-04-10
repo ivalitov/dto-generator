@@ -20,11 +20,11 @@ public class DtoGenerator {
     private final Map<Field, Exception> errors = new HashMap<>();
     private final Map<Field, IGenerator<?>> fieldIGeneratorMap = new LinkedHashMap<>();
 
-    private final Set<IRuleRemark> ruleRemarks;
+    private final IRuleRemark ruleRemark;
     private final Map<String, IRuleRemark> fieldRuleRemarkMap;
 
-    protected DtoGenerator(Set<IRuleRemark> ruleRemarks, Map<String, IRuleRemark> fieldRuleRemarkMap) {
-        this.ruleRemarks = ruleRemarks;
+    protected DtoGenerator(IRuleRemark ruleRemark, Map<String, IRuleRemark> fieldRuleRemarkMap) {
+        this.ruleRemark = ruleRemark;
         this.fieldRuleRemarkMap = fieldRuleRemarkMap;
     }
 
@@ -136,15 +136,23 @@ public class DtoGenerator {
         return generator;
     }
 
-    IGenerator<?> selectGenerator(Field field) {
+    private IRuleRemark getBasicRuleRemark(Field field) {
+        if (fieldRuleRemarkMap.containsKey(field.getName())) {
+            return fieldRuleRemarkMap.get(field.getName());
+        }
+        return ruleRemark;
+    }
+
+    private IGenerator<?> selectGenerator(Field field) {
 
         if (field.getType() == Double.class) {
-            DoubleRules decimalBounds = field.getAnnotation(DoubleRules.class);
-            if (decimalBounds != null) {
+            DoubleRules doubleBounds = field.getAnnotation(DoubleRules.class);
+            if (doubleBounds != null) {
                 return new BasicTypeGenerators.DoubleGenerator(
-                        decimalBounds.maxValue(),
-                        decimalBounds.minValue(),
-                        decimalBounds.precision()
+                        doubleBounds.maxValue(),
+                        doubleBounds.minValue(),
+                        doubleBounds.precision(),
+                        getBasicRuleRemark(field)
                 );
             }
         }
@@ -155,7 +163,8 @@ public class DtoGenerator {
                 return new BasicTypeGenerators.StringGenerator(
                         stringBounds.maxSymbols(),
                         stringBounds.minSymbols(),
-                        stringBounds.charset()
+                        stringBounds.charset(),
+                        getBasicRuleRemark(field)
                 );
             }
         }
@@ -165,7 +174,8 @@ public class DtoGenerator {
             if (stringBounds != null) {
                 return new BasicTypeGenerators.IntegerGenerator(
                         stringBounds.maxValue(),
-                        stringBounds.minValue()
+                        stringBounds.minValue(),
+                        getBasicRuleRemark(field)
                 );
             }
         }
@@ -175,7 +185,8 @@ public class DtoGenerator {
             if (enumBounds != null) {
                 return new BasicTypeGenerators.EnumGenerator(
                         enumBounds.possibleEnumNames(),
-                        enumBounds.enumClass()
+                        enumBounds.enumClass(),
+                        getBasicRuleRemark(field)
                 );
             }
         }
@@ -185,7 +196,8 @@ public class DtoGenerator {
             if (enumBounds != null) {
                 return new BasicTypeGenerators.LocalDateTimeGenerator(
                         enumBounds.leftShiftDays(),
-                        enumBounds.rightShiftDays()
+                        enumBounds.rightShiftDays(),
+                        getBasicRuleRemark(field)
                 );
             }
         }

@@ -14,7 +14,7 @@ public class RemarkableDtoGeneratorBuilder extends DtoGeneratorBuilder {
 
     Map<Class<? extends IGenerator<?>>, IExtendedRuleRemark> extendedRuleRemarks = new HashMap<>();
 
-    public DtoGeneratorBuilder addRuleRemarks(IExtendedRuleRemark ruleRemark, IExtendedRuleRemark... ruleRemarks) {
+    public DtoGeneratorBuilder addExtendedRuleRemarks(IExtendedRuleRemark ruleRemark, IExtendedRuleRemark... ruleRemarks) {
         this.extendedRuleRemarks.put(ruleRemark.getGeneratorClass(), ruleRemark);
         if (ruleRemarks != null && ruleRemarks.length != 0) {
             this.extendedRuleRemarks.putAll(
@@ -29,8 +29,8 @@ public class RemarkableDtoGeneratorBuilder extends DtoGeneratorBuilder {
     }
 
     @Override
-    public RemarkableDtoGeneratorBuilder addRuleRemarks(RuleRemark ruleRemark, IRuleRemark... ruleRemarks) {
-        super.addRuleRemarks(ruleRemark, ruleRemarks);
+    public RemarkableDtoGeneratorBuilder setRuleRemark(RuleRemark ruleRemark) {
+        super.setRuleRemark(ruleRemark);
         return this;
     }
 
@@ -41,6 +41,6 @@ public class RemarkableDtoGeneratorBuilder extends DtoGeneratorBuilder {
     }
 
     public RemarkableDtoGenerator build() {
-        return new RemarkableDtoGenerator(ruleRemarks, fieldRuleRemarkMap, extendedRuleRemarks);
+        return new RemarkableDtoGenerator(ruleRemark, fieldRuleRemarkMap, extendedRuleRemarks);
     }
 }

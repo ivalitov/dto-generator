@@ -15,10 +15,10 @@ public class RemarkableDtoGenerator extends DtoGenerator {
 
     private final Map<Class<? extends IGenerator<?>>, IExtendedRuleRemark> extendedRuleRemarks;
 
-    protected RemarkableDtoGenerator(Set<IRuleRemark> ruleRemarks,
+    protected RemarkableDtoGenerator(IRuleRemark ruleRemark,
                                   Map<String, IRuleRemark> fieldRuleRemarkMap,
                                   Map<Class<? extends IGenerator<?>>, IExtendedRuleRemark> extendedRuleRemarks) {
-        super(ruleRemarks, fieldRuleRemarkMap);
+        super(ruleRemark, fieldRuleRemarkMap);
         this.extendedRuleRemarks = extendedRuleRemarks;
     }
 
