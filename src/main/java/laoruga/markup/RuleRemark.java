@@ -1,6 +1,6 @@
 package laoruga.markup;
 
-public enum Marker {
+public enum RuleRemark implements IRuleRemark {
     MIN_VALUE,
     MAX_VALUE
 }

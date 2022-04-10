@@ -59,7 +59,6 @@ public class BasicGenerators {
 
         @Override
         public Long generate() {
-            if (true) throw new RuntimeException("zhopka");
             return minValue + (long) (Math.random() * (maxValue - minValue));
         }
     }

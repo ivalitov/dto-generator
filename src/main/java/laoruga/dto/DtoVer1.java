@@ -3,7 +3,8 @@ package laoruga.dto;
 
 import laoruga.CharSet;
 import laoruga.SystemType;
-import laoruga.custom.ArrearsBusinessRule;
+import laoruga._demo.annotation_style.ArrearsBusinessRule;
+import laoruga._demo.second_style.ClosedDateGenerator;
 import laoruga.markup.rules.*;
 import lombok.Data;
 
@@ -15,7 +16,7 @@ public class DtoVer1 {
     @LocalDateTimeFieldRules(leftShiftDays = 365 * 3, rightShiftDays = 0)
     LocalDateTime openDate;
 
-    @CustomGenerator(className = "laoruga.ClosedDateGenerator", args = {"1", "5"})
+    @CustomGenerator(clazz = ClosedDateGenerator.class, args = {"1", "5"})
     LocalDateTime closedDate;
 
     @StringFieldRules(maxSymbols = 25, charset = {CharSet.ENG, CharSet.NUM})

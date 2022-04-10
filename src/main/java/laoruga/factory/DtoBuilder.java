@@ -1,11 +1,7 @@
 package laoruga.factory;
 
-import laoruga.custom.ArrearsBusinessRule;
-import laoruga.dto.Arrears;
-import laoruga.dto.DtoVer1;
 import laoruga.markup.*;
 import laoruga.markup.rules.*;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;
@@ -17,21 +13,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DtoBuilder {
 
-
-    public static void main(String[] args) throws IllegalAccessException {
-        GenerationFactory.getInstance().registerCustomGenerator(ArrearsBusinessRule.class, ArrearsGenerator.class);
-        new DtoBuilder().generateDto(DtoVer1.class);
-    }
-
     private final Map<Field, Exception> errors = new HashMap<>();
     private final Map<Field, IGenerator<?>> fieldIGeneratorMap = new LinkedHashMap<>();
     private Object dtoInstance;
 
-    void generateDto(Class<?> dtoClass) {
+    public <T> T generateDto(Class<T> dtoClass) {
         createDtoInstance(dtoClass);
         prepareGenerators();
         applyGenerators();
-        System.out.println(dtoInstance);
+        return (T) dtoInstance;
     }
 
     void createDtoInstance(Class<?> dtoClass) {
@@ -44,7 +34,7 @@ public class DtoBuilder {
 
     void applyGenerators() {
         int attempts = 0;
-        int maxAttempts = 3;
+        int maxAttempts = 100;
         while (!fieldIGeneratorMap.isEmpty() && attempts < maxAttempts) {
             attempts++;
             log.debug("Attempt {} to generate field values", attempts);
@@ -220,9 +210,8 @@ public class DtoBuilder {
         CustomGenerator customGeneratorRules = field.getAnnotation(CustomGenerator.class);
 
         if (customGeneratorRules != null) {
-            String generatorClassName = customGeneratorRules.className();
             try {
-                Class<?> aClass = Class.forName(generatorClassName);
+                Class<?> aClass = customGeneratorRules.clazz();
                 Object generatorInstance = aClass.newInstance();
                 if (generatorInstance instanceof ICustomGenerator) {
                     ((ICustomGenerator<?>) generatorInstance).setArgs(customGeneratorRules.args());
@@ -232,40 +221,14 @@ public class DtoBuilder {
                 } else {
                     throw new RuntimeException();
                 }
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
             } catch (IllegalAccessException e) {
-
+                e.printStackTrace();
             } catch (InstantiationException e) {
                 e.printStackTrace();
             }
         }
 
         return new BasicGenerators.NullGenerator();
-    }
-
-    /*
-     * Custom
-     */
-
-    @NoArgsConstructor
-    static class ArrearsGenerator implements IRulesDependentCustomGenerator<Arrears, ArrearsBusinessRule> {
-
-        int arrearsCount;
-
-        @Override
-        public void prepareGenerator(ArrearsBusinessRule rules) {
-            arrearsCount = rules.arrearsCount();
-        }
-
-        @Override
-        public Arrears generate() {
-            Arrears arrears = new Arrears();
-            for (int i = 0; i < arrearsCount; i++) {
-                arrears.addArrear(i);
-            }
-            return arrears;
-        }
     }
 
 }

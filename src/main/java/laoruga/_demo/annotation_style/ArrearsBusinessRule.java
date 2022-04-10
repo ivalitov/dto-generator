@@ -1,4 +1,4 @@
-package laoruga.custom;
+package laoruga._demo.annotation_style;
 
 import laoruga.ChField;
 import laoruga.markup.CustomRules;
