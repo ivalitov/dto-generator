@@ -20,8 +20,8 @@ public enum CustomRuleRemark implements IExtendedRuleRemark {
         return generatorClass;
     }
 
-    @Override
-    public String[] getArgs() {
-        return IExtendedRuleRemark.super.getArgs();
-    }
+
+
+
+
 }

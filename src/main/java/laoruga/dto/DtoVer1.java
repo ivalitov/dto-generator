@@ -4,6 +4,7 @@ package laoruga.dto;
 import laoruga.CharSet;
 import laoruga.SystemType;
 import laoruga._demo.annotation_style.ArrearsBusinessRule;
+import laoruga._demo.second_style.ArrearsGenerator2;
 import laoruga._demo.second_style.ClosedDateGenerator;
 import laoruga.markup.rules.*;
 import lombok.Data;
@@ -29,7 +30,10 @@ public class DtoVer1 {
     Double fieldDecimal;
 
     @ArrearsBusinessRule(arrearsCount = 3)
-    Arrears arrearsBlock;
+    Arrears arrearsBlock_1;
+
+    @CustomGenerator(clazz = ArrearsGenerator2.class, args = {"5"})
+    Arrears arrearsBlock_2;
 
     @EnumFieldRules(possibleValues = {"NBCH", "EI", "GP", "ASSD"}, className = "laoruga.SystemType")
     SystemType system;

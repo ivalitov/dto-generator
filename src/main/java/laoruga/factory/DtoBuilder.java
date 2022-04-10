@@ -99,7 +99,7 @@ public class DtoBuilder {
             }
         }
         if (!errors.isEmpty()) {
-            log.error("{} errors while generators preparation. Fileds vs Generators: " + errors, errors.size());
+            log.error("{} error(s) while generators preparation. Fileds vs Generators: " + errors, errors.size());
             throw new RuntimeException("Error while generators preparation (see log above)");
         }
     }
@@ -211,9 +211,11 @@ public class DtoBuilder {
 
         if (customGeneratorRules != null) {
             try {
-                Class<?> aClass = customGeneratorRules.clazz();
-                Object generatorInstance = aClass.newInstance();
+                Class<?> generatorClass = customGeneratorRules.clazz();
+                Object generatorInstance = generatorClass.newInstance();
                 if (generatorInstance instanceof ICustomGenerator) {
+                    log.debug("Args {} have been obtained from Annotation: {}",
+                            Arrays.asList(customGeneratorRules.args()), customGeneratorRules);
                     ((ICustomGenerator<?>) generatorInstance).setArgs(customGeneratorRules.args());
                 }
                 if (generatorInstance instanceof IGenerator) {

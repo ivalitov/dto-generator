@@ -1,8 +1,7 @@
 package laoruga.factory;
 
-import laoruga.markup.IExtendedRuleRemark;
-import laoruga.markup.IGenerator;
-import laoruga.markup.IRemarkableCustomGenerator;
+import laoruga.markup.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class RemarkableDtoBuilder extends DtoBuilder {
 
     Map<Class<? extends IGenerator<?>>, IExtendedRuleRemark> ruleRemarks = new HashMap<>();
@@ -39,13 +39,28 @@ public class RemarkableDtoBuilder extends DtoBuilder {
     @Override
     IGenerator<?> prepareGenerator(Field field) {
         IGenerator<?> generator = super.prepareGenerator(field);
+
         if (generator instanceof IRemarkableCustomGenerator) {
             if (ruleRemarks.containsKey(generator.getClass())) {
-                ((IRemarkableCustomGenerator<?>) generator).setRuleRemarks(
-                        ruleRemarks.get(generator.getClass())
-                );
+                IExtendedRuleRemark ruleRemark = ruleRemarks.get(generator.getClass());
+                if (ruleRemark instanceof ExtendedRuleRemarkArgs) {
+                    ExtendedRuleRemarkArgs remarkWithArgs = (ExtendedRuleRemarkArgs) ruleRemark;
+                    ((IRemarkableCustomGenerator<?>) generator).setRuleRemarks(
+                            remarkWithArgs.getWrappedRule()
+                    );
+                    if (remarkWithArgs.getArgs() != null && remarkWithArgs.getArgs().length != 0) {
+                        log.debug("Annotation args have been overridden with remark {} passed values: {}",
+                                ((ExtendedRuleRemarkArgs) ruleRemark).getWrappedRule(), remarkWithArgs.getArgs());
+                        ((IRemarkableCustomGenerator<?>) generator).setArgs(remarkWithArgs.getArgs());
+                    }
+                } else {
+                    ((IRemarkableCustomGenerator<?>) generator).setRuleRemarks(
+                            ruleRemark
+                    );
+                }
             }
         }
+
         return generator;
     }
 }
