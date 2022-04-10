@@ -1,10 +1,10 @@
 package dtogenerator.examples._demo.second_style;
 
 import dtogenerator.examples.DtoVer1;
-import dtogenerator.api.markup.ICustomGenerator;
-import dtogenerator.api.markup.IExtendedRuleRemark;
-import dtogenerator.api.markup.IObjectDependentCustomGenerator;
-import dtogenerator.api.markup.IRemarkableCustomGenerator;
+import dtogenerator.api.markup.generators.ICustomGenerator;
+import dtogenerator.api.markup.remarks.IExtendedRuleRemark;
+import dtogenerator.api.markup.generators.IDtoDependentCustomGenerator;
+import dtogenerator.api.markup.generators.IRemarkableCustomGenerator;
 import lombok.NoArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
@@ -15,7 +15,7 @@ import static dtogenerator.examples._demo.second_style.CustomRuleRemark.CLOSED;
 import static dtogenerator.examples._demo.second_style.CustomRuleRemark.OPEN;
 
 @NoArgsConstructor
-public class ClosedDateGenerator implements ICustomGenerator<LocalDateTime>, IObjectDependentCustomGenerator<LocalDateTime, DtoVer1>, IRemarkableCustomGenerator<LocalDateTime> {
+public class ClosedDateGenerator implements ICustomGenerator<LocalDateTime>, IDtoDependentCustomGenerator<LocalDateTime, DtoVer1>, IRemarkableCustomGenerator<LocalDateTime> {
 
     DtoVer1 dtoVer1;
     String[] args;
@@ -50,12 +50,12 @@ public class ClosedDateGenerator implements ICustomGenerator<LocalDateTime>, IOb
     }
 
     @Override
-    public void setDependentObject(DtoVer1 dtoVer1) {
+    public void setDto(DtoVer1 dtoVer1) {
         this.dtoVer1 = dtoVer1;
     }
 
     @Override
-    public boolean isObjectReady() {
+    public boolean isDtoReady() {
         return dtoVer1.getOpenDate() != null;
     }
 

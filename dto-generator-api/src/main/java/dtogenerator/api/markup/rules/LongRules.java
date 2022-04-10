@@ -1,8 +1,5 @@
 package dtogenerator.api.markup.rules;
 
-import dtogenerator.api.markup.BoundType;
-import dtogenerator.api.markup.RuleRemark;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -11,11 +8,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface IntegerFieldRules {
+public @interface LongRules {
 
-    @BoundType(RuleRemark.MAX_VALUE)
-    int maxValue() default 999999999;
+    long maxValue() default 999999999999999999L;
 
-    @BoundType(RuleRemark.MIN_VALUE)
-    int minValue() default 0;
+    long minValue() default 0L;
 }

@@ -1,6 +1,7 @@
-package dtogenerator.api.markup;
+package dtogenerator.api.markup.remarks;
 
 
+import dtogenerator.api.markup.generators.IGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 

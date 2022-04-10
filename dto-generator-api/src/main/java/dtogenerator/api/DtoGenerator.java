@@ -1,21 +1,64 @@
-package dtogenerator.api.factory;
+package dtogenerator.api;
 
-import dtogenerator.api.markup.*;
+import dtogenerator.api.generators.BasicTypeGenerators;
+import dtogenerator.api.markup.generators.ICustomGenerator;
+import dtogenerator.api.markup.generators.IDtoDependentCustomGenerator;
+import dtogenerator.api.markup.generators.IGenerator;
+import dtogenerator.api.markup.remarks.IRuleRemark;
+import dtogenerator.api.markup.remarks.RuleRemark;
 import dtogenerator.api.markup.rules.*;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
-public class DtoBuilder {
+public class DtoGenerator {
+
+    private Object dtoInstance;
 
     private final Map<Field, Exception> errors = new HashMap<>();
     private final Map<Field, IGenerator<?>> fieldIGeneratorMap = new LinkedHashMap<>();
-    private Object dtoInstance;
+
+    private final Set<IRuleRemark> ruleRemarks;
+    private final Map<String, IRuleRemark> fieldRuleRemarkMap;
+
+    protected DtoGenerator(Set<IRuleRemark> ruleRemarks, Map<String, IRuleRemark> fieldRuleRemarkMap) {
+        this.ruleRemarks = ruleRemarks;
+        this.fieldRuleRemarkMap = fieldRuleRemarkMap;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        protected final Set<IRuleRemark> ruleRemarks = new HashSet<>();
+        protected final Map<String, IRuleRemark> fieldRuleRemarkMap = new HashMap<>();
+
+        public Builder addRuleRemarks(RuleRemark ruleRemark, IRuleRemark... ruleRemarks) {
+            this.ruleRemarks.add(ruleRemark);
+            if (ruleRemarks.length > 0) {
+                for (IRuleRemark remark : ruleRemarks) {
+                    this.ruleRemarks.add(remark);
+                }
+            }
+            return this;
+        }
+
+        public Builder addRuleRemarks(String filedName, IRuleRemark ruleRemark) {
+            fieldRuleRemarkMap.put(filedName, ruleRemark);
+            return this;
+        }
+
+        public DtoGenerator build() {
+            return new DtoGenerator(ruleRemarks, fieldRuleRemarkMap);
+        }
+    }
 
     public <T> T generateDto(Class<T> dtoClass) {
         createDtoInstance(dtoClass);
@@ -45,8 +88,8 @@ public class DtoBuilder {
                 Field field = nextFieldAndGenerator.getKey();
                 IGenerator<?> generator = nextFieldAndGenerator.getValue();
                 try {
-                    if (generator instanceof IObjectDependentCustomGenerator) {
-                        if (!((IObjectDependentCustomGenerator<?, ?>) generator).isObjectReady()) {
+                    if (generator instanceof IDtoDependentCustomGenerator) {
+                        if (!((IDtoDependentCustomGenerator<?, ?>) generator).isDtoReady()) {
                             if (attempts < maxAttempts - 1) {
                                 log.debug("Object is not ready to generate dependent field value");
                                 continue;
@@ -108,9 +151,9 @@ public class DtoBuilder {
         IGenerator<?> generator = null;
         try {
             generator = selectGenerator(field);
-            if (generator instanceof IObjectDependentCustomGenerator) {
+            if (generator instanceof IDtoDependentCustomGenerator) {
                 try {
-                    ((IObjectDependentCustomGenerator) generator).setDependentObject(dtoInstance);
+                    ((IDtoDependentCustomGenerator) generator).setDto(dtoInstance);
                 } catch (Exception e) {
                     throw e;
                 }
@@ -124,7 +167,7 @@ public class DtoBuilder {
     IGenerator<?> selectGenerator(Field field) {
 
         if (field.getType() == Double.class) {
-            DecimalFieldRules decimalBounds = field.getAnnotation(DecimalFieldRules.class);
+            DoubleRules decimalBounds = field.getAnnotation(DoubleRules.class);
             if (decimalBounds != null) {
                 return new BasicTypeGenerators.DoubleGenerator(
                         decimalBounds.maxValue(),
@@ -135,9 +178,9 @@ public class DtoBuilder {
         }
 
         if (field.getType() == String.class) {
-            StringFieldRules stringBounds = field.getAnnotation(StringFieldRules.class);
+            StringRules stringBounds = field.getAnnotation(StringRules.class);
             if (stringBounds != null) {
-                return new BasicTypeGenerators.StringFieldGenerator(
+                return new BasicTypeGenerators.StringGenerator(
                         stringBounds.maxSymbols(),
                         stringBounds.minSymbols(),
                         stringBounds.charset()
@@ -146,9 +189,9 @@ public class DtoBuilder {
         }
 
         if (field.getType() == Long.class) {
-            LongFieldRules stringBounds = field.getAnnotation(LongFieldRules.class);
+            LongRules stringBounds = field.getAnnotation(LongRules.class);
             if (stringBounds != null) {
-                return new BasicTypeGenerators.IntegerFieldGenerator(
+                return new BasicTypeGenerators.IntegerGenerator(
                         stringBounds.maxValue(),
                         stringBounds.minValue()
                 );
@@ -156,9 +199,9 @@ public class DtoBuilder {
         }
 
         if (field.getType().isEnum()) {
-            EnumFieldRules enumBounds = field.getAnnotation(EnumFieldRules.class);
+            EnumRules enumBounds = field.getAnnotation(EnumRules.class);
             if (enumBounds != null) {
-                return new BasicTypeGenerators.EnumFieldGenerator(
+                return new BasicTypeGenerators.EnumGenerator(
                         enumBounds.possibleEnumNames(),
                         enumBounds.enumClass()
                 );
@@ -166,41 +209,12 @@ public class DtoBuilder {
         }
 
         if (field.getType() == LocalDateTime.class) {
-            LocalDateTimeFieldRules enumBounds = field.getAnnotation(LocalDateTimeFieldRules.class);
+            LocalDateTimeRules enumBounds = field.getAnnotation(LocalDateTimeRules.class);
             if (enumBounds != null) {
-                return new BasicTypeGenerators.LocalDateTimeFieldGenerator(
+                return new BasicTypeGenerators.LocalDateTimeGenerator(
                         enumBounds.leftShiftDays(),
                         enumBounds.rightShiftDays()
                 );
-            }
-        }
-
-        /*
-         * Custom Rules Annotation
-         */
-
-        List<Annotation> customGenerators = Arrays.stream(field.getAnnotations())
-                .filter(a -> a.annotationType().getAnnotation(CustomRules.class) != null)
-                .collect(Collectors.toList());
-
-        if (!customGenerators.isEmpty()) {
-            CustomRulesContainer genFactory = CustomRulesContainer.getInstance();
-            for (Annotation generationRules : customGenerators) {
-                if (genFactory.isCustomGeneratorExists(generationRules.annotationType())) {
-                    try {
-                        Class<? extends IRulesDependentCustomGenerator<?, ? extends Annotation>> customGenerator =
-                                genFactory.getCustomGenerator(generationRules.annotationType());
-                        IRulesDependentCustomGenerator customGeneratorInstance = customGenerator.newInstance();
-                        customGeneratorInstance.prepareGenerator(generationRules);
-                        return customGeneratorInstance;
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    throw new RuntimeException();
-                }
             }
         }
 

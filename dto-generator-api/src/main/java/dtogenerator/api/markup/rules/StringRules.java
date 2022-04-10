@@ -10,7 +10,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface StringFieldRules {
+public @interface StringRules {
 
     int maxSymbols() default 999999999;
 

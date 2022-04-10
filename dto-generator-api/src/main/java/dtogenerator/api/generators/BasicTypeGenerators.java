@@ -1,7 +1,7 @@
-package dtogenerator.api.factory;
+package dtogenerator.api.generators;
 
 import dtogenerator.api.constants.CharSet;
-import dtogenerator.api.markup.IGenerator;
+import dtogenerator.api.markup.generators.IGenerator;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.math3.util.Precision;
@@ -28,7 +28,7 @@ public class BasicTypeGenerators {
     }
 
     @AllArgsConstructor
-    static class StringFieldGenerator implements IGenerator<String> {
+    public static class StringGenerator implements IGenerator<String> {
 
         private final int maxLength;
         private final int minLength;
@@ -52,7 +52,7 @@ public class BasicTypeGenerators {
     }
 
     @AllArgsConstructor
-    static class IntegerFieldGenerator implements IGenerator<Long> {
+    public static class IntegerGenerator implements IGenerator<Long> {
 
         private final long maxValue;
         private final long minValue;
@@ -64,7 +64,7 @@ public class BasicTypeGenerators {
     }
 
     @AllArgsConstructor
-    static class EnumFieldGenerator implements IGenerator<Enum<?>> {
+    public static class EnumGenerator implements IGenerator<Enum<?>> {
 
         private final String[] possibleEnumNames;
         private final Class<? extends Enum<?>> enumClass;
@@ -85,7 +85,7 @@ public class BasicTypeGenerators {
     }
 
     @AllArgsConstructor
-    static class LocalDateTimeFieldGenerator implements IGenerator<LocalDateTime> {
+    public static class LocalDateTimeGenerator implements IGenerator<LocalDateTime> {
 
         private final int leftShiftDays;
         private final int rightShiftDays;
@@ -98,7 +98,7 @@ public class BasicTypeGenerators {
         }
     }
 
-    static class NullGenerator implements IGenerator<Object> {
+    public static class NullGenerator implements IGenerator<Object> {
         @Override
         public String generate() {
             return null;

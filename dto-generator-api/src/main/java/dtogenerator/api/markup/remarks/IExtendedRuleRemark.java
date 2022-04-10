@@ -1,4 +1,6 @@
-package dtogenerator.api.markup;
+package dtogenerator.api.markup.remarks;
+
+import dtogenerator.api.markup.generators.IGenerator;
 
 public interface IExtendedRuleRemark extends IRuleRemark {
 

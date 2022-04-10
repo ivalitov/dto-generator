@@ -8,10 +8,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface LocalDateTimeFieldRules {
+public @interface DoubleRules {
 
-    int leftShiftDays() default 365 * 5;
+    double maxValue() default 999999999999999999D;
 
-    int rightShiftDays() default 365 * 5;
+    double minValue() default 0D;
+
+    int precision() default 2;
 
 }
