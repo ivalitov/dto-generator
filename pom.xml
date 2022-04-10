@@ -4,11 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>laoruga.test</groupId>
-    <artifactId>test-project</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>laoruga</groupId>
+    <artifactId>dto-generator-parent</artifactId>
+    <packaging>pom</packaging>
+    <version>${project.version}</version>
+
+    <modules>
+        <module>dto-generator-api</module>
+        <module>dto-generator-examples</module>
+    </modules>
 
     <properties>
+        <project.version>0.1-ALPHA</project.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
@@ -25,11 +32,13 @@
             <artifactId>commons-math3</artifactId>
             <version>3.6.1</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.12.0</version>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -37,15 +46,11 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-reload4j -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-reload4j</artifactId>
             <version>1.7.36</version>
         </dependency>
-
-
-
 
     </dependencies>
 
