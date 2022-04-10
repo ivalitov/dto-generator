@@ -5,11 +5,8 @@ import dtogenerator.api.markup.generators.ICustomGenerator;
 import dtogenerator.api.markup.generators.IDtoDependentCustomGenerator;
 import dtogenerator.api.markup.generators.IGenerator;
 import dtogenerator.api.markup.remarks.IRuleRemark;
-import dtogenerator.api.markup.remarks.RuleRemark;
 import dtogenerator.api.markup.rules.*;
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -31,33 +28,8 @@ public class DtoGenerator {
         this.fieldRuleRemarkMap = fieldRuleRemarkMap;
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-
-        protected final Set<IRuleRemark> ruleRemarks = new HashSet<>();
-        protected final Map<String, IRuleRemark> fieldRuleRemarkMap = new HashMap<>();
-
-        public Builder addRuleRemarks(RuleRemark ruleRemark, IRuleRemark... ruleRemarks) {
-            this.ruleRemarks.add(ruleRemark);
-            if (ruleRemarks.length > 0) {
-                for (IRuleRemark remark : ruleRemarks) {
-                    this.ruleRemarks.add(remark);
-                }
-            }
-            return this;
-        }
-
-        public Builder addRuleRemarks(String filedName, IRuleRemark ruleRemark) {
-            fieldRuleRemarkMap.put(filedName, ruleRemark);
-            return this;
-        }
-
-        public DtoGenerator build() {
-            return new DtoGenerator(ruleRemarks, fieldRuleRemarkMap);
-        }
+    public static DtoGeneratorBuilder builder() {
+        return new DtoGeneratorBuilder();
     }
 
     public <T> T generateDto(Class<T> dtoClass) {
