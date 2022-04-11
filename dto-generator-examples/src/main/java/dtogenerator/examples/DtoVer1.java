@@ -18,13 +18,13 @@ public class DtoVer1 {
     @CustomGenerator(generatorClass = ClosedDateGenerator.class, args = {"1", "5"})
     LocalDateTime closedDate;
 
-    @StringRules(maxSymbols = 25, charset = {CharSet.ENG, CharSet.NUM})
+    @StringRules(maxSymbols = 25, charset = {CharSet.ENG, CharSet.NUM}, chars = "*^()")
     String fieldString;
 
     @LongRules(minValue = 1, maxValue = 10)
     Long fieldInteger;
 
-    @DoubleRules(minValue = 0, maxValue = 100000)
+    @DoubleRules(minValue = 0, maxValue = 100000, precision = 10)
     Double fieldDecimal;
 
     @CustomGenerator(generatorClass = ArrearsGenerator2.class, args = {"5"})

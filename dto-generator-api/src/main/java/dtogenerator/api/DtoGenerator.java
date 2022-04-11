@@ -164,6 +164,7 @@ public class DtoGenerator {
                         stringBounds.maxSymbols(),
                         stringBounds.minSymbols(),
                         stringBounds.charset(),
+                        stringBounds.chars(),
                         getBasicRuleRemark(field)
                 );
             }

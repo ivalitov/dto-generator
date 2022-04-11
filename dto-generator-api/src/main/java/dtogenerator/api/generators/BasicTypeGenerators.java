@@ -50,6 +50,7 @@ public class BasicTypeGenerators {
         private final int maxLength;
         private final int minLength;
         private final CharSet[] charset;
+        private final String chars;
         private final IRuleRemark ruleRemark;
 
         @Override
@@ -66,13 +67,17 @@ public class BasicTypeGenerators {
             } else {
                 throw new IllegalStateException("Unexpected value " + ruleRemark);
             }
-            Integer charsCount = Arrays.stream(charset).map(s -> s.getChars().length).reduce(Integer::sum).get();
+            char[] explicitChars = this.chars.toCharArray();
+            int charsCount = explicitChars.length + Arrays.stream(charset).map(s -> s.getChars().length).reduce(Integer::sum).get();
             char[] chars = new char[charsCount];
             int nextCopyPos = 0;
             for (CharSet charSet : charset) {
                 char[] toCopy = charSet.getChars();
                 System.arraycopy(toCopy, 0, chars, nextCopyPos, toCopy.length);
                 nextCopyPos += toCopy.length;
+            }
+            if (explicitChars.length != 0) {
+                System.arraycopy(explicitChars, 0, chars, nextCopyPos, explicitChars.length);
             }
             return new RandomStringGenerator.Builder()
                     .selectFrom(chars)

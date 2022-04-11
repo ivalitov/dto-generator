@@ -18,4 +18,6 @@ public @interface StringRules {
 
     CharSet[] charset() default {CharSet.NUM, CharSet.ENG, CharSet.RUS};
 
+    String chars() default "";
+
 }
