@@ -1,7 +1,7 @@
 package dtogenerator.examples._demo.second_style;
 
-import dtogenerator.api.markup.remarks.IExtendedRuleRemark;
-import dtogenerator.api.markup.generators.IGenerator;
+import laoruga.dtogenerator.api.markup.remarks.IExtendedRuleRemark;
+import laoruga.dtogenerator.api.markup.generators.IGenerator;
 
 public enum CustomRuleRemark implements IExtendedRuleRemark {
     WITH_ARREARS(ArrearsGenerator2.class),

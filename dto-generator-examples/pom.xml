@@ -20,6 +20,7 @@
             <artifactId>dto-generator-api</artifactId>
             <version>0.1-ALPHA</version>
         </dependency>
+
     </dependencies>
 
 </project>

@@ -1,9 +1,9 @@
 package dtogenerator.examples._demo.second_style;
 
 import dtogenerator.examples.Arrears;
-import dtogenerator.api.markup.generators.ICustomGenerator;
-import dtogenerator.api.markup.remarks.IExtendedRuleRemark;
-import dtogenerator.api.markup.generators.IRemarkableCustomGenerator;
+import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
+import laoruga.dtogenerator.api.markup.remarks.IExtendedRuleRemark;
+import laoruga.dtogenerator.api.markup.generators.IRemarkableCustomGenerator;
 import lombok.NoArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
