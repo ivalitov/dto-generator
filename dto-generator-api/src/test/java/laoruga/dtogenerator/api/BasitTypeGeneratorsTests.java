@@ -3,37 +3,35 @@ package laoruga.dtogenerator.api;
 import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayName("Basic Type Generators Tests")
 public class BasitTypeGeneratorsTests {
 
+    @Getter
+    @NoArgsConstructor
+    static class Dto {
+
+        @IntegerRules()
+        private Integer intDefaultRules;
+        @IntegerRules(minValue = 99999999)
+        private Integer intLeftBound;
+        @IntegerRules(maxValue = 100)
+        private int intRightBound;
+        @IntegerRules(minValue = -100, maxValue = 0)
+        private int intLeftAndRightBounds;
+        private int intPrimitiveDefault;
+        private int intPrimitive = 999;
+
+    }
+
     @Test
     public void smokeTest() {
 
-        @Getter
-         class Dto {
-
-            public Dto() {
-            }
-
-            @IntegerRules()
-            private Integer intDefaultRules;
-            @IntegerRules(minValue = 99999999)
-            private Integer intLeftBound;
-//            @IntegerRules(maxValue = 100)
-//            private int intRightBound;
-//            @IntegerRules(minValue = -100, maxValue = 0)
-//            private int intLeftAndRightBounds;
-        }
-
-        Dto dto = DtoGenerator.builder().build().generateDto(new Dto());
-//        Dto dto = DtoGenerator.builder().build().generateDto(Dto.class);
+        Dto dto = DtoGenerator.builder().build().generateDto(Dto.class);
 
         assertNotNull(dto);
         assertAll(
@@ -41,6 +39,8 @@ public class BasitTypeGeneratorsTests {
                 () -> assertTrue(dto.getIntDefaultRules() > 0)
         );
     }
+
+
 
 
 

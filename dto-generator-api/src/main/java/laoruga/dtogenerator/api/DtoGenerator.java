@@ -7,8 +7,10 @@ import laoruga.dtogenerator.api.markup.generators.IDtoDependentCustomGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.*;
+import laoruga.dtogenerator.api.utils.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -49,8 +51,22 @@ public class DtoGenerator {
 
     void createDtoInstance(Class<?> dtoClass) {
         try {
-            dtoClass.getConstructors();
-            dtoInstance = dtoClass.newInstance();
+            if (dtoClass.getConstructors().length == 0) {
+                throw new DtoGeneratorException("Failed to instantiate DTO class: '" + dtoClass + "'. " +
+                        "Class don't have public constructors. It must have public no-args constructor.");
+            }
+            Optional<Constructor<?>> maybeNoArgsConstructor = Arrays.stream(dtoClass.getConstructors())
+                    .filter(constructor -> constructor.getParameterCount() == 0)
+                    .findAny();
+            if (!maybeNoArgsConstructor.isPresent()) {
+                throw new DtoGeneratorException("Failed to instantiate DTO class: '" + dtoClass + "'. " +
+                        "Class must have public no-args constructor.");
+            }
+            Constructor<?> constructor = maybeNoArgsConstructor.get();
+            boolean isAccessible = constructor.isAccessible();
+            constructor.setAccessible(true);
+            dtoInstance = constructor.newInstance();
+            constructor.setAccessible(isAccessible);
         } catch (InstantiationException ie) {
             throw new DtoGeneratorException("Failed to instantiate DTO class: '" + dtoClass + "'. " +
                     "Maybe no-args constructor was not found.", ie);
@@ -132,7 +148,7 @@ public class DtoGenerator {
         if (fieldIGeneratorMap.isEmpty()) {
             log.debug("No generators have been found");
         } else {
-            log.debug( fieldIGeneratorMap.size() + " generators was created for fields: " + fieldIGeneratorMap.keySet());
+            log.debug(fieldIGeneratorMap.size() + " generators was created for fields: " + fieldIGeneratorMap.keySet());
         }
     }
 
@@ -258,7 +274,7 @@ public class DtoGenerator {
             }
         }
 
-        return new BasicTypeGenerators.NullGenerator();
+        return new BasicTypeGenerators.DoNothingGenerator(ReflectionUtils.getValue(dtoInstance, field));
     }
 
 }

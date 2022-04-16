@@ -205,4 +205,15 @@ public class BasicTypeGenerators {
             return null;
         }
     }
+
+    @AllArgsConstructor
+    public static class DoNothingGenerator implements IGenerator<Object> {
+
+        private final Object value;
+
+        @Override
+        public Object generate() {
+            return value;
+        }
+    }
 }
