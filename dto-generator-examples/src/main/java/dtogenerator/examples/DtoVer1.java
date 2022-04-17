@@ -1,10 +1,10 @@
 package dtogenerator.examples;
 
 
-import laoruga.dtogenerator.api.constants.CharSet;
-import dtogenerator.api.markup.rules.*;
 import dtogenerator.examples._demo.second_style.ArrearsGenerator2;
 import dtogenerator.examples._demo.second_style.ClosedDateGenerator;
+import laoruga.dtogenerator.api.constants.CharSet;
+import laoruga.dtogenerator.api.markup.rules.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;

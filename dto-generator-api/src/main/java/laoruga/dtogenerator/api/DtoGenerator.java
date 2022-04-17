@@ -1,13 +1,14 @@
 package laoruga.dtogenerator.api;
 
+import com.sun.istack.internal.Nullable;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.BasicTypeGenerators;
 import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
-import laoruga.dtogenerator.api.markup.generators.IDtoDependentCustomGenerator;
+import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
+import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.*;
-import laoruga.dtogenerator.api.utils.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Constructor;
@@ -88,8 +89,8 @@ public class DtoGenerator {
                 Field field = nextFieldAndGenerator.getKey();
                 IGenerator<?> generator = nextFieldAndGenerator.getValue();
                 try {
-                    if (generator instanceof IDtoDependentCustomGenerator) {
-                        if (!((IDtoDependentCustomGenerator<?, ?>) generator).isDtoReady()) {
+                    if (generator instanceof ICustomGeneratorDtoDependent) {
+                        if (!((ICustomGeneratorDtoDependent<?, ?>) generator).isDtoReady()) {
                             if (attempts < maxAttempts - 1) {
                                 log.debug("Object is not ready to generate dependent field value");
                                 continue;
@@ -156,13 +157,6 @@ public class DtoGenerator {
         IGenerator<?> generator = null;
         try {
             generator = selectGenerator(field);
-            if (generator instanceof IDtoDependentCustomGenerator) {
-                try {
-                    ((IDtoDependentCustomGenerator) generator).setDto(dtoInstance);
-                } catch (Exception e) {
-                    throw e;
-                }
-            }
         } catch (Exception e) {
             errors.put(field, e);
         }
@@ -176,7 +170,8 @@ public class DtoGenerator {
         return ruleRemark;
     }
 
-    private IGenerator<?> selectGenerator(Field field) {
+    private @Nullable
+    IGenerator<?> selectGenerator(Field field) {
 
         if (field.getType() == Double.class) {
             DoubleRules doubleBounds = field.getAnnotation(DoubleRules.class);
@@ -254,27 +249,35 @@ public class DtoGenerator {
         CustomGenerator customGeneratorRules = field.getAnnotation(CustomGenerator.class);
 
         if (customGeneratorRules != null) {
+            Class<?> generatorClass = null;
             try {
-                Class<?> generatorClass = customGeneratorRules.generatorClass();
+                generatorClass = customGeneratorRules.generatorClass();
                 Object generatorInstance = generatorClass.newInstance();
-                if (generatorInstance instanceof ICustomGenerator) {
+                if (generatorInstance instanceof ICustomGeneratorArgs) {
                     log.debug("Args {} have been obtained from Annotation: {}",
                             Arrays.asList(customGeneratorRules.args()), customGeneratorRules);
-                    ((ICustomGenerator<?>) generatorInstance).setArgs(customGeneratorRules.args());
+                    ((ICustomGeneratorArgs<?>) generatorInstance).setArgs(customGeneratorRules.args());
                 }
-                if (generatorInstance instanceof IGenerator) {
-                    return (IGenerator<?>) generatorInstance;
+                if (generatorInstance instanceof ICustomGeneratorDtoDependent) {
+                    try {
+                        ((ICustomGeneratorDtoDependent) generatorInstance).setDto(dtoInstance);
+                    } catch (Exception e) {
+                        throw new DtoGeneratorException("Exception was thrown while trying to set DTO into " +
+                                "DTO dependent custom generator: " + generatorInstance.getClass(), e);
+                    }
+                }
+                if (generatorInstance instanceof ICustomGenerator) {
+                    return (ICustomGenerator<?>) generatorInstance;
                 } else {
-                    throw new RuntimeException();
+                    throw new DtoGeneratorException("Failed to prepare custom generator. " +
+                            "Custom generator must implements: '" + ICustomGenerator.class + "' or it's heirs.");
                 }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                throw new DtoGeneratorException("Error while preparing custom generator from class: " + generatorClass, e);
             }
         }
-
-        return new BasicTypeGenerators.DoNothingGenerator(ReflectionUtils.getValue(dtoInstance, field));
+        log.debug("Field " + field + " hasn't been mapped with any generator.");
+        return null;
     }
 
 }

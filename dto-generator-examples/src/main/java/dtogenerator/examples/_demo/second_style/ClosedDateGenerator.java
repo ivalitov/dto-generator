@@ -1,10 +1,10 @@
 package dtogenerator.examples._demo.second_style;
 
 import dtogenerator.examples.DtoVer1;
-import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
+import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
 import laoruga.dtogenerator.api.markup.remarks.IExtendedRuleRemark;
-import laoruga.dtogenerator.api.markup.generators.IDtoDependentCustomGenerator;
-import laoruga.dtogenerator.api.markup.generators.IRemarkableCustomGenerator;
+import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
+import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
 import lombok.NoArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
@@ -15,7 +15,7 @@ import static dtogenerator.examples._demo.second_style.CustomRuleRemark.CLOSED;
 import static dtogenerator.examples._demo.second_style.CustomRuleRemark.OPEN;
 
 @NoArgsConstructor
-public class ClosedDateGenerator implements ICustomGenerator<LocalDateTime>, IDtoDependentCustomGenerator<LocalDateTime, DtoVer1>, IRemarkableCustomGenerator<LocalDateTime> {
+public class ClosedDateGenerator implements ICustomGeneratorArgs<LocalDateTime>, ICustomGeneratorDtoDependent<LocalDateTime, DtoVer1>, ICustomGeneratorRemarkable<LocalDateTime> {
 
     DtoVer1 dtoVer1;
     String[] args;

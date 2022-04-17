@@ -1,7 +1,7 @@
 package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
-import laoruga.dtogenerator.api.markup.generators.IRemarkableCustomGenerator;
+import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
 import laoruga.dtogenerator.api.markup.remarks.ExtendedRuleRemarkArgs;
 import laoruga.dtogenerator.api.markup.remarks.IExtendedRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
@@ -30,21 +30,21 @@ public class RemarkableDtoGenerator extends DtoGenerator {
     IGenerator<?> prepareGenerator(Field field) {
         IGenerator<?> generator = super.prepareGenerator(field);
 
-        if (generator instanceof IRemarkableCustomGenerator) {
+        if (generator instanceof ICustomGeneratorRemarkable) {
             if (extendedRuleRemarks.containsKey(generator.getClass())) {
                 IExtendedRuleRemark ruleRemark = extendedRuleRemarks.get(generator.getClass());
                 if (ruleRemark instanceof ExtendedRuleRemarkArgs) {
                     ExtendedRuleRemarkArgs remarkWithArgs = (ExtendedRuleRemarkArgs) ruleRemark;
-                    ((IRemarkableCustomGenerator<?>) generator).setRuleRemarks(
+                    ((ICustomGeneratorRemarkable<?>) generator).setRuleRemarks(
                             remarkWithArgs.getWrappedRule()
                     );
                     if (remarkWithArgs.getArgs() != null && remarkWithArgs.getArgs().length != 0) {
                         log.debug("Annotation args have been overridden with remark {} passed values: {}",
                                 ((ExtendedRuleRemarkArgs) ruleRemark).getWrappedRule(), remarkWithArgs.getArgs());
-                        ((IRemarkableCustomGenerator<?>) generator).setArgs(remarkWithArgs.getArgs());
+                        ((ICustomGeneratorRemarkable<?>) generator).setArgs(remarkWithArgs.getArgs());
                     }
                 } else {
-                    ((IRemarkableCustomGenerator<?>) generator).setRuleRemarks(
+                    ((ICustomGeneratorRemarkable<?>) generator).setRuleRemarks(
                             ruleRemark
                     );
                 }
