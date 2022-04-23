@@ -176,14 +176,22 @@ public class DtoGenerator {
     private @Nullable
     IGenerator<?> selectGenerator(Field field) {
 
-        if (field.getType() == Double.class) {
+        if (field.getType() == Double.class || field.getType() == Double.TYPE) {
             DoubleRules doubleBounds = field.getAnnotation(DoubleRules.class);
             if (doubleBounds != null) {
+                IRuleRemark basicRuleRemark = getBasicRuleRemark(field);
+                double minValue = doubleBounds.minValue();
+                if (basicRuleRemark == NULL_VALUE && field.getType() == Double.TYPE) {
+                    log.debug("Doubel primitive field '" + field.getName() + "' can't be null, it will be assigned " +
+                            " to DoubleRules.DEFAULT_MIN");
+                    basicRuleRemark = MIN_VALUE;
+                    minValue = DoubleRules.DEFAULT_MIN;
+                }
                 return new BasicTypeGenerators.DoubleGenerator(
                         doubleBounds.maxValue(),
-                        doubleBounds.minValue(),
+                        minValue,
                         doubleBounds.precision(),
-                        getBasicRuleRemark(field)
+                        basicRuleRemark
                 );
             }
         }
@@ -205,29 +213,36 @@ public class DtoGenerator {
             IntegerRules integerRules = field.getAnnotation(IntegerRules.class);
             if (integerRules != null) {
                 IRuleRemark basicRuleRemark = getBasicRuleRemark(field);
+                int minValue = integerRules.minValue();
                 if (basicRuleRemark == NULL_VALUE && field.getType() == Integer.TYPE) {
-                    return new BasicTypeGenerators.IntegerGenerator(
-                            integerRules.maxValue(),
-                            IntegerRules.DEFAULT_MIN,
-                            MIN_VALUE
-                    );
-                } else {
-                    return new BasicTypeGenerators.IntegerGenerator(
-                            integerRules.maxValue(),
-                            integerRules.minValue(),
-                            basicRuleRemark
-                    );
+                    log.debug("Integer primitive field '" + field.getName() + "' can't be null, it will be assigned " +
+                            " to IntegerRules.DEFAULT_MIN");
+                    basicRuleRemark = MIN_VALUE;
+                    minValue = IntegerRules.DEFAULT_MIN;
                 }
+                return new BasicTypeGenerators.IntegerGenerator(
+                        integerRules.maxValue(),
+                        minValue,
+                        basicRuleRemark
+                );
             }
         }
 
-        if (field.getType() == Long.class) {
-            LongRules integerRules = field.getAnnotation(LongRules.class);
-            if (integerRules != null) {
+        if (field.getType() == Long.class || field.getType() == Long.TYPE) {
+            LongRules longRules = field.getAnnotation(LongRules.class);
+            if (longRules != null) {
+                IRuleRemark basicRuleRemark = getBasicRuleRemark(field);
+                long minValue = longRules.minValue();
+                if (basicRuleRemark == NULL_VALUE && field.getType() == Long.TYPE) {
+                    log.debug("Long primitive field '" + field.getName() + "' can't be null, it will be assigned " +
+                            " to LongRules.DEFAULT_MIN");
+                    basicRuleRemark = MIN_VALUE;
+                    minValue = LongRules.DEFAULT_MIN;
+                }
                 return new BasicTypeGenerators.LongGenerator(
-                        integerRules.maxValue(),
-                        integerRules.minValue(),
-                        getBasicRuleRemark(field)
+                        longRules.maxValue(),
+                        minValue,
+                        basicRuleRemark
                 );
             }
         }

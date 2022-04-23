@@ -10,6 +10,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(FIELD)
 public @interface LongRules {
 
+    long DEFAULT_MIN = 0L;
+    long DEFAULT_MAX = 999999999999999999L;
+
     long maxValue() default 999999999999999999L;
 
     long minValue() default 0L;

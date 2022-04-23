@@ -10,9 +10,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(FIELD)
 public @interface DoubleRules {
 
-    double maxValue() default 999999999999999999D;
+    double DEFAULT_MIN = 0D;
+    double DEFAULT_MAX = 999999999999999999D;
 
-    double minValue() default 0D;
+    double maxValue() default DEFAULT_MAX;
+
+    double minValue() default DEFAULT_MIN;
 
     int precision() default 2;
 
