@@ -1,7 +1,7 @@
 package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
-import laoruga.dtogenerator.api.markup.remarks.IExtendedRuleRemark;
+import laoruga.dtogenerator.api.markup.remarks.ExtendedRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.RuleRemark;
 
@@ -12,16 +12,15 @@ import java.util.stream.Collectors;
 
 public class RemarkableDtoGeneratorBuilder extends DtoGeneratorBuilder {
 
-    Map<Class<? extends IGenerator<?>>, IExtendedRuleRemark> extendedRuleRemarks = new HashMap<>();
+    Map<Class<? extends IGenerator<?>>, ExtendedRuleRemarkWrapper> extendedRuleRemarks = new HashMap<>();
 
-    public DtoGeneratorBuilder addExtendedRuleRemarks(IExtendedRuleRemark ruleRemark, IExtendedRuleRemark... ruleRemarks) {
-        this.extendedRuleRemarks.put(ruleRemark.getGeneratorClass(), ruleRemark);
+    public DtoGeneratorBuilder addExtendedRuleRemarks(ExtendedRuleRemarkWrapper... ruleRemarks) {
         if (ruleRemarks != null && ruleRemarks.length != 0) {
             this.extendedRuleRemarks.putAll(
                     Arrays.stream(ruleRemarks).collect(
                             Collectors.toMap(
-                                    IExtendedRuleRemark::getGeneratorClass,
-                                    k -> k
+                                    ExtendedRuleRemarkWrapper::getGeneratorClass,
+                                    wrappedRuleRemark -> wrappedRuleRemark
                             ))
             );
         }

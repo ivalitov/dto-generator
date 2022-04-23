@@ -101,7 +101,7 @@ public class BasicTypeGenerators {
                 return maxValue;
             }
             if (ruleRemark == RuleRemark.RANDOM_VALUE) {
-                return new RandomDataGenerator().nextInt(minValue, maxValue) ;
+                return new RandomDataGenerator().nextInt(minValue, maxValue);
             }
             if (ruleRemark == RuleRemark.NULL_VALUE) {
                 return null;

@@ -2,6 +2,7 @@ package laoruga.dtogenerator.api.markup.remarks;
 
 
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -11,20 +12,20 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Value
-public class ExtendedRuleRemarkWrapperWithArgs implements IExtendedRuleRemark {
+public class ExtendedRuleRemarkWrapper {
 
     IExtendedRuleRemark wrappedRuleRemark;
     Class<? extends IGenerator<?>> generatorClass;
-    String[] args;
+    @NonNull String[] args;
 
-    @Override
     public String[] getArgs() {
-        return args;
+        return Arrays.copyOf(args, args.length);
     }
 
-    @Override
-    public int requiredArgsNumber() {
-        return wrappedRuleRemark.requiredArgsNumber();
+    public List<String> getArgsList() {
+        if (getArgs() == null || getArgs().length == 0) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(getArgs());
     }
-
 }

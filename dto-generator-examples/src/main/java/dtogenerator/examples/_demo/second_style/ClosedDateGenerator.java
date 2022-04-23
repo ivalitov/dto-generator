@@ -2,6 +2,7 @@ package dtogenerator.examples._demo.second_style;
 
 import dtogenerator.examples.DtoVer1;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
+import laoruga.dtogenerator.api.markup.remarks.ExtendedRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IExtendedRuleRemark;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
@@ -66,7 +67,7 @@ public class ClosedDateGenerator implements ICustomGeneratorArgs<LocalDateTime>,
     }
 
     @Override
-    public void setRuleRemarks(IExtendedRuleRemark... ruleRemarks) {
-        this.ruleRemarks = ruleRemarks;
+    public void setRuleRemarks(ExtendedRuleRemarkWrapper... ruleRemarks) {
+//        this.ruleRemarks = ruleRemarks;
     }
 }

@@ -2,7 +2,7 @@ package dtogenerator.examples._demo.second_style;
 
 import dtogenerator.examples.Arrears;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
-import laoruga.dtogenerator.api.markup.remarks.ExtendedRuleRemarkWrapperWithArgs;
+import laoruga.dtogenerator.api.markup.remarks.ExtendedRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IExtendedRuleRemark;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
 import lombok.NoArgsConstructor;
@@ -47,17 +47,12 @@ public class ArrearsGenerator2 implements
     }
 
     @Override
-    public void setRuleRemarks(IExtendedRuleRemark... ruleRemarks) {
-        for (IExtendedRuleRemark ruleRemark : ruleRemarks) {
-            IExtendedRuleRemark enumType;
-            if (ruleRemark instanceof ExtendedRuleRemarkWrapperWithArgs) {
-                enumType = ((ExtendedRuleRemarkWrapperWithArgs) ruleRemark).getWrappedRuleRemark();
-            } else {
-                enumType = ruleRemark;
-            }
+    public void setRuleRemarks(ExtendedRuleRemarkWrapper... ruleRemarks) {
+        for (ExtendedRuleRemarkWrapper ruleRemark : ruleRemarks) {
+            IExtendedRuleRemark enumType = ruleRemark.getWrappedRuleRemark();
             if (enumType == WITH_ARREARS) {
-                arrearsCount = Integer.parseInt(enumType.getArgsList().get(0));
-            } else if (ruleRemark == WITHOUT_ARREARS) {
+                arrearsCount = Integer.parseInt(ruleRemark.getArgsList().get(0));
+            } else if (enumType == WITHOUT_ARREARS) {
                 arrearsCount = 0;
             }
         }
