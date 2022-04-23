@@ -3,6 +3,7 @@ package laoruga.dtogenerator.api;
 import com.sun.istack.internal.Nullable;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.BasicTypeGenerators;
+import laoruga.dtogenerator.api.generators.NestedDtoGenerator;
 import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
@@ -30,9 +31,14 @@ public class DtoGenerator {
     private final IRuleRemark ruleRemark;
     private final Map<String, IRuleRemark> fieldRuleRemarkMap;
 
-    protected DtoGenerator(IRuleRemark ruleRemark, Map<String, IRuleRemark> fieldRuleRemarkMap) {
+    private final DtoGeneratorBuilder builderInstance;
+
+    protected DtoGenerator(IRuleRemark ruleRemark,
+                           Map<String, IRuleRemark> fieldRuleRemarkMap,
+                           DtoGeneratorBuilder dtoGeneratorBuilder) {
         this.ruleRemark = ruleRemark;
         this.fieldRuleRemarkMap = fieldRuleRemarkMap;
+        this.builderInstance = dtoGeneratorBuilder;
     }
 
     public static DtoGeneratorBuilder builder() {
@@ -272,7 +278,7 @@ public class DtoGenerator {
         NestedDtoRules nestedDtoRules = field.getAnnotation(NestedDtoRules.class);
 
         if (nestedDtoRules != null) {
-
+            return new NestedDtoGenerator<>(builderInstance.build(), field.getType());
         }
 
         /*

@@ -16,8 +16,9 @@ public class RemarkableDtoGenerator extends DtoGenerator {
 
     protected RemarkableDtoGenerator(IRuleRemark ruleRemark,
                                      Map<String, IRuleRemark> fieldRuleRemarkMap,
-                                     Map<Class<? extends IGenerator<?>>, ExtendedRuleRemarkWrapper> extendedRuleRemarks) {
-        super(ruleRemark, fieldRuleRemarkMap);
+                                     Map<Class<? extends IGenerator<?>>, ExtendedRuleRemarkWrapper> extendedRuleRemarks,
+                                     RemarkableDtoGeneratorBuilder remarkableDtoGeneratorBuilder) {
+        super(ruleRemark, fieldRuleRemarkMap, remarkableDtoGeneratorBuilder);
         this.extendedRuleRemarks = extendedRuleRemarks;
     }
 

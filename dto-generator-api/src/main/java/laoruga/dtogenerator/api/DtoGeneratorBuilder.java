@@ -22,6 +22,6 @@ public class DtoGeneratorBuilder {
     }
 
     public DtoGenerator build() {
-        return new DtoGenerator(ruleRemark, fieldRuleRemarkMap);
+        return new DtoGenerator(ruleRemark, fieldRuleRemarkMap, this);
     }
 }

@@ -40,6 +40,6 @@ public class RemarkableDtoGeneratorBuilder extends DtoGeneratorBuilder {
     }
 
     public RemarkableDtoGenerator build() {
-        return new RemarkableDtoGenerator(ruleRemark, fieldRuleRemarkMap, extendedRuleRemarks);
+        return new RemarkableDtoGenerator(ruleRemark, fieldRuleRemarkMap, extendedRuleRemarks, this);
     }
 }
