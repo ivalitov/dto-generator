@@ -269,6 +269,12 @@ public class DtoGenerator {
             }
         }
 
+        NestedDtoRules nestedDtoRules = field.getAnnotation(NestedDtoRules.class);
+
+        if (nestedDtoRules != null) {
+
+        }
+
         /*
          * Custom Generator
          */
@@ -303,6 +309,7 @@ public class DtoGenerator {
                 throw new DtoGeneratorException("Error while preparing custom generator from class: " + generatorClass, e);
             }
         }
+
         log.debug("Field " + field + " hasn't been mapped with any generator.");
         return null;
     }

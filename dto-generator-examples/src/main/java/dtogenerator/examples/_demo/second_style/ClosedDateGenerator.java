@@ -14,6 +14,7 @@ import java.util.Random;
 import static dtogenerator.examples._demo.second_style.CustomRuleRemark.CLOSED;
 import static dtogenerator.examples._demo.second_style.CustomRuleRemark.OPEN;
 
+
 @NoArgsConstructor
 public class ClosedDateGenerator implements ICustomGeneratorArgs<LocalDateTime>, ICustomGeneratorDtoDependent<LocalDateTime, DtoVer1>, ICustomGeneratorRemarkable<LocalDateTime> {
 

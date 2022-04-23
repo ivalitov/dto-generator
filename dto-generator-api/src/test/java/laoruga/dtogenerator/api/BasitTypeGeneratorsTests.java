@@ -89,10 +89,4 @@ public class BasitTypeGeneratorsTests {
         );
     }
 
-
-    @DisplayName("Integer Generator")
-    static class IntegerGenerator {
-
-    }
-
 }

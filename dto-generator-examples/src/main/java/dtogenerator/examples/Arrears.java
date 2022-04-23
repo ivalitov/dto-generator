@@ -1,5 +1,6 @@
 package dtogenerator.examples;
 
+import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import lombok.Data;
 import lombok.Value;
 
@@ -8,6 +9,9 @@ import java.util.List;
 
 @Data
 public class Arrears {
+
+    @IntegerRules(minValue = 1, maxValue = 5)
+    private int id;
 
     List<Arrear> arrearsList = new ArrayList<>();
 

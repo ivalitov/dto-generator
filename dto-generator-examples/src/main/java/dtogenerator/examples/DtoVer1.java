@@ -30,6 +30,9 @@ public class DtoVer1 {
     @CustomGenerator(generatorClass = ArrearsGenerator2.class, args = {"5"})
     Arrears arrearsBlock_2;
 
+    @NestedDtoRules
+    Arrears arrearsBlock_3;
+
     @EnumRules(possibleEnumNames = {"NBCH", "EI", "GP", "ASSD"}, enumClass = SystemType.class)
     SystemType system;
 
