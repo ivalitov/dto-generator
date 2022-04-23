@@ -16,6 +16,9 @@ import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static laoruga.dtogenerator.api.markup.remarks.RuleRemark.MIN_VALUE;
+import static laoruga.dtogenerator.api.markup.remarks.RuleRemark.NULL_VALUE;
+
 @Slf4j
 public class DtoGenerator {
 
@@ -198,14 +201,23 @@ public class DtoGenerator {
             }
         }
 
-        if (field.getType() == Integer.class) {
+        if (field.getType() == Integer.class || field.getType() == Integer.TYPE) {
             IntegerRules integerRules = field.getAnnotation(IntegerRules.class);
             if (integerRules != null) {
-                return new BasicTypeGenerators.IntegerGenerator(
-                        integerRules.maxValue(),
-                        integerRules.minValue(),
-                        getBasicRuleRemark(field)
-                );
+                IRuleRemark basicRuleRemark = getBasicRuleRemark(field);
+                if (basicRuleRemark == NULL_VALUE && field.getType() == Integer.TYPE) {
+                    return new BasicTypeGenerators.IntegerGenerator(
+                            integerRules.maxValue(),
+                            IntegerRules.DEFAULT_MIN,
+                            MIN_VALUE
+                    );
+                } else {
+                    return new BasicTypeGenerators.IntegerGenerator(
+                            integerRules.maxValue(),
+                            integerRules.minValue(),
+                            basicRuleRemark
+                    );
+                }
             }
         }
 

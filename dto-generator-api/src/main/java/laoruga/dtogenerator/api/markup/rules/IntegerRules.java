@@ -13,9 +13,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(FIELD)
 public @interface IntegerRules {
 
+    int DEFAULT_MIN = 0;
+    int DEFAULT_MAX = 999999999;
+
     @BoundType(RuleRemark.MAX_VALUE)
-    int maxValue() default 999999999;
+    int maxValue() default DEFAULT_MAX;
 
     @BoundType(RuleRemark.MIN_VALUE)
-    int minValue() default 0;
+    int minValue() default DEFAULT_MIN;
 }
