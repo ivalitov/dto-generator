@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static laoruga.dtogenerator.api.BasitTypeGeneratorsTests.simpleIntegerGenerationAssertions;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -31,11 +32,10 @@ public class NestedDtoGenerationTests {
     public void simpleIntegerGeneration() {
         Dto dto = DtoGenerator.builder().build().generateDto(Dto.class);
         assertNotNull(dto);
-        assertAll(
-                () -> assertThat(dto.getIntDefaultRules(), both(
-                        greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX))),
-                () -> assertThat(dto.getDtoNested(), notNullValue())
-        );
+        assertThat(dto.getIntDefaultRules(), both(
+                        greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX)));
+        simpleIntegerGenerationAssertions(dto.getDtoNested());
+
     }
 
 

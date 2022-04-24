@@ -38,11 +38,7 @@ public class BasitTypeGeneratorsTests {
         private int intPrimitive = intPrimitiveVal;
     }
 
-    @Test
-    @Feature("INTEGER_RULES")
-    @DisplayName("Simple Integer Generation")
-    public void simpleIntegerGeneration() {
-        DtoInteger dto = DtoGenerator.builder().build().generateDto(DtoInteger.class);
+    public static void simpleIntegerGenerationAssertions(DtoInteger dto){
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getIntDefaultRules(), both(
@@ -55,6 +51,14 @@ public class BasitTypeGeneratorsTests {
                 () -> assertThat(dto.getIntPrimitiveDefault(), equalTo(0)),
                 () -> assertThat(dto.getIntPrimitive(), equalTo(intPrimitiveVal))
         );
+    }
+
+    @Test
+    @Feature("INTEGER_RULES")
+    @DisplayName("Simple Integer Generation")
+    public void simpleIntegerGeneration() {
+        DtoInteger dto = DtoGenerator.builder().build().generateDto(DtoInteger.class);
+        simpleIntegerGenerationAssertions(dto);
     }
 
     @Test
