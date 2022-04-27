@@ -168,7 +168,22 @@ public class DtoGenerator {
     IGenerator<?> prepareGenerator(Field field) {
         IGenerator<?> generator = null;
         try {
-            generator = selectGenerator(field);
+            RulesType rulesType = checkFieldAnnotations(field);
+            switch (rulesType) {
+                case COLLECTION:
+                    generator = selectCollectionGenerator(field);
+                    break;
+                case BASIC:
+                    generator = selectBasicGenerator(field);
+                    break;
+                case CUSTOM:
+                    generator = selectCustomGenerator(field);
+                    break;
+                case NOT_ANNOTATED:
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + rulesType);
+            }
         } catch (Exception e) {
             errors.put(field, e);
         }
@@ -182,42 +197,6 @@ public class DtoGenerator {
         return ruleRemark;
     }
 
-    /*
-    1) если коллекция
-    2) если есть ли аннотация
-    3) если есть класс листа и поле == null - создать коллецию из класса (передать её в генератор для заполнения)
-    4) если нет класса листа и поле null:
-    5)      если интерфейс - ошибка
-    6)      если класс листа - создать инстанс списка (передать в генератор для заполнения)
-
-    7) выбрать генератор:
-    8) если есть класс - создать кастонмый генератор как обычно
-    9) если нет - выбрать дефлотный генератор иначе ошибка
-    10) обернуть дефоллтный генератор в List генератор
-
-    11) лист генератор - выполняет дефолтный генератор столько раз, сколько указано когда наступает его время
-
-     */
-
-    /**
-     * 1. Filed type should be assignable from Collection.class
-     * 2. Field should be annotated with any of @Rules annotation
-     *
-     * @param field checking dto field
-     */
-    private void checkCollectionGeneration(Field field) {
-        Class<?> type = field.getType();
-        if (Collection.class.isAssignableFrom(type)) {
-//            IGenerator<?> generator = selectGenerator(field);
-
-            if (type.isInterface()) {
-
-            } else {
-
-            }
-        }
-    }
-
     enum RulesType {
         COLLECTION,
         BASIC,
@@ -227,6 +206,7 @@ public class DtoGenerator {
 
     /**
      * Correctness checks and evaluation of field's annotations type.
+     *
      * @param field field to check
      * @return type field's annotations
      */
@@ -272,8 +252,43 @@ public class DtoGenerator {
         }
     }
 
-    private @Nullable
-    IGenerator<?> selectGenerator(Field field) {
+        /*
+    1) если коллекция
+    2) если есть ли аннотация
+    3) если есть класс листа и поле == null - создать коллецию из класса (передать её в генератор для заполнения)
+    4) если нет класса листа и поле null:
+    5)      если интерфейс - ошибка
+    6)      если класс листа - создать инстанс списка (передать в генератор для заполнения)
+
+    7) выбрать генератор:
+    8) если есть класс - создать кастонмый генератор как обычно
+    9) если нет - выбрать дефлотный генератор иначе ошибка
+    10) обернуть дефоллтный генератор в List генератор
+
+    11) лист генератор - выполняет дефолтный генератор столько раз, сколько указано когда наступает его время
+
+     */
+
+    /**
+     * 1. Filed type should be assignable from Collection.class
+     * 2. Field should be annotated with any of @Rules annotation
+     *
+     * @param field checking dto field
+     */
+    private void checkCollectionGeneration(Field field) {
+        Class<?> type = field.getType();
+        if (Collection.class.isAssignableFrom(type)) {
+//            IGenerator<?> generator = selectGenerator(field);
+
+            if (type.isInterface()) {
+
+            } else {
+
+            }
+        }
+    }
+
+    private IGenerator<?> selectCollectionGenerator(Field field) {
 
         // Check if it is Collection
         Class<?> type = field.getType();
@@ -298,6 +313,11 @@ public class DtoGenerator {
 
             }
         }
+
+    }
+
+    private @Nullable
+    IGenerator<?> selectBasicGenerator(Field field) {
 
         if (field.getType() == Double.class || field.getType() == Double.TYPE) {
             DoubleRules doubleBounds = field.getAnnotation(DoubleRules.class);
@@ -398,43 +418,37 @@ public class DtoGenerator {
             return new NestedDtoGenerator<>(builderInstance.build(), field.getType());
         }
 
-        /*
-         * Custom Generator
-         */
+        throw new DtoGeneratorException("Field " + field + " hasn't been mapped with any basic generator.");
+    }
 
+    private IGenerator<?> selectCustomGenerator(Field field) {
         CustomGenerator customGeneratorRules = field.getAnnotation(CustomGenerator.class);
-
-        if (customGeneratorRules != null) {
-            Class<?> generatorClass = null;
-            try {
-                generatorClass = customGeneratorRules.generatorClass();
-                Object generatorInstance = generatorClass.newInstance();
-                if (generatorInstance instanceof ICustomGeneratorArgs) {
-                    log.debug("Args {} have been obtained from Annotation: {}",
-                            Arrays.asList(customGeneratorRules.args()), customGeneratorRules);
-                    ((ICustomGeneratorArgs<?>) generatorInstance).setArgs(customGeneratorRules.args());
-                }
-                if (generatorInstance instanceof ICustomGeneratorDtoDependent) {
-                    try {
-                        ((ICustomGeneratorDtoDependent) generatorInstance).setDto(dtoInstance);
-                    } catch (Exception e) {
-                        throw new DtoGeneratorException("Exception was thrown while trying to set DTO into " +
-                                "DTO dependent custom generator: " + generatorInstance.getClass(), e);
-                    }
-                }
-                if (generatorInstance instanceof ICustomGenerator) {
-                    return (ICustomGenerator<?>) generatorInstance;
-                } else {
-                    throw new DtoGeneratorException("Failed to prepare custom generator. " +
-                            "Custom generator must implements: '" + ICustomGenerator.class + "' or it's heirs.");
-                }
-            } catch (Exception e) {
-                throw new DtoGeneratorException("Error while preparing custom generator from class: " + generatorClass, e);
+        Class<?> generatorClass = null;
+        try {
+            generatorClass = customGeneratorRules.generatorClass();
+            Object generatorInstance = generatorClass.newInstance();
+            if (generatorInstance instanceof ICustomGeneratorArgs) {
+                log.debug("Args {} have been obtained from Annotation: {}",
+                        Arrays.asList(customGeneratorRules.args()), customGeneratorRules);
+                ((ICustomGeneratorArgs<?>) generatorInstance).setArgs(customGeneratorRules.args());
             }
+            if (generatorInstance instanceof ICustomGeneratorDtoDependent) {
+                try {
+                    ((ICustomGeneratorDtoDependent) generatorInstance).setDto(dtoInstance);
+                } catch (Exception e) {
+                    throw new DtoGeneratorException("Exception was thrown while trying to set DTO into " +
+                            "DTO dependent custom generator: " + generatorInstance.getClass(), e);
+                }
+            }
+            if (generatorInstance instanceof ICustomGenerator) {
+                return (ICustomGenerator<?>) generatorInstance;
+            } else {
+                throw new DtoGeneratorException("Failed to prepare custom generator. " +
+                        "Custom generator must implements: '" + ICustomGenerator.class + "' or it's heirs.");
+            }
+        } catch (Exception e) {
+            throw new DtoGeneratorException("Error while preparing custom generator from class: " + generatorClass, e);
         }
-
-        log.debug("Field " + field + " hasn't been mapped with any generator.");
-        return null;
     }
 
 }
