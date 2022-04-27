@@ -12,10 +12,13 @@ import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static laoruga.dtogenerator.api.markup.remarks.RuleRemark.MIN_VALUE;
 import static laoruga.dtogenerator.api.markup.remarks.RuleRemark.NULL_VALUE;
@@ -179,8 +182,122 @@ public class DtoGenerator {
         return ruleRemark;
     }
 
+    /*
+    1) если коллекция
+    2) если есть ли аннотация
+    3) если есть класс листа и поле == null - создать коллецию из класса (передать её в генератор для заполнения)
+    4) если нет класса листа и поле null:
+    5)      если интерфейс - ошибка
+    6)      если класс листа - создать инстанс списка (передать в генератор для заполнения)
+
+    7) выбрать генератор:
+    8) если есть класс - создать кастонмый генератор как обычно
+    9) если нет - выбрать дефлотный генератор иначе ошибка
+    10) обернуть дефоллтный генератор в List генератор
+
+    11) лист генератор - выполняет дефолтный генератор столько раз, сколько указано когда наступает его время
+
+     */
+
+    /**
+     * 1. Filed type should be assignable from Collection.class
+     * 2. Field should be annotated with any of @Rules annotation
+     *
+     * @param field checking dto field
+     */
+    private void checkCollectionGeneration(Field field) {
+        Class<?> type = field.getType();
+        if (Collection.class.isAssignableFrom(type)) {
+//            IGenerator<?> generator = selectGenerator(field);
+
+            if (type.isInterface()) {
+
+            } else {
+
+            }
+        }
+    }
+
+    enum RulesType {
+        COLLECTION,
+        BASIC,
+        CUSTOM,
+        NOT_ANNOTATED
+    }
+
+    /**
+     * Correctness checks and evaluation of field's annotations type.
+     * @param field field to check
+     * @return type field's annotations
+     */
+    private RulesType checkFieldAnnotations(Field field) {
+        Annotation[] annotations = field.getDeclaredAnnotations();
+        if (annotations.length == 0) {
+            return RulesType.NOT_ANNOTATED;
+        }
+        List<Annotation> generationRules = Arrays.stream(annotations)
+                .filter(annotation -> annotation.annotationType().getDeclaredAnnotation(Rule.class) != null)
+                .collect(Collectors.toList());
+        if (generationRules.isEmpty()) {
+            return RulesType.NOT_ANNOTATED;
+        }
+        if (generationRules.size() == 1) {
+            Class<? extends Annotation> rulesClass = generationRules.get(0).annotationType();
+            if (rulesClass == CustomGenerator.class) {
+                return RulesType.CUSTOM;
+            }
+            if (rulesClass.getDeclaredAnnotation(RuleForCollection.class) != null) {
+                throw new DtoGeneratorException("Field '" + field.getName() + "'annotated with only collection generation rules." +
+                        " There is second generation rules annotation expected.");
+            }
+            return RulesType.BASIC;
+        }
+        if (generationRules.size() == 2) {
+            int collectionCount = (int) generationRules.stream()
+                    .filter(annotation -> annotation.annotationType().getDeclaredAnnotation(RuleForCollection.class) == null)
+                    .count();
+            if (collectionCount == 1) {
+                return RulesType.COLLECTION;
+            } else if (collectionCount == 2) {
+                throw new DtoGeneratorException("Field '" + field.getName() + "'annotated with 2 collection generation rules." +
+                        " There are no more than one collection annotation expected");
+            } else {
+                throw new DtoGeneratorException("Field '" + field.getName() + "'annotated with 2 collection generation rules " +
+                        " non of which is collection annotation.");
+            }
+        } else {
+            throw new DtoGeneratorException("Field '" + field.getName() + "'  annotated with '" + generationRules.size() +
+                    "' generation rules" +
+                    " annotations. No more than '2' expected.");
+        }
+    }
+
     private @Nullable
     IGenerator<?> selectGenerator(Field field) {
+
+        // Check if it is Collection
+        Class<?> type = field.getType();
+        if (type.isInterface()) {
+            if (Collection.class.isAssignableFrom(type)) {
+                ListRules listRules = field.getAnnotation(ListRules.class);
+                if (listRules != null) {
+                    Class<?> listClass = listRules.listClass();
+                    if (listClass.isInterface() || Modifier.isAbstract(listClass.getModifiers())) {
+                        throw new DtoGeneratorException("Can't create instance of '" + listClass + "' because it is interface or abstract.");
+                    }
+                    Object listInstance;
+                    try {
+                        listInstance = listClass.newInstance();
+                    } catch (Exception e) {
+                        log.error("Exception while creating Collection instance ", e);
+                        throw new DtoGeneratorException(e);
+                    }
+                }
+
+                System.out.println();
+
+            }
+        }
 
         if (field.getType() == Double.class || field.getType() == Double.TYPE) {
             DoubleRules doubleBounds = field.getAnnotation(DoubleRules.class);

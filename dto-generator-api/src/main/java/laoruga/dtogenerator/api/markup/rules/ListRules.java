@@ -2,6 +2,7 @@ package laoruga.dtogenerator.api.markup.rules;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.util.Collection;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -9,10 +10,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(FIELD)
 @Rule
-public @interface LocalDateTimeRules {
+@RuleForCollection
+public @interface ListRules {
 
-    int leftShiftDays() default 365 * 5;
+    Class<? extends Collection> listClass() default Collection.class;
 
-    int rightShiftDays() default 365 * 5;
-
+//    CustomGenerator rules() default @CustomGenerator(generatorClass = Object.class);
 }

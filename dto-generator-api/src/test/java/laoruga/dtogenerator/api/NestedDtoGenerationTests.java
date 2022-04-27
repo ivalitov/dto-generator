@@ -28,7 +28,7 @@ public class NestedDtoGenerationTests {
 
     @Test
     @Feature("INTEGER_RULES")
-    @DisplayName("Simple Integer Generation")
+    @DisplayName("Nested Dto Generation")
     public void simpleIntegerGeneration() {
         Dto dto = DtoGenerator.builder().build().generateDto(Dto.class);
         assertNotNull(dto);

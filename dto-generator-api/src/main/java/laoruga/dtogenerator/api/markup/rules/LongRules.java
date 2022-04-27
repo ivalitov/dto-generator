@@ -8,6 +8,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(FIELD)
+@Rule
 public @interface LongRules {
 
     long DEFAULT_MIN = 0L;

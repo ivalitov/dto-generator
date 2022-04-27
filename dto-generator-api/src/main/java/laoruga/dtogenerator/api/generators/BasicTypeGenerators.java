@@ -13,6 +13,7 @@ import org.apache.commons.text.RandomStringGenerator;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 
 public class BasicTypeGenerators {
@@ -207,13 +208,12 @@ public class BasicTypeGenerators {
     }
 
     @AllArgsConstructor
-    public static class DoNothingGenerator implements IGenerator<Object> {
-
-        private final Object value;
+    public static class ListGenerator implements IGenerator<List> {
 
         @Override
-        public Object generate() {
-            return value;
+        public List generate() {
+            return null;
         }
     }
+
 }

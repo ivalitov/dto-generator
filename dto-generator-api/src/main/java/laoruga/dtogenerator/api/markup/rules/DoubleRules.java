@@ -8,6 +8,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(FIELD)
+@Rule
 public @interface DoubleRules {
 
     double DEFAULT_MIN = 0D;

@@ -11,6 +11,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(FIELD)
+@Rule
 public @interface IntegerRules {
 
     int DEFAULT_MIN = 0;
