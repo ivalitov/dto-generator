@@ -4,10 +4,7 @@ import com.sun.istack.internal.Nullable;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.BasicTypeGenerators;
 import laoruga.dtogenerator.api.generators.NestedDtoGenerator;
-import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
-import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
-import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
-import laoruga.dtogenerator.api.markup.generators.IGenerator;
+import laoruga.dtogenerator.api.markup.generators.*;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.*;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +15,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static laoruga.dtogenerator.api.markup.remarks.RuleRemark.MIN_VALUE;
@@ -88,11 +86,38 @@ public class DtoGenerator {
         }
     }
 
+    /**
+     * Check whether DTO is ready for using CustomGeneratorDtoDependent or not.
+     * There is limited attempts to prevent infinite loops.
+     *
+     * @param generator   - generator to check
+     * @param attempts    - attempts counter
+     * @param maxAttempts - max limit
+     * @return - doesn't DTO ready?
+     * @throws DtoGeneratorException - throws if all attempts are spent
+     */
+    private boolean doesDtoDependentGeneratorNotReady(IGenerator<?> generator,
+                                                      AtomicInteger attempts,
+                                                      AtomicInteger maxAttempts) throws DtoGeneratorException {
+        if (generator instanceof ICustomGeneratorDtoDependent) {
+            if (!((ICustomGeneratorDtoDependent<?, ?>) generator).isDtoReady()) {
+                if (attempts.get() < maxAttempts.get() - 1) {
+                    log.debug("Object is not ready to generate dependent field value");
+                    return true;
+                } else {
+                    throw new DtoGeneratorException("Generator " + generator.getClass() +
+                            " wasn't prepared in " + attempts + " attempts");
+                }
+            }
+        }
+        return false;
+    }
+
     void applyGenerators() {
-        int attempts = 0;
-        int maxAttempts = 100;
-        while (!fieldIGeneratorMap.isEmpty() && attempts < maxAttempts) {
-            attempts++;
+        AtomicInteger attempts = new AtomicInteger(0);
+        AtomicInteger maxAttempts = new AtomicInteger(100);
+        while (!fieldIGeneratorMap.isEmpty() && attempts.get() < maxAttempts.get()) {
+            attempts.incrementAndGet();
             log.debug("Attempt {} to generate field values", attempts);
             Iterator<Map.Entry<Field, IGenerator<?>>> iterator = fieldIGeneratorMap.entrySet().iterator();
             while (iterator.hasNext()) {
@@ -101,15 +126,17 @@ public class DtoGenerator {
                 Field field = nextFieldAndGenerator.getKey();
                 IGenerator<?> generator = nextFieldAndGenerator.getValue();
                 try {
-                    if (generator instanceof ICustomGeneratorDtoDependent) {
-                        if (!((ICustomGeneratorDtoDependent<?, ?>) generator).isDtoReady()) {
-                            if (attempts < maxAttempts - 1) {
-                                log.debug("Object is not ready to generate dependent field value");
+                    if (generator instanceof ICollectionGenerator) {
+                        IGenerator<?> innerGenerator = ((ICollectionGenerator<?>) generator).getInnerGenerator();
+                        if (innerGenerator instanceof ICustomGeneratorDtoDependent) {
+                            if (doesDtoDependentGeneratorNotReady(innerGenerator, attempts, maxAttempts)) {
                                 continue;
-                            } else {
-                                throw new RuntimeException("Generator " + generator.getClass() +
-                                        " wasn't prepared in " + attempts + " attempts");
                             }
+                        }
+                    }
+                    if (generator instanceof ICustomGeneratorDtoDependent) {
+                        if (doesDtoDependentGeneratorNotReady(generator, attempts, maxAttempts)) {
+                            continue;
                         }
                     }
                     boolean isFieldAccessible = field.isAccessible();
@@ -156,7 +183,7 @@ public class DtoGenerator {
         }
         if (!errors.isEmpty()) {
             log.error("{} error(s) while generators preparation. Fileds vs Generators: " + errors, errors.size());
-            throw new RuntimeException("Error while generators preparation (see log above)");
+            throw new DtoGeneratorException("Error while generators preparation (see log above)");
         }
         if (fieldIGeneratorMap.isEmpty()) {
             log.debug("No generators have been found");
@@ -170,14 +197,17 @@ public class DtoGenerator {
         try {
             RulesType rulesType = checkFieldAnnotations(field);
             switch (rulesType) {
-                case COLLECTION:
-                    generator = selectCollectionGenerator(field);
-                    break;
                 case BASIC:
                     generator = selectBasicGenerator(field);
                     break;
                 case CUSTOM:
                     generator = selectCustomGenerator(field);
+                    break;
+                case COLLECTION_BASIC:
+                    generator = selectCollectionGenerator(field, selectBasicGenerator(field));
+                    break;
+                case COLLECTION_CUSTOM:
+                    generator = selectCollectionGenerator(field, selectCustomGenerator(field));
                     break;
                 case NOT_ANNOTATED:
                     break;
@@ -198,9 +228,10 @@ public class DtoGenerator {
     }
 
     enum RulesType {
-        COLLECTION,
         BASIC,
         CUSTOM,
+        COLLECTION_BASIC,
+        COLLECTION_CUSTOM,
         NOT_ANNOTATED
     }
 
@@ -237,7 +268,13 @@ public class DtoGenerator {
                     .filter(annotation -> annotation.annotationType().getDeclaredAnnotation(RuleForCollection.class) == null)
                     .count();
             if (collectionCount == 1) {
-                return RulesType.COLLECTION;
+                boolean customGenerator = generationRules.stream()
+                        .anyMatch(annotation -> annotation.annotationType().getDeclaredAnnotation(CustomGenerator.class) != null);
+                if (customGenerator) {
+                    return RulesType.COLLECTION_CUSTOM;
+                } else {
+                    return RulesType.COLLECTION_BASIC;
+                }
             } else if (collectionCount == 2) {
                 throw new DtoGeneratorException("Field '" + field.getName() + "'annotated with 2 collection generation rules." +
                         " There are no more than one collection annotation expected");
@@ -275,10 +312,9 @@ public class DtoGenerator {
      *
      * @param field checking dto field
      */
-    private void checkCollectionGeneration(Field field) {
+    private void createCollectionFieldInstance(Field field) {
         Class<?> type = field.getType();
         if (Collection.class.isAssignableFrom(type)) {
-//            IGenerator<?> generator = selectGenerator(field);
 
             if (type.isInterface()) {
 
@@ -288,43 +324,49 @@ public class DtoGenerator {
         }
     }
 
-    private IGenerator<?> selectCollectionGenerator(Field field) {
+    private IGenerator<?> selectCollectionGenerator(Field field, IGenerator<?> listItemGenerator) {
 
-        // Check if it is Collection
-        Class<?> type = field.getType();
-        if (type.isInterface()) {
-            if (Collection.class.isAssignableFrom(type)) {
-                ListRules listRules = field.getAnnotation(ListRules.class);
-                if (listRules != null) {
-                    Class<?> listClass = listRules.listClass();
-                    if (listClass.isInterface() || Modifier.isAbstract(listClass.getModifiers())) {
-                        throw new DtoGeneratorException("Can't create instance of '" + listClass + "' because it is interface or abstract.");
-                    }
-                    Object listInstance;
-                    try {
-                        listInstance = listClass.newInstance();
-                    } catch (Exception e) {
-                        log.error("Exception while creating Collection instance ", e);
-                        throw new DtoGeneratorException(e);
-                    }
+        Class<?> fieldType = field.getType();
+
+        if (List.class.isAssignableFrom(fieldType)) {
+            ListRules listRules = field.getAnnotation(ListRules.class);
+            if (listRules != null) {
+                Class<? extends List> listClass = listRules.listClass();
+                if (!dtoInstance.getClass().isAssignableFrom(listClass)) {
+                    throw new DtoGeneratorException("ListClass from rules: '" + listRules + "' can't" +
+                            " be assign to the field: " + fieldType);
                 }
-
-                System.out.println();
-
+                if (listClass.isInterface() || Modifier.isAbstract(listClass.getModifiers())) {
+                    throw new DtoGeneratorException("Can't create instance of '" + listClass + "' because" +
+                            " it is interface or abstract.");
+                }
+                List<?> listInstance;
+                try {
+                    listInstance = listClass.newInstance();
+                } catch (Exception e) {
+                    log.error("Exception while creating Collection instance ", e);
+                    throw new DtoGeneratorException(e);
+                }
+                return new BasicTypeGenerators.ListGenerator(
+                        listInstance,
+                        listItemGenerator);
             }
         }
 
+        throw new DtoGeneratorException("Field " + field + " hasn't been mapped with any collection generator.");
     }
 
     private @Nullable
     IGenerator<?> selectBasicGenerator(Field field) {
 
-        if (field.getType() == Double.class || field.getType() == Double.TYPE) {
+        Class<?> fieldType = field.getType();
+
+        if (fieldType == Double.class || fieldType == Double.TYPE) {
             DoubleRules doubleBounds = field.getAnnotation(DoubleRules.class);
             if (doubleBounds != null) {
                 IRuleRemark basicRuleRemark = getBasicRuleRemark(field);
                 double minValue = doubleBounds.minValue();
-                if (basicRuleRemark == NULL_VALUE && field.getType() == Double.TYPE) {
+                if (basicRuleRemark == NULL_VALUE && fieldType == Double.TYPE) {
                     log.debug("Doubel primitive field '" + field.getName() + "' can't be null, it will be assigned " +
                             " to DoubleRules.DEFAULT_MIN");
                     basicRuleRemark = MIN_VALUE;
@@ -339,7 +381,7 @@ public class DtoGenerator {
             }
         }
 
-        if (field.getType() == String.class) {
+        if (fieldType == String.class) {
             StringRules stringBounds = field.getAnnotation(StringRules.class);
             if (stringBounds != null) {
                 return new BasicTypeGenerators.StringGenerator(
@@ -352,12 +394,12 @@ public class DtoGenerator {
             }
         }
 
-        if (field.getType() == Integer.class || field.getType() == Integer.TYPE) {
+        if (fieldType == Integer.class || fieldType == Integer.TYPE) {
             IntegerRules integerRules = field.getAnnotation(IntegerRules.class);
             if (integerRules != null) {
                 IRuleRemark basicRuleRemark = getBasicRuleRemark(field);
                 int minValue = integerRules.minValue();
-                if (basicRuleRemark == NULL_VALUE && field.getType() == Integer.TYPE) {
+                if (basicRuleRemark == NULL_VALUE && fieldType == Integer.TYPE) {
                     log.debug("Integer primitive field '" + field.getName() + "' can't be null, it will be assigned " +
                             " to IntegerRules.DEFAULT_MIN");
                     basicRuleRemark = MIN_VALUE;
@@ -371,12 +413,12 @@ public class DtoGenerator {
             }
         }
 
-        if (field.getType() == Long.class || field.getType() == Long.TYPE) {
+        if (fieldType == Long.class || fieldType == Long.TYPE) {
             LongRules longRules = field.getAnnotation(LongRules.class);
             if (longRules != null) {
                 IRuleRemark basicRuleRemark = getBasicRuleRemark(field);
                 long minValue = longRules.minValue();
-                if (basicRuleRemark == NULL_VALUE && field.getType() == Long.TYPE) {
+                if (basicRuleRemark == NULL_VALUE && fieldType == Long.TYPE) {
                     log.debug("Long primitive field '" + field.getName() + "' can't be null, it will be assigned " +
                             " to LongRules.DEFAULT_MIN");
                     basicRuleRemark = MIN_VALUE;
@@ -390,7 +432,7 @@ public class DtoGenerator {
             }
         }
 
-        if (field.getType().isEnum()) {
+        if (fieldType.isEnum()) {
             EnumRules enumBounds = field.getAnnotation(EnumRules.class);
             if (enumBounds != null) {
                 return new BasicTypeGenerators.EnumGenerator(
@@ -401,7 +443,7 @@ public class DtoGenerator {
             }
         }
 
-        if (field.getType() == LocalDateTime.class) {
+        if (fieldType == LocalDateTime.class) {
             LocalDateTimeRules enumBounds = field.getAnnotation(LocalDateTimeRules.class);
             if (enumBounds != null) {
                 return new BasicTypeGenerators.LocalDateTimeGenerator(
@@ -415,7 +457,7 @@ public class DtoGenerator {
         NestedDtoRules nestedDtoRules = field.getAnnotation(NestedDtoRules.class);
 
         if (nestedDtoRules != null) {
-            return new NestedDtoGenerator<>(builderInstance.build(), field.getType());
+            return new NestedDtoGenerator<>(builderInstance.build(), fieldType);
         }
 
         throw new DtoGeneratorException("Field " + field + " hasn't been mapped with any basic generator.");

@@ -1,6 +1,7 @@
 package laoruga.dtogenerator.api.generators;
 
 import laoruga.dtogenerator.api.constants.CharSet;
+import laoruga.dtogenerator.api.markup.generators.ICollectionGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.RuleRemark;
@@ -208,11 +209,19 @@ public class BasicTypeGenerators {
     }
 
     @AllArgsConstructor
-    public static class ListGenerator implements IGenerator<List> {
+    public static class ListGenerator implements ICollectionGenerator<List<?>> {
+
+        private final List<?> listInstance;
+        private final IGenerator<?> itemGenerator;
 
         @Override
-        public List generate() {
+        public List<?> generate() {
             return null;
+        }
+
+        @Override
+        public IGenerator<?> getInnerGenerator() {
+            return itemGenerator;
         }
     }
 
