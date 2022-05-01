@@ -1,5 +1,8 @@
 package laoruga.dtogenerator.api.markup.rules;
 
+import laoruga.dtogenerator.api.markup.BoundType;
+import laoruga.dtogenerator.api.markup.remarks.RuleRemark;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
@@ -14,7 +17,14 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @RuleForCollection
 public @interface ListRules {
 
+    int DEFAULT_MIN_SIZE = 0;
+    int DEFAULT_MAX_SIZE = 10;
+
     Class<? extends List> listClass() default ArrayList.class;
 
-//    CustomGenerator rules() default @CustomGenerator(generatorClass = Object.class);
+    @BoundType(RuleRemark.MAX_VALUE)
+    int maxSize() default DEFAULT_MAX_SIZE;
+
+    @BoundType(RuleRemark.MIN_VALUE)
+    int minSize() default DEFAULT_MIN_SIZE;
 }

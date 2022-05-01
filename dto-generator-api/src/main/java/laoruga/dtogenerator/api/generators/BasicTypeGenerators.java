@@ -208,15 +208,25 @@ public class BasicTypeGenerators {
         }
     }
 
-    @AllArgsConstructor
-    public static class ListGenerator implements ICollectionGenerator<List<?>> {
+    public static class ListGenerator <ITEM_TYPE> implements ICollectionGenerator<List<ITEM_TYPE>> {
 
-        private final List<?> listInstance;
-        private final IGenerator<?> itemGenerator;
+        private final int size;
+        private final List<ITEM_TYPE> listInstance;
+        private final IGenerator<ITEM_TYPE> itemGenerator;
+
+
+        public ListGenerator(int minSize, int maxSize, List<ITEM_TYPE> listInstance, IGenerator<ITEM_TYPE> itemGenerator) {
+            this.listInstance = listInstance;
+            this.itemGenerator = itemGenerator;
+            this.size = new RandomDataGenerator().nextInt(minSize, maxSize);
+        }
 
         @Override
-        public List<?> generate() {
-            return null;
+        public List<ITEM_TYPE> generate() {
+            while (listInstance.size() < size) {
+                listInstance.add(itemGenerator.generate());
+            }
+            return listInstance;
         }
 
         @Override
