@@ -41,8 +41,8 @@ public class CustomDtoGenerationTests {
         @IntegerRules
         private List<Integer> years;
 
-        @ListRules
-        private ArrayList<Integer> years_2;
+//        @ListRules
+//        private ArrayList<Integer> years_2;
     }
 
     static class Example implements ExtendsOne, Two<String>{

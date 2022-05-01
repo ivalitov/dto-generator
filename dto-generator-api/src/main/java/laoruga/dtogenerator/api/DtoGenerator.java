@@ -1,6 +1,5 @@
 package laoruga.dtogenerator.api;
 
-import com.sun.istack.internal.Nullable;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.BasicTypeGenerators;
 import laoruga.dtogenerator.api.generators.NestedDtoGenerator;
@@ -126,17 +125,19 @@ public class DtoGenerator {
                 Field field = nextFieldAndGenerator.getKey();
                 IGenerator<?> generator = nextFieldAndGenerator.getValue();
                 try {
+                    // if it's dto dependent generator - checking if dto is ready for this generator
+                    if (generator instanceof ICustomGeneratorDtoDependent) {
+                        if (doesDtoDependentGeneratorNotReady(generator, attempts, maxAttempts)) {
+                            continue;
+                        }
+                    }
+                    // if it's collection generator + dto dependent generator - checking if dto is ready for this generator
                     if (generator instanceof ICollectionGenerator) {
                         IGenerator<?> innerGenerator = ((ICollectionGenerator<?>) generator).getInnerGenerator();
                         if (innerGenerator instanceof ICustomGeneratorDtoDependent) {
                             if (doesDtoDependentGeneratorNotReady(innerGenerator, attempts, maxAttempts)) {
                                 continue;
                             }
-                        }
-                    }
-                    if (generator instanceof ICustomGeneratorDtoDependent) {
-                        if (doesDtoDependentGeneratorNotReady(generator, attempts, maxAttempts)) {
-                            continue;
                         }
                     }
                     boolean isFieldAccessible = field.isAccessible();
@@ -307,48 +308,39 @@ public class DtoGenerator {
      */
 
     /**
-     * 1. Filed type should be assignable from Collection.class
-     * 2. Field should be annotated with any of @Rules annotation
+     * 1. Filed type should be assignable from required collectionClass
+     * 2. CollectionClass should not be an interface or abstract
      *
      * @param field checking dto field
      */
-    private void createCollectionFieldInstance(Field field) {
-        Class<?> type = field.getType();
-        if (Collection.class.isAssignableFrom(type)) {
-
-            if (type.isInterface()) {
-
-            } else {
-
-            }
+    private static <T> T createCollectionFieldInstance(Field field, Class<T> collectionClass) {
+        if (!field.getType().isAssignableFrom(collectionClass)) {
+            throw new DtoGeneratorException("CollectionClass from rules: '" + collectionClass + "' can't" +
+                    " be assign to the field: " + field.getType());
         }
+        if (collectionClass.isInterface() || Modifier.isAbstract(collectionClass.getModifiers())) {
+            throw new DtoGeneratorException("Can't create instance of '" + collectionClass + "' because" +
+                    " it is interface or abstract.");
+        }
+        T collectionInstance;
+        try {
+            collectionInstance = collectionClass.newInstance();
+        } catch (Exception e) {
+            log.error("Exception while creating Collection instance ", e);
+            throw new DtoGeneratorException(e);
+        }
+        return collectionInstance;
     }
 
-    private IGenerator<?> selectCollectionGenerator(Field field, IGenerator<?> listItemGenerator) {
+    private IGenerator<?> selectCollectionGenerator(Field field, IGenerator<?> listItemGenerator) throws DtoGeneratorException {
 
         Class<?> fieldType = field.getType();
 
         if (List.class.isAssignableFrom(fieldType)) {
             ListRules listRules = field.getAnnotation(ListRules.class);
             if (listRules != null) {
-                Class<? extends List> listClass = listRules.listClass();
-                if (!dtoInstance.getClass().isAssignableFrom(listClass)) {
-                    throw new DtoGeneratorException("ListClass from rules: '" + listRules + "' can't" +
-                            " be assign to the field: " + fieldType);
-                }
-                if (listClass.isInterface() || Modifier.isAbstract(listClass.getModifiers())) {
-                    throw new DtoGeneratorException("Can't create instance of '" + listClass + "' because" +
-                            " it is interface or abstract.");
-                }
-                List<?> listInstance;
-                try {
-                    listInstance = listClass.newInstance();
-                } catch (Exception e) {
-                    log.error("Exception while creating Collection instance ", e);
-                    throw new DtoGeneratorException(e);
-                }
                 return new BasicTypeGenerators.ListGenerator(
-                        listInstance,
+                        createCollectionFieldInstance(field, listRules.listClass()),
                         listItemGenerator);
             }
         }
@@ -356,8 +348,7 @@ public class DtoGenerator {
         throw new DtoGeneratorException("Field " + field + " hasn't been mapped with any collection generator.");
     }
 
-    private @Nullable
-    IGenerator<?> selectBasicGenerator(Field field) {
+    private IGenerator<?> selectBasicGenerator(Field field) throws DtoGeneratorException {
 
         Class<?> fieldType = field.getType();
 
@@ -463,7 +454,7 @@ public class DtoGenerator {
         throw new DtoGeneratorException("Field " + field + " hasn't been mapped with any basic generator.");
     }
 
-    private IGenerator<?> selectCustomGenerator(Field field) {
+    private IGenerator<?> selectCustomGenerator(Field field) throws DtoGeneratorException {
         CustomGenerator customGeneratorRules = field.getAnnotation(CustomGenerator.class);
         Class<?> generatorClass = null;
         try {
