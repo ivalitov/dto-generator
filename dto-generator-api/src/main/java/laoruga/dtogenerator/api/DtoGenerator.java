@@ -13,6 +13,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -206,11 +207,10 @@ public class DtoGenerator {
                     generator = selectCustomGenerator(field);
                     break;
                 case COLLECTION_BASIC:
-                    Class<?>[] genericTypeArguments = Arrays.stream(((ParameterizedTypeImpl) field.getGenericType()).getActualTypeArguments())
-                            .toArray(Class<?>[]::new);
+                    Type[] genericTypes = ((ParameterizedTypeImpl) field.getGenericType()).getActualTypeArguments();
                     IGenerator<?> collectionItemGenerator = selectBasicGeneratorForCollectionItem(
-                            genericTypeArguments,
-                            field.getName() + "_" + field.getGenericType().getClass(),
+                            Arrays.stream(genericTypes).toArray(Class<?>[]::new),
+                            field.getGenericType().getClass() + "_" + field.getName(),
                             field.getDeclaredAnnotations());
                     generator = selectCollectionGenerator(field, collectionItemGenerator);
                     break;
@@ -277,7 +277,7 @@ public class DtoGenerator {
                     .count();
             if (collectionCount == 1) {
                 boolean customGenerator = generationRules.stream()
-                        .anyMatch(annotation -> annotation.annotationType().getDeclaredAnnotation(CustomGenerator.class) != null);
+                        .anyMatch(annotation -> generationRules.get(1).annotationType() == CustomGenerator.class);
                 if (customGenerator) {
                     return RulesType.COLLECTION_CUSTOM;
                 } else {

@@ -1,6 +1,7 @@
-package laoruga.dtogenerator.api;
+package laoruga.dtogenerator.api.tests;
 
 import io.qameta.allure.Feature;
+import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

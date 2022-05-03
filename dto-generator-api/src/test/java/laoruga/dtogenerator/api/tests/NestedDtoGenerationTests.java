@@ -1,6 +1,7 @@
-package laoruga.dtogenerator.api;
+package laoruga.dtogenerator.api.tests;
 
 import io.qameta.allure.Feature;
+import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
 import lombok.Getter;
@@ -8,7 +9,7 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static laoruga.dtogenerator.api.BasitTypeGeneratorsTests.simpleIntegerGenerationAssertions;
+import static laoruga.dtogenerator.api.tests.BasitTypeGeneratorsTests.simpleIntegerGenerationAssertions;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
