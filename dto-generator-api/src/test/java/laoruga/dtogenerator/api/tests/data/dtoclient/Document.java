@@ -1,4 +1,4 @@
-package laoruga.dtogenerator.api.tests.data;
+package laoruga.dtogenerator.api.tests.data.dtoclient;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

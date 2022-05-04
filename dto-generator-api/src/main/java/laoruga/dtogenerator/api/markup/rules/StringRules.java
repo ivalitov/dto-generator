@@ -13,7 +13,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Rule
 public @interface StringRules {
 
-    int maxSymbols() default 999999999;
+    int maxSymbols() default 1000;
 
     int minSymbols() default 0;
 

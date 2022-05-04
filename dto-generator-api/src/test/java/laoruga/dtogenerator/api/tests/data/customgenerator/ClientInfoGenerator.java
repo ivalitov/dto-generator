@@ -1,21 +1,27 @@
 package laoruga.dtogenerator.api.tests.data.customgenerator;
 
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
+import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
 import laoruga.dtogenerator.api.markup.remarks.ExtendedRuleRemarkWrapper;
-import laoruga.dtogenerator.api.tests.data.*;
+import laoruga.dtogenerator.api.tests.data.dtoclient.*;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.text.RandomStringGenerator;
 
 import java.time.LocalDate;
 import java.util.Random;
 
-import static laoruga.dtogenerator.api.tests.data.DocType.DRIVER_LICENCE;
-import static laoruga.dtogenerator.api.tests.data.DocType.PASSPORT;
+import static laoruga.dtogenerator.api.tests.data.customgenerator.ClientRemark.*;
+import static laoruga.dtogenerator.api.tests.data.dtoclient.DocType.DRIVER_LICENCE;
+import static laoruga.dtogenerator.api.tests.data.dtoclient.DocType.PASSPORT;
 
 public class ClientInfoGenerator implements
         ICustomGeneratorArgs<ClientInfoDto>,
-        ICustomGeneratorRemarkable<ClientInfoDto> {
+        ICustomGeneratorRemarkable<ClientInfoDto>,
+        ICustomGeneratorDtoDependent<ClientInfoDto, ClientDto> {
+
+    ClientDto generatedDto;
+    ExtendedRuleRemarkWrapper[] remarks;
 
     @Override
     public void setArgs(String[] args) {
@@ -23,19 +29,33 @@ public class ClientInfoGenerator implements
 
     @Override
     public void setRuleRemarks(ExtendedRuleRemarkWrapper... iRuleRemarks) {
+        remarks = iRuleRemarks;
     }
 
     @Override
     public ClientInfoDto generate() {
-        Random random = new Random();
         RandomDataGenerator randomGen = new RandomDataGenerator();
 
-        ClientType type = ClientType.values()[randomGen.nextInt(0, ClientType.values().length - 1)];
-        DocType docType = random.nextBoolean() ? PASSPORT : DRIVER_LICENCE;
+        ClientType clientType;
+        DocType docType;
+
+        ExtendedRuleRemarkWrapper clientTypeRemark = ICustomGeneratorRemarkable.getRemarkOrNull(CLIENT_TYPE, remarks);
+        if (clientTypeRemark != null) {
+            clientType = ClientType.valueOf(String.valueOf(clientTypeRemark.getArgs()[0]).toUpperCase());
+        } else {
+            clientType = ClientType.values()[randomGen.nextInt(0, ClientType.values().length - 1)];
+        }
+
+        ExtendedRuleRemarkWrapper docTypeRemark = ICustomGeneratorRemarkable.getRemarkOrNull(DOCUMENT, remarks);
+        if (docTypeRemark != null) {
+            docType = DocType.valueOf(String.valueOf(docTypeRemark.getArgs()[0]).toUpperCase());
+        } else {
+            docType = DocType.values()[randomGen.nextInt(0, DocType.values().length - 1)];
+        }
 
         ClientInfoDto clientInfo;
 
-        switch (type) {
+        switch (clientType) {
             case ORG:
                 clientInfo = new OrgInfoDto(new RandomStringGenerator.Builder().build().generate(10));
                 break;
@@ -63,9 +83,20 @@ public class ClientInfoGenerator implements
                 );
                 break;
             default:
-                throw new IllegalStateException("Unexpected value: " + type);
+                throw new IllegalStateException("Unexpected value: " + clientType);
         }
-        clientInfo.setClientType(type);
+        clientInfo.setClientType(clientType);
+        clientInfo.setId(generatedDto.getStringRequiredForClient());
         return clientInfo;
+    }
+
+    @Override
+    public void setDto(ClientDto generatedDto) {
+        this.generatedDto = generatedDto;
+    }
+
+    @Override
+    public boolean isDtoReady() {
+        return generatedDto.getStringRequiredForClient() != null;
     }
 }

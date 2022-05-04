@@ -5,7 +5,7 @@ import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
 import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import laoruga.dtogenerator.api.markup.rules.ListRules;
-import laoruga.dtogenerator.api.tests.data.ClientInfoDto;
+import laoruga.dtogenerator.api.tests.data.dtoclient.ClientInfoDto;
 import laoruga.dtogenerator.api.tests.data.customgenerator.ClientInfoGenerator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
