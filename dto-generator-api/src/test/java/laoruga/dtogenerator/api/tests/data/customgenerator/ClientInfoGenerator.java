@@ -9,11 +9,9 @@ import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.text.RandomStringGenerator;
 
 import java.time.LocalDate;
-import java.util.Random;
+import java.util.List;
 
 import static laoruga.dtogenerator.api.tests.data.customgenerator.ClientRemark.*;
-import static laoruga.dtogenerator.api.tests.data.dtoclient.DocType.DRIVER_LICENCE;
-import static laoruga.dtogenerator.api.tests.data.dtoclient.DocType.PASSPORT;
 
 public class ClientInfoGenerator implements
         ICustomGeneratorArgs<ClientInfoDto>,
@@ -21,14 +19,14 @@ public class ClientInfoGenerator implements
         ICustomGeneratorDtoDependent<ClientInfoDto, ClientDto> {
 
     ClientDto generatedDto;
-    ExtendedRuleRemarkWrapper[] remarks;
+    List<ExtendedRuleRemarkWrapper> remarks;
 
     @Override
     public void setArgs(String[] args) {
     }
 
     @Override
-    public void setRuleRemarks(ExtendedRuleRemarkWrapper... iRuleRemarks) {
+    public void setRuleRemarks(List<ExtendedRuleRemarkWrapper> iRuleRemarks) {
         remarks = iRuleRemarks;
     }
 
@@ -72,12 +70,12 @@ public class ClientInfoGenerator implements
                                 LocalDate.of(
                                         randomGen.nextInt(1999, 2022),
                                         randomGen.nextInt(1, 12),
-                                        randomGen.nextInt(1, 31)
+                                        randomGen.nextInt(1, 28)
                                 ),
                                 LocalDate.of(
                                         randomGen.nextInt(1999, 2022),
                                         randomGen.nextInt(1, 12),
-                                        randomGen.nextInt(1, 31)
+                                        randomGen.nextInt(1, 28)
                                 )
                         )
                 );

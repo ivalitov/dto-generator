@@ -7,16 +7,17 @@ import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
 public class RemarkableDtoGenerator extends DtoGenerator {
 
-    private final Map<Class<? extends IGenerator<?>>, ExtendedRuleRemarkWrapper> extendedRuleRemarks;
+    private final Map<Class<? extends IGenerator<?>>, List<ExtendedRuleRemarkWrapper>> extendedRuleRemarks;
 
     protected RemarkableDtoGenerator(IRuleRemark ruleRemark,
                                      Map<String, IRuleRemark> fieldRuleRemarkMap,
-                                     Map<Class<? extends IGenerator<?>>, ExtendedRuleRemarkWrapper> extendedRuleRemarks,
+                                     Map<Class<? extends IGenerator<?>>, List<ExtendedRuleRemarkWrapper>> extendedRuleRemarks,
                                      RemarkableDtoGeneratorBuilder remarkableDtoGeneratorBuilder) {
         super(ruleRemark, fieldRuleRemarkMap, remarkableDtoGeneratorBuilder);
         this.extendedRuleRemarks = extendedRuleRemarks;

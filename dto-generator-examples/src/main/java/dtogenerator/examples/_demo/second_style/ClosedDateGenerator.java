@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 import static dtogenerator.examples._demo.second_style.CustomRuleRemark.CLOSED;
@@ -67,7 +68,7 @@ public class ClosedDateGenerator implements ICustomGeneratorArgs<LocalDateTime>,
     }
 
     @Override
-    public void setRuleRemarks(ExtendedRuleRemarkWrapper... ruleRemarks) {
+    public void setRuleRemarks(List<ExtendedRuleRemarkWrapper> ruleRemarks) {
 //        this.ruleRemarks = ruleRemarks;
     }
 }

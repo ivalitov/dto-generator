@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static dtogenerator.examples._demo.second_style.CustomRuleRemark.WITHOUT_ARREARS;
 import static dtogenerator.examples._demo.second_style.CustomRuleRemark.WITH_ARREARS;
@@ -47,7 +48,7 @@ public class ArrearsGenerator2 implements
     }
 
     @Override
-    public void setRuleRemarks(ExtendedRuleRemarkWrapper... ruleRemarks) {
+    public void setRuleRemarks(List<ExtendedRuleRemarkWrapper> ruleRemarks) {
         for (ExtendedRuleRemarkWrapper ruleRemark : ruleRemarks) {
             IExtendedRuleRemark enumType = ruleRemark.getWrappedRuleRemark();
             if (enumType == WITH_ARREARS) {
