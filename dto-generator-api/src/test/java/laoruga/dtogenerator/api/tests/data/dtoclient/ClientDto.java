@@ -10,8 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ClientDto {
 
+    public static final String PREFIX = "PREFIX-";
+
     @CustomGenerator(generatorClass = ClientInfoGenerator.class)
     private ClientInfoDto clientInfo;
+
+    @CustomGenerator(args = PREFIX, generatorClass = ClientInfoGenerator.class)
+    private ClientInfoDto clientInfoWithPrefix;
 
     @StringRules
     private String stringRequiredForClient;

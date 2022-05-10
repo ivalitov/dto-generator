@@ -5,6 +5,7 @@ import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
 import laoruga.dtogenerator.api.markup.remarks.ExtendedRuleRemarkWrapper;
 import laoruga.dtogenerator.api.tests.data.dtoclient.*;
+import laoruga.dtogenerator.api.utils.RandomUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.text.RandomStringGenerator;
 
@@ -20,9 +21,11 @@ public class ClientInfoGenerator implements
 
     ClientDto generatedDto;
     List<ExtendedRuleRemarkWrapper> remarks;
+    private String[] generatorArgs;
 
     @Override
     public void setArgs(String[] args) {
+        this.generatorArgs = args;
     }
 
     @Override
@@ -36,6 +39,9 @@ public class ClientInfoGenerator implements
 
         ClientType clientType;
         DocType docType;
+
+        String prefix = RandomUtils.getRandomItemOrNull(generatorArgs);
+        prefix = prefix == null ? "" : prefix;
 
         ExtendedRuleRemarkWrapper clientTypeRemark = ICustomGeneratorRemarkable.getRemarkOrNull(CLIENT_TYPE, remarks);
         if (clientTypeRemark != null) {
@@ -55,14 +61,14 @@ public class ClientInfoGenerator implements
 
         switch (clientType) {
             case ORG:
-                clientInfo = new OrgInfoDto(new RandomStringGenerator.Builder().build().generate(10));
+                clientInfo = new OrgInfoDto(prefix + new RandomStringGenerator.Builder().build().generate(10));
                 break;
             case PERSON:
             case LEGAL_PERSON:
                 clientInfo = new PersonInfoDto(
-                        new RandomStringGenerator.Builder().build().generate(10),
-                        new RandomStringGenerator.Builder().build().generate(10),
-                        new RandomStringGenerator.Builder().build().generate(10),
+                        prefix + new RandomStringGenerator.Builder().build().generate(10),
+                        prefix + new RandomStringGenerator.Builder().build().generate(10),
+                        prefix + new RandomStringGenerator.Builder().build().generate(10),
                         new Document(
                                 docType,
                                 String.valueOf(randomGen.nextInt(100000, 999999)),
