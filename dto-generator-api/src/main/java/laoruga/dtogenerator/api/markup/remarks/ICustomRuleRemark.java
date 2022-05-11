@@ -5,9 +5,9 @@ import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 
 /**
- * Интерфейс предназначен для создания уточнений для кастомных генераторов.
+ * The interface is designed to create remarks for custom generation rules.
  */
-public interface ICustomRuleRemark extends IRuleRemark {
+public interface ICustomRuleRemark {
 
     /**
      * Call this method for passing 'remark' to {@link RemarkableDtoGeneratorBuilder}

@@ -39,7 +39,7 @@ public class CustomDtoGenerationTests {
     @Test
     @Feature("CUSTOM_RULES")
     @DisplayName("Custom Dto Generation With Dependent Dto")
-    public void smokeCustomDtoGeneration() {
+    public void customDtoGenerationWithDependentDto() {
         ClientDto dto = DtoGenerator.builder().build().generateDto(ClientDto.class);
         assertNotNull(dto);
         baseAssertions(dto);

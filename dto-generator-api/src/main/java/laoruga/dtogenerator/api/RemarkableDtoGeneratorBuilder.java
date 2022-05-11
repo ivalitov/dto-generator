@@ -1,22 +1,34 @@
 package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
+import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
-import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
+import lombok.NonNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class RemarkableDtoGeneratorBuilder extends DtoGeneratorBuilder {
 
-    Map<Class<? extends IGenerator<?>>, List<CustomRuleRemarkWrapper>> extendedRuleRemarks = new HashMap<>();
+    protected Map<Class<? extends IGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksForAllFields = new HashMap<>();
+    protected Map<String, List<CustomRuleRemarkWrapper>> fieldCustomRuleRemarkMap = new HashMap<>();
 
-    public DtoGeneratorBuilder addRuleRemarkForField(CustomRuleRemarkWrapper... ruleRemarks) {
-        if (ruleRemarks != null && ruleRemarks.length != 0) {
-            for (CustomRuleRemarkWrapper remark : ruleRemarks) {
-                this.extendedRuleRemarks.putIfAbsent(remark.getGeneratorClass(), new LinkedList<>());
-                this.extendedRuleRemarks.get(remark.getGeneratorClass()).add(remark);
-            }
+    public RemarkableDtoGeneratorBuilder addRuleRemarkForField(@NonNull String filedName,
+                                                     @NonNull CustomRuleRemarkWrapper... ruleRemark) {
+        this.fieldCustomRuleRemarkMap.putIfAbsent(filedName, new LinkedList<>());
+        for (CustomRuleRemarkWrapper remark : ruleRemark) {
+            this.fieldCustomRuleRemarkMap.get(filedName).add(remark);
+        }
+        return this;
+    }
+
+    public RemarkableDtoGeneratorBuilder addRuleRemarkForField(@NonNull CustomRuleRemarkWrapper... ruleRemarks) {
+        for (CustomRuleRemarkWrapper remark : ruleRemarks) {
+            this.customRuleRemarksForAllFields.putIfAbsent(remark.getGeneratorClass(), new LinkedList<>());
+            this.customRuleRemarksForAllFields.get(remark.getGeneratorClass()).add(remark);
         }
         return this;
     }
@@ -34,6 +46,6 @@ public class RemarkableDtoGeneratorBuilder extends DtoGeneratorBuilder {
     }
 
     public RemarkableDtoGenerator build() {
-        return new RemarkableDtoGenerator(ruleRemark, fieldRuleRemarkMap, extendedRuleRemarks, this);
+        return new RemarkableDtoGenerator(getFieldSimpleRuleRemarkMap(), customRuleRemarksForAllFields, this);
     }
 }

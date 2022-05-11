@@ -30,15 +30,12 @@ public class DtoGenerator {
     private final Map<Field, Exception> errors = new HashMap<>();
     private final Map<Field, IGenerator<?>> fieldIGeneratorMap = new LinkedHashMap<>();
 
-    private final IRuleRemark ruleRemark;
     private final Map<String, IRuleRemark> fieldRuleRemarkMap;
 
     private final DtoGeneratorBuilder builderInstance;
 
-    protected DtoGenerator(IRuleRemark ruleRemark,
-                           Map<String, IRuleRemark> fieldRuleRemarkMap,
+    protected DtoGenerator(Map<String, IRuleRemark> fieldRuleRemarkMap,
                            DtoGeneratorBuilder dtoGeneratorBuilder) {
-        this.ruleRemark = ruleRemark;
         this.fieldRuleRemarkMap = fieldRuleRemarkMap;
         this.builderInstance = dtoGeneratorBuilder;
     }
@@ -232,7 +229,7 @@ public class DtoGenerator {
         if (fieldRuleRemarkMap.containsKey(fieldName)) {
             return fieldRuleRemarkMap.get(fieldName);
         }
-        return ruleRemark;
+        return fieldRuleRemarkMap.get(null);
     }
 
     enum RulesType {

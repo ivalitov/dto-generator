@@ -43,14 +43,14 @@ public class ClientInfoGenerator implements
         String prefix = RandomUtils.getRandomItemOrNull(generatorArgs);
         prefix = prefix == null ? "" : prefix;
 
-        CustomRuleRemarkWrapper clientTypeRemark = ICustomGeneratorRemarkable.getRemarkOrNull(CLIENT_TYPE, remarks);
+        CustomRuleRemarkWrapper clientTypeRemark = ICustomGeneratorRemarkable.findWrappedRemarkOrReturnNull(CLIENT_TYPE, remarks);
         if (clientTypeRemark != null) {
             clientType = ClientType.valueOf(String.valueOf(clientTypeRemark.getArgs()[0]).toUpperCase());
         } else {
             clientType = ClientType.values()[randomGen.nextInt(0, ClientType.values().length - 1)];
         }
 
-        CustomRuleRemarkWrapper docTypeRemark = ICustomGeneratorRemarkable.getRemarkOrNull(DOCUMENT, remarks);
+        CustomRuleRemarkWrapper docTypeRemark = ICustomGeneratorRemarkable.findWrappedRemarkOrReturnNull(DOCUMENT, remarks);
         if (docTypeRemark != null) {
             docType = DocType.valueOf(String.valueOf(docTypeRemark.getArgs()[0]).toUpperCase());
         } else {
