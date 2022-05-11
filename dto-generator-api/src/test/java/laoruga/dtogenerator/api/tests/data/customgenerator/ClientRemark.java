@@ -1,9 +1,9 @@
 package laoruga.dtogenerator.api.tests.data.customgenerator;
 
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
-import laoruga.dtogenerator.api.markup.remarks.IExtendedRuleRemark;
+import laoruga.dtogenerator.api.markup.remarks.ICustomRuleRemark;
 
-public enum ClientRemark implements IExtendedRuleRemark {
+public enum ClientRemark implements ICustomRuleRemark {
     CLIENT_TYPE(1),
     DOCUMENT(1);
 

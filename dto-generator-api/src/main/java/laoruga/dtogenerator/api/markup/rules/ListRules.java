@@ -1,7 +1,7 @@
 package laoruga.dtogenerator.api.markup.rules;
 
 import laoruga.dtogenerator.api.markup.BoundType;
-import laoruga.dtogenerator.api.markup.remarks.RuleRemark;
+import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -22,9 +22,9 @@ public @interface ListRules {
 
     Class<? extends List> listClass() default ArrayList.class;
 
-    @BoundType(RuleRemark.MAX_VALUE)
+    @BoundType(BasicRuleRemark.MAX_VALUE)
     int maxSize() default DEFAULT_MAX_SIZE;
 
-    @BoundType(RuleRemark.MIN_VALUE)
+    @BoundType(BasicRuleRemark.MIN_VALUE)
     int minSize() default DEFAULT_MIN_SIZE;
 }

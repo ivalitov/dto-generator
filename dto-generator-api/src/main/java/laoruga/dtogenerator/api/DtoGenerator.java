@@ -19,8 +19,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static laoruga.dtogenerator.api.markup.remarks.RuleRemark.MIN_VALUE;
-import static laoruga.dtogenerator.api.markup.remarks.RuleRemark.NULL_VALUE;
+import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.MIN_VALUE;
+import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.NULL_VALUE;
 
 @Slf4j
 public class DtoGenerator {

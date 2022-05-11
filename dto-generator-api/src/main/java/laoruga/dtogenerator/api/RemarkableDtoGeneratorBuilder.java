@@ -1,20 +1,19 @@
 package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
-import laoruga.dtogenerator.api.markup.remarks.ExtendedRuleRemarkWrapper;
+import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
-import laoruga.dtogenerator.api.markup.remarks.RuleRemark;
+import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class RemarkableDtoGeneratorBuilder extends DtoGeneratorBuilder {
 
-    Map<Class<? extends IGenerator<?>>, List<ExtendedRuleRemarkWrapper>> extendedRuleRemarks = new HashMap<>();
+    Map<Class<? extends IGenerator<?>>, List<CustomRuleRemarkWrapper>> extendedRuleRemarks = new HashMap<>();
 
-    public DtoGeneratorBuilder addExtendedRuleRemarks(ExtendedRuleRemarkWrapper... ruleRemarks) {
+    public DtoGeneratorBuilder addRuleRemarkForField(CustomRuleRemarkWrapper... ruleRemarks) {
         if (ruleRemarks != null && ruleRemarks.length != 0) {
-            for (ExtendedRuleRemarkWrapper remark : ruleRemarks) {
+            for (CustomRuleRemarkWrapper remark : ruleRemarks) {
                 this.extendedRuleRemarks.putIfAbsent(remark.getGeneratorClass(), new LinkedList<>());
                 this.extendedRuleRemarks.get(remark.getGeneratorClass()).add(remark);
             }
@@ -23,14 +22,14 @@ public class RemarkableDtoGeneratorBuilder extends DtoGeneratorBuilder {
     }
 
     @Override
-    public RemarkableDtoGeneratorBuilder setRuleRemark(RuleRemark ruleRemark) {
-        super.setRuleRemark(ruleRemark);
+    public RemarkableDtoGeneratorBuilder setRuleRemarkForAllFields(BasicRuleRemark basicRuleRemark) {
+        super.setRuleRemarkForAllFields(basicRuleRemark);
         return this;
     }
 
     @Override
-    public RemarkableDtoGeneratorBuilder addRuleRemarks(String filedName, IRuleRemark ruleRemark) {
-        super.addRuleRemarks(filedName, ruleRemark);
+    public RemarkableDtoGeneratorBuilder addRuleRemarkForField(String filedName, IRuleRemark ruleRemark) {
+        super.addRuleRemarkForField(filedName, ruleRemark);
         return this;
     }
 

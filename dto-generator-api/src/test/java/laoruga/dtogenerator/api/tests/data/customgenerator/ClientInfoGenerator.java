@@ -3,7 +3,7 @@ package laoruga.dtogenerator.api.tests.data.customgenerator;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
-import laoruga.dtogenerator.api.markup.remarks.ExtendedRuleRemarkWrapper;
+import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.tests.data.dtoclient.*;
 import laoruga.dtogenerator.api.utils.RandomUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -20,7 +20,7 @@ public class ClientInfoGenerator implements
         ICustomGeneratorDtoDependent<ClientInfoDto, ClientDto> {
 
     ClientDto generatedDto;
-    List<ExtendedRuleRemarkWrapper> remarks;
+    List<CustomRuleRemarkWrapper> remarks;
     private String[] generatorArgs;
 
     @Override
@@ -29,7 +29,7 @@ public class ClientInfoGenerator implements
     }
 
     @Override
-    public void setRuleRemarks(List<ExtendedRuleRemarkWrapper> iRuleRemarks) {
+    public void setRuleRemarks(List<CustomRuleRemarkWrapper> iRuleRemarks) {
         remarks = iRuleRemarks;
     }
 
@@ -43,14 +43,14 @@ public class ClientInfoGenerator implements
         String prefix = RandomUtils.getRandomItemOrNull(generatorArgs);
         prefix = prefix == null ? "" : prefix;
 
-        ExtendedRuleRemarkWrapper clientTypeRemark = ICustomGeneratorRemarkable.getRemarkOrNull(CLIENT_TYPE, remarks);
+        CustomRuleRemarkWrapper clientTypeRemark = ICustomGeneratorRemarkable.getRemarkOrNull(CLIENT_TYPE, remarks);
         if (clientTypeRemark != null) {
             clientType = ClientType.valueOf(String.valueOf(clientTypeRemark.getArgs()[0]).toUpperCase());
         } else {
             clientType = ClientType.values()[randomGen.nextInt(0, ClientType.values().length - 1)];
         }
 
-        ExtendedRuleRemarkWrapper docTypeRemark = ICustomGeneratorRemarkable.getRemarkOrNull(DOCUMENT, remarks);
+        CustomRuleRemarkWrapper docTypeRemark = ICustomGeneratorRemarkable.getRemarkOrNull(DOCUMENT, remarks);
         if (docTypeRemark != null) {
             docType = DocType.valueOf(String.valueOf(docTypeRemark.getArgs()[0]).toUpperCase());
         } else {

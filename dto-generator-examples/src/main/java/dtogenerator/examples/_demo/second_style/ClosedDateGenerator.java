@@ -2,8 +2,8 @@ package dtogenerator.examples._demo.second_style;
 
 import dtogenerator.examples.DtoVer1;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
-import laoruga.dtogenerator.api.markup.remarks.ExtendedRuleRemarkWrapper;
-import laoruga.dtogenerator.api.markup.remarks.IExtendedRuleRemark;
+import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
+import laoruga.dtogenerator.api.markup.remarks.ICustomRuleRemark;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
 import lombok.NoArgsConstructor;
@@ -22,13 +22,13 @@ public class ClosedDateGenerator implements ICustomGeneratorArgs<LocalDateTime>,
 
     DtoVer1 dtoVer1;
     String[] args;
-    IExtendedRuleRemark[] ruleRemarks;
+    ICustomRuleRemark[] ruleRemarks;
 
     @Override
     public LocalDateTime generate() {
 
         if (ruleRemarks == null) {
-            ruleRemarks = new IExtendedRuleRemark[1];
+            ruleRemarks = new ICustomRuleRemark[1];
             ruleRemarks[0] = new Random().nextInt(2) == 1 ? OPEN : CLOSED;
         }
 
@@ -36,7 +36,7 @@ public class ClosedDateGenerator implements ICustomGeneratorArgs<LocalDateTime>,
             throw new IllegalStateException();
         }
 
-        IExtendedRuleRemark ruleRemark = ruleRemarks[0];
+        ICustomRuleRemark ruleRemark = ruleRemarks[0];
         if (ruleRemark == OPEN) {
             return null;
         } else if (ruleRemark == CLOSED) {
@@ -68,7 +68,7 @@ public class ClosedDateGenerator implements ICustomGeneratorArgs<LocalDateTime>,
     }
 
     @Override
-    public void setRuleRemarks(List<ExtendedRuleRemarkWrapper> ruleRemarks) {
+    public void setRuleRemarks(List<CustomRuleRemarkWrapper> ruleRemarks) {
 //        this.ruleRemarks = ruleRemarks;
     }
 }

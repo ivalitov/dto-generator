@@ -1,20 +1,17 @@
 package laoruga.dtogenerator.api.markup.remarks;
 
-
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-@RequiredArgsConstructor
 @Value
-public class ExtendedRuleRemarkWrapper {
+public class CustomRuleRemarkWrapper {
 
-    IExtendedRuleRemark wrappedRuleRemark;
+    ICustomRuleRemark wrappedRuleRemark;
     Class<? extends IGenerator<?>> generatorClass;
     @NonNull String[] args;
 

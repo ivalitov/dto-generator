@@ -1,7 +1,7 @@
 package laoruga.dtogenerator.api.markup.rules;
 
 import laoruga.dtogenerator.api.markup.BoundType;
-import laoruga.dtogenerator.api.markup.remarks.RuleRemark;
+import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -17,9 +17,9 @@ public @interface IntegerRules {
     int DEFAULT_MIN = 0;
     int DEFAULT_MAX = 999999999;
 
-    @BoundType(RuleRemark.MAX_VALUE)
+    @BoundType(BasicRuleRemark.MAX_VALUE)
     int maxValue() default DEFAULT_MAX;
 
-    @BoundType(RuleRemark.MIN_VALUE)
+    @BoundType(BasicRuleRemark.MIN_VALUE)
     int minValue() default DEFAULT_MIN;
 }

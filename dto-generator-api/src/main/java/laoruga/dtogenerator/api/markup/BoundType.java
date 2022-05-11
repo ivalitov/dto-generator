@@ -1,6 +1,6 @@
 package laoruga.dtogenerator.api.markup;
 
-import laoruga.dtogenerator.api.markup.remarks.RuleRemark;
+import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -12,6 +12,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(METHOD)
 public @interface BoundType {
 
-    RuleRemark value();
+    BasicRuleRemark value();
 
 }

@@ -2,8 +2,8 @@ package dtogenerator.examples._demo.second_style;
 
 import dtogenerator.examples.Arrears;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
-import laoruga.dtogenerator.api.markup.remarks.ExtendedRuleRemarkWrapper;
-import laoruga.dtogenerator.api.markup.remarks.IExtendedRuleRemark;
+import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
+import laoruga.dtogenerator.api.markup.remarks.ICustomRuleRemark;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
 import lombok.NoArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -20,7 +20,7 @@ public class ArrearsGenerator2 implements
         ICustomGeneratorRemarkable<Arrears> {
 
     int arrearsCount;
-    IExtendedRuleRemark[] ruleRemarks;
+    ICustomRuleRemark[] ruleRemarks;
 
     @Override
     public Arrears generate() {
@@ -48,9 +48,9 @@ public class ArrearsGenerator2 implements
     }
 
     @Override
-    public void setRuleRemarks(List<ExtendedRuleRemarkWrapper> ruleRemarks) {
-        for (ExtendedRuleRemarkWrapper ruleRemark : ruleRemarks) {
-            IExtendedRuleRemark enumType = ruleRemark.getWrappedRuleRemark();
+    public void setRuleRemarks(List<CustomRuleRemarkWrapper> ruleRemarks) {
+        for (CustomRuleRemarkWrapper ruleRemark : ruleRemarks) {
+            ICustomRuleRemark enumType = ruleRemark.getWrappedRuleRemark();
             if (enumType == WITH_ARREARS) {
                 arrearsCount = Integer.parseInt(ruleRemark.getArgsList().get(0));
             } else if (enumType == WITHOUT_ARREARS) {

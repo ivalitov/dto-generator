@@ -59,9 +59,9 @@ public class CustomDtoGenerationTests {
     @MethodSource("customDtoGenerationWithRemarksTestData")
     public void customDtoGenerationWithRemarks(ClientType clientType, DocType docType) {
         RemarkableDtoGeneratorBuilder builder = RemarkableDtoGenerator.builder();
-        builder.addExtendedRuleRemarks(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
+        builder.addRuleRemarkForField(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
         if (docType != null) {
-            builder.addExtendedRuleRemarks(ClientRemark.DOCUMENT.wrap(docType.name()));
+            builder.addRuleRemarkForField(ClientRemark.DOCUMENT.wrap(docType.name()));
         }
         ClientDto dto = builder.build().generateDto(ClientDto.class);
 
@@ -78,13 +78,13 @@ public class CustomDtoGenerationTests {
 
     @ParameterizedTest
     @Feature("CUSTOM_RULES")
-    @DisplayName("Custom Dto Generation With Default Args")
+    @DisplayName("Custom Dto Generation With Args")
     @MethodSource("customDtoGenerationWithRemarksTestData")
     public void customDtoGenerationWithDefaultArgs(ClientType clientType, DocType docType) {
         RemarkableDtoGeneratorBuilder builder = RemarkableDtoGenerator.builder();
-        builder.addExtendedRuleRemarks(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
+        builder.addRuleRemarkForField(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
         if (docType != null) {
-            builder.addExtendedRuleRemarks(ClientRemark.DOCUMENT.wrap(docType.name()));
+            builder.addRuleRemarkForField(ClientRemark.DOCUMENT.wrap(docType.name()));
         }
         ClientDto dto = builder.build().generateDto(ClientDto.class);
 

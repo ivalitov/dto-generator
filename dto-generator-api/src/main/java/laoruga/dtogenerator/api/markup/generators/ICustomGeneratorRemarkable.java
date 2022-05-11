@@ -1,18 +1,18 @@
 package laoruga.dtogenerator.api.markup.generators;
 
 import com.sun.istack.internal.Nullable;
-import laoruga.dtogenerator.api.markup.remarks.ExtendedRuleRemarkWrapper;
-import laoruga.dtogenerator.api.markup.remarks.IExtendedRuleRemark;
+import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
+import laoruga.dtogenerator.api.markup.remarks.ICustomRuleRemark;
 
 import java.util.List;
 
 public interface ICustomGeneratorRemarkable<GENERATED_TYPE> extends ICustomGenerator<GENERATED_TYPE> {
 
-    void setRuleRemarks(List<ExtendedRuleRemarkWrapper> iRuleRemarks);
+    void setRuleRemarks(List<CustomRuleRemarkWrapper> iRuleRemarks);
 
     @Nullable
-    static ExtendedRuleRemarkWrapper getRemarkOrNull(IExtendedRuleRemark remark, List<ExtendedRuleRemarkWrapper> ruleRemarks) {
-        for (ExtendedRuleRemarkWrapper ruleRemark : ruleRemarks) {
+    static CustomRuleRemarkWrapper getRemarkOrNull(ICustomRuleRemark remark, List<CustomRuleRemarkWrapper> ruleRemarks) {
+        for (CustomRuleRemarkWrapper ruleRemark : ruleRemarks) {
             if (ruleRemark.getWrappedRuleRemark().equals(remark)) {
                 return ruleRemark;
             }

@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static laoruga.dtogenerator.api.markup.remarks.RuleRemark.MAX_VALUE;
-import static laoruga.dtogenerator.api.markup.remarks.RuleRemark.MIN_VALUE;
+import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.MAX_VALUE;
+import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.MIN_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -66,7 +66,7 @@ public class BasitTypeGeneratorsTests {
     @Feature("INTEGER_RULES")
     @DisplayName("MIN Values Integer Generation")
     public void minIntegerGeneration() {
-        DtoInteger dto = DtoGenerator.builder().setRuleRemark(MIN_VALUE).build().generateDto(DtoInteger.class);
+        DtoInteger dto = DtoGenerator.builder().setRuleRemarkForAllFields(MIN_VALUE).build().generateDto(DtoInteger.class);
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getIntDefaultRules(), equalTo(IntegerRules.DEFAULT_MIN)),
@@ -82,7 +82,7 @@ public class BasitTypeGeneratorsTests {
     @Feature("INTEGER_RULES")
     @DisplayName("MAX Values Integer Generation")
     public void maxIntegerGeneration() {
-        DtoInteger dto = DtoGenerator.builder().setRuleRemark(MAX_VALUE).build().generateDto(DtoInteger.class);
+        DtoInteger dto = DtoGenerator.builder().setRuleRemarkForAllFields(MAX_VALUE).build().generateDto(DtoInteger.class);
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getIntDefaultRules(), equalTo(IntegerRules.DEFAULT_MAX)),

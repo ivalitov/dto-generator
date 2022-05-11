@@ -4,7 +4,7 @@ import laoruga.dtogenerator.api.constants.CharSet;
 import laoruga.dtogenerator.api.markup.generators.ICollectionGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
-import laoruga.dtogenerator.api.markup.remarks.RuleRemark;
+import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -29,17 +29,17 @@ public class BasicTypeGenerators {
 
         @Override
         public Double generate() {
-            if (ruleRemark == RuleRemark.MIN_VALUE) {
+            if (ruleRemark == BasicRuleRemark.MIN_VALUE) {
                 return minValue;
             }
-            if (ruleRemark == RuleRemark.MAX_VALUE) {
+            if (ruleRemark == BasicRuleRemark.MAX_VALUE) {
                 return maxValue;
             }
-            if (ruleRemark == RuleRemark.RANDOM_VALUE) {
+            if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
                 double generated = minValue + new Random().nextDouble() * (maxValue - minValue);
                 return Precision.round(generated, precision);
             }
-            if (ruleRemark == RuleRemark.NULL_VALUE) {
+            if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
                 return null;
             }
             throw new IllegalStateException("Unexpected value " + ruleRemark);
@@ -58,13 +58,13 @@ public class BasicTypeGenerators {
         @Override
         public String generate() {
             int length;
-            if (ruleRemark == RuleRemark.MIN_VALUE) {
+            if (ruleRemark == BasicRuleRemark.MIN_VALUE) {
                 length = minLength;
-            } else if (ruleRemark == RuleRemark.MAX_VALUE) {
+            } else if (ruleRemark == BasicRuleRemark.MAX_VALUE) {
                 length = maxLength;
-            } else if (ruleRemark == RuleRemark.RANDOM_VALUE) {
+            } else if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
                 length = minLength + (int) (Math.random() * (maxLength - minLength));
-            } else if (ruleRemark == RuleRemark.NULL_VALUE) {
+            } else if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
                 return null;
             } else {
                 throw new IllegalStateException("Unexpected value " + ruleRemark);
@@ -96,16 +96,16 @@ public class BasicTypeGenerators {
 
         @Override
         public Integer generate() {
-            if (ruleRemark == RuleRemark.MIN_VALUE) {
+            if (ruleRemark == BasicRuleRemark.MIN_VALUE) {
                 return minValue;
             }
-            if (ruleRemark == RuleRemark.MAX_VALUE) {
+            if (ruleRemark == BasicRuleRemark.MAX_VALUE) {
                 return maxValue;
             }
-            if (ruleRemark == RuleRemark.RANDOM_VALUE) {
+            if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
                 return new RandomDataGenerator().nextInt(minValue, maxValue);
             }
-            if (ruleRemark == RuleRemark.NULL_VALUE) {
+            if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
                 return null;
             }
             throw new IllegalStateException("Unexpected value " + ruleRemark);
@@ -121,16 +121,16 @@ public class BasicTypeGenerators {
 
         @Override
         public Long generate() {
-            if (ruleRemark == RuleRemark.MIN_VALUE) {
+            if (ruleRemark == BasicRuleRemark.MIN_VALUE) {
                 return minValue;
             }
-            if (ruleRemark == RuleRemark.MAX_VALUE) {
+            if (ruleRemark == BasicRuleRemark.MAX_VALUE) {
                 return maxValue;
             }
-            if (ruleRemark == RuleRemark.RANDOM_VALUE) {
+            if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
                 return minValue + (long) (Math.random() * (maxValue - minValue));
             }
-            if (ruleRemark == RuleRemark.NULL_VALUE) {
+            if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
                 return null;
             }
             throw new IllegalStateException("Unexpected value " + ruleRemark);
@@ -151,14 +151,14 @@ public class BasicTypeGenerators {
                     .sorted(Comparator.comparing(String::length))
                     .toArray(String[]::new);
             String enumInstanceName;
-            if (ruleRemark == RuleRemark.MIN_VALUE) {
+            if (ruleRemark == BasicRuleRemark.MIN_VALUE) {
                 enumInstanceName = sortedEnumNames[0];
-            } else if (ruleRemark == RuleRemark.MAX_VALUE) {
+            } else if (ruleRemark == BasicRuleRemark.MAX_VALUE) {
                 enumInstanceName = sortedEnumNames[sortedEnumNames.length - 1];
-            } else if (ruleRemark == RuleRemark.RANDOM_VALUE) {
+            } else if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
                 int count = sortedEnumNames.length;
                 enumInstanceName = sortedEnumNames[new Random().nextInt(count)];
-            } else if (ruleRemark == RuleRemark.NULL_VALUE) {
+            } else if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
                 return null;
             } else {
                 throw new IllegalStateException("Unexpected value " + ruleRemark);
@@ -183,18 +183,18 @@ public class BasicTypeGenerators {
         @Override
         public LocalDateTime generate() {
             LocalDateTime now = LocalDateTime.now();
-            if (ruleRemark == RuleRemark.MIN_VALUE) {
+            if (ruleRemark == BasicRuleRemark.MIN_VALUE) {
                 return now.minusDays(leftShiftDays);
             }
-            if (ruleRemark == RuleRemark.MAX_VALUE) {
+            if (ruleRemark == BasicRuleRemark.MAX_VALUE) {
                 return now.plusDays(rightShiftDays);
             }
-            if (ruleRemark == RuleRemark.RANDOM_VALUE) {
+            if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
                 int randomInt = new Random().nextInt(leftShiftDays + rightShiftDays + 1);
                 LocalDateTime minDate = now.minusDays(leftShiftDays);
                 return minDate.plusDays(randomInt);
             }
-            if (ruleRemark == RuleRemark.NULL_VALUE) {
+            if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
                 return null;
             }
             throw new IllegalStateException("Unexpected value " + ruleRemark);
