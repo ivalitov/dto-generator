@@ -1,4 +1,4 @@
-package laoruga.dtogenerator.api.generators;
+package laoruga.dtogenerator.api.generators.basictypegenerators;
 
 import laoruga.dtogenerator.api.constants.CharSet;
 import laoruga.dtogenerator.api.markup.generators.ICollectionGenerator;
@@ -6,6 +6,7 @@ import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.SneakyThrows;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.math3.util.Precision;
@@ -43,47 +44,6 @@ public class BasicTypeGenerators {
                 return null;
             }
             throw new IllegalStateException("Unexpected value " + ruleRemark);
-        }
-    }
-
-    @AllArgsConstructor
-    public static class StringGenerator implements IGenerator<String> {
-
-        private final int maxLength;
-        private final int minLength;
-        private final CharSet[] charset;
-        private final String chars;
-        private final IRuleRemark ruleRemark;
-
-        @Override
-        public String generate() {
-            int length;
-            if (ruleRemark == BasicRuleRemark.MIN_VALUE) {
-                length = minLength;
-            } else if (ruleRemark == BasicRuleRemark.MAX_VALUE) {
-                length = maxLength;
-            } else if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
-                length = minLength + (int) (Math.random() * (maxLength - minLength));
-            } else if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
-                return null;
-            } else {
-                throw new IllegalStateException("Unexpected value " + ruleRemark);
-            }
-            char[] explicitChars = this.chars.toCharArray();
-            int charsCount = explicitChars.length + Arrays.stream(charset).map(s -> s.getChars().length).reduce(Integer::sum).get();
-            char[] chars = new char[charsCount];
-            int nextCopyPos = 0;
-            for (CharSet charSet : charset) {
-                char[] toCopy = charSet.getChars();
-                System.arraycopy(toCopy, 0, chars, nextCopyPos, toCopy.length);
-                nextCopyPos += toCopy.length;
-            }
-            if (explicitChars.length != 0) {
-                System.arraycopy(explicitChars, 0, chars, nextCopyPos, explicitChars.length);
-            }
-            return new RandomStringGenerator.Builder()
-                    .selectFrom(chars)
-                    .build().generate(length);
         }
     }
 

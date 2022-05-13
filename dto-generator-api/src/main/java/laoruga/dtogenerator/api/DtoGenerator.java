@@ -1,9 +1,11 @@
 package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
-import laoruga.dtogenerator.api.generators.BasicTypeGenerators;
 import laoruga.dtogenerator.api.generators.NestedDtoGenerator;
+import laoruga.dtogenerator.api.generators.basictypegenerators.BasicTypeGenerators;
+import laoruga.dtogenerator.api.generators.basictypegenerators.StringGenerator;
 import laoruga.dtogenerator.api.markup.generators.*;
+import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.*;
 import lombok.extern.slf4j.Slf4j;
@@ -11,12 +13,14 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.MIN_VALUE;
 import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.NULL_VALUE;
@@ -27,21 +31,26 @@ public class DtoGenerator {
     private Object dtoInstance;
 
     private final Map<Field, Exception> errors = new HashMap<>();
-    private final Map<Field, IGenerator<?>> fieldIGeneratorMap = new LinkedHashMap<>();
+    private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
 
     private final Map<String, IRuleRemark> fieldRuleRemarkMap;
+    private final Map<Class<? extends IGenerator<?>>, List<CustomRuleRemarkWrapper>> extendedRuleRemarks;
+
 
     private final DtoGeneratorBuilder builderInstance;
 
     protected DtoGenerator(Map<String, IRuleRemark> fieldRuleRemarkMap,
+                           Map<Class<? extends IGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksForAllFields,
                            DtoGeneratorBuilder dtoGeneratorBuilder) {
         this.fieldRuleRemarkMap = fieldRuleRemarkMap;
+        this.extendedRuleRemarks = customRuleRemarksForAllFields;
         this.builderInstance = dtoGeneratorBuilder;
     }
 
     public static DtoGeneratorBuilder builder() {
         return new DtoGeneratorBuilder();
     }
+
 
     public <T> T generateDto(Class<T> dtoClass) {
         createDtoInstance(dtoClass);
@@ -113,10 +122,10 @@ public class DtoGenerator {
     void applyGenerators() {
         AtomicInteger attempts = new AtomicInteger(0);
         AtomicInteger maxAttempts = new AtomicInteger(100);
-        while (!fieldIGeneratorMap.isEmpty() && attempts.get() < maxAttempts.get()) {
+        while (!getFieldGeneratorMap().isEmpty() && attempts.get() < maxAttempts.get()) {
             attempts.incrementAndGet();
             log.debug("Attempt {} to generate field values", attempts);
-            Iterator<Map.Entry<Field, IGenerator<?>>> iterator = fieldIGeneratorMap.entrySet().iterator();
+            Iterator<Map.Entry<Field, IGenerator<?>>> iterator = getFieldGeneratorMap().entrySet().iterator();
             while (iterator.hasNext()) {
 
                 Map.Entry<Field, IGenerator<?>> nextFieldAndGenerator = iterator.next();
@@ -160,10 +169,10 @@ public class DtoGenerator {
 
             }
         }
-        if (!fieldIGeneratorMap.isEmpty() || !errors.isEmpty()) {
-            if (!fieldIGeneratorMap.isEmpty()) {
+        if (!getFieldGeneratorMap().isEmpty() || !errors.isEmpty()) {
+            if (!getFieldGeneratorMap().isEmpty()) {
                 log.error("Unexpected state. There {} unused generator(s) left. Fileds vs Generators: " +
-                        fieldIGeneratorMap, fieldIGeneratorMap.size());
+                        getFieldGeneratorMap(), getFieldGeneratorMap().size());
             }
             if (!errors.isEmpty()) {
                 log.error("{} error(s) while generators execution. Fileds vs Generators: " + errors, errors.size());
@@ -177,7 +186,7 @@ public class DtoGenerator {
         for (Field field : dtoInstance.getClass().getDeclaredFields()) {
             IGenerator<?> generator = prepareGenerator(field);
             if (generator != null) {
-                fieldIGeneratorMap.put(field, generator);
+                getFieldGeneratorMap().put(field, generator);
             }
         }
         if (!errors.isEmpty()) {
@@ -186,17 +195,17 @@ public class DtoGenerator {
             String formattedErrors = errors.entrySet().stream()
                     .map(fieldExceptionEntry ->
                             "- [" + counter.incrementAndGet() + "] Field: '" + fieldExceptionEntry.getKey().toString() + "'\n" +
-                            "- [" + counter.get() + "] Exception:\n" +
-                                ExceptionUtils.getStackTrace(fieldExceptionEntry.getValue())
+                                    "- [" + counter.get() + "] Exception:\n" +
+                                    ExceptionUtils.getStackTrace(fieldExceptionEntry.getValue())
                     )
                     .collect(Collectors.joining("\n"));
             log.error("{} error(s) while generators preparation. See problems below: \n" + formattedErrors, errors.size());
             throw new DtoGeneratorException("Error while generators preparation (see log above)");
         }
-        if (fieldIGeneratorMap.isEmpty()) {
+        if (getFieldGeneratorMap().isEmpty()) {
             log.debug("No generators have been found");
         } else {
-            log.debug(fieldIGeneratorMap.size() + " generators was created for fields: " + fieldIGeneratorMap.keySet());
+            log.debug(getFieldGeneratorMap().size() + " generators was created for fields: " + getFieldGeneratorMap().keySet());
         }
     }
 
@@ -230,7 +239,17 @@ public class DtoGenerator {
         } catch (Exception e) {
             errors.put(field, e);
         }
+        prepareCustomRemarks(generator);
         return generator;
+    }
+
+    void prepareCustomRemarks(IGenerator<?> generator) {
+        if (generator instanceof ICustomGeneratorRemarkable) {
+            ICustomGeneratorRemarkable<?> remarkableGenerator = (ICustomGeneratorRemarkable<?>) generator;
+            if (extendedRuleRemarks.containsKey(remarkableGenerator.getClass())) {
+                remarkableGenerator.setRuleRemarks(extendedRuleRemarks.get(remarkableGenerator.getClass()));
+            }
+        }
     }
 
     private IRuleRemark getBasicRuleRemark(String fieldName) {
@@ -409,7 +428,7 @@ public class DtoGenerator {
         if (fieldType == String.class) {
             StringRules stringBounds = (StringRules) getAnnotationOrNull(StringRules.class, fieldAnnotations);
             if (stringBounds != null) {
-                return new BasicTypeGenerators.StringGenerator(
+                return new StringGenerator(
                         stringBounds.maxSymbols(),
                         stringBounds.minSymbols(),
                         stringBounds.charset(),
@@ -507,7 +526,7 @@ public class DtoGenerator {
                             "DTO dependent custom generator. Perhaps there is wrong argument type is passing into " +
                             "'setDto' method of generator class. " +
                             "Generator class: '" + generatorInstance.getClass() + "', " +
-                            "Passing argument type: '" + dtoInstance.getClass() + "'"  , e);
+                            "Passing argument type: '" + dtoInstance.getClass() + "'", e);
                 } catch (Exception e) {
                     throw new DtoGeneratorException("Exception was thrown while trying to set DTO into " +
                             "DTO dependent custom generator: " + generatorInstance.getClass(), e);
@@ -522,6 +541,10 @@ public class DtoGenerator {
         } catch (Exception e) {
             throw new DtoGeneratorException("Error while preparing custom generator from class: " + generatorClass, e);
         }
+    }
+
+    protected Map<Field, IGenerator<?>> getFieldGeneratorMap() {
+        return fieldGeneratorMap;
     }
 
 }

@@ -2,8 +2,7 @@ package laoruga.dtogenerator.api.tests;
 
 import io.qameta.allure.Feature;
 import laoruga.dtogenerator.api.DtoGenerator;
-import laoruga.dtogenerator.api.RemarkableDtoGenerator;
-import laoruga.dtogenerator.api.RemarkableDtoGeneratorBuilder;
+import laoruga.dtogenerator.api.DtoGeneratorBuilder;
 import laoruga.dtogenerator.api.tests.data.customgenerator.ClientRemark;
 import laoruga.dtogenerator.api.tests.data.dtoclient.*;
 import org.junit.jupiter.api.DisplayName;
@@ -58,10 +57,10 @@ public class CustomDtoGenerationTests {
     @DisplayName("Custom Dto Generation With Remarks")
     @MethodSource("customDtoGenerationWithRemarksTestData")
     public void customDtoGenerationWithRemarks(ClientType clientType, DocType docType) {
-        RemarkableDtoGeneratorBuilder builder = RemarkableDtoGenerator.builder();
-        builder.addRuleRemarkForField(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
+        DtoGeneratorBuilder builder = DtoGenerator.builder();
+        builder.addRuleRemarkForAllFields(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
         if (docType != null) {
-            builder.addRuleRemarkForField(ClientRemark.DOCUMENT.wrap(docType.name()));
+            builder.addRuleRemarkForAllFields(ClientRemark.DOCUMENT.wrap(docType.name()));
         }
         ClientDto dto = builder.build().generateDto(ClientDto.class);
 
@@ -81,10 +80,10 @@ public class CustomDtoGenerationTests {
     @DisplayName("Custom Dto Generation With Args")
     @MethodSource("customDtoGenerationWithRemarksTestData")
     public void customDtoGenerationWithDefaultArgs(ClientType clientType, DocType docType) {
-        RemarkableDtoGeneratorBuilder builder = RemarkableDtoGenerator.builder();
-        builder.addRuleRemarkForField(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
+        DtoGeneratorBuilder builder = DtoGenerator.builder();
+        builder.addRuleRemarkForAllFields(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
         if (docType != null) {
-            builder.addRuleRemarkForField(ClientRemark.DOCUMENT.wrap(docType.name()));
+            builder.addRuleRemarkForAllFields(ClientRemark.DOCUMENT.wrap(docType.name()));
         }
         ClientDto dto = builder.build().generateDto(ClientDto.class);
 

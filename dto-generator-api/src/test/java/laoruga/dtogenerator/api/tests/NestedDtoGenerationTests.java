@@ -4,10 +4,7 @@ import io.qameta.allure.Feature;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
-import laoruga.dtogenerator.api.tests.data.dtoclient.ClientDto;
-import laoruga.dtogenerator.api.tests.data.dtoclient.ClientType;
-import laoruga.dtogenerator.api.tests.data.dtoclient.OrgInfoDto;
-import laoruga.dtogenerator.api.tests.data.dtoclient.PersonInfoDto;
+import laoruga.dtogenerator.api.tests.data.dtoclient.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
@@ -17,8 +14,8 @@ import org.junit.jupiter.api.Test;
 import static laoruga.dtogenerator.api.tests.BasitTypeGeneratorsTests.simpleIntegerGenerationAssertions;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayName("Basic Type Generators Tests")
 public class NestedDtoGenerationTests {
@@ -68,28 +65,31 @@ public class NestedDtoGenerationTests {
         // base assertions for client generation
         CustomDtoGenerationTests.baseAssertions(clientDto);
 
-        if (clientDto.getClientInfo().getClientType() == ClientType.ORG) {
-            OrgInfoDto orgInfo = ((OrgInfoDto) clientDto.getClientInfo());
-            OrgInfoDto orgInfoWithPrefix = ((OrgInfoDto) clientDto.getClientInfoWithPrefix());
-            assertAll(
-                    () -> assertThat(orgInfo.getOrgName(), not(startsWith(ClientDto.PREFIX))),
-                    () -> assertThat(orgInfoWithPrefix.getOrgName(), startsWith(ClientDto.PREFIX))
-            );
+        ClientInfoDto clientInfo = clientDto.getClientInfo();
+        if (clientInfo.getClientType() == ClientType.ORG) {
+            OrgInfoDto orgInfo = ((OrgInfoDto) clientInfo);
+            assertThat(orgInfo.getOrgName(), not(startsWith(ClientDto.PREFIX)));
         } else {
-            PersonInfoDto personInfo = ((PersonInfoDto) clientDto.getClientInfo());
-            PersonInfoDto personInfoWithPrefix = ((PersonInfoDto) clientDto.getClientInfoWithPrefix());
+            PersonInfoDto personInfo = ((PersonInfoDto) clientInfo);
             assertAll(
                     () -> assertThat(personInfo.getFirstName(), not(startsWith(ClientDto.PREFIX))),
                     () -> assertThat(personInfo.getMiddleName(), not(startsWith(ClientDto.PREFIX))),
-                    () -> assertThat(personInfo.getSecondName(), not(startsWith(ClientDto.PREFIX))),
+                    () -> assertThat(personInfo.getSecondName(), not(startsWith(ClientDto.PREFIX)))
+            );
+        }
 
+        ClientInfoDto clientInfoWithPrefix = clientDto.getClientInfoWithPrefix();
+        if (clientInfoWithPrefix.getClientType() == ClientType.ORG) {
+            OrgInfoDto orgInfoWithPrefix = ((OrgInfoDto) clientInfoWithPrefix);
+            assertThat(orgInfoWithPrefix.getOrgName(), startsWith(ClientDto.PREFIX));
+        } else {
+            PersonInfoDto personInfoWithPrefix = ((PersonInfoDto) clientInfoWithPrefix);
+            assertAll(
                     () -> assertThat(personInfoWithPrefix.getFirstName(), startsWith(ClientDto.PREFIX)),
                     () -> assertThat(personInfoWithPrefix.getMiddleName(), startsWith(ClientDto.PREFIX)),
                     () -> assertThat(personInfoWithPrefix.getSecondName(), startsWith(ClientDto.PREFIX))
             );
         }
-
-        assertNotNull(clientDto);
     }
 
 }

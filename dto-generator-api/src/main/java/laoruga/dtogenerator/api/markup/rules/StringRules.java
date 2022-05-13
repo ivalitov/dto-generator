@@ -1,6 +1,7 @@
 package laoruga.dtogenerator.api.markup.rules;
 
 import laoruga.dtogenerator.api.constants.CharSet;
+import org.apache.commons.math3.analysis.function.Max;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -15,13 +16,14 @@ public @interface StringRules {
 
     int DEFAULT_MIN_SYMBOLS_NUMBER = 0;
     int DEFAULT_MAX_SYMBOLS_NUMBER = 1000;
+    CharSet[] DEFAULT_CHARSET = new CharSet[]{CharSet.NUM, CharSet.ENG, CharSet.RUS};
+    String DEFAULT_CHARS = "";
 
-    int maxSymbols() default 1000;
+    int maxSymbols() default DEFAULT_MAX_SYMBOLS_NUMBER;
 
-    int minSymbols() default 0;
+    int minSymbols() default DEFAULT_MIN_SYMBOLS_NUMBER;
 
     CharSet[] charset() default {CharSet.NUM, CharSet.ENG, CharSet.RUS};
 
-    String chars() default "";
-
+    String chars() default DEFAULT_CHARS;
 }

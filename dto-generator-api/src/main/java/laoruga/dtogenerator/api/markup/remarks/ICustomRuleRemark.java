@@ -1,6 +1,5 @@
 package laoruga.dtogenerator.api.markup.remarks;
 
-import laoruga.dtogenerator.api.RemarkableDtoGeneratorBuilder;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 
@@ -10,7 +9,7 @@ import laoruga.dtogenerator.api.markup.generators.IGenerator;
 public interface ICustomRuleRemark {
 
     /**
-     * Call this method for passing 'remark' to {@link RemarkableDtoGeneratorBuilder}
+     * Call this method for passing 'remark' to {@link laoruga.dtogenerator.api.DtoGeneratorBuilder}
      *
      * @param args params that need to be passed with this 'remark', it may be empty
      * @return wrapper of 'remark', containing params and generator's class
