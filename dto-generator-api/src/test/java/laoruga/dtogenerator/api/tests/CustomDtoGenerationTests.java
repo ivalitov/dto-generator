@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Custom Type Generators Tests")
 public class CustomDtoGenerationTests {
 
-    private void baseAssertions(ClientDto dto) {
+    public static void baseAssertions(ClientDto dto) {
         ClientInfoDto clientInfo = dto.getClientInfo();
         String stringRequiredForClient = dto.getStringRequiredForClient();
         assertAll(

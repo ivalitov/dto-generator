@@ -47,7 +47,7 @@ public class ClientInfoGenerator implements
         if (clientTypeRemark != null) {
             clientType = ClientType.valueOf(String.valueOf(clientTypeRemark.getArgs()[0]).toUpperCase());
         } else {
-            clientType = ClientType.values()[randomGen.nextInt(0, ClientType.values().length - 1)];
+            clientType = RandomUtils.getRandomItemOrNull(ClientType.values());
         }
 
         CustomRuleRemarkWrapper docTypeRemark = ICustomGeneratorRemarkable.findWrappedRemarkOrReturnNull(DOCUMENT, remarks);
