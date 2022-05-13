@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import static laoruga.dtogenerator.api.tests.BasitTypeGeneratorsTests.simpleIntegerGenerationAssertions;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayName("Basic Type Generators Tests")
@@ -34,10 +33,9 @@ public class NestedDtoGenerationTests {
         Dto dto = DtoGenerator.builder().build().generateDto(Dto.class);
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
-                        greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX)));
+                greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX)));
         simpleIntegerGenerationAssertions(dto.getDtoNested());
 
     }
-
 
 }

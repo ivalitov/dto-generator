@@ -7,17 +7,16 @@ import laoruga.dtogenerator.api.markup.generators.*;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.MIN_VALUE;
 import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.NULL_VALUE;
@@ -182,7 +181,16 @@ public class DtoGenerator {
             }
         }
         if (!errors.isEmpty()) {
-            log.error("{} error(s) while generators preparation. Fileds vs Generators: " + errors, errors.size());
+            int i = 0;
+            final AtomicInteger counter = new AtomicInteger(0);
+            String formattedErrors = errors.entrySet().stream()
+                    .map(fieldExceptionEntry ->
+                            "- [" + counter.incrementAndGet() + "] Field: '" + fieldExceptionEntry.getKey().toString() + "'\n" +
+                            "- [" + counter.get() + "] Exception:\n" +
+                                ExceptionUtils.getStackTrace(fieldExceptionEntry.getValue())
+                    )
+                    .collect(Collectors.joining("\n"));
+            log.error("{} error(s) while generators preparation. See problems below: \n" + formattedErrors, errors.size());
             throw new DtoGeneratorException("Error while generators preparation (see log above)");
         }
         if (fieldIGeneratorMap.isEmpty()) {
@@ -494,6 +502,12 @@ public class DtoGenerator {
             if (generatorInstance instanceof ICustomGeneratorDtoDependent) {
                 try {
                     ((ICustomGeneratorDtoDependent) generatorInstance).setDto(dtoInstance);
+                } catch (ClassCastException e) {
+                    throw new DtoGeneratorException("ClassCastException while trying to set basic DTO into " +
+                            "DTO dependent custom generator. Perhaps there is wrong argument type is passing into " +
+                            "'setDto' method of generator class. " +
+                            "Generator class: '" + generatorInstance.getClass() + "', " +
+                            "Passing argument type: '" + dtoInstance.getClass() + "'"  , e);
                 } catch (Exception e) {
                     throw new DtoGeneratorException("Exception was thrown while trying to set DTO into " +
                             "DTO dependent custom generator: " + generatorInstance.getClass(), e);

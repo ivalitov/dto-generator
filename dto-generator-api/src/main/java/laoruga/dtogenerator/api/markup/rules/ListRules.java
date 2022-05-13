@@ -17,7 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @RuleForCollection
 public @interface ListRules {
 
-    int DEFAULT_MIN_SIZE = 0;
+    int DEFAULT_MIN_SIZE = 1;
     int DEFAULT_MAX_SIZE = 10;
 
     Class<? extends List> listClass() default ArrayList.class;
