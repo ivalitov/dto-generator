@@ -24,7 +24,7 @@ public class StringGenerator implements IGenerator<String> {
     @Builder.Default
     private final String chars = StringRules.DEFAULT_CHARS;
     @Builder.Default
-    private final IRuleRemark ruleRemark = BasicRuleRemark.RANDOM_VALUE;
+    private final IRuleRemark ruleRemark = StringRules.RULE_REMARK;
 
     @Override
     public String generate() {

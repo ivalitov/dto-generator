@@ -36,7 +36,6 @@ public class DtoGenerator {
     private final Map<String, IRuleRemark> fieldRuleRemarkMap;
     private final Map<Class<? extends IGenerator<?>>, List<CustomRuleRemarkWrapper>> extendedRuleRemarks;
 
-
     private final DtoGeneratorBuilder builderInstance;
 
     protected DtoGenerator(Map<String, IRuleRemark> fieldRuleRemarkMap,
@@ -403,6 +402,8 @@ public class DtoGenerator {
         }
     }
 
+    BasicGensBuildersProvider generatorsProvider;
+
     private IGenerator<?> selectBasicGenerator(Class<?> fieldType, String fieldName, Annotation[] fieldAnnotations) throws DtoGeneratorException {
 
         if (fieldType == Double.class || fieldType == Double.TYPE) {
@@ -428,13 +429,7 @@ public class DtoGenerator {
         if (fieldType == String.class) {
             StringRules stringBounds = (StringRules) getAnnotationOrNull(StringRules.class, fieldAnnotations);
             if (stringBounds != null) {
-                return new StringGenerator(
-                        stringBounds.maxSymbols(),
-                        stringBounds.minSymbols(),
-                        stringBounds.charset(),
-                        stringBounds.chars(),
-                        getBasicRuleRemark(fieldName)
-                );
+                return generatorsProvider.getStringIGenerator(stringBounds);
             }
         }
 

@@ -7,10 +7,28 @@ import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import lombok.NonNull;
 
+import java.lang.annotation.Annotation;
 import java.util.*;
 
 import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.RANDOM_VALUE;
 
+/**
+ * 1. ок - Basic remark applicable to any field marked with simple rules
+ * 2. ок - Basic remark for field with name
+ * <p>
+ * 3. ок - Custom remark for custom generator applicable to any field marked with that custom generator
+ * 4. [not finished] Custom remark field with name
+ * <p>
+ * 5. [not finished] - Concrete generator for specific field (basic or custom, override or new - whatever)
+ * 6. Change simple generator for any field
+ * 6.1 - default builder
+ * 6.2 - custom simple field generator
+ * <p>
+ * 7. [won't fix] Change custom generator for any field
+ * 8. [same as set or override basic generator] Change custom generator for specific field
+ * <p>
+ * 9. how to apply this to nested pojo field ???
+ */
 public class DtoGeneratorBuilder {
 
     /**
@@ -32,6 +50,11 @@ public class DtoGeneratorBuilder {
         return this;
     }
 
+    public DtoGeneratorBuilder overrideGenerator(@NonNull Class<? extends Annotation> rulesAnnotation,
+                                                 @NonNull IGenerator<?> newGenerator) throws DtoGeneratorException {
+        return this;
+    }
+
     // TODO
     //    public DtoGeneratorBuilder addRuleRemarkForAllFields(BasicGensBuilder builders) {
     //        fieldGeneratorMap.put(null, builders.getGenerator());
@@ -39,8 +62,8 @@ public class DtoGeneratorBuilder {
     //    }
 
     // TODO fields of nested objects
-    public DtoGeneratorBuilder addRuleRemarkForField(@NonNull String fieldName,
-                                                     @NonNull IGenerator<?> explicitGenerator) throws DtoGeneratorException {
+    public DtoGeneratorBuilder setGeneratorForField(@NonNull String fieldName,
+                                                    @NonNull IGenerator<?> explicitGenerator) throws DtoGeneratorException {
         if (fieldGeneratorMap.containsKey(fieldName)) {
             throw new DtoGeneratorException("Generator has already been explicitly added for field: '" + fieldName + "'");
         }
