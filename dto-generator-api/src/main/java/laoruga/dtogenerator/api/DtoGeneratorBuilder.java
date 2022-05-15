@@ -8,7 +8,10 @@ import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import lombok.NonNull;
 
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.RANDOM_VALUE;
 
@@ -31,13 +34,14 @@ import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.RANDOM_VAL
  */
 public class DtoGeneratorBuilder {
 
+    private final GensBuildersProvider gensBuildersProvider = new GensBuildersProvider();
+
     /**
      * key - field name;
      * if key == null - rule remark is passing to all basic fields generators;
      * if key != null - rule remarks is passing to field with this name.
      */
     private final Map<String, IRuleRemark> fieldSimpleRuleRemarkMap = new HashMap<>();
-    private final Map<String, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
     protected Map<Class<? extends IGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksForAllFields = new HashMap<>();
     protected Map<String, List<CustomRuleRemarkWrapper>> fieldCustomRuleRemarkMap = new HashMap<>();
 
@@ -52,6 +56,7 @@ public class DtoGeneratorBuilder {
 
     public DtoGeneratorBuilder overrideGenerator(@NonNull Class<? extends Annotation> rulesAnnotation,
                                                  @NonNull IGenerator<?> newGenerator) throws DtoGeneratorException {
+        gensBuildersProvider.overrideGenerator(rulesAnnotation, newGenerator);
         return this;
     }
 
@@ -64,10 +69,7 @@ public class DtoGeneratorBuilder {
     // TODO fields of nested objects
     public DtoGeneratorBuilder setGeneratorForField(@NonNull String fieldName,
                                                     @NonNull IGenerator<?> explicitGenerator) throws DtoGeneratorException {
-        if (fieldGeneratorMap.containsKey(fieldName)) {
-            throw new DtoGeneratorException("Generator has already been explicitly added for field: '" + fieldName + "'");
-        }
-        fieldGeneratorMap.put(fieldName, explicitGenerator);
+        gensBuildersProvider.addExplicitlyAddedGeneratorForFields(fieldName, explicitGenerator);
         return this;
     }
 
@@ -98,7 +100,11 @@ public class DtoGeneratorBuilder {
     }
 
     public DtoGenerator build() {
-        return new DtoGenerator(getFieldSimpleRuleRemarkMap(), customRuleRemarksForAllFields, this);
+        return new DtoGenerator(
+                gensBuildersProvider,
+                getFieldSimpleRuleRemarkMap(),
+                customRuleRemarksForAllFields,
+                this);
     }
 
     // TODO maybe exclude this

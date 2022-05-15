@@ -3,7 +3,6 @@ package laoruga.dtogenerator.api;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.NestedDtoGenerator;
 import laoruga.dtogenerator.api.generators.basictypegenerators.BasicTypeGenerators;
-import laoruga.dtogenerator.api.generators.basictypegenerators.StringGenerator;
 import laoruga.dtogenerator.api.markup.generators.*;
 import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
@@ -30,6 +29,8 @@ public class DtoGenerator {
 
     private Object dtoInstance;
 
+    GensBuildersProvider generatorsProvider;
+
     private final Map<Field, Exception> errors = new HashMap<>();
     private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
 
@@ -38,9 +39,11 @@ public class DtoGenerator {
 
     private final DtoGeneratorBuilder builderInstance;
 
-    protected DtoGenerator(Map<String, IRuleRemark> fieldRuleRemarkMap,
+    protected DtoGenerator(GensBuildersProvider generatorsProvider,
+                           Map<String, IRuleRemark> fieldRuleRemarkMap,
                            Map<Class<? extends IGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksForAllFields,
                            DtoGeneratorBuilder dtoGeneratorBuilder) {
+        this.generatorsProvider = generatorsProvider;
         this.fieldRuleRemarkMap = fieldRuleRemarkMap;
         this.extendedRuleRemarks = customRuleRemarksForAllFields;
         this.builderInstance = dtoGeneratorBuilder;
@@ -401,8 +404,6 @@ public class DtoGenerator {
                     "'" + collectionGenericTypes.length + "'");
         }
     }
-
-    BasicGensBuildersProvider generatorsProvider;
 
     private IGenerator<?> selectBasicGenerator(Class<?> fieldType, String fieldName, Annotation[] fieldAnnotations) throws DtoGeneratorException {
 

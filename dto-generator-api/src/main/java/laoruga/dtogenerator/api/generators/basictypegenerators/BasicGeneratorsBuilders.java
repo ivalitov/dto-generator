@@ -1,8 +1,9 @@
 package laoruga.dtogenerator.api.generators.basictypegenerators;
 
-public class BasicGenerators {
+public class BasicGeneratorsBuilders {
 
-    private BasicGenerators() {}
+    private BasicGeneratorsBuilders() {
+    }
 
     public static StringGenerator.StringGeneratorBuilder stringGenerator() {
         return StringGenerator.builder();
