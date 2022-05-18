@@ -3,35 +3,36 @@ package laoruga.dtogenerator.api;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.basictypegenerators.BasicGeneratorsBuilders;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
+import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.markup.rules.StringRules;
+import lombok.NonNull;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class GensBuildersProvider {
 
-    private final Map<String, IGenerator<?>> explicitlyAddedGeneratorForFields = new HashMap<>();
-    Map<Class<? extends Annotation>, IGenerator<?>> overriddenBuilders = new HashMap<>();
+    private final Map<String, IGeneratorBuilder> overriddenBuildersSpecificFields = new HashMap<>();
+    private final Map<Class<? extends Annotation>, IGeneratorBuilder> overriddenBuilders = new HashMap<>();
 
-    void addExplicitlyAddedGeneratorForFields(String fieldName, IGenerator<?> generator) {
-        if (explicitlyAddedGeneratorForFields.containsKey(fieldName)) {
+    void addExplicitlyAddedGeneratorForFields(String fieldName, IGeneratorBuilder genBuilder) {
+        if (overriddenBuildersSpecificFields.containsKey(fieldName)) {
             throw new DtoGeneratorException("Generator has already been explicitly added for field: '" + fieldName + "'");
         }
-        explicitlyAddedGeneratorForFields.put(fieldName, generator);
+        overriddenBuildersSpecificFields.put(fieldName, genBuilder);
     }
 
-    void overrideGenerator(Class<? extends Annotation> rulesClass, IGenerator<?> newGenerator) {
-        if (overriddenBuilders.containsKey(rulesClass)) {
-            throw new DtoGeneratorException("Generator has already been overridden: '" + rulesClass + "'");
-        }
-        overriddenBuilders.put(rulesClass, newGenerator);
+    void overrideGenerator(Class<? extends Annotation> rulesClass, @NonNull IGeneratorBuilder genBuilder) {
+        overriddenBuilders.put(rulesClass, genBuilder);
     }
 
-    IGenerator<?> getStringIGenerator(StringRules stringRules) {
-        IGenerator<?> generator = getOverriddenGeneratorOrNull(stringRules.getClass());
-        if (generator == null) {
-            generator = BasicGeneratorsBuilders.stringGenerator()
+    IGenerator<?> getStringGenerator(String fieldName, StringRules stringRules) {
+        if (isGeneratorOverridden(fieldName, stringRules)) {
+            return getOverriddenGenerator(fieldName, stringRules);
+        } else {
+            return BasicGeneratorsBuilders.string()
                     .minLength(stringRules.minSymbols())
                     .maxLength(stringRules.maxSymbols())
                     .charset(stringRules.charset())
@@ -39,10 +40,16 @@ public class GensBuildersProvider {
                     .ruleRemark(stringRules.ruleRemark())
                     .build();
         }
-        return generator;
     }
 
-    private IGenerator<?> getOverriddenGeneratorOrNull(Class<? extends Annotation> rulesClass) {
-        return overriddenBuilders.getOrDefault(rulesClass, null);
+    private boolean isGeneratorOverridden(String fieldName, Annotation rules) {
+        return overriddenBuildersSpecificFields.containsKey(fieldName) ||
+                overriddenBuilders.containsKey(rules.getClass());
+    }
+
+    private IGenerator<?> getOverriddenGenerator(String fieldName, Annotation rules) {
+        return overriddenBuildersSpecificFields.getOrDefault(
+                fieldName,
+                Objects.requireNonNull(overriddenBuilders.get(rules.getClass()))).build();
     }
 }

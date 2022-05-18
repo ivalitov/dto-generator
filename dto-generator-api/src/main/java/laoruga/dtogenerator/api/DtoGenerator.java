@@ -430,7 +430,7 @@ public class DtoGenerator {
         if (fieldType == String.class) {
             StringRules stringBounds = (StringRules) getAnnotationOrNull(StringRules.class, fieldAnnotations);
             if (stringBounds != null) {
-                return generatorsProvider.getStringIGenerator(stringBounds);
+                return generatorsProvider.getStringGenerator(fieldName, stringBounds);
             }
         }
 

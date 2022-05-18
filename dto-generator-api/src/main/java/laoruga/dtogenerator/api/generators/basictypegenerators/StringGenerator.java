@@ -2,29 +2,24 @@ package laoruga.dtogenerator.api.generators.basictypegenerators;
 
 import laoruga.dtogenerator.api.constants.CharSet;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
+import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.StringRules;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import org.apache.commons.text.RandomStringGenerator;
 
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 
 @AllArgsConstructor
-@Builder
 public class StringGenerator implements IGenerator<String> {
 
-    @Builder.Default
-    private final int maxLength = StringRules.DEFAULT_MAX_SYMBOLS_NUMBER;
-    @Builder.Default
-    private final int minLength = StringRules.DEFAULT_MIN_SYMBOLS_NUMBER;
-    @Builder.Default
-    private final CharSet[] charset = StringRules.DEFAULT_CHARSET;
-    @Builder.Default
-    private final String chars = StringRules.DEFAULT_CHARS;
-    @Builder.Default
-    private final IRuleRemark ruleRemark = StringRules.RULE_REMARK;
+    private final int maxLength;
+    private final int minLength;
+    private final CharSet[] charset;
+    private final String chars;
+    private final IRuleRemark ruleRemark;
 
     @Override
     public String generate() {
@@ -57,46 +52,70 @@ public class StringGenerator implements IGenerator<String> {
                 .build().generate(length);
     }
 
-//    public static StringGeneratorBuilder builder() {
-//        return new StringGeneratorBuilder();
-//    }
-//
-//    @RequiredArgsConstructor
-//    public static class StringGeneratorBuilder {
-//
-//        private int maxLength = StringRules.DEFAULT_MAX_SYMBOLS_NUMBER;
-//        private int minLength = StringRules.DEFAULT_MIN_SYMBOLS_NUMBER;
-//        private CharSet[] charset = StringRules.DEFAULT_CHARSET;
-//        private String chars = StringRules.DEFAULT_CHARS;
-//        private IRuleRemark ruleRemark;
-//
-//        public StringGenerator build(){
-//            return new StringGenerator(maxLength, minLength, charset, chars, ruleRemark);
+    public static StringGeneratorBuilder builder() {
+        return new StringGeneratorBuilder();
+    }
+
+    public static final class StringGeneratorBuilder implements IGeneratorBuilder {
+        private int maxLength = StringRules.DEFAULT_MAX_SYMBOLS_NUMBER;
+        private int minLength = StringRules.DEFAULT_MIN_SYMBOLS_NUMBER;
+        private CharSet[] charset = StringRules.DEFAULT_CHARSET;
+        private String chars = StringRules.DEFAULT_CHARS;
+        private IRuleRemark ruleRemark = StringRules.RULE_REMARK;
+
+        private StringGeneratorBuilder() {}
+
+        public StringGeneratorBuilder(StringRules stringRules) {
+            maxLength = stringRules.maxSymbols();
+            minLength = stringRules.minSymbols();
+        }
+
+        public StringGeneratorBuilder maxLength(int maxLength) {
+            this.maxLength = maxLength;
+            return this;
+        }
+
+        public StringGeneratorBuilder minLength(int minLength) {
+            this.minLength = minLength;
+            return this;
+        }
+
+        public StringGeneratorBuilder charset(CharSet[] charset) {
+            this.charset = charset;
+            return this;
+        }
+
+        public StringGeneratorBuilder chars(String chars) {
+            this.chars = chars;
+            return this;
+        }
+
+        public StringGeneratorBuilder ruleRemark(IRuleRemark ruleRemark) {
+            this.ruleRemark = ruleRemark;
+            return this;
+        }
+
+        @Override
+        public StringGenerator build() {
+            return new StringGenerator(
+                    this.maxLength,
+                    this.minLength,
+                    this.charset,
+                    this.chars,
+                    this.ruleRemark
+            );
+        }
+
+//        @Override
+//        public IGenerator<?> build(Annotation rules) {
+//            StringRules stringRules = (StringRules) rules;
+//            return new StringGenerator(
+//                    this.maxLength,
+//                    this.minLength,
+//                    this.charset,
+//                    this.chars,
+//                    this.ruleRemark
+//            );
 //        }
-//
-//        public StringGeneratorBuilder setMaxLength(int maxLength) {
-//            this.maxLength = maxLength;
-//            return this;
-//        }
-//
-//        public StringGeneratorBuilder setMinLength(int minLength) {
-//            this.minLength = minLength;
-//            return this;
-//        }
-//
-//        public StringGeneratorBuilder setCharset(CharSet[] charset) {
-//            this.charset = charset;
-//            return this;
-//        }
-//
-//        public StringGeneratorBuilder setChars(String chars) {
-//            this.chars = chars;
-//            return this;
-//        }
-//
-//        public StringGeneratorBuilder setRuleRemark(IRuleRemark ruleRemark) {
-//            this.ruleRemark = ruleRemark;
-//            return this;
-//        }
-//    }
+    }
 }

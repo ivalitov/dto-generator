@@ -5,7 +5,7 @@ public class BasicGeneratorsBuilders {
     private BasicGeneratorsBuilders() {
     }
 
-    public static StringGenerator.StringGeneratorBuilder stringGenerator() {
+    public static StringGenerator.StringGeneratorBuilder string() {
         return StringGenerator.builder();
     }
 }

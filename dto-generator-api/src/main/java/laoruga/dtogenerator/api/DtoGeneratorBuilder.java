@@ -2,6 +2,7 @@ package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
+import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
@@ -54,9 +55,9 @@ public class DtoGeneratorBuilder {
         return this;
     }
 
-    public DtoGeneratorBuilder overrideGenerator(@NonNull Class<? extends Annotation> rulesAnnotation,
-                                                 @NonNull IGenerator<?> newGenerator) throws DtoGeneratorException {
-        gensBuildersProvider.overrideGenerator(rulesAnnotation, newGenerator);
+    public DtoGeneratorBuilder overrideBasicGenerator(@NonNull Class<? extends Annotation> rulesAnnotation,
+                                                      @NonNull IGeneratorBuilder newGeneratorBuilder) throws DtoGeneratorException {
+        gensBuildersProvider.overrideGenerator(rulesAnnotation, newGeneratorBuilder);
         return this;
     }
 
@@ -68,7 +69,7 @@ public class DtoGeneratorBuilder {
 
     // TODO fields of nested objects
     public DtoGeneratorBuilder setGeneratorForField(@NonNull String fieldName,
-                                                    @NonNull IGenerator<?> explicitGenerator) throws DtoGeneratorException {
+                                                    @NonNull IGeneratorBuilder explicitGenerator) throws DtoGeneratorException {
         gensBuildersProvider.addExplicitlyAddedGeneratorForFields(fieldName, explicitGenerator);
         return this;
     }
