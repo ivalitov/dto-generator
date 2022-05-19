@@ -106,16 +106,5 @@ public class StringGenerator implements IGenerator<String> {
             );
         }
 
-//        @Override
-//        public IGenerator<?> build(Annotation rules) {
-//            StringRules stringRules = (StringRules) rules;
-//            return new StringGenerator(
-//                    this.maxLength,
-//                    this.minLength,
-//                    this.charset,
-//                    this.chars,
-//                    this.ruleRemark
-//            );
-//        }
     }
 }

@@ -23,12 +23,13 @@ public @interface StringRules {
     String DEFAULT_CHARS = "";
     IRuleRemark RULE_REMARK = RANDOM_VALUE;
 
-    int maxSymbols() default DEFAULT_MAX_SYMBOLS_NUMBER;
-
     int minSymbols() default DEFAULT_MIN_SYMBOLS_NUMBER;
+
+    int maxSymbols() default DEFAULT_MAX_SYMBOLS_NUMBER;
 
     CharSet[] charset() default {CharSet.NUM, CharSet.ENG, CharSet.RUS};
 
     String chars() default DEFAULT_CHARS;
+
     BasicRuleRemark ruleRemark() default RANDOM_VALUE;
 }

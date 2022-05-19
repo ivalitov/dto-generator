@@ -29,23 +29,19 @@ public class DtoGenerator {
 
     private Object dtoInstance;
 
-    GensBuildersProvider generatorsProvider;
+    private final GeneratorBuildersProvider generatorsProvider;
+    private final GeneratorRemarksProvider generatorRemarksProvider;
 
     private final Map<Field, Exception> errors = new HashMap<>();
     private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
 
-    private final Map<String, IRuleRemark> fieldRuleRemarkMap;
-    private final Map<Class<? extends IGenerator<?>>, List<CustomRuleRemarkWrapper>> extendedRuleRemarks;
-
     private final DtoGeneratorBuilder builderInstance;
 
-    protected DtoGenerator(GensBuildersProvider generatorsProvider,
-                           Map<String, IRuleRemark> fieldRuleRemarkMap,
-                           Map<Class<? extends IGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksForAllFields,
+    protected DtoGenerator(GeneratorBuildersProvider generatorsProvider,
+                           GeneratorRemarksProvider generatorRemarksProvider,
                            DtoGeneratorBuilder dtoGeneratorBuilder) {
         this.generatorsProvider = generatorsProvider;
-        this.fieldRuleRemarkMap = fieldRuleRemarkMap;
-        this.extendedRuleRemarks = customRuleRemarksForAllFields;
+        this.generatorRemarksProvider = generatorRemarksProvider;
         this.builderInstance = dtoGeneratorBuilder;
     }
 
@@ -248,17 +244,10 @@ public class DtoGenerator {
     void prepareCustomRemarks(IGenerator<?> generator) {
         if (generator instanceof ICustomGeneratorRemarkable) {
             ICustomGeneratorRemarkable<?> remarkableGenerator = (ICustomGeneratorRemarkable<?>) generator;
-            if (extendedRuleRemarks.containsKey(remarkableGenerator.getClass())) {
-                remarkableGenerator.setRuleRemarks(extendedRuleRemarks.get(remarkableGenerator.getClass()));
+            if (generatorRemarksProvider.isCustomRemarkExists(remarkableGenerator)) {
+                remarkableGenerator.setRuleRemarks(generatorRemarksProvider.getCustomRemarks(remarkableGenerator));
             }
         }
-    }
-
-    private IRuleRemark getBasicRuleRemark(String fieldName) {
-        if (fieldRuleRemarkMap.containsKey(fieldName)) {
-            return fieldRuleRemarkMap.get(fieldName);
-        }
-        return fieldRuleRemarkMap.get(null);
     }
 
     enum RulesType {
@@ -410,7 +399,7 @@ public class DtoGenerator {
         if (fieldType == Double.class || fieldType == Double.TYPE) {
             DoubleRules doubleBounds = (DoubleRules) getAnnotationOrNull(DoubleRules.class, fieldAnnotations);
             if (doubleBounds != null) {
-                IRuleRemark basicRuleRemark = getBasicRuleRemark(fieldName);
+                IRuleRemark basicRuleRemark = generatorRemarksProvider.getBasicRuleRemark(fieldName);
                 double minValue = doubleBounds.minValue();
                 if (basicRuleRemark == NULL_VALUE && fieldType == Double.TYPE) {
                     log.debug("Doubel primitive field '" + fieldName + "' can't be null, it will be assigned " +
@@ -437,7 +426,7 @@ public class DtoGenerator {
         if (fieldType == Integer.class || fieldType == Integer.TYPE) {
             IntegerRules integerRules = (IntegerRules) getAnnotationOrNull(IntegerRules.class, fieldAnnotations);
             if (integerRules != null) {
-                IRuleRemark basicRuleRemark = getBasicRuleRemark(fieldName);
+                IRuleRemark basicRuleRemark = generatorRemarksProvider.getBasicRuleRemark(fieldName);
                 int minValue = integerRules.minValue();
                 if (basicRuleRemark == NULL_VALUE && fieldType == Integer.TYPE) {
                     log.debug("Integer primitive field '" + fieldName + "' can't be null, it will be assigned " +
@@ -456,7 +445,7 @@ public class DtoGenerator {
         if (fieldType == Long.class || fieldType == Long.TYPE) {
             LongRules longRules = (LongRules) getAnnotationOrNull(LongRules.class, fieldAnnotations);
             if (longRules != null) {
-                IRuleRemark basicRuleRemark = getBasicRuleRemark(fieldName);
+                IRuleRemark basicRuleRemark = generatorRemarksProvider.getBasicRuleRemark(fieldName);
                 long minValue = longRules.minValue();
                 if (basicRuleRemark == NULL_VALUE && fieldType == Long.TYPE) {
                     log.debug("Long primitive field '" + fieldName + "' can't be null, it will be assigned " +
@@ -478,7 +467,7 @@ public class DtoGenerator {
                 return new BasicTypeGenerators.EnumGenerator(
                         enumBounds.possibleEnumNames(),
                         enumBounds.enumClass(),
-                        getBasicRuleRemark(fieldName)
+                        generatorRemarksProvider.getBasicRuleRemark(fieldName)
                 );
             }
         }
@@ -489,7 +478,7 @@ public class DtoGenerator {
                 return new BasicTypeGenerators.LocalDateTimeGenerator(
                         enumBounds.leftShiftDays(),
                         enumBounds.rightShiftDays(),
-                        getBasicRuleRemark(fieldName)
+                        generatorRemarksProvider.getBasicRuleRemark(fieldName)
                 );
             }
         }

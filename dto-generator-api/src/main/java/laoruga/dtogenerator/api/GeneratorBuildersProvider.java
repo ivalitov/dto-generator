@@ -12,12 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class GensBuildersProvider {
+public class GeneratorBuildersProvider {
 
-    private final Map<String, IGeneratorBuilder> overriddenBuildersSpecificFields = new HashMap<>();
     private final Map<Class<? extends Annotation>, IGeneratorBuilder> overriddenBuilders = new HashMap<>();
+    private final Map<String, IGeneratorBuilder> overriddenBuildersSpecificFields = new HashMap<>();
 
-    void addExplicitlyAddedGeneratorForFields(String fieldName, IGeneratorBuilder genBuilder) {
+    void setGeneratorForFields(String fieldName, IGeneratorBuilder genBuilder) throws DtoGeneratorException {
         if (overriddenBuildersSpecificFields.containsKey(fieldName)) {
             throw new DtoGeneratorException("Generator has already been explicitly added for field: '" + fieldName + "'");
         }
@@ -25,6 +25,9 @@ public class GensBuildersProvider {
     }
 
     void overrideGenerator(Class<? extends Annotation> rulesClass, @NonNull IGeneratorBuilder genBuilder) {
+        if (overriddenBuilders.containsKey(rulesClass)) {
+            throw new DtoGeneratorException("Generator has already been explicitly added for Rules: '" + rulesClass + "'");
+        }
         overriddenBuilders.put(rulesClass, genBuilder);
     }
 

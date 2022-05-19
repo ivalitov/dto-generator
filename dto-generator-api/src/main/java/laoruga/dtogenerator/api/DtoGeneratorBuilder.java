@@ -14,8 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.RANDOM_VALUE;
-
 /**
  * 1. ок - Basic remark applicable to any field marked with simple rules
  * 2. ок - Basic remark for field with name
@@ -35,7 +33,8 @@ import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.RANDOM_VAL
  */
 public class DtoGeneratorBuilder {
 
-    private final GensBuildersProvider gensBuildersProvider = new GensBuildersProvider();
+    private final GeneratorBuildersProvider gensBuildersProvider = new GeneratorBuildersProvider();
+    private final GeneratorRemarksProvider gensRemarksProvider = new GeneratorRemarksProvider();
 
     /**
      * key - field name;
@@ -46,6 +45,32 @@ public class DtoGeneratorBuilder {
     protected Map<Class<? extends IGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksForAllFields = new HashMap<>();
     protected Map<String, List<CustomRuleRemarkWrapper>> fieldCustomRuleRemarkMap = new HashMap<>();
 
+    public DtoGeneratorBuilder overrideBasicGenerator(@NonNull Class<? extends Annotation> rules,
+                                                      @NonNull IGeneratorBuilder newGeneratorBuilder) throws DtoGeneratorException {
+        gensBuildersProvider.overrideGenerator(rules, newGeneratorBuilder);
+        return this;
+    }
+
+    // TODO fields of nested objects
+    public DtoGeneratorBuilder setGeneratorForField(@NonNull String fieldName,
+                                                    @NonNull IGeneratorBuilder explicitGenerator) throws DtoGeneratorException {
+        gensBuildersProvider.setGeneratorForFields(fieldName, explicitGenerator);
+        return this;
+    }
+
+    /*
+     * Basic Rule Remarks
+     */
+
+    public DtoGeneratorBuilder setRuleRemarkForField(@NonNull String filedName,
+                                                     @NonNull BasicRuleRemark ruleRemark) throws DtoGeneratorException {
+        if (fieldSimpleRuleRemarkMap.containsKey(filedName)) {
+            throw new DtoGeneratorException("For field '" + filedName + "' has already been passed 'remark");
+        }
+        fieldSimpleRuleRemarkMap.put(filedName, ruleRemark);
+        return this;
+    }
+
     public DtoGeneratorBuilder setRuleRemarkForAllFields(@NonNull BasicRuleRemark basicRuleRemark) throws DtoGeneratorException {
         if (fieldSimpleRuleRemarkMap.containsKey(null)) {
             throw new DtoGeneratorException("Dto Generator Builder already has a ruleRemarkForAllFields: "
@@ -55,33 +80,9 @@ public class DtoGeneratorBuilder {
         return this;
     }
 
-    public DtoGeneratorBuilder overrideBasicGenerator(@NonNull Class<? extends Annotation> rulesAnnotation,
-                                                      @NonNull IGeneratorBuilder newGeneratorBuilder) throws DtoGeneratorException {
-        gensBuildersProvider.overrideGenerator(rulesAnnotation, newGeneratorBuilder);
-        return this;
-    }
-
-    // TODO
-    //    public DtoGeneratorBuilder addRuleRemarkForAllFields(BasicGensBuilder builders) {
-    //        fieldGeneratorMap.put(null, builders.getGenerator());
-    //        return this;
-    //    }
-
-    // TODO fields of nested objects
-    public DtoGeneratorBuilder setGeneratorForField(@NonNull String fieldName,
-                                                    @NonNull IGeneratorBuilder explicitGenerator) throws DtoGeneratorException {
-        gensBuildersProvider.addExplicitlyAddedGeneratorForFields(fieldName, explicitGenerator);
-        return this;
-    }
-
-    public DtoGeneratorBuilder addRuleRemarkForField(@NonNull String filedName,
-                                                     @NonNull IRuleRemark ruleRemark) throws DtoGeneratorException {
-        if (fieldSimpleRuleRemarkMap.containsKey(filedName)) {
-            throw new DtoGeneratorException("For field '" + filedName + "' has already been passed 'remark");
-        }
-        fieldSimpleRuleRemarkMap.put(filedName, ruleRemark);
-        return this;
-    }
+    /*
+     * Custom Rule Remarks
+     */
 
     public DtoGeneratorBuilder addRuleRemarkForField(@NonNull String filedName,
                                                      @NonNull CustomRuleRemarkWrapper... ruleRemark) {
@@ -103,16 +104,7 @@ public class DtoGeneratorBuilder {
     public DtoGenerator build() {
         return new DtoGenerator(
                 gensBuildersProvider,
-                getFieldSimpleRuleRemarkMap(),
-                customRuleRemarksForAllFields,
+                gensRemarksProvider,
                 this);
-    }
-
-    // TODO maybe exclude this
-    private Map<String, IRuleRemark> getFieldSimpleRuleRemarkMap() {
-        if (!fieldSimpleRuleRemarkMap.containsKey(null)) {
-            fieldSimpleRuleRemarkMap.put(null, RANDOM_VALUE);
-        }
-        return fieldSimpleRuleRemarkMap;
     }
 }
