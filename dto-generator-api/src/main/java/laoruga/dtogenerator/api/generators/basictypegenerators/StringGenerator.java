@@ -9,7 +9,6 @@ import laoruga.dtogenerator.api.markup.rules.StringRules;
 import lombok.AllArgsConstructor;
 import org.apache.commons.text.RandomStringGenerator;
 
-import java.lang.annotation.Annotation;
 import java.util.Arrays;
 
 @AllArgsConstructor
@@ -61,14 +60,9 @@ public class StringGenerator implements IGenerator<String> {
         private int minLength = StringRules.DEFAULT_MIN_SYMBOLS_NUMBER;
         private CharSet[] charset = StringRules.DEFAULT_CHARSET;
         private String chars = StringRules.DEFAULT_CHARS;
-        private IRuleRemark ruleRemark = StringRules.RULE_REMARK;
+        private IRuleRemark ruleRemark = StringRules.DEFAULT_RULE_REMARK;
 
         private StringGeneratorBuilder() {}
-
-        public StringGeneratorBuilder(StringRules stringRules) {
-            maxLength = stringRules.maxSymbols();
-            minLength = stringRules.minSymbols();
-        }
 
         public StringGeneratorBuilder maxLength(int maxLength) {
             this.maxLength = maxLength;

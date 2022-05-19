@@ -33,17 +33,23 @@ import java.util.Map;
  */
 public class DtoGeneratorBuilder {
 
-    private final GeneratorBuildersProvider gensBuildersProvider = new GeneratorBuildersProvider();
-    private final GeneratorRemarksProvider gensRemarksProvider = new GeneratorRemarksProvider();
+    private final GeneratorBuildersProvider gensBuildersProvider;
 
     /**
      * key - field name;
      * if key == null - rule remark is passing to all basic fields generators;
      * if key != null - rule remarks is passing to field with this name.
      */
-    private final Map<String, IRuleRemark> fieldSimpleRuleRemarkMap = new HashMap<>();
-    protected Map<Class<? extends IGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksForAllFields = new HashMap<>();
-    protected Map<String, List<CustomRuleRemarkWrapper>> fieldCustomRuleRemarkMap = new HashMap<>();
+    private final Map<String, IRuleRemark> fieldSimpleRuleRemarkMap;
+    private final Map<Class<? extends IGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksForAllFields;
+    private final Map<String, List<CustomRuleRemarkWrapper>> fieldCustomRuleRemarkMap;
+
+    public DtoGeneratorBuilder() {
+        this.gensBuildersProvider = new GeneratorBuildersProvider(new GeneratorRemarksProvider());
+        this.fieldSimpleRuleRemarkMap = new HashMap<>();
+        this.customRuleRemarksForAllFields = new HashMap<>();
+        this.fieldCustomRuleRemarkMap = new HashMap<>();
+    }
 
     public DtoGeneratorBuilder overrideBasicGenerator(@NonNull Class<? extends Annotation> rules,
                                                       @NonNull IGeneratorBuilder newGeneratorBuilder) throws DtoGeneratorException {
@@ -104,7 +110,6 @@ public class DtoGeneratorBuilder {
     public DtoGenerator build() {
         return new DtoGenerator(
                 gensBuildersProvider,
-                gensRemarksProvider,
                 this);
     }
 }

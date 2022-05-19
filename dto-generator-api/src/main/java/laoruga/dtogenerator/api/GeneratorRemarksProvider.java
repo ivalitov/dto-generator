@@ -1,7 +1,6 @@
 package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
-import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 
@@ -14,13 +13,14 @@ public class GeneratorRemarksProvider {
 
     private final Map<String, IRuleRemark> basicRuleRemarksMapByField = new HashMap<>();
     private final Map<String, List<CustomRuleRemarkWrapper>> customRuleRemarksMapByField = new HashMap<>();
-    private final Map<Class<? extends ICustomGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksMap= new HashMap<>();
+    private final Map<Class<? extends ICustomGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksMap = new HashMap<>();
+
+    boolean isBasicRuleRemarkExists(String fieldName) {
+        return basicRuleRemarksMapByField.containsKey(fieldName);
+    }
 
     IRuleRemark getBasicRuleRemark(String fieldName) {
-        if (basicRuleRemarksMapByField.containsKey(fieldName)) {
-            return basicRuleRemarksMapByField.get(fieldName);
-        }
-        return Objects.requireNonNull(basicRuleRemarksMapByField.get(null));
+        return basicRuleRemarksMapByField.get(fieldName);
     }
 
     boolean isCustomRemarkExists(ICustomGenerator<?> customGenerator) {

@@ -2,9 +2,8 @@ package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.NestedDtoGenerator;
-import laoruga.dtogenerator.api.generators.basictypegenerators.BasicTypeGenerators;
+import laoruga.dtogenerator.api.generators.basictypegenerators.*;
 import laoruga.dtogenerator.api.markup.generators.*;
-import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.*;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,6 @@ public class DtoGenerator {
     private Object dtoInstance;
 
     private final GeneratorBuildersProvider generatorsProvider;
-    private final GeneratorRemarksProvider generatorRemarksProvider;
 
     private final Map<Field, Exception> errors = new HashMap<>();
     private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
@@ -38,10 +36,8 @@ public class DtoGenerator {
     private final DtoGeneratorBuilder builderInstance;
 
     protected DtoGenerator(GeneratorBuildersProvider generatorsProvider,
-                           GeneratorRemarksProvider generatorRemarksProvider,
                            DtoGeneratorBuilder dtoGeneratorBuilder) {
         this.generatorsProvider = generatorsProvider;
-        this.generatorRemarksProvider = generatorRemarksProvider;
         this.builderInstance = dtoGeneratorBuilder;
     }
 
@@ -244,8 +240,9 @@ public class DtoGenerator {
     void prepareCustomRemarks(IGenerator<?> generator) {
         if (generator instanceof ICustomGeneratorRemarkable) {
             ICustomGeneratorRemarkable<?> remarkableGenerator = (ICustomGeneratorRemarkable<?>) generator;
-            if (generatorRemarksProvider.isCustomRemarkExists(remarkableGenerator)) {
-                remarkableGenerator.setRuleRemarks(generatorRemarksProvider.getCustomRemarks(remarkableGenerator));
+            if (generatorsProvider.getGeneratorRemarksProvider().isCustomRemarkExists(remarkableGenerator)) {
+                remarkableGenerator.setRuleRemarks(generatorsProvider.getGeneratorRemarksProvider()
+                        .getCustomRemarks(remarkableGenerator));
             }
         }
     }
@@ -361,7 +358,7 @@ public class DtoGenerator {
         if (List.class.isAssignableFrom(fieldType)) {
             ListRules listRules = field.getAnnotation(ListRules.class);
             if (listRules != null) {
-                return new BasicTypeGenerators.ListGenerator<>(
+                return new ListGenerator<>(
                         listRules.minSize(),
                         listRules.maxSize(),
                         createCollectionFieldInstance(field, listRules.listClass()),
@@ -397,48 +394,23 @@ public class DtoGenerator {
     private IGenerator<?> selectBasicGenerator(Class<?> fieldType, String fieldName, Annotation[] fieldAnnotations) throws DtoGeneratorException {
 
         if (fieldType == Double.class || fieldType == Double.TYPE) {
-            DoubleRules doubleBounds = (DoubleRules) getAnnotationOrNull(DoubleRules.class, fieldAnnotations);
-            if (doubleBounds != null) {
-                IRuleRemark basicRuleRemark = generatorRemarksProvider.getBasicRuleRemark(fieldName);
-                double minValue = doubleBounds.minValue();
-                if (basicRuleRemark == NULL_VALUE && fieldType == Double.TYPE) {
-                    log.debug("Doubel primitive field '" + fieldName + "' can't be null, it will be assigned " +
-                            " to DoubleRules.DEFAULT_MIN");
-                    basicRuleRemark = MIN_VALUE;
-                    minValue = DoubleRules.DEFAULT_MIN;
-                }
-                return new BasicTypeGenerators.DoubleGenerator(
-                        doubleBounds.maxValue(),
-                        minValue,
-                        doubleBounds.precision(),
-                        basicRuleRemark
-                );
+            DoubleRules rules = (DoubleRules) getAnnotationOrNull(DoubleRules.class, fieldAnnotations);
+            if (rules != null) {
+                return generatorsProvider.getDoubleGenerator(fieldName, rules, fieldType == Double.TYPE);
             }
         }
 
         if (fieldType == String.class) {
-            StringRules stringBounds = (StringRules) getAnnotationOrNull(StringRules.class, fieldAnnotations);
-            if (stringBounds != null) {
-                return generatorsProvider.getStringGenerator(fieldName, stringBounds);
+            StringRules rules = (StringRules) getAnnotationOrNull(StringRules.class, fieldAnnotations);
+            if (rules != null) {
+                return generatorsProvider.getStringGenerator(fieldName, rules);
             }
         }
 
         if (fieldType == Integer.class || fieldType == Integer.TYPE) {
-            IntegerRules integerRules = (IntegerRules) getAnnotationOrNull(IntegerRules.class, fieldAnnotations);
-            if (integerRules != null) {
-                IRuleRemark basicRuleRemark = generatorRemarksProvider.getBasicRuleRemark(fieldName);
-                int minValue = integerRules.minValue();
-                if (basicRuleRemark == NULL_VALUE && fieldType == Integer.TYPE) {
-                    log.debug("Integer primitive field '" + fieldName + "' can't be null, it will be assigned " +
-                            " to IntegerRules.DEFAULT_MIN");
-                    basicRuleRemark = MIN_VALUE;
-                    minValue = IntegerRules.DEFAULT_MIN;
-                }
-                return new BasicTypeGenerators.IntegerGenerator(
-                        integerRules.maxValue(),
-                        minValue,
-                        basicRuleRemark
-                );
+            IntegerRules rules = (IntegerRules) getAnnotationOrNull(IntegerRules.class, fieldAnnotations);
+            if (rules != null) {
+                return generatorsProvider.getIntegerGenerator(fieldName, rules, fieldType == Integer.TYPE);
             }
         }
 
@@ -453,7 +425,7 @@ public class DtoGenerator {
                     basicRuleRemark = MIN_VALUE;
                     minValue = LongRules.DEFAULT_MIN;
                 }
-                return new BasicTypeGenerators.LongGenerator(
+                return new LongGenerator(
                         longRules.maxValue(),
                         minValue,
                         basicRuleRemark
@@ -464,7 +436,7 @@ public class DtoGenerator {
         if (fieldType.isEnum()) {
             EnumRules enumBounds = (EnumRules) getAnnotationOrNull(EnumRules.class, fieldAnnotations);
             if (enumBounds != null) {
-                return new BasicTypeGenerators.EnumGenerator(
+                return new EnumGenerator(
                         enumBounds.possibleEnumNames(),
                         enumBounds.enumClass(),
                         generatorRemarksProvider.getBasicRuleRemark(fieldName)
@@ -475,7 +447,7 @@ public class DtoGenerator {
         if (fieldType == LocalDateTime.class) {
             LocalDateTimeRules enumBounds = (LocalDateTimeRules) getAnnotationOrNull(LocalDateTimeRules.class, fieldAnnotations);
             if (enumBounds != null) {
-                return new BasicTypeGenerators.LocalDateTimeGenerator(
+                return new LocalDateTimeGenerator(
                         enumBounds.leftShiftDays(),
                         enumBounds.rightShiftDays(),
                         generatorRemarksProvider.getBasicRuleRemark(fieldName)
