@@ -5,9 +5,7 @@ import laoruga.dtogenerator.api.generators.basictypegenerators.BasicGeneratorsBu
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
-import laoruga.dtogenerator.api.markup.rules.DoubleRules;
-import laoruga.dtogenerator.api.markup.rules.IntegerRules;
-import laoruga.dtogenerator.api.markup.rules.StringRules;
+import laoruga.dtogenerator.api.markup.rules.*;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -99,6 +97,49 @@ public class GeneratorBuildersProvider {
                     .minValue(integerRules.minValue())
                     .maxValue(integerRules.maxValue())
                     .ruleRemark(remark)
+                    .build();
+        }
+    }
+
+    public IGenerator<?> getLongGenerator(String fieldName, LongRules longRules, boolean isPrimitive) {
+        if (isGeneratorOverridden(fieldName, longRules)) {
+            return getOverriddenGenerator(fieldName, longRules);
+        } else {
+            IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
+                    generatorRemarksProvider.getBasicRuleRemark(fieldName) :
+                    longRules.ruleRemark();
+            if (remark == NULL_VALUE && isPrimitive) {
+                log.debug("Primitive field '" + fieldName + "' can't be null, it will be assigned to '0'");
+                return (IGenerator<Long>) () -> 0L;
+            }
+            return BasicGeneratorsBuilders.longBuilder()
+                    .minValue(longRules.minValue())
+                    .maxValue(longRules.maxValue())
+                    .ruleRemark(remark)
+                    .build();
+        }
+    }
+
+    public IGenerator<?> getEnumGenerator(String fieldName, EnumRules enumRules) {
+        if (isGeneratorOverridden(fieldName, enumRules)) {
+            return getOverriddenGenerator(fieldName, enumRules);
+        } else {
+            return BasicGeneratorsBuilders.enumBuilder()
+                    .enumClass(enumRules.enumClass())
+                    .possibleEnumNames(enumRules.possibleEnumNames())
+                    .ruleRemark(enumRules.ruleRemark())
+                    .build();
+        }
+    }
+
+    public IGenerator<?> getLocalDateTimeGenerator(String fieldName, LocalDateTimeRules localDateTimeRules) {
+        if (isGeneratorOverridden(fieldName, localDateTimeRules)) {
+            return getOverriddenGenerator(fieldName, localDateTimeRules);
+        } else {
+            return BasicGeneratorsBuilders.localDateTimeBuilder()
+                    .leftShiftDays(localDateTimeRules.leftShiftDays())
+                    .rightShiftDays(localDateTimeRules.rightShiftDays())
+                    .ruleRemark(localDateTimeRules.ruleRemark())
                     .build();
         }
     }

@@ -2,9 +2,10 @@ package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.NestedDtoGenerator;
-import laoruga.dtogenerator.api.generators.basictypegenerators.*;
+import laoruga.dtogenerator.api.generators.basictypegenerators.EnumGenerator;
+import laoruga.dtogenerator.api.generators.basictypegenerators.ListGenerator;
+import laoruga.dtogenerator.api.generators.basictypegenerators.LocalDateTimeGenerator;
 import laoruga.dtogenerator.api.markup.generators.*;
-import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -19,9 +20,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.MIN_VALUE;
-import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.NULL_VALUE;
 
 @Slf4j
 public class DtoGenerator {
@@ -415,48 +413,28 @@ public class DtoGenerator {
         }
 
         if (fieldType == Long.class || fieldType == Long.TYPE) {
-            LongRules longRules = (LongRules) getAnnotationOrNull(LongRules.class, fieldAnnotations);
-            if (longRules != null) {
-                IRuleRemark basicRuleRemark = generatorRemarksProvider.getBasicRuleRemark(fieldName);
-                long minValue = longRules.minValue();
-                if (basicRuleRemark == NULL_VALUE && fieldType == Long.TYPE) {
-                    log.debug("Long primitive field '" + fieldName + "' can't be null, it will be assigned " +
-                            " to LongRules.DEFAULT_MIN");
-                    basicRuleRemark = MIN_VALUE;
-                    minValue = LongRules.DEFAULT_MIN;
-                }
-                return new LongGenerator(
-                        longRules.maxValue(),
-                        minValue,
-                        basicRuleRemark
-                );
+            LongRules rules = (LongRules) getAnnotationOrNull(LongRules.class, fieldAnnotations);
+            if (rules != null) {
+                return generatorsProvider.getLongGenerator(fieldName, rules, fieldType == Integer.TYPE);
             }
         }
 
         if (fieldType.isEnum()) {
-            EnumRules enumBounds = (EnumRules) getAnnotationOrNull(EnumRules.class, fieldAnnotations);
-            if (enumBounds != null) {
-                return new EnumGenerator(
-                        enumBounds.possibleEnumNames(),
-                        enumBounds.enumClass(),
-                        generatorRemarksProvider.getBasicRuleRemark(fieldName)
-                );
+            EnumRules rules = (EnumRules) getAnnotationOrNull(EnumRules.class, fieldAnnotations);
+            if (rules != null) {
+                return generatorsProvider.getEnumGenerator(fieldName, rules);
             }
         }
 
         if (fieldType == LocalDateTime.class) {
-            LocalDateTimeRules enumBounds = (LocalDateTimeRules) getAnnotationOrNull(LocalDateTimeRules.class, fieldAnnotations);
-            if (enumBounds != null) {
-                return new LocalDateTimeGenerator(
-                        enumBounds.leftShiftDays(),
-                        enumBounds.rightShiftDays(),
-                        generatorRemarksProvider.getBasicRuleRemark(fieldName)
-                );
+            LocalDateTimeRules rules = (LocalDateTimeRules) getAnnotationOrNull(LocalDateTimeRules.class, fieldAnnotations);
+            if (rules != null) {
+                return generatorsProvider.getLocalDateTimeGenerator(fieldName, rules);
+
             }
         }
 
         NestedDtoRules nestedDtoRules = (NestedDtoRules) getAnnotationOrNull(NestedDtoRules.class, fieldAnnotations);
-
         if (nestedDtoRules != null) {
             return new NestedDtoGenerator<>(builderInstance.build(), fieldType);
         }

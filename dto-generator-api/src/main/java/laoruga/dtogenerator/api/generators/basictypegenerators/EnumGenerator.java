@@ -1,6 +1,7 @@
 package laoruga.dtogenerator.api.generators.basictypegenerators;
 
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
+import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import lombok.AllArgsConstructor;
@@ -49,7 +50,7 @@ public class EnumGenerator implements IGenerator<Enum<?>> {
         return new EnumGeneratorBuilder();
     }
 
-    public static final class EnumGeneratorBuilder {
+    public static final class EnumGeneratorBuilder implements IGeneratorBuilder {
         private String[] possibleEnumNames;
         private Class<? extends Enum<?>> enumClass;
         private IRuleRemark ruleRemark;
