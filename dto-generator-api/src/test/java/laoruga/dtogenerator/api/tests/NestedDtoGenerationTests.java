@@ -11,7 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-import static laoruga.dtogenerator.api.tests.BasitTypeGeneratorsTests.simpleIntegerGenerationAssertions;
+import static laoruga.dtogenerator.api.tests.IntegerGenerationTests.simpleIntegerGenerationAssertions;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -26,7 +26,7 @@ public class NestedDtoGenerationTests {
         @IntegerRules()
         private Integer intDefaultRules;
         @NestedDtoRules()
-        private BasitTypeGeneratorsTests.DtoInteger dtoNested;
+        private IntegerGenerationTests.DtoInteger dtoNested;
     }
 
     @Getter

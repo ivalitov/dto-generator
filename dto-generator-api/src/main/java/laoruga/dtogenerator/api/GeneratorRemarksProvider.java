@@ -23,9 +23,9 @@ public class GeneratorRemarksProvider {
         return basicRuleRemarksMapByField.containsKey(fieldName) || basicRuleRemarksMapByField.containsKey(null);
     }
 
-    public void setBasicRuleRemarkForField(String filedName,
-                                           @NonNull BasicRuleRemark ruleRemark) {
-        if (isBasicRuleRemarkExists(filedName)) {
+    void setBasicRuleRemarkForField(String filedName,
+                                    @NonNull BasicRuleRemark ruleRemark) {
+        if (basicRuleRemarksMapByField.containsKey(filedName)) {
             if (filedName != null) {
                 throw new DtoGeneratorException("Trying to overwrite remark from: '" + getBasicRuleRemark(filedName) + "'" +
                         " to: '" + ruleRemark + "' for field '" + filedName + "'.");
