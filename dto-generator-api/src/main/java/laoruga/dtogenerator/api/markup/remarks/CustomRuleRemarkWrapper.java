@@ -1,6 +1,6 @@
 package laoruga.dtogenerator.api.markup.remarks;
 
-import laoruga.dtogenerator.api.markup.generators.IGenerator;
+import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -12,7 +12,7 @@ import java.util.List;
 public class CustomRuleRemarkWrapper {
 
     ICustomRuleRemark wrappedRuleRemark;
-    Class<? extends IGenerator<?>> generatorClass;
+    Class<? extends ICustomGenerator<?>> generatorClass;
     @NonNull String[] args;
 
     public String[] getArgs() {

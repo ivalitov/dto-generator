@@ -1,6 +1,7 @@
 package laoruga.dtogenerator.api.markup.remarks;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
+import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 
 /**
@@ -25,7 +26,7 @@ public interface ICustomRuleRemark {
     /**
      * @return class of custom generator for which is intended this 'remark'
      */
-    Class<? extends IGenerator<?>> getGeneratorClass();
+    Class<? extends ICustomGenerator<?>> getGeneratorClass();
 
     /**
      * A method for checking that the correct number of args

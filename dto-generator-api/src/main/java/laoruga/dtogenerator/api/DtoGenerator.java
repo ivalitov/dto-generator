@@ -2,9 +2,7 @@ package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.NestedDtoGenerator;
-import laoruga.dtogenerator.api.generators.basictypegenerators.EnumGenerator;
 import laoruga.dtogenerator.api.generators.basictypegenerators.ListGenerator;
-import laoruga.dtogenerator.api.generators.basictypegenerators.LocalDateTimeGenerator;
 import laoruga.dtogenerator.api.markup.generators.*;
 import laoruga.dtogenerator.api.markup.rules.*;
 import lombok.extern.slf4j.Slf4j;
@@ -238,9 +236,9 @@ public class DtoGenerator {
     void prepareCustomRemarks(IGenerator<?> generator) {
         if (generator instanceof ICustomGeneratorRemarkable) {
             ICustomGeneratorRemarkable<?> remarkableGenerator = (ICustomGeneratorRemarkable<?>) generator;
-            if (generatorsProvider.getGeneratorRemarksProvider().isCustomRemarkExists(remarkableGenerator)) {
+            if (generatorsProvider.getGeneratorRemarksProvider().isCustomRuleRemarkExists(remarkableGenerator)) {
                 remarkableGenerator.setRuleRemarks(generatorsProvider.getGeneratorRemarksProvider()
-                        .getCustomRemarks(remarkableGenerator));
+                        .getCustomRuleRemarks(remarkableGenerator));
             }
         }
     }

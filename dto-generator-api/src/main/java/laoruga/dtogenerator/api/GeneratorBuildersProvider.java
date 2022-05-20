@@ -4,6 +4,7 @@ import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.basictypegenerators.BasicGeneratorsBuilders;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
+import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.*;
 import lombok.NonNull;

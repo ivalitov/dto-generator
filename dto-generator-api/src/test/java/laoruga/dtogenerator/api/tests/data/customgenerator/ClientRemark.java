@@ -1,5 +1,6 @@
 package laoruga.dtogenerator.api.tests.data.customgenerator;
 
+import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.remarks.ICustomRuleRemark;
 
@@ -14,7 +15,7 @@ public enum ClientRemark implements ICustomRuleRemark {
     }
 
     @Override
-    public Class<? extends IGenerator<?>> getGeneratorClass() {
+    public Class<? extends ICustomGenerator<?>> getGeneratorClass() {
         return ClientInfoGenerator.class;
     }
 
