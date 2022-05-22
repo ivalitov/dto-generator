@@ -20,22 +20,21 @@ public class RandomUtils {
 
     private static final String HEX_CHARSET = "0123456789abcdefABCDEF";
 
-    public static Double generateRandomDouble(int minNumber, int maxNumber) {
+    public static Double nextDouble(int minNumber, int maxNumber) {
         double floatPart = random.nextDouble();
-        int integerPart = generateRandomInteger(minNumber, maxNumber);
+        int integerPart = nextInt(minNumber, maxNumber);
         return integerPart + floatPart;
     }
 
-    public static Integer generateRandomInteger(int minNumber, int maxNumber) {
+    public static Integer nextInt(int minNumber, int maxNumber) {
         return random.nextInt((maxNumber - minNumber) + 1) + minNumber;
     }
 
-    public static boolean generateRandomBoolean() {
-        return generateRandomInteger(0, 1) == 1;
+    public static boolean nextBoolean() {
+        return nextInt(0, 1) == 1;
     }
 
-    // Метод создает массив значений между minValue и maxValue без повторений
-    public static Integer[] generateRandomIntArray(int length, int minValue, int maxValue) {
+    public static Integer[] nextIntArray(int length, int minValue, int maxValue) {
         List<Integer> possibleValues = IntStream.range(minValue, maxValue + 1)
                 .boxed()
                 .collect(Collectors.toList());
@@ -47,12 +46,9 @@ public class RandomUtils {
     }
 
     /*
-     * Получение данных из списка
+     * Receiving random item from list
      */
 
-    /*
-     * Методы возрващают случайный элемент или null - если элементов нет
-     */
     public static <T> T getRandomItemOrNull(T... items) {
         if (items == null) {
             return null;
@@ -65,19 +61,19 @@ public class RandomUtils {
             return null;
         }
         List<T> asList = (collection instanceof List) ? (List<T>) collection : new ArrayList<>(collection);
-        return asList.get(RandomUtils.generateRandomInteger(0, asList.size() - 1));
+        return asList.get(RandomUtils.nextInt(0, asList.size() - 1));
     }
 
     /*
      * Методы возрващают случайный элемент, если элементов нет - возникает ошибка
      */
     public static <T> T getRandomItemFromList(T... items) {
-        int index = nextInt(0, items.length);
+        int index = org.apache.commons.lang3.RandomUtils.nextInt(0, items.length);
         return items[index];
     }
 
     public static <T> T getRandomItemFromList(List<T> list) {
-        int index = nextInt(0, list.size());
+        int index = org.apache.commons.lang3.RandomUtils.nextInt(0, list.size());
         return list.get(index);
     }
 
@@ -116,7 +112,7 @@ public class RandomUtils {
     }
 
     public static int getRandomDuration() {
-        return (nextInt(0, 120) + 1) * 60;
+        return (org.apache.commons.lang3.RandomUtils.nextInt(0, 120) + 1) * 60;
     }
 
     public static LocalDateTime getRandomDateTimeInCertainInterval(LocalDateTime startDate, LocalDateTime endDate) {
