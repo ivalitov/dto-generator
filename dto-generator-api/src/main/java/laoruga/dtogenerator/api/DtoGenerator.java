@@ -24,6 +24,7 @@ public class DtoGenerator {
 
     private Object dtoInstance;
 
+    private final String fieldsFromRoot;
     private final GeneratorBuildersProvider generatorBuildersProvider;
 
     private final Map<Field, Exception> errors = new HashMap<>();
@@ -31,8 +32,10 @@ public class DtoGenerator {
 
     private final DtoGeneratorBuilder builderInstance;
 
-    protected DtoGenerator(GeneratorBuildersProvider generatorBuildersProvider,
+    protected DtoGenerator(String fieldsFromRoot,
+                           GeneratorBuildersProvider generatorBuildersProvider,
                            DtoGeneratorBuilder dtoGeneratorBuilder) {
+        this.fieldsFromRoot = fieldsFromRoot;
         this.generatorBuildersProvider = generatorBuildersProvider;
         this.builderInstance = dtoGeneratorBuilder;
     }
@@ -428,13 +431,14 @@ public class DtoGenerator {
             LocalDateTimeRules rules = (LocalDateTimeRules) getAnnotationOrNull(LocalDateTimeRules.class, fieldAnnotations);
             if (rules != null) {
                 return generatorBuildersProvider.getLocalDateTimeGenerator(fieldName, rules);
-
             }
         }
 
         NestedDtoRules nestedDtoRules = (NestedDtoRules) getAnnotationOrNull(NestedDtoRules.class, fieldAnnotations);
         if (nestedDtoRules != null) {
-            return new NestedDtoGenerator<>(builderInstance.build(), fieldType);
+            builderInstance.build();
+            return new NestedDtoGenerator<>(
+                    builderInstance.buildForNestedField(fieldsFromRoot + fieldName), fieldType);
         }
 
         throw new DtoGeneratorException("Field " + fieldName + " hasn't been mapped with any basic generator.");

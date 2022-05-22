@@ -101,6 +101,7 @@ public class NestedDtoGenerationTests {
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
                 greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX)));
+        assertThat(dto.getDtoNested().getIntDefaultRules(), equalTo(IntegerRules.DEFAULT_MIN));
         simpleIntegerGenerationAssertions(dto.getDtoNested());
     }
 

@@ -51,7 +51,7 @@ public class DtoGeneratorBuilder {
                 toCopy.gensBuildersProvider.getGeneratorRemarksProvider().getCustomRuleRemarksMap());
         this.gensBuildersProvider = new GeneratorBuildersProvider(
                 generatorRemarksProvider, toCopy.gensBuildersProvider.getOverriddenBuilders());
-        this.buildersTree = null;
+        this.buildersTree = toCopy.buildersTree;
     }
 
     public DtoGeneratorBuilder overrideBasicGenerator(@NonNull Class<? extends Annotation> rules,
@@ -72,9 +72,11 @@ public class DtoGeneratorBuilder {
      * Basic Rule Remarks
      */
 
-    public DtoGeneratorBuilder setRuleRemarkForField(@NonNull String filedName,
+    public DtoGeneratorBuilder setRuleRemarkForField(@NonNull String fieldName,
                                                      @NonNull BasicRuleRemark ruleRemark) throws DtoGeneratorException {
-        gensBuildersProvider.getGeneratorRemarksProvider().setBasicRuleRemarkForField(filedName, ruleRemark);
+        Pair<String, DtoGeneratorBuilder> fieldAndBuilder = getBuilderFromTreeOrThis(fieldName);
+        fieldAndBuilder.getSecond().gensBuildersProvider.getGeneratorRemarksProvider().setBasicRuleRemarkForField(
+                fieldAndBuilder.getFirst(), ruleRemark);
         return this;
     }
 
@@ -102,18 +104,31 @@ public class DtoGeneratorBuilder {
 
     public DtoGenerator build() {
         return new DtoGenerator(
+                "",
                 gensBuildersProvider,
                 this);
     }
 
-    private Pair<String, DtoGeneratorBuilder> getBuilderFromTreeOrThis(String fieldName) {
-        if (fieldName.contains(".")) {
-            String[] fieldsSequence = fieldName.split("//.");
-            fieldName = fieldsSequence[fieldsSequence.length - 1];
+    private DtoGenerator build(String fieldsFromRoot) {
+        return new DtoGenerator(
+                fieldsFromRoot,
+                gensBuildersProvider,
+                this);
+    }
+
+    public DtoGenerator buildForNestedField(String fieldsFromRoot) {
+        Pair<String, DtoGeneratorBuilder> builderFromTreeOrThis = getBuilderFromTreeOrThis(fieldsFromRoot);
+        return builderFromTreeOrThis.getSecond().build(fieldsFromRoot);
+    }
+
+    private Pair<String, DtoGeneratorBuilder> getBuilderFromTreeOrThis(String fieldsFromRoot) {
+        if (fieldsFromRoot.contains(".")) {
+            String[] fieldsSequence = fieldsFromRoot.split("//.");
+            fieldsFromRoot = fieldsSequence[fieldsSequence.length - 1];
             fieldsSequence = Arrays.copyOf(fieldsSequence, fieldsSequence.length - 1);
-            return Pair.create(fieldName, buildersTree.getBuilder(fieldsSequence));
-        }  else {
-            return Pair.create(fieldName, this);
+            return Pair.create(fieldsFromRoot, buildersTree.getBuilder(fieldsSequence));
+        } else {
+            return Pair.create(fieldsFromRoot, this);
         }
     }
 
@@ -130,7 +145,6 @@ public class DtoGeneratorBuilder {
             Node prev = tree;
             Node next = null;
             for (String field : fields) {
-                next = null;
                 Optional<Node> maybeNode = prev.getChildren().stream()
                         .filter(node -> field.equals(node.getFieldName()))
                         .findFirst();
@@ -139,36 +153,14 @@ public class DtoGeneratorBuilder {
             }
             return Objects.requireNonNull(next).getBuilder();
         }
+
+        @Getter
+        @Setter
+        @RequiredArgsConstructor
+        static class Node {
+            private final String fieldName;
+            private final DtoGeneratorBuilder builder;
+            private List<Node> children = new LinkedList<>();
+        }
     }
-
-    @Getter
-    @Setter
-    @RequiredArgsConstructor
-    static class Node {
-        private final String fieldName;
-        private final DtoGeneratorBuilder builder;
-        private List<Node> children = new LinkedList<>();
-    }
-
-    /*
-      Страна
-         Город 1
-            Магазин 1
-              Соль
-              Сахар
-         Город 2
-            Магазин 2
-              Лук
-              Чеснок
-     1) если есть точка (точки) - добавить в дерево узел (узлы) содержащий:
-     - имя поля для билдера
-     - ремарки для поля
-     - ремарки для всех полей
-     - сам билдер
-            -- каждый бидер надо дополлнять ремарками для всех полей (можно предеать ссылку на одну и ту же MAP)
-            -- билдеры надо дополнять ремарками полей
-
-
-
-     */
 }
