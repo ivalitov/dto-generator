@@ -62,9 +62,9 @@ public class DtoGeneratorBuilder {
 
     public DtoGeneratorBuilder setGeneratorForField(@NonNull String fieldName,
                                                     @NonNull IGeneratorBuilder explicitGenerator) throws DtoGeneratorException {
-        Pair<String, DtoGeneratorBuilder> fieldAndBuilder = getBuilderFromTreeOrThis(fieldName);
-        fieldAndBuilder.getSecond().gensBuildersProvider.setGeneratorForFields(
-                fieldAndBuilder.getFirst(), explicitGenerator);
+        Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
+        DtoGeneratorBuilder builder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
+        builder.gensBuildersProvider.setGeneratorForFields(fieldAndPath.getFirst(), explicitGenerator);
         return this;
     }
 
@@ -74,9 +74,10 @@ public class DtoGeneratorBuilder {
 
     public DtoGeneratorBuilder setRuleRemarkForField(@NonNull String fieldName,
                                                      @NonNull BasicRuleRemark ruleRemark) throws DtoGeneratorException {
-        Pair<String, DtoGeneratorBuilder> fieldAndBuilder = getBuilderFromTreeOrThis(fieldName);
-        fieldAndBuilder.getSecond().gensBuildersProvider.getGeneratorRemarksProvider().setBasicRuleRemarkForField(
-                fieldAndBuilder.getFirst(), ruleRemark);
+        Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
+        DtoGeneratorBuilder fieldAndBuilder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
+        fieldAndBuilder.gensBuildersProvider.getGeneratorRemarksProvider().setBasicRuleRemarkForField(
+                fieldAndPath.getFirst(), ruleRemark);
         return this;
     }
 
@@ -91,9 +92,10 @@ public class DtoGeneratorBuilder {
 
     public DtoGeneratorBuilder addRuleRemarkForField(@NonNull String fieldName,
                                                      @NonNull CustomRuleRemarkWrapper... ruleRemark) {
-        Pair<String, DtoGeneratorBuilder> fieldAndBuilder = getBuilderFromTreeOrThis(fieldName);
-        fieldAndBuilder.getSecond().gensBuildersProvider.getGeneratorRemarksProvider().addCustomRuleRemarkForField(
-                fieldAndBuilder.getFirst(), ruleRemark);
+        Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
+        DtoGeneratorBuilder fieldAndBuilder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
+        fieldAndBuilder.gensBuildersProvider.getGeneratorRemarksProvider().addCustomRuleRemarkForField(
+                fieldAndPath.getFirst(), ruleRemark);
         return this;
     }
 
@@ -104,7 +106,7 @@ public class DtoGeneratorBuilder {
 
     public DtoGenerator build() {
         return new DtoGenerator(
-                "",
+                "root",
                 gensBuildersProvider,
                 this);
     }
@@ -116,19 +118,27 @@ public class DtoGeneratorBuilder {
                 this);
     }
 
-    public DtoGenerator buildForNestedField(String fieldsFromRoot) {
-        Pair<String, DtoGeneratorBuilder> builderFromTreeOrThis = getBuilderFromTreeOrThis(fieldsFromRoot);
-        return builderFromTreeOrThis.getSecond().build(fieldsFromRoot);
+    DtoGenerator buildNestedFieldGenerator(String fieldsFromRoot) {
+        DtoGeneratorBuilder builderFromTreeOrThis = getBuilderFromTreeOrThis(fieldsFromRoot.split("\\."));
+        return builderFromTreeOrThis.build(fieldsFromRoot);
     }
 
-    private Pair<String, DtoGeneratorBuilder> getBuilderFromTreeOrThis(String fieldsFromRoot) {
-        if (fieldsFromRoot.contains(".")) {
-            String[] fieldsSequence = fieldsFromRoot.split("//.");
-            fieldsFromRoot = fieldsSequence[fieldsSequence.length - 1];
-            fieldsSequence = Arrays.copyOf(fieldsSequence, fieldsSequence.length - 1);
-            return Pair.create(fieldsFromRoot, buildersTree.getBuilder(fieldsSequence));
+    private DtoGeneratorBuilder getBuilderFromTreeOrThis(String[] pathToField) {
+        if (pathToField != null) {
+            return buildersTree.getBuilder(pathToField);
         } else {
-            return Pair.create(fieldsFromRoot, this);
+            return this;
+        }
+    }
+
+    private Pair<String, String[]> splitPathToField(String fieldsFromRoot) {
+        if (fieldsFromRoot.contains(".")) {
+            String[] pathToField = fieldsFromRoot.split("\\.");
+            String fieldName = pathToField[pathToField.length - 1];
+            pathToField = Arrays.copyOf(pathToField, pathToField.length - 1);
+            return Pair.create(fieldName, pathToField);
+        } else {
+            return Pair.create(fieldsFromRoot, null);
         }
     }
 
@@ -148,8 +158,12 @@ public class DtoGeneratorBuilder {
                 Optional<Node> maybeNode = prev.getChildren().stream()
                         .filter(node -> field.equals(node.getFieldName()))
                         .findFirst();
-                next = maybeNode.orElseGet(() -> new Node(field, new DtoGeneratorBuilder(tree.getBuilder())));
-                prev.getChildren().add(next);
+                if (maybeNode.isPresent()) {
+                    next = maybeNode.get();
+                } else {
+                    next = new Node(field, new DtoGeneratorBuilder(tree.getBuilder()));
+                    prev.getChildren().add(next);
+                }
             }
             return Objects.requireNonNull(next).getBuilder();
         }

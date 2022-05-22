@@ -438,7 +438,7 @@ public class DtoGenerator {
         if (nestedDtoRules != null) {
             builderInstance.build();
             return new NestedDtoGenerator<>(
-                    builderInstance.buildForNestedField(fieldsFromRoot + fieldName), fieldType);
+                    builderInstance.buildNestedFieldGenerator(fieldsFromRoot + "." + fieldName), fieldType);
         }
 
         throw new DtoGeneratorException("Field " + fieldName + " hasn't been mapped with any basic generator.");
