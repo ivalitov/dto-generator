@@ -24,7 +24,7 @@ public class DtoGenerator {
 
     private Object dtoInstance;
 
-    private final String fieldsFromRoot;
+    private final String[] fieldsFromRoot;
     private final GeneratorBuildersProvider generatorBuildersProvider;
 
     private final Map<Field, Exception> errors = new HashMap<>();
@@ -32,7 +32,7 @@ public class DtoGenerator {
 
     private final DtoGeneratorBuilder builderInstance;
 
-    protected DtoGenerator(String fieldsFromRoot,
+    protected DtoGenerator(String[] fieldsFromRoot,
                            GeneratorBuildersProvider generatorBuildersProvider,
                            DtoGeneratorBuilder dtoGeneratorBuilder) {
         this.fieldsFromRoot = fieldsFromRoot;
@@ -437,8 +437,10 @@ public class DtoGenerator {
         NestedDtoRules nestedDtoRules = (NestedDtoRules) getAnnotationOrNull(NestedDtoRules.class, fieldAnnotations);
         if (nestedDtoRules != null) {
             builderInstance.build();
+            String[] pathToNestedDtoField = Arrays.copyOf(fieldsFromRoot, fieldsFromRoot.length + 1);
+            pathToNestedDtoField[fieldsFromRoot.length] = fieldName;
             return new NestedDtoGenerator<>(
-                    builderInstance.buildNestedFieldGenerator(fieldsFromRoot + "." + fieldName), fieldType);
+                    builderInstance.buildNestedFieldGenerator(pathToNestedDtoField), fieldType);
         }
 
         throw new DtoGeneratorException("Field " + fieldName + " hasn't been mapped with any basic generator.");

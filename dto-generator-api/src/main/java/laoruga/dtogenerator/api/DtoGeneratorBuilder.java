@@ -106,21 +106,21 @@ public class DtoGeneratorBuilder {
 
     public DtoGenerator build() {
         return new DtoGenerator(
-                "root",
+                new String[]{BuildersTree.ROOT},
                 gensBuildersProvider,
                 this);
     }
 
-    private DtoGenerator build(String fieldsFromRoot) {
+    private DtoGenerator build(String[] pathToField) {
         return new DtoGenerator(
-                fieldsFromRoot,
+                pathToField,
                 gensBuildersProvider,
                 this);
     }
 
-    DtoGenerator buildNestedFieldGenerator(String fieldsFromRoot) {
-        DtoGeneratorBuilder builderFromTreeOrThis = getBuilderFromTreeOrThis(fieldsFromRoot.split("\\."));
-        return builderFromTreeOrThis.build(fieldsFromRoot);
+    DtoGenerator buildNestedFieldGenerator(String[] pathToNestedDtoField) {
+        DtoGeneratorBuilder builderFromTreeOrThis = getBuilderFromTreeOrThis(pathToNestedDtoField);
+        return builderFromTreeOrThis.build(pathToNestedDtoField);
     }
 
     private DtoGeneratorBuilder getBuilderFromTreeOrThis(String[] pathToField) {
@@ -145,10 +145,12 @@ public class DtoGeneratorBuilder {
     @RequiredArgsConstructor
     static class BuildersTree {
 
+        public static String ROOT = "%ROOT%";
+
         private final Node tree;
 
         public BuildersTree(DtoGeneratorBuilder rootBuilder) {
-            this.tree = new Node("root", rootBuilder);
+            this.tree = new Node(ROOT, rootBuilder);
         }
 
         DtoGeneratorBuilder getBuilder(String[] fields) {
