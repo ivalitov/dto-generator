@@ -2,6 +2,7 @@ package laoruga.dtogenerator.api.tests;
 
 import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
+import laoruga.dtogenerator.api.generators.basictypegenerators.BasicGeneratorsBuilders;
 import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
@@ -12,7 +13,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
+import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.MAX_VALUE;
 import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.MIN_VALUE;
+import static laoruga.dtogenerator.api.tests.IntegerGenerationTests.maxValueRightBound;
 import static laoruga.dtogenerator.api.tests.IntegerGenerationTests.simpleIntegerGenerationAssertions;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -97,11 +100,18 @@ public class NestedDtoGenerationTests {
     public void nestedDtoRemark() {
         Dto dto = DtoGenerator.builder()
                 .setRuleRemarkForField("dtoNested.intDefaultRules", MIN_VALUE)
+                .setRuleRemarkForField("dtoNested.intRightBound", MAX_VALUE)
+                .setGeneratorForField("dtoNested.intPrimitiveDefaultRules",
+                        BasicGeneratorsBuilders.integerBuilder().maxValue(5).minValue(5))
                 .build().generateDto(Dto.class);
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
                 greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX)));
+
         assertThat(dto.getDtoNested().getIntDefaultRules(), equalTo(IntegerRules.DEFAULT_MIN));
+        assertThat(dto.getDtoNested().getIntRightBound(), equalTo(maxValueRightBound));
+        assertThat(dto.getDtoNested().getIntPrimitiveDefaultRules(), equalTo(5));
+
         simpleIntegerGenerationAssertions(dto.getDtoNested());
     }
 

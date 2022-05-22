@@ -161,6 +161,7 @@ public class GeneratorBuildersProvider {
     private IGenerator<?> getOverriddenGenerator(String fieldName, Annotation rules) {
         return overriddenBuildersSpecificFields.getOrDefault(
                 fieldName,
-                Objects.requireNonNull(overriddenBuilders.get(rules.getClass()))).build();
+                overriddenBuilders.get(rules.getClass())
+        ).build();
     }
 }
