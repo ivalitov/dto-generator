@@ -5,15 +5,27 @@ import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
 import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GeneratorRemarksProvider {
 
     private final Map<String, IRuleRemark> basicRuleRemarksMapByField = new HashMap<>();
     private final Map<String, List<CustomRuleRemarkWrapper>> customRuleRemarksMapByField = new HashMap<>();
-    private final Map<Class<? extends ICustomGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksMap = new HashMap<>();
+    @Getter(AccessLevel.PACKAGE)
+    private final Map<Class<? extends ICustomGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksMap;
+
+    public GeneratorRemarksProvider() {
+        customRuleRemarksMap = new ConcurrentHashMap<>();
+    }
+
+    public GeneratorRemarksProvider(Map<Class<? extends ICustomGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksMap) {
+        this.customRuleRemarksMap = customRuleRemarksMap;
+    }
 
     /*
      * Basic Rule Remarks

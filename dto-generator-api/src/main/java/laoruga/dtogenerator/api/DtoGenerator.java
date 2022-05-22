@@ -24,16 +24,16 @@ public class DtoGenerator {
 
     private Object dtoInstance;
 
-    private final GeneratorBuildersProvider generatorsProvider;
+    private final GeneratorBuildersProvider generatorBuildersProvider;
 
     private final Map<Field, Exception> errors = new HashMap<>();
     private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
 
     private final DtoGeneratorBuilder builderInstance;
 
-    protected DtoGenerator(GeneratorBuildersProvider generatorsProvider,
+    protected DtoGenerator(GeneratorBuildersProvider generatorBuildersProvider,
                            DtoGeneratorBuilder dtoGeneratorBuilder) {
-        this.generatorsProvider = generatorsProvider;
+        this.generatorBuildersProvider = generatorBuildersProvider;
         this.builderInstance = dtoGeneratorBuilder;
     }
 
@@ -236,8 +236,8 @@ public class DtoGenerator {
     void prepareCustomRemarks(IGenerator<?> generator) {
         if (generator instanceof ICustomGeneratorRemarkable) {
             ICustomGeneratorRemarkable<?> remarkableGenerator = (ICustomGeneratorRemarkable<?>) generator;
-            if (generatorsProvider.getGeneratorRemarksProvider().isCustomRuleRemarkExists(remarkableGenerator)) {
-                remarkableGenerator.setRuleRemarks(generatorsProvider.getGeneratorRemarksProvider()
+            if (generatorBuildersProvider.getGeneratorRemarksProvider().isCustomRuleRemarkExists(remarkableGenerator)) {
+                remarkableGenerator.setRuleRemarks(generatorBuildersProvider.getGeneratorRemarksProvider()
                         .getCustomRuleRemarks(remarkableGenerator));
             }
         }
@@ -392,42 +392,42 @@ public class DtoGenerator {
         if (fieldType == Double.class || fieldType == Double.TYPE) {
             DoubleRules rules = (DoubleRules) getAnnotationOrNull(DoubleRules.class, fieldAnnotations);
             if (rules != null) {
-                return generatorsProvider.getDoubleGenerator(fieldName, rules, fieldType == Double.TYPE);
+                return generatorBuildersProvider.getDoubleGenerator(fieldName, rules, fieldType == Double.TYPE);
             }
         }
 
         if (fieldType == String.class) {
             StringRules rules = (StringRules) getAnnotationOrNull(StringRules.class, fieldAnnotations);
             if (rules != null) {
-                return generatorsProvider.getStringGenerator(fieldName, rules);
+                return generatorBuildersProvider.getStringGenerator(fieldName, rules);
             }
         }
 
         if (fieldType == Integer.class || fieldType == Integer.TYPE) {
             IntegerRules rules = (IntegerRules) getAnnotationOrNull(IntegerRules.class, fieldAnnotations);
             if (rules != null) {
-                return generatorsProvider.getIntegerGenerator(fieldName, rules, fieldType == Integer.TYPE);
+                return generatorBuildersProvider.getIntegerGenerator(fieldName, rules, fieldType == Integer.TYPE);
             }
         }
 
         if (fieldType == Long.class || fieldType == Long.TYPE) {
             LongRules rules = (LongRules) getAnnotationOrNull(LongRules.class, fieldAnnotations);
             if (rules != null) {
-                return generatorsProvider.getLongGenerator(fieldName, rules, fieldType == Integer.TYPE);
+                return generatorBuildersProvider.getLongGenerator(fieldName, rules, fieldType == Integer.TYPE);
             }
         }
 
         if (fieldType.isEnum()) {
             EnumRules rules = (EnumRules) getAnnotationOrNull(EnumRules.class, fieldAnnotations);
             if (rules != null) {
-                return generatorsProvider.getEnumGenerator(fieldName, rules);
+                return generatorBuildersProvider.getEnumGenerator(fieldName, rules);
             }
         }
 
         if (fieldType == LocalDateTime.class) {
             LocalDateTimeRules rules = (LocalDateTimeRules) getAnnotationOrNull(LocalDateTimeRules.class, fieldAnnotations);
             if (rules != null) {
-                return generatorsProvider.getLocalDateTimeGenerator(fieldName, rules);
+                return generatorBuildersProvider.getLocalDateTimeGenerator(fieldName, rules);
 
             }
         }

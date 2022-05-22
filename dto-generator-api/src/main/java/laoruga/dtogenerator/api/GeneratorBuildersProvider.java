@@ -4,9 +4,10 @@ import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.basictypegenerators.BasicGeneratorsBuilders;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
-import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.*;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,6 +15,7 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.NULL_VALUE;
 
@@ -22,13 +24,19 @@ public class GeneratorBuildersProvider {
 
     private final GeneratorRemarksProvider generatorRemarksProvider;
 
+    @Getter(AccessLevel.PACKAGE)
     private final Map<Class<? extends Annotation>, IGeneratorBuilder> overriddenBuilders;
-    private final Map<String, IGeneratorBuilder> overriddenBuildersSpecificFields;
+    private final Map<String, IGeneratorBuilder> overriddenBuildersSpecificFields = new HashMap<>();
 
-    public GeneratorBuildersProvider(GeneratorRemarksProvider generatorRemarksProvider) {
+    GeneratorBuildersProvider(GeneratorRemarksProvider generatorRemarksProvider) {
         this.generatorRemarksProvider = generatorRemarksProvider;
-        this.overriddenBuilders = new HashMap<>();
-        this.overriddenBuildersSpecificFields = new HashMap<>();
+        this.overriddenBuilders = new ConcurrentHashMap<>();
+    }
+
+    GeneratorBuildersProvider(GeneratorRemarksProvider generatorRemarksProvider,
+                              Map<Class<? extends Annotation>, IGeneratorBuilder> overriddenBuilders) {
+        this.generatorRemarksProvider = generatorRemarksProvider;
+        this.overriddenBuilders = overriddenBuilders;
     }
 
     public GeneratorRemarksProvider getGeneratorRemarksProvider() {

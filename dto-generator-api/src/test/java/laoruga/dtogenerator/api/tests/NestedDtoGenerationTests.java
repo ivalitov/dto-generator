@@ -1,7 +1,8 @@
 package laoruga.dtogenerator.api.tests;
 
-import io.qameta.allure.Feature;
+import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
+import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
 import laoruga.dtogenerator.api.tests.data.dtoclient.*;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
+import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.MIN_VALUE;
 import static laoruga.dtogenerator.api.tests.IntegerGenerationTests.simpleIntegerGenerationAssertions;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -18,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayName("Basic Type Generators Tests")
+@Epic("NESTED_DTO")
 public class NestedDtoGenerationTests {
 
     @Getter
@@ -39,7 +42,6 @@ public class NestedDtoGenerationTests {
     }
 
     @Test
-    @Feature("NESTED_DTO")
     @DisplayName("Nested Dto Generation With Integer Rules")
     public void nestedDtoWithIntegerRules() {
         Dto dto = DtoGenerator.builder().build().generateDto(Dto.class);
@@ -47,11 +49,9 @@ public class NestedDtoGenerationTests {
         assertThat(dto.getIntDefaultRules(), both(
                 greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX)));
         simpleIntegerGenerationAssertions(dto.getDtoNested());
-
     }
 
     @RepeatedTest(50)
-    @Feature("NESTED_DTO")
     @DisplayName("Nested Dto Generation With Custom Rules")
     public void nestedDtoWithCustomRules() {
         DtoCustomNested dto = DtoGenerator.builder().build().generateDto(DtoCustomNested.class);
@@ -90,6 +90,18 @@ public class NestedDtoGenerationTests {
                     () -> assertThat(personInfoWithPrefix.getSecondName(), startsWith(ClientDto.PREFIX))
             );
         }
+    }
+
+    @Test
+    @DisplayName("Nested Dto Remark")
+    public void nestedDtoRemark() {
+        Dto dto = DtoGenerator.builder()
+                .setRuleRemarkForField("dtoNested.intDefaultRules", MIN_VALUE)
+                .build().generateDto(Dto.class);
+        assertNotNull(dto);
+        assertThat(dto.getIntDefaultRules(), both(
+                greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX)));
+        simpleIntegerGenerationAssertions(dto.getDtoNested());
     }
 
 }
