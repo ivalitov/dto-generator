@@ -3,9 +3,9 @@ package laoruga.dtogenerator.api.tests;
 import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.generators.basictypegenerators.BasicGeneratorsBuilders;
-import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
+import laoruga.dtogenerator.api.markup.rules.StringRules;
 import laoruga.dtogenerator.api.tests.data.dtoclient.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,6 +42,36 @@ public class NestedDtoGenerationTests {
         private Integer intDefaultRules;
         @NestedDtoRules()
         private ClientDto clientDto;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    static class DtoWithNestedLevels {
+        @IntegerRules()
+        private Integer simpleInt;
+        @NestedDtoRules()
+        private Nested_1 nested_1;
+        @NestedDtoRules()
+        private IntegerGenerationTests.DtoInteger dtoNestedInteger;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    static class Nested_1 {
+
+        @IntegerRules(minValue = 1, maxValue = 1)
+        private Integer one;
+        @NestedDtoRules()
+        private Nested_2 nested_2;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    static class Nested_2 {
+        @IntegerRules()
+        private Integer intDefaultRules;
+        @StringRules()
+        private String stringDefaultRules;
     }
 
     @Test
@@ -113,6 +143,29 @@ public class NestedDtoGenerationTests {
         assertThat(dto.getDtoNested().getIntPrimitiveDefaultRules(), equalTo(5));
 
         simpleIntegerGenerationAssertions(dto.getDtoNested());
+    }
+
+    @Test
+    @DisplayName("Multilevel Nested Dto")
+    public void nestedDtoMultiLevel() {
+        DtoWithNestedLevels dto = DtoGenerator.builder().build().generateDto(DtoWithNestedLevels.class);
+
+        assertNotNull(dto);
+        Nested_1 nested_1 = dto.getNested_1();
+        assertNotNull(nested_1);
+        Nested_2 nested_2 = nested_1.getNested_2();
+        assertNotNull(nested_2);
+
+        assertAll(
+                () -> assertThat(dto.getSimpleInt(), both(
+                        greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX))),
+                () -> assertThat(nested_2.getIntDefaultRules(), both(
+                        greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX))),
+                () -> assertThat(nested_2.getStringDefaultRules(), notNullValue()),
+                () -> assertThat(nested_1.getOne(), equalTo(1))
+        );
+
+        simpleIntegerGenerationAssertions(dto.getDtoNestedInteger());
     }
 
 }
