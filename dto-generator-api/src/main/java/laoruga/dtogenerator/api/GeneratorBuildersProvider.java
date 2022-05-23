@@ -61,12 +61,15 @@ public class GeneratorBuildersProvider {
         if (isGeneratorOverridden(fieldName, stringRules)) {
             return getOverriddenGenerator(fieldName, stringRules);
         } else {
+            IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
+                    generatorRemarksProvider.getBasicRuleRemark(fieldName) :
+                    stringRules.ruleRemark();
             return BasicGeneratorsBuilders.stringBuilder()
                     .minLength(stringRules.minSymbols())
                     .maxLength(stringRules.maxSymbols())
                     .charset(stringRules.charset())
                     .chars(stringRules.chars())
-                    .ruleRemark(stringRules.ruleRemark())
+                    .ruleRemark(remark)
                     .build();
         }
     }
@@ -133,10 +136,13 @@ public class GeneratorBuildersProvider {
         if (isGeneratorOverridden(fieldName, enumRules)) {
             return getOverriddenGenerator(fieldName, enumRules);
         } else {
+            IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
+                    generatorRemarksProvider.getBasicRuleRemark(fieldName) :
+                    enumRules.ruleRemark();
             return BasicGeneratorsBuilders.enumBuilder()
                     .enumClass(enumRules.enumClass())
                     .possibleEnumNames(enumRules.possibleEnumNames())
-                    .ruleRemark(enumRules.ruleRemark())
+                    .ruleRemark(remark)
                     .build();
         }
     }
@@ -145,10 +151,13 @@ public class GeneratorBuildersProvider {
         if (isGeneratorOverridden(fieldName, localDateTimeRules)) {
             return getOverriddenGenerator(fieldName, localDateTimeRules);
         } else {
+            IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
+                    generatorRemarksProvider.getBasicRuleRemark(fieldName) :
+                    localDateTimeRules.ruleRemark();
             return BasicGeneratorsBuilders.localDateTimeBuilder()
                     .leftShiftDays(localDateTimeRules.leftShiftDays())
                     .rightShiftDays(localDateTimeRules.rightShiftDays())
-                    .ruleRemark(localDateTimeRules.ruleRemark())
+                    .ruleRemark(remark)
                     .build();
         }
     }

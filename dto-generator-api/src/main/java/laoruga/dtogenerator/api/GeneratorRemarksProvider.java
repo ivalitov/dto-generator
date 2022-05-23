@@ -5,25 +5,27 @@ import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
 import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class GeneratorRemarksProvider {
 
     private final Map<String, IRuleRemark> basicRuleRemarksMapByField = new HashMap<>();
+    private final AtomicReference<IRuleRemark> basicRuleRemarkForFields;
     private final Map<String, List<CustomRuleRemarkWrapper>> customRuleRemarksMapByField = new HashMap<>();
-    @Getter(AccessLevel.PACKAGE)
     private final Map<Class<? extends ICustomGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksMap;
 
     public GeneratorRemarksProvider() {
-        customRuleRemarksMap = new ConcurrentHashMap<>();
+        this(new AtomicReference<>(), new ConcurrentHashMap<>());
     }
 
-    public GeneratorRemarksProvider(Map<Class<? extends ICustomGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksMap) {
+    private GeneratorRemarksProvider(
+            AtomicReference<IRuleRemark> basicRuleRemarkForFields,
+            Map<Class<? extends ICustomGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksMap) {
+        this.basicRuleRemarkForFields = basicRuleRemarkForFields;
         this.customRuleRemarksMap = customRuleRemarksMap;
     }
 
@@ -32,28 +34,31 @@ public class GeneratorRemarksProvider {
      */
 
     boolean isBasicRuleRemarkExists(String fieldName) {
-        return basicRuleRemarksMapByField.containsKey(fieldName) || basicRuleRemarksMapByField.containsKey(null);
+        return basicRuleRemarksMapByField.containsKey(fieldName) || basicRuleRemarkForFields.get() != null;
     }
 
-    void setBasicRuleRemarkForField(String filedName,
+    void setBasicRuleRemarkForField(@NonNull String filedName,
                                     @NonNull BasicRuleRemark ruleRemark) {
         if (basicRuleRemarksMapByField.containsKey(filedName)) {
-            if (filedName != null) {
-                throw new DtoGeneratorException("Trying to overwrite remark from: '" + getBasicRuleRemark(filedName) + "'" +
-                        " to: '" + ruleRemark + "' for field '" + filedName + "'.");
-            } else {
-                throw new DtoGeneratorException("Trying to overwrite remark from: '" + getBasicRuleRemark(null) + "'" +
-                        " to: '" + ruleRemark + "' for all fields.");
-            }
+            throw new DtoGeneratorException("Trying to overwrite remark from: '" + getBasicRuleRemark(filedName) + "'" +
+                    " to: '" + ruleRemark + "' for field '" + filedName + "'.");
         }
         basicRuleRemarksMapByField.put(filedName, ruleRemark);
     }
 
-    IRuleRemark getBasicRuleRemark(String fieldName) {
+    public void setBasicRuleRemarkForFields(BasicRuleRemark basicRuleRemark) {
+        if (basicRuleRemarkForFields.get() != null && basicRuleRemarkForFields.get() != basicRuleRemark) {
+            throw new DtoGeneratorException("Trying to overwrite remark for all fields from: '"
+                    + basicRuleRemarkForFields.get() + "' to: '" + basicRuleRemark + "'.");
+        }
+        basicRuleRemarkForFields.set(basicRuleRemark);
+    }
+
+    IRuleRemark getBasicRuleRemark(String fieldName) throws NullPointerException {
         if (basicRuleRemarksMapByField.containsKey(fieldName)) {
             return basicRuleRemarksMapByField.get(fieldName);
         }
-        return Objects.requireNonNull(basicRuleRemarksMapByField.get(null));
+        return Objects.requireNonNull(basicRuleRemarkForFields.get());
     }
 
     /*
@@ -81,5 +86,9 @@ public class GeneratorRemarksProvider {
             this.customRuleRemarksMap.putIfAbsent(remark.getGeneratorClass(), new LinkedList<>());
             this.customRuleRemarksMap.get(remark.getGeneratorClass()).add(remark);
         }
+    }
+
+    GeneratorRemarksProvider copy() {
+        return new GeneratorRemarksProvider(basicRuleRemarkForFields, customRuleRemarksMap);
     }
 }

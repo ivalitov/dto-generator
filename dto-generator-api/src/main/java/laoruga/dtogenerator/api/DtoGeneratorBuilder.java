@@ -47,10 +47,9 @@ public class DtoGeneratorBuilder {
     }
 
     private DtoGeneratorBuilder(DtoGeneratorBuilder toCopy) {
-        GeneratorRemarksProvider generatorRemarksProvider = new GeneratorRemarksProvider(
-                toCopy.gensBuildersProvider.getGeneratorRemarksProvider().getCustomRuleRemarksMap());
         this.gensBuildersProvider = new GeneratorBuildersProvider(
-                generatorRemarksProvider, toCopy.gensBuildersProvider.getOverriddenBuilders());
+                toCopy.gensBuildersProvider.getGeneratorRemarksProvider().copy(),
+                toCopy.gensBuildersProvider.getOverriddenBuilders());
         this.buildersTree = toCopy.buildersTree;
     }
 
@@ -82,7 +81,7 @@ public class DtoGeneratorBuilder {
     }
 
     public DtoGeneratorBuilder setRuleRemarkForFields(@NonNull BasicRuleRemark basicRuleRemark) throws DtoGeneratorException {
-        gensBuildersProvider.getGeneratorRemarksProvider().setBasicRuleRemarkForField(null, basicRuleRemark);
+        gensBuildersProvider.getGeneratorRemarksProvider().setBasicRuleRemarkForFields(basicRuleRemark);
         return this;
     }
 
@@ -157,14 +156,16 @@ public class DtoGeneratorBuilder {
             Node prev = tree;
             Node next = null;
             for (String field : fields) {
-                Optional<Node> maybeNode = prev.getChildren().stream()
-                        .filter(node -> field.equals(node.getFieldName()))
-                        .findFirst();
-                if (maybeNode.isPresent()) {
-                    next = maybeNode.get();
-                } else {
-                    next = new Node(field, new DtoGeneratorBuilder(tree.getBuilder()));
-                    prev.getChildren().add(next);
+                if (!ROOT.equals(field)) {
+                    Optional<Node> maybeNode = prev.getChildren().stream()
+                            .filter(node -> field.equals(node.getFieldName()))
+                            .findFirst();
+                    if (maybeNode.isPresent()) {
+                        next = maybeNode.get();
+                    } else {
+                        next = new Node(field, new DtoGeneratorBuilder(tree.getBuilder()));
+                        prev.getChildren().add(next);
+                    }
                 }
             }
             return Objects.requireNonNull(next).getBuilder();
