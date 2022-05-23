@@ -2,6 +2,7 @@ package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.basictypegenerators.BasicGeneratorsBuilders;
+import laoruga.dtogenerator.api.generators.basictypegenerators.ListGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
@@ -12,9 +13,9 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.NULL_VALUE;
@@ -160,6 +161,48 @@ public class GeneratorBuildersProvider {
                     .ruleRemark(remark)
                     .build();
         }
+    }
+
+    public IGenerator<?> getListGenerator(String fieldName, Class<?> fieldType, ListRules listRules, IGenerator<?> listItemGenerator) {
+        if (isGeneratorOverridden(fieldName, listRules)) {
+            return getOverriddenGenerator(fieldName, listRules);
+        } else {
+            IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
+                    generatorRemarksProvider.getBasicRuleRemark(fieldName) :
+                    listRules.ruleRemark();
+            return BasicGeneratorsBuilders.listBuilder()
+                    .minSize(listRules.minSize())
+                    .maxSize(listRules.maxSize())
+                    .listInstance(createCollectionFieldInstance(fieldType, listRules.listClass()))
+                    .itemGenerator(listItemGenerator)
+                    .ruleRemark(remark)
+                    .build();
+        }
+    }
+
+    /**
+     * 1. Filed type should be assignable from required collectionClass
+     * 2. CollectionClass should not be an interface or abstract
+     *
+     * @param fieldType checking dto field type
+     */
+    private static <T> T createCollectionFieldInstance(Class<?> fieldType, Class<T> collectionClass) {
+        if (!fieldType.isAssignableFrom(collectionClass)) {
+            throw new DtoGeneratorException("CollectionClass from rules: '" + collectionClass + "' can't" +
+                    " be assign to the field: " + fieldType);
+        }
+        if (collectionClass.isInterface() || Modifier.isAbstract(collectionClass.getModifiers())) {
+            throw new DtoGeneratorException("Can't create instance of '" + collectionClass + "' because" +
+                    " it is interface or abstract.");
+        }
+        T collectionInstance;
+        try {
+            collectionInstance = collectionClass.newInstance();
+        } catch (Exception e) {
+            log.error("Exception while creating Collection instance ", e);
+            throw new DtoGeneratorException(e);
+        }
+        return collectionInstance;
     }
 
     private boolean isGeneratorOverridden(String fieldName, Annotation rules) {

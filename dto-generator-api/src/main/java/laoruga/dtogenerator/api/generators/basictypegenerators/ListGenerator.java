@@ -3,25 +3,40 @@ package laoruga.dtogenerator.api.generators.basictypegenerators;
 import laoruga.dtogenerator.api.markup.generators.ICollectionGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
+import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
+import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
+import lombok.AllArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 import java.util.List;
 
+@AllArgsConstructor
 public class ListGenerator<ITEM_TYPE> implements ICollectionGenerator<List<ITEM_TYPE>> {
 
-    private final int size;
+    private final int minSize;
+    private final int maxSize;
     private final List<ITEM_TYPE> listInstance;
     private final IGenerator<ITEM_TYPE> itemGenerator;
-
-
-    public ListGenerator(int minSize, int maxSize, List<ITEM_TYPE> listInstance, IGenerator<ITEM_TYPE> itemGenerator) {
-        this.listInstance = listInstance;
-        this.itemGenerator = itemGenerator;
-        this.size = new RandomDataGenerator().nextInt(minSize, maxSize);
-    }
+    private final IRuleRemark ruleRemark;
 
     @Override
     public List<ITEM_TYPE> generate() {
+        int size;
+        switch ((BasicRuleRemark) ruleRemark) {
+            case MIN_VALUE:
+                size = minSize;
+                break;
+            case MAX_VALUE:
+                size = maxSize;
+                break;
+            case RANDOM_VALUE:
+                size = new RandomDataGenerator().nextInt(minSize, maxSize);
+                break;
+            case NULL_VALUE:
+                return null;
+            default:
+                throw new IllegalStateException("Unexpected value: " + ruleRemark);
+        }
         while (listInstance.size() < size) {
             listInstance.add(itemGenerator.generate());
         }
@@ -42,6 +57,7 @@ public class ListGenerator<ITEM_TYPE> implements ICollectionGenerator<List<ITEM_
         private int maxSize;
         private List<ITEM_TYPE> listInstance;
         private IGenerator<ITEM_TYPE> itemGenerator;
+        private IRuleRemark ruleRemark;
 
         private ListGeneratorBuilder() {
         }
@@ -66,8 +82,13 @@ public class ListGenerator<ITEM_TYPE> implements ICollectionGenerator<List<ITEM_
             return this;
         }
 
+      public ListGeneratorBuilder<ITEM_TYPE> ruleRemark(IRuleRemark ruleRemark) {
+            this.ruleRemark = ruleRemark;
+            return this;
+        }
+
         public ListGenerator<ITEM_TYPE> build() {
-            return new ListGenerator<>(minSize, maxSize, listInstance, itemGenerator);
+            return new ListGenerator<>(minSize, maxSize, listInstance, itemGenerator, ruleRemark);
         }
     }
 }

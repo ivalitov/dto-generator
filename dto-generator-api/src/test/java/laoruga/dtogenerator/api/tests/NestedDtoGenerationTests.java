@@ -168,7 +168,7 @@ public class NestedDtoGenerationTests {
         simpleIntegerGenerationAssertions(dto.getDtoNestedInteger());
     }
 
-    @Test
+    @RepeatedTest(10)
     @DisplayName("Multilevel Nested Dto With Remarks")
     public void multiLevelNestedDtoWithRemarks() {
         DtoWithNestedLevels dto = DtoGenerator.builder()

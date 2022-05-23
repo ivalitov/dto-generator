@@ -325,43 +325,15 @@ public class DtoGenerator {
 
      */
 
-    /**
-     * 1. Filed type should be assignable from required collectionClass
-     * 2. CollectionClass should not be an interface or abstract
-     *
-     * @param field checking dto field
-     */
-    private static <T> T createCollectionFieldInstance(Field field, Class<T> collectionClass) {
-        if (!field.getType().isAssignableFrom(collectionClass)) {
-            throw new DtoGeneratorException("CollectionClass from rules: '" + collectionClass + "' can't" +
-                    " be assign to the field: " + field.getType());
-        }
-        if (collectionClass.isInterface() || Modifier.isAbstract(collectionClass.getModifiers())) {
-            throw new DtoGeneratorException("Can't create instance of '" + collectionClass + "' because" +
-                    " it is interface or abstract.");
-        }
-        T collectionInstance;
-        try {
-            collectionInstance = collectionClass.newInstance();
-        } catch (Exception e) {
-            log.error("Exception while creating Collection instance ", e);
-            throw new DtoGeneratorException(e);
-        }
-        return collectionInstance;
-    }
-
     private IGenerator<?> selectCollectionGenerator(Field field, IGenerator<?> listItemGenerator) throws DtoGeneratorException {
 
         Class<?> fieldType = field.getType();
+        String fieldName = field.getName();
 
         if (List.class.isAssignableFrom(fieldType)) {
-            ListRules listRules = field.getAnnotation(ListRules.class);
-            if (listRules != null) {
-                return new ListGenerator<>(
-                        listRules.minSize(),
-                        listRules.maxSize(),
-                        createCollectionFieldInstance(field, listRules.listClass()),
-                        listItemGenerator);
+            ListRules rules = field.getAnnotation(ListRules.class);
+            if (rules != null) {
+                return generatorBuildersProvider.getListGenerator(fieldName, fieldType, rules, listItemGenerator);
             }
         }
 
