@@ -1,7 +1,6 @@
 package laoruga.dtogenerator.api.tests.data.customgenerator;
 
 import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
-import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.remarks.ICustomRuleRemark;
 
 /**

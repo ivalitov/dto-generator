@@ -11,8 +11,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.apache.commons.lang3.RandomUtils.nextInt;
-
 /**
  * @author Il'dar Valitov
  * Created on 10.05.2022

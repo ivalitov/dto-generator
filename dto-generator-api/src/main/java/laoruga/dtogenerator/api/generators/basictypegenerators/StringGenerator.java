@@ -40,7 +40,9 @@ public class StringGenerator implements IGenerator<String> {
             throw new IllegalStateException("Unexpected value " + ruleRemark);
         }
         char[] explicitChars = this.chars.toCharArray();
-        int charsCount = explicitChars.length + Arrays.stream(charset).map(s -> s.getChars().length).reduce(Integer::sum).get();
+        int charsCount = explicitChars.length + Arrays.stream(charset)
+                .map(s -> s.getChars().length)
+                .reduce(Integer::sum).orElse(0);
         char[] chars = new char[charsCount];
         int nextCopyPos = 0;
         for (CharSet charSet : charset) {

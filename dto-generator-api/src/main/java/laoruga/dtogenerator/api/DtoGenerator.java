@@ -59,7 +59,7 @@ public class DtoGenerator {
         this.dtoInstance = dtoInstance;
         prepareGenerators();
         applyGenerators();
-        return (T) dtoInstance;
+        return dtoInstance;
     }
 
     void createDtoInstance(Class<?> dtoClass) {
@@ -167,11 +167,11 @@ public class DtoGenerator {
         }
         if (!getFieldGeneratorMap().isEmpty() || !errors.isEmpty()) {
             if (!getFieldGeneratorMap().isEmpty()) {
-                log.error("Unexpected state. There {} unused generator(s) left. Fileds vs Generators: " +
+                log.error("Unexpected state. There {} unused generator(s) left. Fields vs Generators: " +
                         getFieldGeneratorMap(), getFieldGeneratorMap().size());
             }
             if (!errors.isEmpty()) {
-                log.error("{} error(s) while generators execution. Fileds vs Generators: " + errors, errors.size());
+                log.error("{} error(s) while generators execution. Fields vs Generators: " + errors, errors.size());
             }
             throw new RuntimeException("Error while generators execution (see log above)");
         }

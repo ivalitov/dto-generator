@@ -147,7 +147,7 @@ public class DtoGeneratorBuilder {
     @RequiredArgsConstructor
     static class BuildersTree {
 
-        public static String ROOT = "%ROOT%";
+        public static final String ROOT = "%ROOT%";
 
         private final Node tree;
 
