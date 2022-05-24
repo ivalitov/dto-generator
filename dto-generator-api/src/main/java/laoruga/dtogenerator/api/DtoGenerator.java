@@ -1,6 +1,5 @@
 package laoruga.dtogenerator.api;
 
-import com.sun.istack.internal.Nullable;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.BasicTypeGenerators;
 import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
@@ -173,8 +172,7 @@ public class DtoGenerator {
         return ruleRemark;
     }
 
-    private @Nullable
-    IGenerator<?> selectGenerator(Field field) {
+    private IGenerator<?> selectGenerator(Field field) {
 
         if (field.getType() == Double.class || field.getType() == Double.TYPE) {
             DoubleRules doubleBounds = field.getAnnotation(DoubleRules.class);
