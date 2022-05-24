@@ -18,7 +18,7 @@ pipelines:
           caches:
             - maven
           script:
-            - mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar --file pom.xml
+            - mvn -B install org.sonarsource.scanner.maven:sonar-maven-plugin:sonar --file pom.xml
           after-script:
               # Collect checkstyle results, if any, and convert to Bitbucket Code Insights.
             - pipe: atlassian/checkstyle-report:0.3.0
