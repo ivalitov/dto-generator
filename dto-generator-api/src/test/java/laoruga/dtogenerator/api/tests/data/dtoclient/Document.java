@@ -5,6 +5,11 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 04.05.2022
+ */
+
 @Data
 @AllArgsConstructor
 public class Document {

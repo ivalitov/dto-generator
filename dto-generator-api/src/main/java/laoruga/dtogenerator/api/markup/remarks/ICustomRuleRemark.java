@@ -2,11 +2,14 @@ package laoruga.dtogenerator.api.markup.remarks;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
-import laoruga.dtogenerator.api.markup.generators.IGenerator;
 
 /**
  * The interface is designed to create remarks for custom generation rules.
+ *
+ * @author Il'dar Valitov
+ * Created on 28.04.2022
  */
+
 public interface ICustomRuleRemark {
 
     /**

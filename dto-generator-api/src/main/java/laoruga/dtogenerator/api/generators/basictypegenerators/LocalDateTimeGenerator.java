@@ -8,6 +8,11 @@ import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.Random;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 19.05.2022
+ */
+
 @AllArgsConstructor
 public class LocalDateTimeGenerator implements IGenerator<LocalDateTime> {
 

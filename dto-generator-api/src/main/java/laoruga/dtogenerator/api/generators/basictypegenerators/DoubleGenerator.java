@@ -10,6 +10,11 @@ import org.apache.commons.math3.util.Precision;
 
 import java.util.Random;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 19.05.2022
+ */
+
 @AllArgsConstructor
 public class DoubleGenerator implements IGenerator<Double> {
 

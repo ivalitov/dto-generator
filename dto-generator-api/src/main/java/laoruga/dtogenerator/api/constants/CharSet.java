@@ -2,6 +2,11 @@ package laoruga.dtogenerator.api.constants;
 
 import lombok.Getter;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 04.04.2022
+ */
+
 @Getter
 public enum CharSet {
 

@@ -29,6 +29,9 @@ import java.util.*;
  * 8. [same as set or override basic generator] Change custom generator for specific field
  * <p>
  * 9. how to apply this to nested pojo field ???
+ *
+ * @author Il'dar Valitov
+ * Created on 16.04.2022
  */
 public class DtoGeneratorBuilder {
 

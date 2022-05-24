@@ -11,6 +11,11 @@ import org.apache.commons.text.RandomStringGenerator;
 
 import java.util.Arrays;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 19.05.2022
+ */
+
 @AllArgsConstructor
 public class StringGenerator implements IGenerator<String> {
 

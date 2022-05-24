@@ -8,6 +8,11 @@ import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 19.05.2022
+ */
+
 @AllArgsConstructor
 public class IntegerGenerator implements IGenerator<Integer> {
 

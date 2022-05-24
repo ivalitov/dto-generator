@@ -1,5 +1,10 @@
 package laoruga.dtogenerator.api.exceptions;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 16.04.2022
+ */
+
 public class DtoGeneratorException extends RuntimeException {
     public DtoGeneratorException() {
     }

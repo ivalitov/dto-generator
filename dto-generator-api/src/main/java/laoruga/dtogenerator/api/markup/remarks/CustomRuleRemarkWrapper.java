@@ -8,6 +8,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 16.04.2022
+ */
+
 @Value
 public class CustomRuleRemarkWrapper {
 

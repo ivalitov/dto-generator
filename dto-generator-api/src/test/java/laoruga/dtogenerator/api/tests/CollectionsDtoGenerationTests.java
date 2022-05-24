@@ -21,6 +21,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 03.05.2022
+ */
+
 @DisplayName("Basic Type Generators Tests")
 public class CollectionsDtoGenerationTests {
 

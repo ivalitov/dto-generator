@@ -18,6 +18,11 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 04.05.2022
+ */
+
 @DisplayName("Custom Type Generators Tests")
 public class CustomDtoGenerationTests {
 

@@ -5,6 +5,11 @@ import laoruga.dtogenerator.api.markup.remarks.ICustomRuleRemark;
 
 import java.util.List;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 16.04.2022
+ */
+
 public interface ICustomGeneratorRemarkable<GENERATED_TYPE> extends ICustomGenerator<GENERATED_TYPE> {
 
     void setRuleRemarks(List<CustomRuleRemarkWrapper> iRuleRemarks);

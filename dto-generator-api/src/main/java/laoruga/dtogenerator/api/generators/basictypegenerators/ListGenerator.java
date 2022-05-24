@@ -10,6 +10,11 @@ import org.apache.commons.math3.random.RandomDataGenerator;
 
 import java.util.List;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 19.05.2022
+ */
+
 @AllArgsConstructor
 public class ListGenerator<ITEM_TYPE> implements ICollectionGenerator<List<ITEM_TYPE>> {
 

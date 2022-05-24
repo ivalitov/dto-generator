@@ -11,6 +11,11 @@ import lombok.NoArgsConstructor;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 04.05.2022
+ */
+
 @Getter
 @NoArgsConstructor
 public class ClientDto {

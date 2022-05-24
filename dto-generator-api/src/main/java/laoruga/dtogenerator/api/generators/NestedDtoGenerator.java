@@ -3,6 +3,11 @@ package laoruga.dtogenerator.api.generators;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 23.04.2022
+ */
+
 public class NestedDtoGenerator<GENERATED_TYPE> implements IGenerator<GENERATED_TYPE> {
 
     private final DtoGenerator dtoGenerator;

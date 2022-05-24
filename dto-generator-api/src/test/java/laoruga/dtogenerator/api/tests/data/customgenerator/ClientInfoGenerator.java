@@ -14,6 +14,11 @@ import java.util.List;
 
 import static laoruga.dtogenerator.api.tests.data.customgenerator.ClientRemark.*;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 03.05.2022
+ */
+
 public class ClientInfoGenerator implements
         ICustomGeneratorArgs<ClientInfoDto>,
         ICustomGeneratorRemarkable<ClientInfoDto>,

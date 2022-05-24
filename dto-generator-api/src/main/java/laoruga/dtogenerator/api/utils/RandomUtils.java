@@ -13,6 +13,11 @@ import java.util.stream.IntStream;
 
 import static org.apache.commons.lang3.RandomUtils.nextInt;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 10.05.2022
+ */
+
 @Slf4j
 public class RandomUtils {
 

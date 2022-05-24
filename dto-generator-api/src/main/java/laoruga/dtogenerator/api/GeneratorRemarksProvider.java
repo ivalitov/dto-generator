@@ -11,6 +11,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 19.05.2022
+ */
+
 public class GeneratorRemarksProvider {
 
     private final Map<String, IRuleRemark> basicRuleRemarksMapByField = new HashMap<>();

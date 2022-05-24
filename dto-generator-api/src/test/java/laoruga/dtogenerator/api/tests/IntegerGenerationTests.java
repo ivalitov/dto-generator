@@ -15,6 +15,11 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 03.05.2022
+ */
+
 @DisplayName("Integer Generation Tests")
 @Epic("INTEGER_RULES")
 public class IntegerGenerationTests {

@@ -1,5 +1,10 @@
 package laoruga.dtogenerator.api.generators.basictypegenerators;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 13.05.2022
+ */
+
 public class BasicGeneratorsBuilders {
 
     private BasicGeneratorsBuilders() {

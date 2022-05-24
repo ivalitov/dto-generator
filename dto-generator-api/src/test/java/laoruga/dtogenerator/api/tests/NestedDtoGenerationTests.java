@@ -22,6 +22,11 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 03.05.2022
+ */
+
 @DisplayName("Basic Type Generators Tests")
 @Epic("NESTED_DTO")
 public class NestedDtoGenerationTests {

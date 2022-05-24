@@ -2,7 +2,6 @@ package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generators.NestedDtoGenerator;
-import laoruga.dtogenerator.api.generators.basictypegenerators.ListGenerator;
 import laoruga.dtogenerator.api.markup.generators.*;
 import laoruga.dtogenerator.api.markup.rules.*;
 import lombok.extern.slf4j.Slf4j;
@@ -12,12 +11,16 @@ import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+/**
+ * @author Il'dar Valitov
+ * Created on 16.04.2022
+ */
 
 @Slf4j
 public class DtoGenerator {
