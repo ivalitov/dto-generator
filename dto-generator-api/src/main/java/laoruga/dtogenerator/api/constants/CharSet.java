@@ -2,6 +2,11 @@ package laoruga.dtogenerator.api.constants;
 
 import lombok.Getter;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 04.04.2022
+ */
+
 @Getter
 public enum CharSet {
 
@@ -11,7 +16,7 @@ public enum CharSet {
     RUS(new char[]{'а', 'б', 'в', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'э', 'ъ', 'ь', 'ю', 'я'}),
     RUS_CAP(new char[]{'А', 'Б', 'В', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Э', 'Ъ', 'Ь', 'Ю', 'Я'});
 
-    private char[] chars;
+    private final char[] chars;
 
     CharSet(char[] chars) {
         this.chars = chars;

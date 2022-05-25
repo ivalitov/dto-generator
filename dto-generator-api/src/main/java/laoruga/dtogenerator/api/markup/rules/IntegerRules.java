@@ -1,24 +1,30 @@
 package laoruga.dtogenerator.api.markup.rules;
 
 import laoruga.dtogenerator.api.markup.BoundType;
-import laoruga.dtogenerator.api.markup.remarks.RuleRemark;
+import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
+import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.RANDOM_VALUE;
 
 @Retention(RUNTIME)
 @Target(FIELD)
+@Rule
 public @interface IntegerRules {
 
     int DEFAULT_MIN = 0;
     int DEFAULT_MAX = 999999999;
+    IRuleRemark DEFAULT_RULE_REMARK = RANDOM_VALUE;
 
-    @BoundType(RuleRemark.MAX_VALUE)
+    @BoundType(BasicRuleRemark.MAX_VALUE)
     int maxValue() default DEFAULT_MAX;
 
-    @BoundType(RuleRemark.MIN_VALUE)
+    @BoundType(BasicRuleRemark.MIN_VALUE)
     int minValue() default DEFAULT_MIN;
+
+    BasicRuleRemark ruleRemark() default RANDOM_VALUE;
 }
