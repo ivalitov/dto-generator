@@ -5,7 +5,7 @@
 
 # Prerequisites: pom.xml and appropriate project structure should exist in the repository.
 
-image: maven:3.6.3
+image: maven:3.6.3-jdk-8
 
 clone:
   depth: full    # SonarCloud scanner needs the full history to assign issues properly
