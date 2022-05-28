@@ -1,7 +1,9 @@
 package laoruga.dtogenerator.api.tests;
 
+import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import laoruga.dtogenerator.api.DtoGenerator;
+import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import laoruga.dtogenerator.api.markup.rules.ListRules;
 import laoruga.dtogenerator.api.markup.rules.StringRules;
@@ -11,12 +13,10 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import java.util.function.Consumer;
 
+import static laoruga.dtogenerator.api.tests.util.TestUtils.getErrorsMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 
 @DisplayName("Basic Type Generators Tests")
+@Epic("LIST_RULES")
 public class CollectionsDtoGenerationTests {
 
     @Getter
@@ -122,6 +123,56 @@ public class CollectionsDtoGenerationTests {
                 () -> assertListOfStrings.accept(dto.getArrayListOfStringsImplicit()),
                 () -> assertListOfStrings.accept(dto.getVectorOfStrings())
         );
+    }
+
+    @Getter
+    static class DtoWithWildcardList {
+        private DtoWithWildcardList() {
+        }
+
+        @ListRules
+        @StringRules
+        List<?> wildCardList;
+    }
+
+    @Getter
+    static class DtoWithRawList {
+        @ListRules()
+        List rawList;
+    }
+
+    @Getter
+    static class DtoWithCustomTypeList {
+        @ListRules(listClass = LinkedList.class)
+        List<Foo> customTypeList;
+
+        class Foo {
+        }
+    }
+
+    @Getter
+    static class DtoWithListOfCollections {
+        @ListRules()
+        List<Set<String>> customTypeList;
+    }
+
+    @Feature("NEGATIVE_TESTS")
+    static class NegativeTests {
+
+        @Test
+        @DisplayName("Unexpected wildcard generic type")
+        public void listOfIntegerWithDefaultRulesPrams() throws NoSuchFieldException, IllegalAccessException {
+            DtoGenerator generator = DtoGenerator.builder().build();
+            assertThrows(DtoGeneratorException.class,
+                    () -> generator.generateDto(DtoWithWildcardList.class));
+
+            Map<String, Exception> errorsMap = getErrorsMap(generator);
+
+            assertEquals(1, errorsMap.size());
+            assertTrue(errorsMap.containsKey("wildCardList"));
+            assertThat(errorsMap.get("wildCardList").getMessage(), stringContainsInOrder("Can't generate wildcard type"));
+        }
+
     }
 
 }
