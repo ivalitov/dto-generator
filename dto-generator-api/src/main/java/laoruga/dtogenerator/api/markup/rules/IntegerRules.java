@@ -19,6 +19,7 @@ public @interface IntegerRules {
     int DEFAULT_MIN = 0;
     int DEFAULT_MAX = 999999999;
     IRuleRemark DEFAULT_RULE_REMARK = RANDOM_VALUE;
+    Class<?>[] APPLICABLE_TYPES = {Integer.class, Integer.TYPE};
 
     @BoundType(BasicRuleRemark.MAX_VALUE)
     int maxValue() default DEFAULT_MAX;

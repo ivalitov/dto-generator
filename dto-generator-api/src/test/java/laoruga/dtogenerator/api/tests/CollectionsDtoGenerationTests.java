@@ -4,9 +4,11 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
+import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
 import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import laoruga.dtogenerator.api.markup.rules.ListRules;
 import laoruga.dtogenerator.api.markup.rules.StringRules;
+import laoruga.dtogenerator.api.tests.data.customgenerator.ClientInfoGenerator;
 import laoruga.dtogenerator.api.tests.data.dtoclient.ClientDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -127,9 +129,6 @@ public class CollectionsDtoGenerationTests {
 
     @Getter
     static class DtoWithWildcardList {
-        private DtoWithWildcardList() {
-        }
-
         @ListRules
         @StringRules
         List<?> wildCardList;
@@ -137,31 +136,26 @@ public class CollectionsDtoGenerationTests {
 
     @Getter
     static class DtoWithRawList {
-        @ListRules()
+        @ListRules
+        @IntegerRules
         List rawList;
-    }
-
-    @Getter
-    static class DtoWithCustomTypeList {
-        @ListRules(listClass = LinkedList.class)
-        List<Foo> customTypeList;
-
-        class Foo {
-        }
     }
 
     @Getter
     static class DtoWithListOfCollections {
         @ListRules()
-        List<Set<String>> customTypeList;
+        List<Set<String>> listOfSet;
+
+        @ListRules(listClass = LinkedList.class)
+        List<String> listOfString;
     }
 
     @Feature("NEGATIVE_TESTS")
     static class NegativeTests {
 
         @Test
-        @DisplayName("Unexpected wildcard generic type")
-        public void listOfIntegerWithDefaultRulesPrams() throws NoSuchFieldException, IllegalAccessException {
+        @DisplayName("Wildcard generic type")
+        public void wildcardGenericType() {
             DtoGenerator generator = DtoGenerator.builder().build();
             assertThrows(DtoGeneratorException.class,
                     () -> generator.generateDto(DtoWithWildcardList.class));
@@ -171,6 +165,37 @@ public class CollectionsDtoGenerationTests {
             assertEquals(1, errorsMap.size());
             assertTrue(errorsMap.containsKey("wildCardList"));
             assertThat(errorsMap.get("wildCardList").getMessage(), stringContainsInOrder("Can't generate wildcard type"));
+        }
+
+        @Test
+        @DisplayName("Raw list")
+        public void rawList() {
+            DtoGenerator generator = DtoGenerator.builder().build();
+            assertThrows(DtoGeneratorException.class,
+                    () -> generator.generateDto(DtoWithRawList.class));
+
+            Map<String, Exception> errorsMap = getErrorsMap(generator);
+
+            assertEquals(1, errorsMap.size());
+            assertTrue(errorsMap.containsKey("rawList"));
+            assertThat(errorsMap.get("rawList").getMessage(), stringContainsInOrder("Can't generate raw type"));
+        }
+
+        @Test
+        @DisplayName("List Of Collection")
+        public void listOfCollection() {
+            DtoGenerator generator = DtoGenerator.builder().build();
+            assertThrows(DtoGeneratorException.class,
+                    () -> generator.generateDto(DtoWithListOfCollections.class));
+
+            Map<String, Exception> errorsMap = getErrorsMap(generator);
+            final String ERROR_PART = "There is also generation rules annotation expected";
+
+            assertEquals(2, errorsMap.size());
+            assertTrue(errorsMap.containsKey("listOfSet"));
+            assertThat(errorsMap.get("listOfSet").getMessage(), stringContainsInOrder(ERROR_PART));
+            assertTrue(errorsMap.containsKey("listOfString"));
+            assertThat(errorsMap.get("listOfString").getMessage(), stringContainsInOrder(ERROR_PART));
         }
 
     }

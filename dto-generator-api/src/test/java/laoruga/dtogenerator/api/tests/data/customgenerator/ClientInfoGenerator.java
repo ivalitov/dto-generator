@@ -5,7 +5,7 @@ import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
 import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.tests.data.dtoclient.*;
-import laoruga.dtogenerator.api.utils.RandomUtils;
+import laoruga.dtogenerator.api.util.RandomUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.text.RandomStringGenerator;
 

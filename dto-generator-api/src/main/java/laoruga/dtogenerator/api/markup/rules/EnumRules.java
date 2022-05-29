@@ -16,6 +16,7 @@ import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.RANDOM_VAL
 public @interface EnumRules {
 
     IRuleRemark DEFAULT_RULE_REMARK = RANDOM_VALUE;
+    Class<?>[] APPLICABLE_TYPES = {Enum.class};
 
     String[] possibleEnumNames();
 

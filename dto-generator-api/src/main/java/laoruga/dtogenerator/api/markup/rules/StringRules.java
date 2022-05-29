@@ -21,6 +21,7 @@ public @interface StringRules {
     CharSet[] DEFAULT_CHARSET = new CharSet[]{CharSet.NUM, CharSet.ENG, CharSet.RUS};
     String DEFAULT_CHARS = "";
     IRuleRemark DEFAULT_RULE_REMARK = RANDOM_VALUE;
+    Class<?>[] APPLICABLE_TYPES = {String.class};
 
     int minSymbols() default DEFAULT_MIN_SYMBOLS_NUMBER;
 

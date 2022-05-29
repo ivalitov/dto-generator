@@ -1,4 +1,4 @@
-package laoruga.dtogenerator.api.utils;
+package laoruga.dtogenerator.api.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;

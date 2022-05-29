@@ -1,4 +1,4 @@
-package laoruga.dtogenerator.api.utils;
+package laoruga.dtogenerator.api.util;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import org.apache.commons.math3.util.Pair;
@@ -42,8 +42,8 @@ public class ReflectionUtils {
     static Object getGenericTypeOrPair(Field field) throws DtoGeneratorException {
         String typeName = field.getGenericType().getTypeName();
         char[] chars = typeName.toCharArray();
-        Integer rightIdx = null;
         Integer leftIdx = null;
+        Integer rightIdx = null;
         boolean multipleTypes = false;
         for (int i = 0; i < chars.length; i++) {
             if (chars[i] == '<') {
@@ -68,7 +68,7 @@ public class ReflectionUtils {
             }
         }
         if (rightIdx == null || leftIdx == null) {
-            throw new DtoGeneratorException("Can't generate via default generator," +
+            throw new DtoGeneratorException("Can't generate raw type via default generator," +
                     " please create custom generator for type: " + typeName);
         } else {
             String className = typeName.substring(leftIdx, rightIdx);

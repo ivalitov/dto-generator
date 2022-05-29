@@ -19,6 +19,7 @@ public @interface DoubleRules {
     double DEFAULT_MAX = 999999999999999999D;
     int DEFAULT_PRECISION = 2;
     IRuleRemark DEFAULT_RULE_REMARK = RANDOM_VALUE;
+    Class<?>[] APPLICABLE_TYPES = {Double.class, Double.TYPE};
 
     double maxValue() default DEFAULT_MAX;
 
