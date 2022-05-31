@@ -17,7 +17,7 @@ import java.util.TreeSet;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Il'dar Valitov
@@ -53,7 +53,18 @@ public class SetGeneratorTests {
         DtoSet dto = DtoGenerator.builder().build().generateDto(DtoSet.class);
 
         assertNotNull(dto);
-        Set<Integer> numbers = dto.getNumbers();
+        checkNumbers(dto.getNumbers());
+        assertEquals(HashSet.class, dto.getNumbers().getClass());
+
+        checkNumbers(dto.getLinkedHashSet());
+        assertEquals(LinkedHashSet.class, dto.getLinkedHashSet().getClass());
+
+        checkNumbers(dto.getTreeSet());
+        checkNumbers(dto.getHashSet());
+
+    }
+
+    private static void checkNumbers(Set<Integer> numbers) {
         assertThat(numbers.size(), both(
                 greaterThanOrEqualTo(SetRules.DEFAULT_MIN_SIZE)).and(lessThanOrEqualTo(SetRules.DEFAULT_MAX_SIZE)));
         for (Integer number : numbers) {
