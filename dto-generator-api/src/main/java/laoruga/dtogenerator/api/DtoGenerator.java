@@ -245,9 +245,9 @@ public class DtoGenerator {
                             field.getName() + " " + field.getGenericType().getClass(),
                             ReflectionUtils.getGenericType(field),
                             rulesInfoWrapper.getItemGenerationRules());
-                    generator = getGenBuildersProvider().getListGenerator(
+                    generator = getGenBuildersProvider().getCollectionTypeGenerator(
                             fieldName, fieldType,
-                            (ListRules) rulesInfoWrapper.getCollectionGenerationRules(),
+                            rulesInfoWrapper.getCollectionGenerationRules(),
                             collectionItemGenerator);
                     break;
                 case MAP_BASIC:
@@ -267,9 +267,9 @@ public class DtoGenerator {
                 case COLLECTION_CUSTOM:
                     collectionItemGenerator = getGenBuildersProvider().getCustomGenerator(
                             rulesInfoWrapper.getItemGenerationRules(), dtoInstance);
-                    generator = getGenBuildersProvider().getListGenerator(
+                    generator = getGenBuildersProvider().getCollectionTypeGenerator(
                             fieldName, fieldType,
-                            (ListRules) rulesInfoWrapper.getCollectionGenerationRules(),
+                            rulesInfoWrapper.getCollectionGenerationRules(),
                             collectionItemGenerator);
                     break;
                 case NOT_ANNOTATED:

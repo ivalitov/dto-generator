@@ -4,11 +4,9 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
-import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
 import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import laoruga.dtogenerator.api.markup.rules.ListRules;
 import laoruga.dtogenerator.api.markup.rules.StringRules;
-import laoruga.dtogenerator.api.tests.data.customgenerator.ClientInfoGenerator;
 import laoruga.dtogenerator.api.tests.data.dtoclient.ClientDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,14 +25,15 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Il'dar Valitov
  * Created on 03.05.2022
  */
-
-@DisplayName("Basic Type Generators Tests")
+// TODO Needs to check and handle situation when item rules and generic are not same
+// TODO Add feature - remarks for item generator (maybe already exists?)
+@DisplayName("List Type Generators Tests")
 @Epic("LIST_RULES")
-public class CollectionsDtoGenerationTests {
+public class ListGenerationTests {
 
     @Getter
     @NoArgsConstructor
-    static class Dto {
+    static class DtoList {
 
         @ListRules(listClass = LinkedList.class)
         @StringRules
@@ -53,9 +52,7 @@ public class CollectionsDtoGenerationTests {
         private LinkedList<String> linkedListOfStringsImplicit;
     }
 
-
     @Test
-    @Feature("LIST_RULES")
     @DisplayName("List Of Integer Generation (default rules params)")
     public void listOfIntegerWithDefaultRulesPrams() {
         ClientDto dto = DtoGenerator.builder().build().generateDto(ClientDto.class);
@@ -72,7 +69,6 @@ public class CollectionsDtoGenerationTests {
 
 
     @Test
-    @Feature("LIST_RULES")
     @DisplayName("List Of Integer Generation (explicit rules params)")
     public void listOfIntegerWithExplicitRulesPrams() {
         ClientDto dto = DtoGenerator.builder().build().generateDto(ClientDto.class);
@@ -91,10 +87,9 @@ public class CollectionsDtoGenerationTests {
     }
 
     @Test
-    @Feature("LIST_RULES")
     @DisplayName("List Of Strings Generation (explicit rules params)")
     public void listOfStingsWithExplicitRulesPrams() {
-        Dto dto = DtoGenerator.builder().build().generateDto(Dto.class);
+        DtoList dto = DtoGenerator.builder().build().generateDto(DtoList.class);
 
         assertNotNull(dto);
 
@@ -150,54 +145,52 @@ public class CollectionsDtoGenerationTests {
         List<String> listOfString;
     }
 
+    @Test
     @Feature("NEGATIVE_TESTS")
-    static class NegativeTests {
+    @DisplayName("Wildcard generic type")
+    public void wildcardGenericType() {
+        DtoGenerator generator = DtoGenerator.builder().build();
+        assertThrows(DtoGeneratorException.class,
+                () -> generator.generateDto(DtoWithWildcardList.class));
 
-        @Test
-        @DisplayName("Wildcard generic type")
-        public void wildcardGenericType() {
-            DtoGenerator generator = DtoGenerator.builder().build();
-            assertThrows(DtoGeneratorException.class,
-                    () -> generator.generateDto(DtoWithWildcardList.class));
+        Map<String, Exception> errorsMap = getErrorsMap(generator);
 
-            Map<String, Exception> errorsMap = getErrorsMap(generator);
+        assertEquals(1, errorsMap.size());
+        assertTrue(errorsMap.containsKey("wildCardList"));
+        assertThat(errorsMap.get("wildCardList").getMessage(), stringContainsInOrder("Can't generate wildcard type"));
+    }
 
-            assertEquals(1, errorsMap.size());
-            assertTrue(errorsMap.containsKey("wildCardList"));
-            assertThat(errorsMap.get("wildCardList").getMessage(), stringContainsInOrder("Can't generate wildcard type"));
-        }
+    @Test
+    @Feature("NEGATIVE_TESTS")
+    @DisplayName("Raw list")
+    public void rawList() {
+        DtoGenerator generator = DtoGenerator.builder().build();
+        assertThrows(DtoGeneratorException.class,
+                () -> generator.generateDto(DtoWithRawList.class));
 
-        @Test
-        @DisplayName("Raw list")
-        public void rawList() {
-            DtoGenerator generator = DtoGenerator.builder().build();
-            assertThrows(DtoGeneratorException.class,
-                    () -> generator.generateDto(DtoWithRawList.class));
+        Map<String, Exception> errorsMap = getErrorsMap(generator);
 
-            Map<String, Exception> errorsMap = getErrorsMap(generator);
+        assertEquals(1, errorsMap.size());
+        assertTrue(errorsMap.containsKey("rawList"));
+        assertThat(errorsMap.get("rawList").getMessage(), stringContainsInOrder("Can't generate raw type"));
+    }
 
-            assertEquals(1, errorsMap.size());
-            assertTrue(errorsMap.containsKey("rawList"));
-            assertThat(errorsMap.get("rawList").getMessage(), stringContainsInOrder("Can't generate raw type"));
-        }
+    @Test
+    @Feature("NEGATIVE_TESTS")
+    @DisplayName("List Of Collection")
+    public void listOfCollection() {
+        DtoGenerator generator = DtoGenerator.builder().build();
+        assertThrows(DtoGeneratorException.class,
+                () -> generator.generateDto(DtoWithListOfCollections.class));
 
-        @Test
-        @DisplayName("List Of Collection")
-        public void listOfCollection() {
-            DtoGenerator generator = DtoGenerator.builder().build();
-            assertThrows(DtoGeneratorException.class,
-                    () -> generator.generateDto(DtoWithListOfCollections.class));
+        Map<String, Exception> errorsMap = getErrorsMap(generator);
+        final String ERROR_PART = "There is also generation rules annotation expected";
 
-            Map<String, Exception> errorsMap = getErrorsMap(generator);
-            final String ERROR_PART = "There is also generation rules annotation expected";
-
-            assertEquals(2, errorsMap.size());
-            assertTrue(errorsMap.containsKey("listOfSet"));
-            assertThat(errorsMap.get("listOfSet").getMessage(), stringContainsInOrder(ERROR_PART));
-            assertTrue(errorsMap.containsKey("listOfString"));
-            assertThat(errorsMap.get("listOfString").getMessage(), stringContainsInOrder(ERROR_PART));
-        }
-
+        assertEquals(2, errorsMap.size());
+        assertTrue(errorsMap.containsKey("listOfSet"));
+        assertThat(errorsMap.get("listOfSet").getMessage(), stringContainsInOrder(ERROR_PART));
+        assertTrue(errorsMap.containsKey("listOfString"));
+        assertThat(errorsMap.get("listOfString").getMessage(), stringContainsInOrder(ERROR_PART));
     }
 
 }

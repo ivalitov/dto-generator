@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -103,6 +102,20 @@ public class GeneratorBuildersProvider {
         throw new DtoGeneratorException("Field " + fieldName + " hasn't been mapped with any basic generator.");
     }
 
+    IGenerator<?> getCollectionTypeGenerator(String fieldName, Class<?> fieldType, Annotation rules, IGenerator<?> itemGenerator) {
+        Class<? extends Annotation> rulesClass = rules.annotationType();
+
+        if (ListRules.class == rulesClass) {
+            return getListGenerator(fieldName, fieldType, (ListRules) rules, itemGenerator);
+        }
+
+        if (SetRules.class == rulesClass) {
+            return getSetGenerator(fieldName, fieldType, (SetRules) rules, itemGenerator);
+        }
+
+        throw new DtoGeneratorException("Field " + fieldName + " hasn't been mapped with any collection generator.");
+    }
+
     IGenerator<?> getNestedDtoGenerator(Field field,
                                         String[] fieldsPath,
                                         DtoGeneratorBuilder dtoGeneratorBuilder) {
@@ -149,23 +162,6 @@ public class GeneratorBuildersProvider {
             }
         }
         throw new DtoGeneratorException("Unexpected error. Unexpected annotation instead of: " + CustomGenerator.class);
-    }
-
-    public IGenerator<?> getListGenerator(String fieldName, Class<?> fieldType, ListRules listRules, IGenerator<?> listItemGenerator) {
-        if (isGeneratorOverridden(fieldName, listRules)) {
-            return getOverriddenGenerator(fieldName, listRules);
-        } else {
-            IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
-                    generatorRemarksProvider.getBasicRuleRemark(fieldName) :
-                    listRules.ruleRemark();
-            return BasicGeneratorsBuilders.listBuilder()
-                    .minSize(listRules.minSize())
-                    .maxSize(listRules.maxSize())
-                    .listInstance(createCollectionFieldInstance(fieldType, listRules.listClass()))
-                    .itemGenerator(listItemGenerator)
-                    .ruleRemark(remark)
-                    .build();
-        }
     }
 
     /*
@@ -272,6 +268,44 @@ public class GeneratorBuildersProvider {
             return BasicGeneratorsBuilders.localDateTimeBuilder()
                     .leftShiftDays(localDateTimeRules.leftShiftDays())
                     .rightShiftDays(localDateTimeRules.rightShiftDays())
+                    .ruleRemark(remark)
+                    .build();
+        }
+    }
+
+    /*
+     * Collection generators providers
+     */
+
+    IGenerator<?> getListGenerator(String fieldName, Class<?> fieldType, ListRules listRules, IGenerator<?> listItemGenerator) {
+        if (isGeneratorOverridden(fieldName, listRules)) {
+            return getOverriddenGenerator(fieldName, listRules);
+        } else {
+            IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
+                    generatorRemarksProvider.getBasicRuleRemark(fieldName) :
+                    listRules.ruleRemark();
+            return BasicGeneratorsBuilders.collectionBuilder()
+                    .minSize(listRules.minSize())
+                    .maxSize(listRules.maxSize())
+                    .listInstance(createCollectionFieldInstance(fieldType, listRules.listClass()))
+                    .itemGenerator(listItemGenerator)
+                    .ruleRemark(remark)
+                    .build();
+        }
+    }
+
+    IGenerator<?> getSetGenerator(String fieldName, Class<?> fieldType, SetRules setRules, IGenerator<?> listItemGenerator) {
+        if (isGeneratorOverridden(fieldName, setRules)) {
+            return getOverriddenGenerator(fieldName, setRules);
+        } else {
+            IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
+                    generatorRemarksProvider.getBasicRuleRemark(fieldName) :
+                    setRules.ruleRemark();
+            return BasicGeneratorsBuilders.collectionBuilder()
+                    .minSize(setRules.minSize())
+                    .maxSize(setRules.maxSize())
+                    .listInstance(createCollectionFieldInstance(fieldType, setRules.setClass()))
+                    .itemGenerator(listItemGenerator)
                     .ruleRemark(remark)
                     .build();
         }

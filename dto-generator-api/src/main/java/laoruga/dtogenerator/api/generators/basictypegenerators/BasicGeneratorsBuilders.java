@@ -30,8 +30,8 @@ public class BasicGeneratorsBuilders {
         return EnumGenerator.builder();
     }
 
-    public static ListGenerator.ListGeneratorBuilder<?> listBuilder() {
-        return ListGenerator.builder();
+    public static CollectionGenerator.CollectionGeneratorBuilder<?> collectionBuilder() {
+        return CollectionGenerator.builder();
     }
 
     public static LocalDateTimeGenerator.LocalDateTimeGeneratorBuilder localDateTimeBuilder() {

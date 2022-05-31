@@ -8,7 +8,7 @@ import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * @author Il'dar Valitov
@@ -16,16 +16,16 @@ import java.util.List;
  */
 
 @AllArgsConstructor
-public class ListGenerator<ITEM_TYPE> implements ICollectionGenerator<List<ITEM_TYPE>> {
+public class CollectionGenerator<ITEM_TYPE> implements ICollectionGenerator<Collection<ITEM_TYPE>> {
 
     private final int minSize;
     private final int maxSize;
-    private final List<ITEM_TYPE> listInstance;
+    private final Collection<ITEM_TYPE> listInstance;
     private final IGenerator<ITEM_TYPE> itemGenerator;
     private final IRuleRemark ruleRemark;
 
     @Override
-    public List<ITEM_TYPE> generate() {
+    public Collection<ITEM_TYPE> generate() {
         int size;
         switch ((BasicRuleRemark) ruleRemark) {
             case MIN_VALUE:
@@ -53,47 +53,47 @@ public class ListGenerator<ITEM_TYPE> implements ICollectionGenerator<List<ITEM_
         return itemGenerator;
     }
 
-    public static ListGeneratorBuilder<?> builder() {
-        return new ListGeneratorBuilder<>();
+    public static CollectionGeneratorBuilder<?> builder() {
+        return new CollectionGeneratorBuilder<>();
     }
 
-    public static final class ListGeneratorBuilder<ITEM_TYPE> implements IGeneratorBuilder {
+    public static final class CollectionGeneratorBuilder<ITEM_TYPE> implements IGeneratorBuilder {
         private int minSize;
         private int maxSize;
-        private List<ITEM_TYPE> listInstance;
+        private Collection<ITEM_TYPE> listInstance;
         private IGenerator<ITEM_TYPE> itemGenerator;
         private IRuleRemark ruleRemark;
 
-        private ListGeneratorBuilder() {
+        private CollectionGeneratorBuilder() {
         }
 
-        public ListGeneratorBuilder<ITEM_TYPE> minSize(int minSize) {
+        public CollectionGeneratorBuilder<ITEM_TYPE> minSize(int minSize) {
             this.minSize = minSize;
             return this;
         }
 
-        public ListGeneratorBuilder<ITEM_TYPE> maxSize(int maxSize) {
+        public CollectionGeneratorBuilder<ITEM_TYPE> maxSize(int maxSize) {
             this.maxSize = maxSize;
             return this;
         }
 
-        public ListGeneratorBuilder<ITEM_TYPE> listInstance(List<ITEM_TYPE> listInstance) {
+        public CollectionGeneratorBuilder<ITEM_TYPE> listInstance(Collection<ITEM_TYPE> listInstance) {
             this.listInstance = listInstance;
             return this;
         }
 
-        public ListGeneratorBuilder<ITEM_TYPE> itemGenerator(IGenerator<ITEM_TYPE> itemGenerator) {
+        public CollectionGeneratorBuilder<ITEM_TYPE> itemGenerator(IGenerator<ITEM_TYPE> itemGenerator) {
             this.itemGenerator = itemGenerator;
             return this;
         }
 
-      public ListGeneratorBuilder<ITEM_TYPE> ruleRemark(IRuleRemark ruleRemark) {
+      public CollectionGeneratorBuilder<ITEM_TYPE> ruleRemark(IRuleRemark ruleRemark) {
             this.ruleRemark = ruleRemark;
             return this;
         }
 
-        public ListGenerator<ITEM_TYPE> build() {
-            return new ListGenerator<>(minSize, maxSize, listInstance, itemGenerator, ruleRemark);
+        public CollectionGenerator<ITEM_TYPE> build() {
+            return new CollectionGenerator<>(minSize, maxSize, listInstance, itemGenerator, ruleRemark);
         }
     }
 }

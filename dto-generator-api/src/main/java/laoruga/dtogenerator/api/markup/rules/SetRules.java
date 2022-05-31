@@ -6,9 +6,7 @@ import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -18,14 +16,14 @@ import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.RANDOM_VAL
 @Target(FIELD)
 @Rule
 @RuleForCollection
-public @interface ListRules {
+public @interface SetRules {
 
     int DEFAULT_MIN_SIZE = 1;
     int DEFAULT_MAX_SIZE = 10;
     IRuleRemark DEFAULT_RULE_REMARK = RANDOM_VALUE;
     Class<?>[] APPLICABLE_TYPES = {List.class};
 
-    Class<? extends List> listClass() default ArrayList.class;
+    Class<? extends Set> setClass() default HashSet.class;
 
     @BoundType(BasicRuleRemark.MAX_VALUE)
     int maxSize() default DEFAULT_MAX_SIZE;
