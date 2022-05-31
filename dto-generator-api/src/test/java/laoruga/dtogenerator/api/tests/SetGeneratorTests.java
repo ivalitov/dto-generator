@@ -48,7 +48,7 @@ public class SetGeneratorTests {
     }
 
     @Test
-    @DisplayName("Set Of Strings Generation (default rules params)")
+    @DisplayName("Set Of Integers Generation (default rules params)")
     public void listOfIntegerWithDefaultRulesPrams() {
         DtoSet dto = DtoGenerator.builder().build().generateDto(DtoSet.class);
 

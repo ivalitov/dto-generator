@@ -58,7 +58,7 @@ public class ListGenerationTests {
         ClientDto dto = DtoGenerator.builder().build().generateDto(ClientDto.class);
 
         assertNotNull(dto);
-        List<Integer> numbers = dto.getLinkedListExplicitRules();
+        List<Integer> numbers = dto.getArrayListIntegerRules();
         assertThat(numbers.size(), both(
                 greaterThanOrEqualTo(ListRules.DEFAULT_MIN_SIZE)).and(lessThanOrEqualTo(ListRules.DEFAULT_MAX_SIZE)));
         for (Integer number : numbers) {
