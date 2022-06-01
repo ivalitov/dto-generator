@@ -6,7 +6,10 @@ import laoruga.dtogenerator.api.markup.generators.ICollectionGenerator;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
-import laoruga.dtogenerator.api.markup.rules.*;
+import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
+import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
+import laoruga.dtogenerator.api.markup.rules.Rule;
+import laoruga.dtogenerator.api.markup.rules.RuleForCollection;
 import laoruga.dtogenerator.api.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,12 +19,13 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.math3.util.Pair;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static laoruga.dtogenerator.api.util.ReflectionUtils.createInstance;
 
 /**
  * @author Il'dar Valitov
@@ -61,7 +65,7 @@ public class DtoGenerator {
     }
 
     public <T> T generateDto(Class<T> dtoClass) {
-        createDtoInstance(dtoClass);
+        dtoInstance = createInstance(dtoClass);
         prepareGenerators();
         applyGenerators();
         return (T) dtoInstance;
@@ -72,33 +76,6 @@ public class DtoGenerator {
         prepareGenerators();
         applyGenerators();
         return dtoInstance;
-    }
-
-    void createDtoInstance(Class<?> dtoClass) {
-        try {
-            Constructor<?>[] declaredConstructors = dtoClass.getDeclaredConstructors();
-            if (declaredConstructors.length == 0) {
-                throw new DtoGeneratorException("Failed to instantiate DTO class: '" + dtoClass + "'. " +
-                        "Class don't have public constructors. It must have public no-args constructor.");
-            }
-            Optional<Constructor<?>> maybeNoArgsConstructor = Arrays.stream(declaredConstructors)
-                    .filter(constructor -> constructor.getParameterCount() == 0)
-                    .findAny();
-            if (!maybeNoArgsConstructor.isPresent()) {
-                throw new DtoGeneratorException("Failed to instantiate DTO class: '" + dtoClass + "'. " +
-                        "Class must have public no-args constructor.");
-            }
-            Constructor<?> constructor = maybeNoArgsConstructor.get();
-            boolean isAccessible = constructor.isAccessible();
-            constructor.setAccessible(true);
-            dtoInstance = constructor.newInstance();
-            constructor.setAccessible(isAccessible);
-        } catch (InstantiationException ie) {
-            throw new DtoGeneratorException("Failed to instantiate DTO class: '" + dtoClass + "'. " +
-                    "Maybe no-args constructor was not found.", ie);
-        } catch (Exception e) {
-            throw new DtoGeneratorException("Failed to instantiate DTO class: '" + dtoClass + "'.", e);
-        }
     }
 
     /**

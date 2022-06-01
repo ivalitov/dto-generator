@@ -2,17 +2,20 @@ package laoruga.dtogenerator.api.tests;
 
 import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
+import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
+import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
+import laoruga.dtogenerator.api.markup.rules.IntegerRules;
+import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
 import laoruga.dtogenerator.api.markup.rules.StringRules;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import static laoruga.dtogenerator.api.constants.Group.REQUIRED;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -30,9 +33,50 @@ public class FieldsGroupingTests {
         @StringRules(group = REQUIRED)
         String reqStr;
 
+        @IntegerRules(group = REQUIRED)
+        Integer reqInt;
+
+        @NestedDtoRules(group = REQUIRED)
+        DtoInner reqInnerDto;
+
+        @CustomGenerator(generatorClass = MapGen.class, group = REQUIRED)
+        Map<String, String> reqMap;
+
         @StringRules
         String defaultStr;
 
+        @IntegerRules
+        Integer defaultInt;
+
+        @NestedDtoRules
+        DtoInner defaultInnerDto;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    static class DtoInner {
+
+        @StringRules(group = REQUIRED)
+        String reqStr;
+
+        @IntegerRules(group = REQUIRED)
+        Integer reqInt;
+
+        @StringRules
+        String defaultStr;
+
+        @IntegerRules
+        Integer defaultInt;
+
+        @CustomGenerator(generatorClass = MapGen.class)
+        Map<String, String> reqMap;
+    }
+
+    static class MapGen implements ICustomGenerator<Map<String, String>> {
+        @Override
+        public Map<String, String> generate() {
+            return new HashMap<>();
+        }
     }
 
     @Test
@@ -45,7 +89,15 @@ public class FieldsGroupingTests {
         assertNotNull(dto);
         assertAll(
                 () -> assertNotNull(dto.getReqStr()),
-                () -> assertNull(dto.getDefaultStr())
+                () -> assertNotNull(dto.getReqInt()),
+                () -> assertNotNull(dto.getReqInnerDto()),
+                () -> assertNotNull(dto.getReqMap()),
+                () -> assertNotNull(dto.getReqInnerDto().getReqInt()),
+                () -> assertNotNull(dto.getReqInnerDto().getReqStr()),
+                () -> assertNotNull(dto.getReqInnerDto().getReqMap()),
+                () -> assertNull(dto.getDefaultStr()),
+                () -> assertNull(dto.getDefaultInt()),
+                () -> assertNull(dto.getDefaultInnerDto())
         );
     }
 }

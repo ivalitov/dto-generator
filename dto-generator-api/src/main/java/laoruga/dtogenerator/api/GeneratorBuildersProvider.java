@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static laoruga.dtogenerator.api.constants.BasicRuleRemark.NULL_VALUE;
+import static laoruga.dtogenerator.api.util.ReflectionUtils.createInstance;
 import static laoruga.dtogenerator.api.util.Utils.createCollectionFieldInstance;
 
 /**
@@ -131,7 +132,7 @@ public class GeneratorBuildersProvider {
             Class<?> generatorClass = null;
             try {
                 generatorClass = customRules.generatorClass();
-                Object generatorInstance = generatorClass.newInstance();
+                Object generatorInstance = createInstance(generatorClass);
                 if (generatorInstance instanceof ICustomGeneratorArgs) {
                     log.debug("Args {} have been obtained from Annotation: {}",
                             Arrays.asList(customRules.args()), customRules);

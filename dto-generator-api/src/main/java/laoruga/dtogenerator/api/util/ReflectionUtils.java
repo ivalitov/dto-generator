@@ -3,10 +3,9 @@ package laoruga.dtogenerator.api.util;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import org.apache.commons.math3.util.Pair;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Il'dar Valitov
@@ -14,29 +13,8 @@ import java.util.Set;
  */
 public class ReflectionUtils {
 
-    List list_1;
-    List<String> list_2;
-    List<?> list_3;
-    List<? extends String> list_4;
-    List<List<String>> list_5;
-    List<Set> list_6;
-    Map map_1;
-    Map<String, Integer> map_2;
-    Map<String, Map<String, ?>> map_22;
-    Map<String, Map<String, String>> map_33;
-    Map<?, ?> map_3;
-    String string;
-
-    public static void main(String[] args) {
-        System.out.println();
-    }
-
     public static Class<?> getGenericType(Field field) throws DtoGeneratorException {
         return (Class<?>) getGenericTypeOrPair(field);
-    }
-
-    public static Pair<Class<?>, Class<?>> getGenericTypesPair(Field field) throws DtoGeneratorException {
-        return (Pair<Class<?>, Class<?>>) getGenericTypeOrPair(field);
     }
 
     static Object getGenericTypeOrPair(Field field) throws DtoGeneratorException {
@@ -87,6 +65,34 @@ public class ReflectionUtils {
         } catch (ClassNotFoundException e) {
             throw new DtoGeneratorException("Can't create class for name: '" + className + "' obtained from" +
                     " type: '" + typeName + "'", e);
+        }
+    }
+
+    public static Object createInstance(Class<?> dtoClass) {
+        try {
+            Constructor<?>[] declaredConstructors = dtoClass.getDeclaredConstructors();
+            if (declaredConstructors.length == 0) {
+                throw new DtoGeneratorException("Failed to instantiate class: '" + dtoClass + "'. " +
+                        "Class don't have public constructors. It must have public no-args constructor.");
+            }
+            Optional<Constructor<?>> maybeNoArgsConstructor = Arrays.stream(declaredConstructors)
+                    .filter(constructor -> constructor.getParameterCount() == 0)
+                    .findAny();
+            if (!maybeNoArgsConstructor.isPresent()) {
+                throw new DtoGeneratorException("Failed to instantiate class: '" + dtoClass + "'. " +
+                        "Class must have public no-args constructor.");
+            }
+            Constructor<?> constructor = maybeNoArgsConstructor.get();
+            boolean isAccessible = constructor.isAccessible();
+            constructor.setAccessible(true);
+            Object instance = constructor.newInstance();
+            constructor.setAccessible(isAccessible);
+            return instance;
+        } catch (InstantiationException ie) {
+            throw new DtoGeneratorException("Failed to instantiate class: '" + dtoClass + "'. " +
+                    "Maybe no-args constructor was not found.", ie);
+        } catch (Exception e) {
+            throw new DtoGeneratorException("Failed to instantiate class: '" + dtoClass + "'.", e);
         }
     }
 }
