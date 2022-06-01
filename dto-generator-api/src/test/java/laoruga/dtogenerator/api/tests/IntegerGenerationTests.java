@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.*;
+import static laoruga.dtogenerator.api.constants.BasicRuleRemark.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;

@@ -1,4 +1,6 @@
-package laoruga.dtogenerator.api.markup.remarks;
+package laoruga.dtogenerator.api.constants;
+
+import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 
 /**
  * @author Il'dar Valitov

@@ -1,7 +1,8 @@
 package laoruga.dtogenerator.api.markup.rules;
 
 import laoruga.dtogenerator.api.constants.CharSet;
-import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
+import laoruga.dtogenerator.api.constants.BasicRuleRemark;
+import laoruga.dtogenerator.api.constants.Group;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 
 import java.lang.annotation.Retention;
@@ -9,7 +10,8 @@ import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.RANDOM_VALUE;
+import static laoruga.dtogenerator.api.constants.BasicRuleRemark.RANDOM_VALUE;
+import static laoruga.dtogenerator.api.constants.Group.DEFAULT;
 
 @Retention(RUNTIME)
 @Target(FIELD)
@@ -32,4 +34,6 @@ public @interface StringRules {
     String chars() default DEFAULT_CHARS;
 
     BasicRuleRemark ruleRemark() default RANDOM_VALUE;
+
+    Group group() default DEFAULT;
 }

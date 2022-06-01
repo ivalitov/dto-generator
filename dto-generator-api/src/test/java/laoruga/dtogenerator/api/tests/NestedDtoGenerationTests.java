@@ -13,8 +13,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.MAX_VALUE;
-import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.MIN_VALUE;
+import static laoruga.dtogenerator.api.constants.BasicRuleRemark.MAX_VALUE;
+import static laoruga.dtogenerator.api.constants.BasicRuleRemark.MIN_VALUE;
 import static laoruga.dtogenerator.api.tests.IntegerGenerationTests.maxValueRightBound;
 import static laoruga.dtogenerator.api.tests.IntegerGenerationTests.simpleIntegerGenerationAssertions;
 import static org.hamcrest.MatcherAssert.assertThat;

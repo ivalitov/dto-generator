@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark.NULL_VALUE;
+import static laoruga.dtogenerator.api.constants.BasicRuleRemark.NULL_VALUE;
 import static laoruga.dtogenerator.api.util.Utils.createCollectionFieldInstance;
 
 /**

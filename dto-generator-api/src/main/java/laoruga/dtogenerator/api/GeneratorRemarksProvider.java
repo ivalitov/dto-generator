@@ -2,7 +2,7 @@ package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
-import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
+import laoruga.dtogenerator.api.constants.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import lombok.NonNull;

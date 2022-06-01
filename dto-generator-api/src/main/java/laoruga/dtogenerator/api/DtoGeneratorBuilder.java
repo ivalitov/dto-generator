@@ -1,8 +1,9 @@
 package laoruga.dtogenerator.api;
 
+import laoruga.dtogenerator.api.constants.BasicRuleRemark;
+import laoruga.dtogenerator.api.constants.Group;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
-import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import lombok.Getter;
 import lombok.NonNull;
@@ -37,6 +38,7 @@ public class DtoGeneratorBuilder {
 
     private final GeneratorBuildersProvider gensBuildersProvider;
     private final BuildersTree buildersTree;
+    private Pair<Boolean, Set<Group>> fieldGroups;
 
     /**
      * key - field name;
@@ -106,10 +108,33 @@ public class DtoGeneratorBuilder {
         return this;
     }
 
+    /*
+     * Groups
+     */
+
+    /**
+     * Rules annotations may be labeled with groups. By default, rules contain DEFAULT group.
+     *
+     * @param onlyOrExclude true - generate only that fields which marked with groups
+     *                      false - not generate fields which marked with groups
+     * @param groups        groups that must be generated only or excluded
+     */
+    public DtoGeneratorBuilder setGroups(boolean onlyOrExclude, Group... groups) {
+        if (groups != null && groups.length != 0) {
+            fieldGroups = new Pair<>(onlyOrExclude, new HashSet<>(Arrays.asList(groups)));
+        }
+        return this;
+    }
+
+    /*
+     * Build
+     */
+
     public DtoGenerator build() {
         return new DtoGenerator(
                 new String[]{BuildersTree.ROOT},
                 gensBuildersProvider,
+                fieldGroups,
                 this);
     }
 
@@ -117,6 +142,7 @@ public class DtoGeneratorBuilder {
         return new DtoGenerator(
                 pathToField,
                 gensBuildersProvider,
+                fieldGroups,
                 this);
     }
 

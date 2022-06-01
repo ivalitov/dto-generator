@@ -2,7 +2,7 @@ package laoruga.dtogenerator.api.generators.basictypegenerators;
 
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
-import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
+import laoruga.dtogenerator.api.constants.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.IntegerRules;
 import lombok.AllArgsConstructor;

@@ -1,5 +1,6 @@
 package laoruga.dtogenerator.api;
 
+import laoruga.dtogenerator.api.constants.Group;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.ICollectionGenerator;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
@@ -7,15 +8,17 @@ import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.rules.*;
 import laoruga.dtogenerator.api.util.ReflectionUtils;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.math3.util.Pair;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -30,32 +33,31 @@ public class DtoGenerator {
 
     private Object dtoInstance;
 
+    @Getter(AccessLevel.PACKAGE)
     private final String[] fieldsFromRoot;
-    private final GeneratorBuildersProvider generatorBuildersProvider;
+    @Getter(AccessLevel.PACKAGE)
+    private final GeneratorBuildersProvider genBuildersProvider;
+    @Getter(AccessLevel.PACKAGE)
+    private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
+    @Getter(AccessLevel.PACKAGE)
+    private final Pair<Boolean, Set<Group>> fieldGroups;
+    @Getter(AccessLevel.PACKAGE)
+    private final DtoGeneratorBuilder builderInstance;
 
     private final Map<Field, Exception> errors = new HashMap<>();
-    private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
-
-    private final DtoGeneratorBuilder builderInstance;
 
     protected DtoGenerator(String[] fieldsFromRoot,
                            GeneratorBuildersProvider generatorBuildersProvider,
+                           Pair<Boolean, Set<Group>> fieldGroups,
                            DtoGeneratorBuilder dtoGeneratorBuilder) {
         this.fieldsFromRoot = fieldsFromRoot;
-        this.generatorBuildersProvider = generatorBuildersProvider;
+        this.genBuildersProvider = generatorBuildersProvider;
+        this.fieldGroups = fieldGroups;
         this.builderInstance = dtoGeneratorBuilder;
     }
 
     public static DtoGeneratorBuilder builder() {
         return new DtoGeneratorBuilder();
-    }
-
-    GeneratorBuildersProvider getGenBuildersProvider() {
-        return generatorBuildersProvider;
-    }
-
-    Map<Field, IGenerator<?>> getFieldGeneratorMap() {
-        return fieldGeneratorMap;
     }
 
     public <T> T generateDto(Class<T> dtoClass) {
@@ -238,7 +240,7 @@ public class DtoGenerator {
                     generator = getGenBuildersProvider().getCustomGenerator(rulesInfoWrapper.getItemGenerationRules(), dtoInstance);
                     break;
                 case NESTED:
-                    generator = getGenBuildersProvider().getNestedDtoGenerator(field, fieldsFromRoot, builderInstance);
+                    generator = getGenBuildersProvider().getNestedDtoGenerator(field, getFieldsFromRoot(), getBuilderInstance());
                     break;
                 case COLLECTION_BASIC:
                     IGenerator<?> collectionItemGenerator = getGenBuildersProvider().getBasicTypeGenerator(
@@ -250,20 +252,6 @@ public class DtoGenerator {
                             rulesInfoWrapper.getCollectionGenerationRules(),
                             collectionItemGenerator);
                     break;
-                case MAP_BASIC:
-                    throw new NotImplementedException();
-//                    Pair<Class<?>, Class<?>> genericTypesPair = ReflectionUtils.getGenericTypesPair(field);
-//                    IGenerator<?> mapKeyGenerator = getGeneratorBuildersProvider().getBasicTypeGenerator(
-//                            field.getName() + " " + field.getGenericType().getClass(),
-//                            genericTypesPair.getKey(),
-//                            field.getDeclaredAnnotations()
-//                    );
-//                    IGenerator<?> mapValueGenerator = selectBasicGenerator(
-//                            genericTypesPair.getValue(),
-//                            field.getName() + " " + field.getGenericType().getClass(),
-//                            field.getDeclaredAnnotations()
-//                    );
-//                    generator = selectMapGenerator(field, mapKeyGenerator, mapValueGenerator);
                 case COLLECTION_CUSTOM:
                     collectionItemGenerator = getGenBuildersProvider().getCustomGenerator(
                             rulesInfoWrapper.getItemGenerationRules(), dtoInstance);
@@ -273,6 +261,7 @@ public class DtoGenerator {
                             collectionItemGenerator);
                     break;
                 case NOT_ANNOTATED:
+                case SKIP:
                     break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + rulesInfo);
@@ -300,8 +289,8 @@ public class DtoGenerator {
         NESTED,
         COLLECTION_BASIC,
         COLLECTION_CUSTOM,
-        MAP_BASIC,
-        NOT_ANNOTATED
+        NOT_ANNOTATED,
+        SKIP
     }
 
     /**
@@ -325,7 +314,9 @@ public class DtoGenerator {
         }
         if (generationRules.size() == 1) {
             Annotation ruleAnnotation = generationRules.get(0);
-            Class<? extends Annotation> rulesAnnotationClass = ruleAnnotation.annotationType();
+            if (skipDependingOnGroup(ruleAnnotation)) {
+                return new Pair<>(RulesType.SKIP, null);
+            }
             if (isItCustomRule(ruleAnnotation)) {
                 return new Pair<>(RulesType.CUSTOM, new RuleWrapper(null, ruleAnnotation));
             }
@@ -336,9 +327,9 @@ public class DtoGenerator {
                 throw new DtoGeneratorException("Field '" + fieldName + "' annotated with collection generation rules, " +
                         "but not annotated with collection's item generation rules. There is also generation rules annotation expected.");
             }
-            if (!checkGeneratorCompatibility(fieldType, rulesAnnotationClass)) {
+            if (!checkGeneratorCompatibility(fieldType, ruleAnnotation)) {
                 throw new DtoGeneratorException("Field '" + fieldName + "' annotated with inappropriate generation " +
-                        "rule annotation: '" + rulesAnnotationClass + "'.");
+                        "rule annotation: '" + ruleAnnotation.annotationType() + "'.");
             }
             return new Pair<>(RulesType.BASIC, new RuleWrapper(null, ruleAnnotation));
         }
@@ -346,6 +337,9 @@ public class DtoGenerator {
             generationRules.sort(Comparator.comparing(DtoGenerator::isItCollectionRule));
             Annotation itemRule = generationRules.get(0);
             Annotation collectionRule = generationRules.get(1);
+            if (skipDependingOnGroup(itemRule)) {
+                return new Pair<>(RulesType.SKIP, null);
+            }
             if (isItCollectionRule(itemRule)) {
                 throw new DtoGeneratorException("Field '" + fieldName + "'annotated with 2 collection generation rules." +
                         " There are no more than one RuleForCollection annotation expected");
@@ -367,8 +361,9 @@ public class DtoGenerator {
         }
     }
 
-    private boolean checkGeneratorCompatibility(Class<?> fieldType, Class<? extends Annotation> rulesAnnotationClass) {
+    private static boolean checkGeneratorCompatibility(Class<?> fieldType, Annotation rules) {
         try {
+            Class<? extends Annotation> rulesAnnotationClass = rules.annotationType();
             Class<?>[] applicableTypes = (Class<?>[]) rulesAnnotationClass.getField("APPLICABLE_TYPES")
                     .get(rulesAnnotationClass);
             for (Class<?> applicableType : applicableTypes) {
@@ -393,6 +388,21 @@ public class DtoGenerator {
 
     private static boolean isItNestedRule(Annotation ruleAnnotation) {
         return ruleAnnotation.annotationType() == NestedDtoRules.class;
+    }
+
+    private boolean skipDependingOnGroup(Annotation rules) {
+        if (getFieldGroups() == null) {
+            return false;
+        } else {
+            try {
+                Group checkedGroup = (Group) rules.annotationType().getMethod("group").invoke(rules);
+                boolean onlyOrExclude = getFieldGroups().getFirst();
+                boolean groupMatched = getFieldGroups().getSecond().contains(checkedGroup);
+                return onlyOrExclude != groupMatched;
+            } catch (IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
+                throw new DtoGeneratorException("Unexpected exception. Can't get 'group' from rules annotation", e);
+            }
+        }
     }
 
 }

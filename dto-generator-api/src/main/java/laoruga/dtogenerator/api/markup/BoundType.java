@@ -1,6 +1,6 @@
 package laoruga.dtogenerator.api.markup;
 
-import laoruga.dtogenerator.api.markup.remarks.BasicRuleRemark;
+import laoruga.dtogenerator.api.constants.BasicRuleRemark;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
