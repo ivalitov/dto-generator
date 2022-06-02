@@ -176,7 +176,6 @@ public class DtoGenerator {
             }
         }
         if (!errors.isEmpty()) {
-            int i = 0;
             final AtomicInteger counter = new AtomicInteger(0);
             String formattedErrors = errors.entrySet().stream()
                     .map(fieldExceptionEntry ->
