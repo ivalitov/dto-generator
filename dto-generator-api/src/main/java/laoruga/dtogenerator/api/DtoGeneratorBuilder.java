@@ -56,6 +56,7 @@ public class DtoGeneratorBuilder {
                 toCopy.gensBuildersProvider.getGeneratorRemarksProvider().copy(),
                 toCopy.gensBuildersProvider.getOverriddenBuilders());
         this.buildersTree = toCopy.buildersTree;
+        this.fieldGroups = toCopy.fieldGroups;
     }
 
     public DtoGeneratorBuilder overrideBasicGenerator(@NonNull Class<? extends Annotation> rules,
