@@ -66,16 +66,23 @@ public class DtoGenerator {
 
     public <T> T generateDto(Class<T> dtoClass) {
         dtoInstance = createInstance(dtoClass);
-        prepareGenerators();
+        prepareGeneratorsRecursively(dtoClass);
         applyGenerators();
         return (T) dtoInstance;
     }
 
     public <T> T generateDto(T dtoInstance) {
         this.dtoInstance = dtoInstance;
-        prepareGenerators();
+        prepareGenerators(dtoInstance.getClass());
         applyGenerators();
         return dtoInstance;
+    }
+
+    private void prepareGeneratorsRecursively(Class<?> dtoClass) {
+        if (dtoClass.getSuperclass() != null) {
+            prepareGeneratorsRecursively(dtoClass.getSuperclass());
+        }
+        prepareGenerators(dtoClass);
     }
 
     /**
@@ -168,8 +175,8 @@ public class DtoGenerator {
 
     }
 
-    void prepareGenerators() {
-        for (Field field : dtoInstance.getClass().getDeclaredFields()) {
+    void prepareGenerators(Class<?> dtoClass) {
+        for (Field field : dtoClass.getDeclaredFields()) {
             IGenerator<?> generator = prepareGenerator(field);
             if (generator != null) {
                 getFieldGeneratorMap().put(field, generator);
