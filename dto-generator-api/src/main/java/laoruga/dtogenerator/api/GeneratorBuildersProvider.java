@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static laoruga.dtogenerator.api.constants.BasicRuleRemark.NULL_VALUE;
 import static laoruga.dtogenerator.api.util.ReflectionUtils.createInstance;
-import static laoruga.dtogenerator.api.util.Utils.createCollectionFieldInstance;
+import static laoruga.dtogenerator.api.util.ReflectionUtils.createCollectionFieldInstance;
 
 /**
  * @author Il'dar Valitov
@@ -182,6 +182,9 @@ public class GeneratorBuildersProvider {
                     .charset(stringRules.charset())
                     .chars(stringRules.chars())
                     .ruleRemark(remark)
+                    .mask(stringRules.mask())
+                    .maskWildcard(stringRules.maskWildcard())
+                    .maskTypeMarker(stringRules.maskTypeMarker())
                     .build();
         }
     }

@@ -36,4 +36,17 @@ public @interface StringRules {
     BasicRuleRemark ruleRemark() default RANDOM_VALUE;
 
     Group group() default DEFAULT;
+
+    /**
+     * Mask examples:
+     * 1) mask: +89 (***) ***-**-** and charset: NUM
+     * result: +89 (923) 152-12-64
+     * 2) mask: %ENG%{*} +89 (***) ***-**-** %ENG%** and charset: NUM
+     * @return mask for resulting string
+     */
+    String mask() default "";
+
+    char maskWildcard() default '*';
+
+    char maskTypeMarker() default '%';
 }
