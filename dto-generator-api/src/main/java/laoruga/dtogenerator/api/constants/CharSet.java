@@ -21,4 +21,12 @@ public enum CharSet {
     CharSet(char[] chars) {
         this.chars = chars;
     }
+
+    public static CharSet getCharSetOrNull(String charsetName) {
+        try {
+           return CharSet.valueOf(charsetName);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

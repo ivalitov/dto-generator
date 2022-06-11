@@ -24,6 +24,9 @@ public @interface StringRules {
     String DEFAULT_CHARS = "";
     IRuleRemark DEFAULT_RULE_REMARK = RANDOM_VALUE;
     Class<?>[] APPLICABLE_TYPES = {String.class};
+    char DEFAULT_WILDCARD = '*';
+    char DEFAULT_TYPE_MARKER = '%';
+    String DEFAULT_MASK = "";
 
     int minSymbols() default DEFAULT_MIN_SYMBOLS_NUMBER;
 
@@ -44,9 +47,9 @@ public @interface StringRules {
      * 2) mask: %ENG%{*} +89 (***) ***-**-** %ENG%** and charset: NUM
      * @return mask for resulting string
      */
-    String mask() default "";
+    String mask() default DEFAULT_MASK;
 
-    char maskWildcard() default '*';
+    char maskWildcard() default DEFAULT_WILDCARD;
 
-    char maskTypeMarker() default '%';
+    char maskTypeMarker() default DEFAULT_TYPE_MARKER;
 }

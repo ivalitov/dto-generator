@@ -10,8 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.RandomStringGenerator;
 
-import java.util.Arrays;
-
 /**
  * @author Il'dar Valitov
  * Created on 19.05.2022
@@ -26,8 +24,8 @@ public class StringGenerator implements IGenerator<String> {
     private final char[] chars;
     private final IRuleRemark ruleRemark;
     private final String mask;
-    private final char maskWildcard;
-    private final char maskTypeMarker;
+    private final Character maskWildcard;
+    private final Character maskTypeMarker;
 
 
     @Override
@@ -58,53 +56,76 @@ public class StringGenerator implements IGenerator<String> {
 
     /*
     1) parse mask      * 1) mask: +89 (%NUM%***) ***-**-** and charset: NUM
-    1-1) get chars
-    1-2) first iteration - replace asterics groups in oder types
      */
+
 
     private String generateStringForMask() {
         StringBuilder stringBuilder = new StringBuilder();
         char[] maskChars = mask.toCharArray();
-        int begin = -1;
-        int end = -1;
-        int typeBegin = -1;
-        int next;
+        int wildCardBeginIdx = 0;
+        int wildCardEndIdx = 0;
+        boolean wildcardGathering = false;
+        boolean wildcardGathered = false;
         char[] partitionChars = chars;
-        for (int current = 0; current < maskChars.length; current++) {
-            if (maskChars[current] == maskWildcard) {
-                next = current + 1;
-                if (begin < 0) {
-                    begin = current;
-                } else if (maskChars.length == next) {
-                    end = current;
-                } else if (maskChars.length > next && maskChars[next] != maskWildcard) {
-                    end = current;
-                }
-            } else if (maskChars[current] == maskTypeMarker) {
-                if (typeBegin < 0) {
-                    typeBegin = current;
+        char currentChar;
+        Character nextChar;
+        boolean typeGathering = false;
+        StringBuilder typeChars = null;
+        for (int currentPos = 0; currentPos < maskChars.length; currentPos++) {
+            currentChar = maskChars[currentPos];
+            nextChar = maskChars.length == currentPos + 1 ? null : maskChars[currentPos + 1];
+            if (currentChar == maskWildcard) {
+                if (wildcardGathering) {
+                    wildCardEndIdx = currentPos;
                 } else {
-                    typeBegin = -1;
-                    end = current;
-                    String charSetName = new String(Arrays.copyOfRange(maskChars, typeBegin, maskChars[current] + 1));
-                    try {
-                        partitionChars = CharSet.valueOf(charSetName).getChars();
-                    } catch (Exception e) {
-                        log.debug("No charset found for name: '" + charSetName + "' for the mask: '" + mask + "'");
+                    wildcardGathering = true;
+                    wildCardBeginIdx = currentPos;
+                    wildCardEndIdx = currentPos;
+                }
+                if (nextChar == maskWildcard) {
+                    continue;
+                } else {
+                    wildcardGathering = false;
+                    wildcardGathered = true;
+                }
+            } else if (currentChar == maskTypeMarker) {
+                // begin of type gathering
+                if (!typeGathering) {
+                    // exclusion of paris: %% %*
+                    if (nextChar != null && nextChar != maskWildcard && nextChar != maskTypeMarker) {
+                        typeGathering = true;
+                        typeChars = new StringBuilder();
+                        continue;
                     }
                 }
-            } else {
-                stringBuilder.append(maskChars[current]);
+                if (typeGathering) {
+                    CharSet charSet = CharSet.getCharSetOrNull(typeChars.toString());
+                    if (nextChar == maskWildcard && charSet != null) {
+                        partitionChars = charSet.getChars();
+                        typeGathering = false;
+                        continue;
+                    } else {
+                        stringBuilder.append(maskChars);
+                        currentPos--;
+                        continue;
+                    }
+                }
             }
-            if (end == current) {
+            if (typeGathering) {
+                typeChars.append(currentChar);
+            } else if (wildcardGathered) {
+                //appending generated substring instead of wildcard substring
                 stringBuilder.append(
-                        new RandomStringGenerator.Builder().selectFrom(partitionChars).build().generate(end - begin + 1));
-                begin = -1;
-                end = -1;
-                typeBegin = -1;
+                        new RandomStringGenerator.Builder().selectFrom(partitionChars).build().generate(
+                                wildCardEndIdx - wildCardBeginIdx + 1));
                 partitionChars = chars;
+                wildcardGathered = false;
+            } else {
+                //appending char as is
+                stringBuilder.append(currentChar);
             }
         }
+
         return stringBuilder.toString();
     }
 
@@ -121,9 +142,9 @@ public class StringGenerator implements IGenerator<String> {
         private CharSet[] charset = StringRules.DEFAULT_CHARSET;
         private String chars = StringRules.DEFAULT_CHARS;
         private IRuleRemark ruleRemark = StringRules.DEFAULT_RULE_REMARK;
-        private String mask;
-        private char maskWildcard;
-        private char maskTypeMarker;
+        private String mask = StringRules.DEFAULT_MASK;
+        private char maskWildcard = StringRules.DEFAULT_WILDCARD;
+        private char maskTypeMarker = StringRules.DEFAULT_TYPE_MARKER;
 
         private StringGeneratorBuilder() {
         }
@@ -138,7 +159,7 @@ public class StringGenerator implements IGenerator<String> {
             return this;
         }
 
-        public StringGeneratorBuilder charset(CharSet[] charset) {
+        public StringGeneratorBuilder charset(CharSet... charset) {
             this.charset = charset;
             return this;
         }
