@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -112,6 +113,22 @@ public class StringGenerationTests {
                 .build().generateDto(Dto_2.class);
         assertAll(
                 () -> assertThat(dto.getString(), matchesRegex(regexpCheck))
+        );
+    }
+
+    @Test
+    @DisplayName("Generated string by mask (custom wildcard and type symbols)")
+    public void maskDifferentMarker() {
+        Dto_2 dto = DtoGenerator.builder()
+                .setGeneratorForField("string",
+                        BasicGeneratorsBuilders.stringBuilder()
+                                .maskWildcard('^')
+                                .maskTypeMarker('#')
+                                .mask("%ENG%* (^^^) ^^^-^^-^^ #RUS#^^^ *** %%%")
+                                .charset(NUM))
+                .build().generateDto(Dto_2.class);
+        assertAll(
+                () -> assertThat(dto.getString(), matchesRegex("^%ENG%[*] [(][0-9]{3}[)] [0-9]{3}[-][0-9]{2}[-][0-9]{2} [а-яА-Я]{3} [*]{3} [%]{3}$"))
         );
     }
 
