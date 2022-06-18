@@ -395,13 +395,7 @@ public class DtoGenerator {
         } else {
             try {
                 Group checkedGroup = (Group) rules.annotationType().getMethod("group").invoke(rules);
-                if (getFieldsGroupFilter().isContainsExcludeGroup(checkedGroup)) {
-                    return true;
-                }
-                if (getFieldsGroupFilter().includesCount() > 0) {
-                    return !getFieldsGroupFilter().isContainsIncludeGroup(checkedGroup);
-                }
-                return false;
+                return !getFieldsGroupFilter().isContainsIncludeGroup(checkedGroup);
             } catch (IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
                 throw new DtoGeneratorException("Unexpected exception. Can't get 'group' from rules annotation", e);
             }

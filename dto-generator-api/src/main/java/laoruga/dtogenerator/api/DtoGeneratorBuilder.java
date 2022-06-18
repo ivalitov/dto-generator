@@ -117,20 +117,13 @@ public class DtoGeneratorBuilder {
     /**
      * Rules annotations may be labeled with groups. By default, rules contain DEFAULT group.
      *
-     * @param onlyOrExclude true - generate only that fields which marked with groups
+     * @param   - generate only that fields which marked with groups
      *                      false - not generate fields which marked with groups
      * @param groups        groups that must be generated only or excluded
      */
     public DtoGeneratorBuilder includeGroups(Group... groups) {
         if (groups != null && groups.length != 0) {
             fieldGroupFilter.includeGroups(groups);
-        }
-        return this;
-    }
-
-    public DtoGeneratorBuilder excludeGroups(boolean onlyOrExclude, Group... groups) {
-        if (groups != null && groups.length != 0) {
-            fieldGroupFilter.excludeGroups(groups);
         }
         return this;
     }
@@ -143,7 +136,7 @@ public class DtoGeneratorBuilder {
         return new DtoGenerator(
                 new String[]{BuildersTree.ROOT},
                 gensBuildersProvider,
-                fieldGroupFilter,
+                fieldGroupFilter.validateGroups(),
                 this);
     }
 
@@ -151,7 +144,7 @@ public class DtoGeneratorBuilder {
         return new DtoGenerator(
                 pathToField,
                 gensBuildersProvider,
-                fieldGroupFilter,
+                fieldGroupFilter.validateGroups(),
                 this);
     }
 
