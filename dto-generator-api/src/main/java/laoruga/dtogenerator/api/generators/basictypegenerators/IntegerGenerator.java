@@ -4,7 +4,7 @@ import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.constants.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
-import laoruga.dtogenerator.api.markup.rules.IntegerRules;
+import laoruga.dtogenerator.api.markup.rules.IntegerRule;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
@@ -42,9 +42,9 @@ public class IntegerGenerator implements IGenerator<Integer> {
     }
 
     public static final class IntegerGeneratorBuilder implements IGeneratorBuilder {
-        private int maxValue = IntegerRules.DEFAULT_MAX;
-        private int minValue = IntegerRules.DEFAULT_MIN;
-        private IRuleRemark ruleRemark = IntegerRules.DEFAULT_RULE_REMARK;
+        private int maxValue = IntegerRule.DEFAULT_MAX;
+        private int minValue = IntegerRule.DEFAULT_MIN;
+        private IRuleRemark ruleRemark = IntegerRule.DEFAULT_RULE_REMARK;
 
         private IntegerGeneratorBuilder() {}
 

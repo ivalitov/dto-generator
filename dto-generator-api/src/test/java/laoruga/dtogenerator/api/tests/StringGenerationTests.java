@@ -3,7 +3,7 @@ package laoruga.dtogenerator.api.tests;
 import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.generators.basictypegenerators.BasicGeneratorsBuilders;
-import laoruga.dtogenerator.api.markup.rules.StringRules;
+import laoruga.dtogenerator.api.markup.rules.StringRule;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
@@ -33,16 +33,16 @@ public class StringGenerationTests {
     @Getter
     @NoArgsConstructor
     static class Dto {
-        @StringRules(mask = "+89 (***) ***-**-**", charset = NUM)
+        @StringRule(mask = "+89 (***) ***-**-**", charset = NUM)
         private String phoneNum;
-        @StringRules(mask = "%ENG%* +89 (***) ***-**-** %RUS%**", charset = NUM)
+        @StringRule(mask = "%ENG%* +89 (***) ***-**-** %RUS%**", charset = NUM)
         private String phoneNumLetters;
     }
 
     @Getter
     @NoArgsConstructor
     static class Dto_2 {
-        @StringRules
+        @StringRule
         private String string;
     }
 

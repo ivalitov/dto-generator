@@ -17,7 +17,6 @@ import static laoruga.dtogenerator.api.constants.Group.DEFAULT;
 
 @Retention(RUNTIME)
 @Target(FIELD)
-@Rule
 @RuleForCollection
 public @interface ListRules {
 

@@ -3,9 +3,9 @@ package laoruga.dtogenerator.api.tests;
 import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.generators.basictypegenerators.BasicGeneratorsBuilders;
-import laoruga.dtogenerator.api.markup.rules.IntegerRules;
+import laoruga.dtogenerator.api.markup.rules.IntegerRule;
 import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
-import laoruga.dtogenerator.api.markup.rules.StringRules;
+import laoruga.dtogenerator.api.markup.rules.StringRule;
 import laoruga.dtogenerator.api.tests.data.dtoclient.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +34,7 @@ public class NestedDtoGenerationTests {
     @Getter
     @NoArgsConstructor
     static class Dto {
-        @IntegerRules()
+        @IntegerRule()
         private Integer intDefaultRules;
         @NestedDtoRules()
         private IntegerGenerationTests.DtoInteger dtoNested;
@@ -43,7 +43,7 @@ public class NestedDtoGenerationTests {
     @Getter
     @NoArgsConstructor
     static class DtoCustomNested {
-        @IntegerRules()
+        @IntegerRule()
         private Integer intDefaultRules;
         @NestedDtoRules()
         private ClientDto clientDto;
@@ -52,7 +52,7 @@ public class NestedDtoGenerationTests {
     @Getter
     @NoArgsConstructor
     static class DtoWithNestedLevels {
-        @IntegerRules()
+        @IntegerRule()
         private Integer simpleInt;
         @NestedDtoRules()
         private Nested_1 nested_1;
@@ -64,7 +64,7 @@ public class NestedDtoGenerationTests {
     @NoArgsConstructor
     static class Nested_1 {
 
-        @IntegerRules(minValue = 1, maxValue = 2)
+        @IntegerRule(minValue = 1, maxValue = 2)
         private Integer oneTwo;
         @NestedDtoRules()
         private Nested_2 nested_2;
@@ -73,9 +73,9 @@ public class NestedDtoGenerationTests {
     @Getter
     @NoArgsConstructor
     static class Nested_2 {
-        @IntegerRules()
+        @IntegerRule()
         private Integer intDefaultRules;
-        @StringRules()
+        @StringRule()
         private String stringDefaultRules;
     }
 
@@ -85,7 +85,7 @@ public class NestedDtoGenerationTests {
         Dto dto = DtoGenerator.builder().build().generateDto(Dto.class);
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
-                greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX)));
+                greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX)));
         simpleIntegerGenerationAssertions(dto.getDtoNested());
     }
 
@@ -95,7 +95,7 @@ public class NestedDtoGenerationTests {
         DtoCustomNested dto = DtoGenerator.builder().build().generateDto(DtoCustomNested.class);
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
-                greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX)));
+                greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX)));
 
         // Dto generated with custom generator
         ClientDto clientDto = dto.getClientDto();
@@ -141,9 +141,9 @@ public class NestedDtoGenerationTests {
                 .build().generateDto(Dto.class);
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
-                greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX)));
+                greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX)));
 
-        assertThat(dto.getDtoNested().getIntDefaultRules(), equalTo(IntegerRules.DEFAULT_MIN));
+        assertThat(dto.getDtoNested().getIntDefaultRules(), equalTo(IntegerRule.DEFAULT_MIN));
         assertThat(dto.getDtoNested().getIntRightBound(), equalTo(maxValueRightBound));
         assertThat(dto.getDtoNested().getIntPrimitiveDefaultRules(), equalTo(5));
 
@@ -163,9 +163,9 @@ public class NestedDtoGenerationTests {
 
         assertAll(
                 () -> assertThat(dto.getSimpleInt(), both(
-                        greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX))),
+                        greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX))),
                 () -> assertThat(nested_2.getIntDefaultRules(), both(
-                        greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX))),
+                        greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX))),
                 () -> assertThat(nested_2.getStringDefaultRules(), notNullValue()),
                 () -> assertThat(nested_1.getOneTwo(), anyOf(equalTo(1), equalTo(2)))
         );
@@ -187,8 +187,8 @@ public class NestedDtoGenerationTests {
         assertNotNull(nested_2);
 
         assertAll(
-                () -> assertThat(dto.getSimpleInt(), equalTo(IntegerRules.DEFAULT_MIN)),
-                () -> assertThat(nested_2.getIntDefaultRules(), equalTo(IntegerRules.DEFAULT_MIN)),
+                () -> assertThat(dto.getSimpleInt(), equalTo(IntegerRule.DEFAULT_MIN)),
+                () -> assertThat(nested_2.getIntDefaultRules(), equalTo(IntegerRule.DEFAULT_MIN)),
                 () -> assertThat(nested_2.getStringDefaultRules(), emptyString()),
                 () -> assertThat(nested_1.getOneTwo(), equalTo(1))
         );

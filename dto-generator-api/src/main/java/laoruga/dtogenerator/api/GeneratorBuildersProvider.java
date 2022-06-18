@@ -80,12 +80,12 @@ public class GeneratorBuildersProvider {
             return getDoubleGenerator(fieldName, (DoubleRules) rules, fieldType == Double.TYPE);
         }
 
-        if (StringRules.class == rulesClass) {
-            return getStringGenerator(fieldName, (StringRules) rules);
+        if (StringRule.class == rulesClass) {
+            return getStringGenerator(fieldName, (StringRule) rules);
         }
 
-        if (IntegerRules.class == rulesClass) {
-            return getIntegerGenerator(fieldName, (IntegerRules) rules, fieldType == Integer.TYPE);
+        if (IntegerRule.class == rulesClass) {
+            return getIntegerGenerator(fieldName, (IntegerRule) rules, fieldType == Integer.TYPE);
         }
 
         if (LongRules.class == rulesClass) {
@@ -169,22 +169,22 @@ public class GeneratorBuildersProvider {
      * Basic type generators providers
      */
 
-    private IGenerator<?> getStringGenerator(String fieldName, StringRules stringRules) {
-        if (isGeneratorOverridden(fieldName, stringRules)) {
-            return getOverriddenGenerator(fieldName, stringRules);
+    private IGenerator<?> getStringGenerator(String fieldName, StringRule stringRule) {
+        if (isGeneratorOverridden(fieldName, stringRule)) {
+            return getOverriddenGenerator(fieldName, stringRule);
         } else {
             IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
                     generatorRemarksProvider.getBasicRuleRemark(fieldName) :
-                    stringRules.ruleRemark();
+                    stringRule.ruleRemark();
             return BasicGeneratorsBuilders.stringBuilder()
-                    .minLength(stringRules.minSymbols())
-                    .maxLength(stringRules.maxSymbols())
-                    .charset(stringRules.charset())
-                    .chars(stringRules.chars())
+                    .minLength(stringRule.minSymbols())
+                    .maxLength(stringRule.maxSymbols())
+                    .charset(stringRule.charset())
+                    .chars(stringRule.chars())
                     .ruleRemark(remark)
-                    .mask(stringRules.mask())
-                    .maskWildcard(stringRules.maskWildcard())
-                    .maskTypeMarker(stringRules.maskTypeMarker())
+                    .mask(stringRule.mask())
+                    .maskWildcard(stringRule.maskWildcard())
+                    .maskTypeMarker(stringRule.maskTypeMarker())
                     .build();
         }
     }
@@ -209,20 +209,20 @@ public class GeneratorBuildersProvider {
         }
     }
 
-    private IGenerator<?> getIntegerGenerator(String fieldName, IntegerRules integerRules, boolean isPrimitive) {
-        if (isGeneratorOverridden(fieldName, integerRules)) {
-            return getOverriddenGenerator(fieldName, integerRules);
+    private IGenerator<?> getIntegerGenerator(String fieldName, IntegerRule integerRule, boolean isPrimitive) {
+        if (isGeneratorOverridden(fieldName, integerRule)) {
+            return getOverriddenGenerator(fieldName, integerRule);
         } else {
             IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
                     generatorRemarksProvider.getBasicRuleRemark(fieldName) :
-                    integerRules.ruleRemark();
+                    integerRule.ruleRemark();
             if (remark == NULL_VALUE && isPrimitive) {
                 log.debug("Primitive field '" + fieldName + "' can't be null, it will be assigned to '0'");
                 return (IGenerator<Integer>) () -> 0;
             }
             return BasicGeneratorsBuilders.integerBuilder()
-                    .minValue(integerRules.minValue())
-                    .maxValue(integerRules.maxValue())
+                    .minValue(integerRule.minValue())
+                    .maxValue(integerRule.maxValue())
                     .ruleRemark(remark)
                     .build();
         }

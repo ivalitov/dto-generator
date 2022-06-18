@@ -5,7 +5,7 @@ import laoruga.dtogenerator.api.constants.CharSet;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
-import laoruga.dtogenerator.api.markup.rules.StringRules;
+import laoruga.dtogenerator.api.markup.rules.StringRule;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.RandomStringGenerator;
@@ -137,14 +137,14 @@ public class StringGenerator implements IGenerator<String> {
     }
 
     public static final class StringGeneratorBuilder implements IGeneratorBuilder {
-        private int maxLength = StringRules.DEFAULT_MAX_SYMBOLS_NUMBER;
-        private int minLength = StringRules.DEFAULT_MIN_SYMBOLS_NUMBER;
-        private CharSet[] charset = StringRules.DEFAULT_CHARSET;
-        private String chars = StringRules.DEFAULT_CHARS;
-        private IRuleRemark ruleRemark = StringRules.DEFAULT_RULE_REMARK;
-        private String mask = StringRules.DEFAULT_MASK;
-        private char maskWildcard = StringRules.DEFAULT_WILDCARD;
-        private char maskTypeMarker = StringRules.DEFAULT_TYPE_MARKER;
+        private int maxLength = StringRule.DEFAULT_MAX_SYMBOLS_NUMBER;
+        private int minLength = StringRule.DEFAULT_MIN_SYMBOLS_NUMBER;
+        private CharSet[] charset = StringRule.DEFAULT_CHARSET;
+        private String chars = StringRule.DEFAULT_CHARS;
+        private IRuleRemark ruleRemark = StringRule.DEFAULT_RULE_REMARK;
+        private String mask = StringRule.DEFAULT_MASK;
+        private char maskWildcard = StringRule.DEFAULT_WILDCARD;
+        private char maskTypeMarker = StringRule.DEFAULT_TYPE_MARKER;
 
         private StringGeneratorBuilder() {
         }

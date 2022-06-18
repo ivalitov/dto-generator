@@ -2,10 +2,10 @@ package laoruga.dtogenerator.api.tests;
 
 import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
-import laoruga.dtogenerator.api.markup.rules.IntegerRules;
+import laoruga.dtogenerator.api.markup.rules.IntegerRule;
 import laoruga.dtogenerator.api.markup.rules.ListRules;
 import laoruga.dtogenerator.api.markup.rules.LocalDateTimeRules;
-import laoruga.dtogenerator.api.markup.rules.StringRules;
+import laoruga.dtogenerator.api.markup.rules.StringRule;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
@@ -28,9 +28,9 @@ public class InheritedDto {
     @Getter
     @NoArgsConstructor
     static class Dto extends DtoSuper {
-        @IntegerRules()
+        @IntegerRule()
         private Integer upperInt;
-        @StringRules()
+        @StringRule()
         private String upperString;
     }
 
@@ -38,7 +38,7 @@ public class InheritedDto {
     @NoArgsConstructor
     static class DtoSuper {
         @ListRules
-        @StringRules
+        @StringRule
         private List<String> superList;
         @LocalDateTimeRules
         private LocalDateTime superDateTime;

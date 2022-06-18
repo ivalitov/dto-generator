@@ -2,12 +2,11 @@ package laoruga.dtogenerator.api.tests;
 
 import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
-import laoruga.dtogenerator.api.markup.rules.IntegerRules;
+import laoruga.dtogenerator.api.markup.rules.IntegerRule;
 import laoruga.dtogenerator.api.markup.rules.SetRules;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -31,19 +30,19 @@ public class SetGeneratorTests {
     @NoArgsConstructor
     static class DtoSet {
         @SetRules
-        @IntegerRules
+        @IntegerRule
         Set<Integer> numbers;
 
         @SetRules(setClass = LinkedHashSet.class)
-        @IntegerRules
+        @IntegerRule
         Set<Integer> linkedHashSet;
 
         @SetRules(setClass = TreeSet.class)
-        @IntegerRules
+        @IntegerRule
         TreeSet<Integer> treeSet;
 
         @SetRules
-        @IntegerRules
+        @IntegerRule
         HashSet<Integer> hashSet;
     }
 
@@ -69,7 +68,7 @@ public class SetGeneratorTests {
                 greaterThanOrEqualTo(SetRules.DEFAULT_MIN_SIZE)).and(lessThanOrEqualTo(SetRules.DEFAULT_MAX_SIZE)));
         for (Integer number : numbers) {
             assertThat(number, both(
-                    greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX)));
+                    greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX)));
         }
     }
 

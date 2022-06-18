@@ -38,7 +38,7 @@ public class DtoGeneratorBuilder {
 
     private final GeneratorBuildersProvider gensBuildersProvider;
     private final BuildersTree buildersTree;
-    private Pair<Boolean, Set<Group>> fieldGroups;
+    private final FieldGroupFilter fieldGroupFilter;
 
     /**
      * key - field name;
@@ -49,6 +49,7 @@ public class DtoGeneratorBuilder {
     DtoGeneratorBuilder() {
         this.gensBuildersProvider = new GeneratorBuildersProvider(new GeneratorRemarksProvider());
         this.buildersTree = new BuildersTree(this);
+        this.fieldGroupFilter = new FieldGroupFilter();
     }
 
     private DtoGeneratorBuilder(DtoGeneratorBuilder toCopy) {
@@ -56,7 +57,7 @@ public class DtoGeneratorBuilder {
                 toCopy.gensBuildersProvider.getGeneratorRemarksProvider().copy(),
                 toCopy.gensBuildersProvider.getOverriddenBuilders());
         this.buildersTree = toCopy.buildersTree;
-        this.fieldGroups = toCopy.fieldGroups;
+        this.fieldGroupFilter = toCopy.fieldGroupFilter;
     }
 
     public DtoGeneratorBuilder overrideBasicGenerator(@NonNull Class<? extends Annotation> rules,
@@ -120,9 +121,16 @@ public class DtoGeneratorBuilder {
      *                      false - not generate fields which marked with groups
      * @param groups        groups that must be generated only or excluded
      */
-    public DtoGeneratorBuilder setGroups(boolean onlyOrExclude, Group... groups) {
+    public DtoGeneratorBuilder includeGroups(Group... groups) {
         if (groups != null && groups.length != 0) {
-            fieldGroups = new Pair<>(onlyOrExclude, new HashSet<>(Arrays.asList(groups)));
+            fieldGroupFilter.includeGroups(groups);
+        }
+        return this;
+    }
+
+    public DtoGeneratorBuilder excludeGroups(boolean onlyOrExclude, Group... groups) {
+        if (groups != null && groups.length != 0) {
+            fieldGroupFilter.excludeGroups(groups);
         }
         return this;
     }
@@ -135,7 +143,7 @@ public class DtoGeneratorBuilder {
         return new DtoGenerator(
                 new String[]{BuildersTree.ROOT},
                 gensBuildersProvider,
-                fieldGroups,
+                fieldGroupFilter,
                 this);
     }
 
@@ -143,7 +151,7 @@ public class DtoGeneratorBuilder {
         return new DtoGenerator(
                 pathToField,
                 gensBuildersProvider,
-                fieldGroups,
+                fieldGroupFilter,
                 this);
     }
 

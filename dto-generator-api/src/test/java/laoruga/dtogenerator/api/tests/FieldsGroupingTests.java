@@ -4,9 +4,9 @@ import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
 import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
-import laoruga.dtogenerator.api.markup.rules.IntegerRules;
+import laoruga.dtogenerator.api.markup.rules.IntegerRule;
 import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
-import laoruga.dtogenerator.api.markup.rules.StringRules;
+import laoruga.dtogenerator.api.markup.rules.StringRule;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
@@ -30,10 +30,10 @@ public class FieldsGroupingTests {
     @NoArgsConstructor
     static class Dto {
 
-        @StringRules(group = REQUIRED)
+        @StringRule(group = REQUIRED)
         String reqStr;
 
-        @IntegerRules(group = REQUIRED)
+        @IntegerRule(group = REQUIRED)
         Integer reqInt;
 
         @NestedDtoRules(group = REQUIRED)
@@ -42,16 +42,17 @@ public class FieldsGroupingTests {
         @CustomGenerator(group = REQUIRED, generatorClass = MapGen.class)
         Map<String, String> reqMap;
 
-        @StringRules
+        @StringRule
         String defaultStr;
 
-        @IntegerRules
+        @IntegerRule
         Integer defaultInt;
 
         @NestedDtoRules
         DtoInner defaultInnerDto;
 
-        @IntegerRules(group = GROUP_1)
+        @IntegerRule(group = GROUP_1)
+        @IntegerRule(group = GROUP_1)
         Integer firstGroupInt;
 
         @NestedDtoRules(group = GROUP_1)
@@ -60,7 +61,7 @@ public class FieldsGroupingTests {
         @CustomGenerator(group = GROUP_1, generatorClass = MapGen.class)
         Map<String, String> firstGroupMap;
 
-        @IntegerRules(group = GROUP_2)
+        @IntegerRule(group = GROUP_2)
         Integer secondGroupInt;
     }
 
@@ -68,28 +69,28 @@ public class FieldsGroupingTests {
     @NoArgsConstructor
     static class DtoInner {
 
-        @StringRules(group = REQUIRED)
+        @StringRule(group = REQUIRED)
         String reqStr;
 
-        @IntegerRules(group = REQUIRED)
+        @IntegerRule(group = REQUIRED)
         Integer reqInt;
 
-        @StringRules
+        @StringRule
         String defaultStr;
 
-        @IntegerRules
+        @IntegerRule
         Integer defaultInt;
 
         @CustomGenerator(generatorClass = MapGen.class)
         Map<String, String> defaultMap;
 
-        @IntegerRules(group = GROUP_1)
+        @IntegerRule(group = GROUP_1)
         Integer firstGroupInt;
 
         @CustomGenerator(generatorClass = MapGen.class, group = GROUP_1)
         Map<String, String> firstGroupMap;
 
-        @IntegerRules(group = GROUP_2)
+        @IntegerRule(group = GROUP_2)
         Integer secondGroupInt;
     }
 
@@ -104,7 +105,7 @@ public class FieldsGroupingTests {
     @DisplayName("Generating required fields only")
     public void requiredGroup() {
         Dto dto = DtoGenerator.builder()
-                .setGroups(true, REQUIRED)
+                .includeGroups(true, REQUIRED)
                 .build().generateDto(Dto.class);
 
         assertNotNull(dto);
@@ -135,7 +136,7 @@ public class FieldsGroupingTests {
     @DisplayName("Generating GROUP_1 fields only")
     public void firstGroup() {
         Dto dto = DtoGenerator.builder()
-                .setGroups(true, GROUP_1)
+                .includeGroups(true, GROUP_1)
                 .build().generateDto(Dto.class);
 
         assertNotNull(dto);
@@ -158,7 +159,7 @@ public class FieldsGroupingTests {
     @DisplayName("Generating required and GROUP_1 fields only")
     public void requiredAndFirstGroup() {
         Dto dto = DtoGenerator.builder()
-                .setGroups(true, REQUIRED, GROUP_1)
+                .includeGroups(true, REQUIRED, GROUP_1)
                 .build().generateDto(Dto.class);
 
         assertNotNull(dto);

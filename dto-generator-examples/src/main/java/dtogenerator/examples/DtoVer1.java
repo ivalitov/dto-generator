@@ -18,7 +18,7 @@ public class DtoVer1 {
     @CustomGenerator(generatorClass = ClosedDateGenerator.class, args = {"1", "5"})
     LocalDateTime closedDate;
 
-    @StringRules(maxSymbols = 25, charset = {CharSet.ENG, CharSet.NUM}, chars = "*^()")
+    @StringRule(maxSymbols = 25, charset = {CharSet.ENG, CharSet.NUM}, chars = "*^()")
     String fieldString;
 
     @LongRules(minValue = 1, maxValue = 10)

@@ -4,9 +4,9 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
-import laoruga.dtogenerator.api.markup.rules.IntegerRules;
+import laoruga.dtogenerator.api.markup.rules.IntegerRule;
 import laoruga.dtogenerator.api.markup.rules.ListRules;
-import laoruga.dtogenerator.api.markup.rules.StringRules;
+import laoruga.dtogenerator.api.markup.rules.StringRule;
 import laoruga.dtogenerator.api.tests.data.dtoclient.ClientDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,19 +36,19 @@ public class ListGenerationTests {
     static class DtoList {
 
         @ListRules(listClass = LinkedList.class)
-        @StringRules
+        @StringRule
         private List<String> linkedListOfStrings;
 
         @ListRules(listClass = Vector.class)
-        @StringRules
+        @StringRule
         private List<String> vectorOfStrings;
 
         @ListRules
-        @StringRules
+        @StringRule
         private ArrayList<String> arrayListOfStringsImplicit;
 
         @ListRules(listClass = LinkedList.class)
-        @StringRules
+        @StringRule
         private LinkedList<String> linkedListOfStringsImplicit;
     }
 
@@ -63,7 +63,7 @@ public class ListGenerationTests {
                 greaterThanOrEqualTo(ListRules.DEFAULT_MIN_SIZE)).and(lessThanOrEqualTo(ListRules.DEFAULT_MAX_SIZE)));
         for (Integer number : numbers) {
             assertThat(number, both(
-                    greaterThanOrEqualTo(IntegerRules.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRules.DEFAULT_MAX)));
+                    greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX)));
         }
     }
 
@@ -102,8 +102,8 @@ public class ListGenerationTests {
 
             for (String str : list) {
                 assertThat(str.length(), both(
-                        greaterThanOrEqualTo(StringRules.DEFAULT_MIN_SYMBOLS_NUMBER))
-                        .and(lessThanOrEqualTo(StringRules.DEFAULT_MAX_SYMBOLS_NUMBER)));
+                        greaterThanOrEqualTo(StringRule.DEFAULT_MIN_SYMBOLS_NUMBER))
+                        .and(lessThanOrEqualTo(StringRule.DEFAULT_MAX_SYMBOLS_NUMBER)));
             }
         };
 
@@ -125,14 +125,14 @@ public class ListGenerationTests {
     @Getter
     static class DtoWithWildcardList {
         @ListRules
-        @StringRules
+        @StringRule
         List<?> wildCardList;
     }
 
     @Getter
     static class DtoWithRawList {
         @ListRules
-        @IntegerRules
+        @IntegerRule
         List rawList;
     }
 
