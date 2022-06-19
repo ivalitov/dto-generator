@@ -1,12 +1,14 @@
 package laoruga.dtogenerator.api.markup.rules;
 
-import laoruga.dtogenerator.api.markup.BoundType;
 import laoruga.dtogenerator.api.constants.BasicRuleRemark;
+import laoruga.dtogenerator.api.markup.BoundType;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

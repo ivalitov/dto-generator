@@ -1,6 +1,5 @@
 package laoruga.dtogenerator.api;
 
-import laoruga.dtogenerator.api.constants.Group;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.ICollectionGenerator;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
@@ -394,7 +393,7 @@ public class DtoGenerator {
             return false;
         } else {
             try {
-                Group checkedGroup = (Group) rules.annotationType().getMethod("group").invoke(rules);
+                String checkedGroup = (String) rules.annotationType().getMethod("group").invoke(rules);
                 return !getFieldsGroupFilter().isContainsIncludeGroup(checkedGroup);
             } catch (IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
                 throw new DtoGeneratorException("Unexpected exception. Can't get 'group' from rules annotation", e);
@@ -410,7 +409,7 @@ public class DtoGenerator {
             Annotation matched = null;
             for (int i = 0; i < length; i++) {
                 Annotation rule = (Annotation) Array.get(ruleAnnotationsArray, i);
-                Group checkedGroup = (Group) rule.annotationType().getMethod("group").invoke(rule);
+                String checkedGroup = (String) rule.annotationType().getMethod("group").invoke(rule);
                 if (uniqueGroups.contains(rule)) {
                     throw new DtoGeneratorException("Rule group '" + checkedGroup + "' is repeating for field.");
                 } else {

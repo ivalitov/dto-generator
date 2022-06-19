@@ -124,7 +124,7 @@ public class DtoGeneratorBuilder {
      *
      * @param groups - groups by which @Rule will be filtered
      */
-    public DtoGeneratorBuilder includeGroups(Group... groups) {
+    public DtoGeneratorBuilder includeGroups(String... groups) {
         if (groups != null && groups.length != 0) {
             fieldGroupFilter.includeGroups(groups);
         }

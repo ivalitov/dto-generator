@@ -1,8 +1,7 @@
 package laoruga.dtogenerator.api.markup.rules;
 
-import laoruga.dtogenerator.api.constants.CharSet;
 import laoruga.dtogenerator.api.constants.BasicRuleRemark;
-import laoruga.dtogenerator.api.constants.Group;
+import laoruga.dtogenerator.api.constants.CharSet;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 
 import java.lang.annotation.Retention;
@@ -38,13 +37,14 @@ public @interface StringRule {
 
     BasicRuleRemark ruleRemark() default RANDOM_VALUE;
 
-    Group group() default DEFAULT;
+    String group() default DEFAULT;
 
     /**
      * Mask examples:
      * 1) mask: +89 (***) ***-**-** and charset: NUM
      * result: +89 (923) 152-12-64
      * 2) mask: %ENG%{*} +89 (***) ***-**-** %ENG%** and charset: NUM
+     *
      * @return mask for resulting string
      */
     String mask() default DEFAULT_MASK;

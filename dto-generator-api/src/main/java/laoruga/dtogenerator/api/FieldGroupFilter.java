@@ -12,7 +12,7 @@ import java.util.Set;
  */
 class FieldGroupFilter {
 
-    private final Set<Group> include = new HashSet<>();
+    private final Set<String> include = new HashSet<>();
 
     FieldGroupFilter validateGroups() {
         if (include.isEmpty()) {
@@ -21,11 +21,11 @@ class FieldGroupFilter {
         return this;
     }
 
-    void includeGroups(Group... groups) {
+    void includeGroups(String... groups) {
         include.addAll(Arrays.asList(groups));
     }
 
-    boolean isContainsIncludeGroup(Group group) {
+    boolean isContainsIncludeGroup(String group) {
         return include.contains(group);
     }
 
