@@ -8,6 +8,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(ANNOTATION_TYPE)
-@Rules
 public @interface Rules {
 }

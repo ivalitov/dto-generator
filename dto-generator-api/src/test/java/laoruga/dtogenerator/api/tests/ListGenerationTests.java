@@ -5,7 +5,7 @@ import io.qameta.allure.Feature;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.rules.IntegerRule;
-import laoruga.dtogenerator.api.markup.rules.ListRules;
+import laoruga.dtogenerator.api.markup.rules.ListRule;
 import laoruga.dtogenerator.api.markup.rules.StringRule;
 import laoruga.dtogenerator.api.tests.data.dtoclient.ClientDto;
 import lombok.Getter;
@@ -35,19 +35,19 @@ public class ListGenerationTests {
     @NoArgsConstructor
     static class DtoList {
 
-        @ListRules(listClass = LinkedList.class)
+        @ListRule(listClass = LinkedList.class)
         @StringRule
         private List<String> linkedListOfStrings;
 
-        @ListRules(listClass = Vector.class)
+        @ListRule(listClass = Vector.class)
         @StringRule
         private List<String> vectorOfStrings;
 
-        @ListRules
+        @ListRule
         @StringRule
         private ArrayList<String> arrayListOfStringsImplicit;
 
-        @ListRules(listClass = LinkedList.class)
+        @ListRule(listClass = LinkedList.class)
         @StringRule
         private LinkedList<String> linkedListOfStringsImplicit;
     }
@@ -60,7 +60,7 @@ public class ListGenerationTests {
         assertNotNull(dto);
         List<Integer> numbers = dto.getArrayListIntegerRules();
         assertThat(numbers.size(), both(
-                greaterThanOrEqualTo(ListRules.DEFAULT_MIN_SIZE)).and(lessThanOrEqualTo(ListRules.DEFAULT_MAX_SIZE)));
+                greaterThanOrEqualTo(ListRule.DEFAULT_MIN_SIZE)).and(lessThanOrEqualTo(ListRule.DEFAULT_MAX_SIZE)));
         for (Integer number : numbers) {
             assertThat(number, both(
                     greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX)));
@@ -95,7 +95,7 @@ public class ListGenerationTests {
 
         Consumer<List<String>> assertListOfStrings = (list) -> {
             assertThat(list.size(), both(
-                    greaterThanOrEqualTo(ListRules.DEFAULT_MIN_SIZE)).and(lessThanOrEqualTo(ListRules.DEFAULT_MAX_SIZE)));
+                    greaterThanOrEqualTo(ListRule.DEFAULT_MIN_SIZE)).and(lessThanOrEqualTo(ListRule.DEFAULT_MAX_SIZE)));
             assertThat(list, everyItem(
                     notNullValue()
             ));
@@ -124,24 +124,24 @@ public class ListGenerationTests {
 
     @Getter
     static class DtoWithWildcardList {
-        @ListRules
+        @ListRule
         @StringRule
         List<?> wildCardList;
     }
 
     @Getter
     static class DtoWithRawList {
-        @ListRules
+        @ListRule
         @IntegerRule
         List rawList;
     }
 
     @Getter
     static class DtoWithListOfCollections {
-        @ListRules()
+        @ListRule()
         List<Set<String>> listOfSet;
 
-        @ListRules(listClass = LinkedList.class)
+        @ListRule(listClass = LinkedList.class)
         List<String> listOfString;
     }
 

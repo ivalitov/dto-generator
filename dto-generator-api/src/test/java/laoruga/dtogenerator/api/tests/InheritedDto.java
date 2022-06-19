@@ -3,7 +3,7 @@ package laoruga.dtogenerator.api.tests;
 import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.markup.rules.IntegerRule;
-import laoruga.dtogenerator.api.markup.rules.ListRules;
+import laoruga.dtogenerator.api.markup.rules.ListRule;
 import laoruga.dtogenerator.api.markup.rules.LocalDateTimeRules;
 import laoruga.dtogenerator.api.markup.rules.StringRule;
 import lombok.Getter;
@@ -37,7 +37,7 @@ public class InheritedDto {
     @Getter
     @NoArgsConstructor
     static class DtoSuper {
-        @ListRules
+        @ListRule
         @StringRule
         private List<String> superList;
         @LocalDateTimeRules

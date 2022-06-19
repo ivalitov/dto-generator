@@ -283,49 +283,105 @@ public class DtoGenerator {
         Annotation[] annotations = field.getDeclaredAnnotations();
         String fieldName = field.getName();
         Class<?> fieldType = field.getType();
+
         if (annotations.length == 0) {
             return new Pair<>(RulesType.NOT_ANNOTATED, null);
         }
-        List<Annotation> generationRules = new LinkedList<>();
+
+        // extracting rules annotations
+
         Annotation rule = null;
-        Annotation rules = null;
+        boolean isRulesArray = false;
+        String ruleGroup;
+
         Annotation collectionRule = null;
+        boolean isCollectionRulesArray = false;
+        String collectionRuleGroup = null;
+
         for (Annotation annotation : annotations) {
             if (isItRule(annotation)) {
-                if (rule != null || rules != null) {
+                if (rule != null) {
                     throw new DtoGeneratorException("Field '" + fieldName + "' annotated with different type rules annotations");
                 }
                 rule = annotation;
             } else if (isItRules(annotation)) {
-                if (rule != null || rules != null) {
+                if (rule != null) {
                     throw new DtoGeneratorException("Field '" + fieldName + "' annotated more then one rules annotation");
                 }
-                rules = annotation;
+                isRulesArray = true;
+                rule = annotation;
             } else if (isItCollectionRule(annotation)) {
                 if (collectionRule != null) {
-                    throw new DtoGeneratorException("Field '" + fieldName + "' annotated with more then one list rules annotations");
+                    throw new DtoGeneratorException("Field '" + fieldName + "' annotated with more then one collection rules annotations");
                 }
+                collectionRule = annotation;
+            } else if (isItCollectionRules(annotation)) {
+                if (collectionRule != null) {
+                    throw new DtoGeneratorException("Field '" + fieldName + "' annotated more then one collection rules annotation");
+                }
+                isCollectionRulesArray = true;
                 collectionRule = annotation;
             }
         }
-        if (rule == null && rules == null) {
-            if (collectionRule != null) {
-                throw new DtoGeneratorException("Field '" + fieldName + "' annotated with collection generation rules, " +
-                        "but not annotated with collection's item generation rules. There is also generation rules annotation expected.");
-
-            }
+        if (rule == null && collectionRule == null) {
             return new Pair<>(RulesType.NOT_ANNOTATED, null);
+        } else if (rule == null) {
+            throw new DtoGeneratorException("Field '" + fieldName + "' annotated with collection generation rules, " +
+                    "but not annotated with collection's item generation rules. There is also generation rules annotation expected.");
         }
-        if (rules != null) {
-            rule = getRuleByGroupOrNull(rules, fieldName);
-            if (rule == null) {
-                return new Pair<>(RulesType.SKIP, null);
+
+        // selecting from annotation arrays
+
+        if (isRulesArray) {
+            Pair<String, Annotation> groupAndRule = getRuleByGroupOrNull(rule, fieldName);
+            ruleGroup = groupAndRule == null ? null : groupAndRule.getFirst();
+            rule = groupAndRule == null ? null : groupAndRule.getSecond();
+        } else {
+            ruleGroup = getRuleGroup(rule);
+        }
+
+        if (isCollectionRulesArray) {
+            Pair<String, Annotation> groupAndRule = getRuleByGroupOrNull(collectionRule, fieldName);
+            collectionRuleGroup = groupAndRule == null ? null : groupAndRule.getFirst();
+            collectionRule = groupAndRule == null ? null : groupAndRule.getSecond();
+        } else if (collectionRule != null) {
+            collectionRuleGroup = getRuleGroup(collectionRule);
+        }
+
+        if (rule == null && collectionRule == null) {
+            return new Pair<>(RulesType.SKIP, null);
+        }
+
+        if (rule == null) {
+            throw new DtoGeneratorException("Item rules exists, but Collection rules missed for the field '" + fieldName + "'");
+        }
+
+        // check if collection's group and item's group are equal
+
+        if (collectionRule != null) {
+            if (!ruleGroup.equals(collectionRuleGroup)) {
+                throw new DtoGeneratorException("Rules annotations not matched with passed include group filters.\n" +
+                        "Collection and item rules groups have matched with different include filters.\n" +
+                        "Item group: '" + ruleGroup + "'\n" +
+                        "Collection group: '" + collectionRuleGroup + "'\n" +
+                        "Rule: '" + rule + "'\n" +
+                        "Collection rule: '" + collectionRule + "'");
             }
         }
-        if (collectionRule == null) {
-            if (skipDependingOnGroup(rule)) {
-                return new Pair<>(RulesType.SKIP, null);
+
+        if (!getFieldsGroupFilter().isContainsIncludeGroup(ruleGroup)) {
+            return new Pair<>(RulesType.SKIP, null);
+        }
+
+        // selecting rules type
+
+        if (collectionRule != null) {
+            if (isItCustomRule(rule)) {
+                return new Pair<>(RulesType.COLLECTION_CUSTOM, new RuleWrapper(collectionRule, rule));
+            } else {
+                return new Pair<>(RulesType.COLLECTION_BASIC, new RuleWrapper(collectionRule, rule));
             }
+        } else {
             if (isItCustomRule(rule)) {
                 return new Pair<>(RulesType.CUSTOM, new RuleWrapper(null, rule));
             }
@@ -337,16 +393,6 @@ public class DtoGenerator {
                         "rule annotation: '" + rule.annotationType() + "'.");
             }
             return new Pair<>(RulesType.BASIC, new RuleWrapper(null, rule));
-        } else {
-            // TODO add group for collection
-            if (skipDependingOnGroup(rule)) {
-                return new Pair<>(RulesType.SKIP, null);
-            }
-            if (isItCustomRule(rule)) {
-                return new Pair<>(RulesType.COLLECTION_CUSTOM, new RuleWrapper(collectionRule, rule));
-            } else {
-                return new Pair<>(RulesType.COLLECTION_BASIC, new RuleWrapper(collectionRule, rule));
-            }
         }
     }
 
@@ -371,6 +417,10 @@ public class DtoGenerator {
         return ruleAnnotation.annotationType().getDeclaredAnnotation(RuleForCollection.class) != null;
     }
 
+    private static boolean isItCollectionRules(Annotation ruleAnnotation) {
+        return ruleAnnotation.annotationType().getDeclaredAnnotation(RulesForCollection.class) != null;
+    }
+
     private static boolean isItCustomRule(Annotation ruleAnnotation) {
         return ruleAnnotation.annotationType() == CustomGenerator.class;
     }
@@ -388,28 +438,23 @@ public class DtoGenerator {
         return ruleAnnotation.annotationType().getDeclaredAnnotation(Rules.class) != null;
     }
 
-    private boolean skipDependingOnGroup(Annotation rules) {
-        if (this.getFieldsGroupFilter() == null) {
-            return false;
-        } else {
-            try {
-                String checkedGroup = (String) rules.annotationType().getMethod("group").invoke(rules);
-                return !getFieldsGroupFilter().isContainsIncludeGroup(checkedGroup);
-            } catch (IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
-                throw new DtoGeneratorException("Unexpected exception. Can't get 'group' from rules annotation", e);
-            }
+    private static String getRuleGroup(Annotation rule) {
+        try {
+            return (String) rule.annotationType().getMethod("group").invoke(rule);
+        } catch (IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
+            throw new DtoGeneratorException("Unexpected exception. Can't get 'group' from rules annotation", e);
         }
     }
 
-    private Annotation getRuleByGroupOrNull(Annotation rules, String fieldName) {
+    private Pair<String, Annotation> getRuleByGroupOrNull(Annotation rules, String fieldName) {
         try {
             LinkedList<Object> uniqueGroups = new LinkedList<>();
             Object ruleAnnotationsArray = rules.getClass().getMethod("value").invoke(rules);
             int length = Array.getLength(ruleAnnotationsArray);
-            Annotation matched = null;
+            Pair<String, Annotation> matched = null;
             for (int i = 0; i < length; i++) {
                 Annotation rule = (Annotation) Array.get(ruleAnnotationsArray, i);
-                String checkedGroup = (String) rule.annotationType().getMethod("group").invoke(rule);
+                String checkedGroup = getRuleGroup(rule);
                 if (uniqueGroups.contains(rule)) {
                     throw new DtoGeneratorException("Rule group '" + checkedGroup + "' is repeating for field.");
                 } else {
@@ -417,7 +462,7 @@ public class DtoGenerator {
                 }
                 if (getFieldsGroupFilter().isContainsIncludeGroup(checkedGroup)) {
                     if (matched == null) {
-                        matched = rule;
+                        matched = Pair.create(checkedGroup, rule);
                     } else {
                         throw new DtoGeneratorException("Ambiguous grouping of the field: '" + fieldName + "'." +
                                 " Check groups of generators and include filters.");

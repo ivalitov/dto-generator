@@ -2,7 +2,7 @@ package laoruga.dtogenerator.api.tests.data.dtoclient;
 
 import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
 import laoruga.dtogenerator.api.markup.rules.IntegerRule;
-import laoruga.dtogenerator.api.markup.rules.ListRules;
+import laoruga.dtogenerator.api.markup.rules.ListRule;
 import laoruga.dtogenerator.api.markup.rules.StringRule;
 import laoruga.dtogenerator.api.tests.data.customgenerator.ClientInfoGenerator;
 import lombok.Getter;
@@ -35,15 +35,15 @@ public class ClientDto {
      * Collections
      */
 
-    @ListRules()
+    @ListRule()
     @CustomGenerator(generatorClass = ClientInfoGenerator.class)
     private List<ClientInfoDto> clients;
 
-    @ListRules()
+    @ListRule()
     @IntegerRule
     private List<Integer> arrayListIntegerRules;
 
-    @ListRules(minSize = 5, maxSize = 5, listClass = LinkedList.class)
+    @ListRule(minSize = 5, maxSize = 5, listClass = LinkedList.class)
     @IntegerRule(minValue = 1, maxValue = 2)
     private List<Integer> linkedListExplicitRules;
 

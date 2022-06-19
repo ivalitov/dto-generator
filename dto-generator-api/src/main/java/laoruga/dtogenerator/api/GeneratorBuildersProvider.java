@@ -106,8 +106,8 @@ public class GeneratorBuildersProvider {
     IGenerator<?> getCollectionTypeGenerator(String fieldName, Class<?> fieldType, Annotation rules, IGenerator<?> itemGenerator) {
         Class<? extends Annotation> rulesClass = rules.annotationType();
 
-        if (ListRules.class == rulesClass) {
-            return getListGenerator(fieldName, fieldType, (ListRules) rules, itemGenerator);
+        if (ListRule.class == rulesClass) {
+            return getListGenerator(fieldName, fieldType, (ListRule) rules, itemGenerator);
         }
 
         if (SetRules.class == rulesClass) {
@@ -281,17 +281,17 @@ public class GeneratorBuildersProvider {
      * Collection generators providers
      */
 
-    IGenerator<?> getListGenerator(String fieldName, Class<?> fieldType, ListRules listRules, IGenerator<?> listItemGenerator) {
-        if (isGeneratorOverridden(fieldName, listRules)) {
-            return getOverriddenGenerator(fieldName, listRules);
+    IGenerator<?> getListGenerator(String fieldName, Class<?> fieldType, ListRule listRule, IGenerator<?> listItemGenerator) {
+        if (isGeneratorOverridden(fieldName, listRule)) {
+            return getOverriddenGenerator(fieldName, listRule);
         } else {
             IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
                     generatorRemarksProvider.getBasicRuleRemark(fieldName) :
-                    listRules.ruleRemark();
+                    listRule.ruleRemark();
             return BasicGeneratorsBuilders.collectionBuilder()
-                    .minSize(listRules.minSize())
-                    .maxSize(listRules.maxSize())
-                    .listInstance(createCollectionFieldInstance(fieldType, listRules.listClass()))
+                    .minSize(listRule.minSize())
+                    .maxSize(listRule.maxSize())
+                    .listInstance(createCollectionFieldInstance(fieldType, listRule.listClass()))
                     .itemGenerator(listItemGenerator)
                     .ruleRemark(remark)
                     .build();
