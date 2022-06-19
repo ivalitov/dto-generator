@@ -115,11 +115,14 @@ public class DtoGeneratorBuilder {
      */
 
     /**
-     * Rules annotations may be labeled with groups. By default, rules contain DEFAULT group.
+     * Passing groups using for:
+     * - exclusion fields annotated with @Rule;
+     * - selecting @Rule by group when field annotated with more than one @Rule.
+     * <p>
+     * If no group passed - DEFAULT group will be used by default,
+     * else - only passed groups are used (In this case, if you need to use DEFAULT group, you need to pass it too).
      *
-     * @param   - generate only that fields which marked with groups
-     *                      false - not generate fields which marked with groups
-     * @param groups        groups that must be generated only or excluded
+     * @param groups - groups by which @Rule will be filtered
      */
     public DtoGeneratorBuilder includeGroups(Group... groups) {
         if (groups != null && groups.length != 0) {

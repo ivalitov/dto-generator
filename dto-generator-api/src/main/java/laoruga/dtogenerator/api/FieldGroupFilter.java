@@ -1,7 +1,6 @@
 package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.constants.Group;
-import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 
 import java.util.Arrays;
 import java.util.HashSet;
