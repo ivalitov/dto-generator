@@ -3,7 +3,7 @@ package laoruga.dtogenerator.api.tests;
 import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.markup.rules.IntegerRule;
-import laoruga.dtogenerator.api.markup.rules.SetRules;
+import laoruga.dtogenerator.api.markup.rules.SetRule;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
@@ -29,19 +29,19 @@ public class SetGeneratorTests {
     @Getter
     @NoArgsConstructor
     static class DtoSet {
-        @SetRules
+        @SetRule
         @IntegerRule
         Set<Integer> numbers;
 
-        @SetRules(setClass = LinkedHashSet.class)
+        @SetRule(setClass = LinkedHashSet.class)
         @IntegerRule
         Set<Integer> linkedHashSet;
 
-        @SetRules(setClass = TreeSet.class)
+        @SetRule(setClass = TreeSet.class)
         @IntegerRule
         TreeSet<Integer> treeSet;
 
-        @SetRules
+        @SetRule
         @IntegerRule
         HashSet<Integer> hashSet;
     }
@@ -65,7 +65,7 @@ public class SetGeneratorTests {
 
     private static void checkNumbers(Set<Integer> numbers) {
         assertThat(numbers.size(), both(
-                greaterThanOrEqualTo(SetRules.DEFAULT_MIN_SIZE)).and(lessThanOrEqualTo(SetRules.DEFAULT_MAX_SIZE)));
+                greaterThanOrEqualTo(SetRule.DEFAULT_MIN_SIZE)).and(lessThanOrEqualTo(SetRule.DEFAULT_MAX_SIZE)));
         for (Integer number : numbers) {
             assertThat(number, both(
                     greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX)));

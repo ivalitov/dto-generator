@@ -1,5 +1,7 @@
 package laoruga.dtogenerator.api.markup.rules;
 
+import laoruga.dtogenerator.api.markup.rules.meta.Rules;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 

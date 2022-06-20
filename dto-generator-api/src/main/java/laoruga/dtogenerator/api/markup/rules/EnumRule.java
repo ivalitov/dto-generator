@@ -1,7 +1,6 @@
 package laoruga.dtogenerator.api.markup.rules;
 
 import laoruga.dtogenerator.api.constants.BasicRuleRemark;
-import laoruga.dtogenerator.api.markup.BoundType;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.meta.Rule;
 
@@ -17,19 +16,15 @@ import static laoruga.dtogenerator.api.constants.Group.DEFAULT;
 @Retention(RUNTIME)
 @Target(FIELD)
 @Rule
-@Repeatable(IntegerRules.class)
-public @interface IntegerRule {
+@Repeatable(EnumRules.class)
+public @interface EnumRule {
 
-    int DEFAULT_MIN = 0;
-    int DEFAULT_MAX = 999999999;
     IRuleRemark DEFAULT_RULE_REMARK = RANDOM_VALUE;
-    Class<?>[] APPLICABLE_TYPES = {Integer.class, Integer.TYPE};
+    Class<?>[] APPLICABLE_TYPES = {Enum.class};
 
-    @BoundType(BasicRuleRemark.MAX_VALUE)
-    int maxValue() default DEFAULT_MAX;
+    String[] possibleEnumNames();
 
-    @BoundType(BasicRuleRemark.MIN_VALUE)
-    int minValue() default DEFAULT_MIN;
+    Class<? extends Enum<?>> enumClass();
 
     BasicRuleRemark ruleRemark() default RANDOM_VALUE;
 

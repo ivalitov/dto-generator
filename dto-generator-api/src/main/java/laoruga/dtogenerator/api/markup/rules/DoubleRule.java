@@ -1,7 +1,6 @@
 package laoruga.dtogenerator.api.markup.rules;
 
 import laoruga.dtogenerator.api.constants.BasicRuleRemark;
-import laoruga.dtogenerator.api.markup.BoundType;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.meta.Rule;
 
@@ -17,19 +16,20 @@ import static laoruga.dtogenerator.api.constants.Group.DEFAULT;
 @Retention(RUNTIME)
 @Target(FIELD)
 @Rule
-@Repeatable(IntegerRules.class)
-public @interface IntegerRule {
+@Repeatable(DoubleRules.class)
+public @interface DoubleRule {
 
-    int DEFAULT_MIN = 0;
-    int DEFAULT_MAX = 999999999;
+    double DEFAULT_MIN = 0D;
+    double DEFAULT_MAX = 999999999999999999D;
+    int DEFAULT_PRECISION = 2;
     IRuleRemark DEFAULT_RULE_REMARK = RANDOM_VALUE;
-    Class<?>[] APPLICABLE_TYPES = {Integer.class, Integer.TYPE};
+    Class<?>[] APPLICABLE_TYPES = {Double.class, Double.TYPE};
 
-    @BoundType(BasicRuleRemark.MAX_VALUE)
-    int maxValue() default DEFAULT_MAX;
+    double maxValue() default DEFAULT_MAX;
 
-    @BoundType(BasicRuleRemark.MIN_VALUE)
-    int minValue() default DEFAULT_MIN;
+    double minValue() default DEFAULT_MIN;
+
+    int precision() default 2;
 
     BasicRuleRemark ruleRemark() default RANDOM_VALUE;
 

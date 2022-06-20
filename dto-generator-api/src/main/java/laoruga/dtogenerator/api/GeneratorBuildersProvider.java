@@ -76,8 +76,8 @@ public class GeneratorBuildersProvider {
     IGenerator<?> getBasicTypeGenerator(String fieldName, Class<?> fieldType, Annotation rules) {
         Class<? extends Annotation> rulesClass = rules.annotationType();
 
-        if (DoubleRules.class == rulesClass) {
-            return getDoubleGenerator(fieldName, (DoubleRules) rules, fieldType == Double.TYPE);
+        if (DoubleRule.class == rulesClass) {
+            return getDoubleGenerator(fieldName, (DoubleRule) rules, fieldType == Double.TYPE);
         }
 
         if (StringRule.class == rulesClass) {
@@ -88,16 +88,16 @@ public class GeneratorBuildersProvider {
             return getIntegerGenerator(fieldName, (IntegerRule) rules, fieldType == Integer.TYPE);
         }
 
-        if (LongRules.class == rulesClass) {
-            return getLongGenerator(fieldName, (LongRules) rules, fieldType == Integer.TYPE);
+        if (LongRule.class == rulesClass) {
+            return getLongGenerator(fieldName, (LongRule) rules, fieldType == Integer.TYPE);
         }
 
-        if (EnumRules.class == rulesClass) {
-            return getEnumGenerator(fieldName, (EnumRules) rules);
+        if (EnumRule.class == rulesClass) {
+            return getEnumGenerator(fieldName, (EnumRule) rules);
         }
 
-        if (LocalDateTimeRules.class == rulesClass) {
-            return getLocalDateTimeGenerator(fieldName, (LocalDateTimeRules) rules);
+        if (LocalDateTimeRule.class == rulesClass) {
+            return getLocalDateTimeGenerator(fieldName, (LocalDateTimeRule) rules);
         }
 
         throw new DtoGeneratorException("Field " + fieldName + " hasn't been mapped with any basic generator.");
@@ -110,8 +110,8 @@ public class GeneratorBuildersProvider {
             return getListGenerator(fieldName, fieldType, (ListRule) rules, itemGenerator);
         }
 
-        if (SetRules.class == rulesClass) {
-            return getSetGenerator(fieldName, fieldType, (SetRules) rules, itemGenerator);
+        if (SetRule.class == rulesClass) {
+            return getSetGenerator(fieldName, fieldType, (SetRule) rules, itemGenerator);
         }
 
         throw new DtoGeneratorException("Field " + fieldName + " hasn't been mapped with any collection generator.");
@@ -189,21 +189,21 @@ public class GeneratorBuildersProvider {
         }
     }
 
-    private IGenerator<?> getDoubleGenerator(String fieldName, DoubleRules doubleRules, boolean isPrimitive) {
-        if (isGeneratorOverridden(fieldName, doubleRules)) {
-            return getOverriddenGenerator(fieldName, doubleRules);
+    private IGenerator<?> getDoubleGenerator(String fieldName, DoubleRule doubleRule, boolean isPrimitive) {
+        if (isGeneratorOverridden(fieldName, doubleRule)) {
+            return getOverriddenGenerator(fieldName, doubleRule);
         } else {
             IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
                     generatorRemarksProvider.getBasicRuleRemark(fieldName) :
-                    doubleRules.ruleRemark();
+                    doubleRule.ruleRemark();
             if (remark == NULL_VALUE && isPrimitive) {
                 log.debug("Primitive field '" + fieldName + "' can't be null, it will be assigned to '0'");
                 return (IGenerator<Double>) () -> 0D;
             }
             return BasicGeneratorsBuilders.doubleBuilder()
-                    .minValue(doubleRules.minValue())
-                    .maxValue(doubleRules.maxValue())
-                    .precision(doubleRules.precision())
+                    .minValue(doubleRule.minValue())
+                    .maxValue(doubleRule.maxValue())
+                    .precision(doubleRule.precision())
                     .ruleRemark(remark)
                     .build();
         }
@@ -228,50 +228,50 @@ public class GeneratorBuildersProvider {
         }
     }
 
-    private IGenerator<?> getLongGenerator(String fieldName, LongRules longRules, boolean isPrimitive) {
-        if (isGeneratorOverridden(fieldName, longRules)) {
-            return getOverriddenGenerator(fieldName, longRules);
+    private IGenerator<?> getLongGenerator(String fieldName, LongRule longRule, boolean isPrimitive) {
+        if (isGeneratorOverridden(fieldName, longRule)) {
+            return getOverriddenGenerator(fieldName, longRule);
         } else {
             IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
                     generatorRemarksProvider.getBasicRuleRemark(fieldName) :
-                    longRules.ruleRemark();
+                    longRule.ruleRemark();
             if (remark == NULL_VALUE && isPrimitive) {
                 log.debug("Primitive field '" + fieldName + "' can't be null, it will be assigned to '0'");
                 return (IGenerator<Long>) () -> 0L;
             }
             return BasicGeneratorsBuilders.longBuilder()
-                    .minValue(longRules.minValue())
-                    .maxValue(longRules.maxValue())
+                    .minValue(longRule.minValue())
+                    .maxValue(longRule.maxValue())
                     .ruleRemark(remark)
                     .build();
         }
     }
 
-    private IGenerator<?> getEnumGenerator(String fieldName, EnumRules enumRules) {
-        if (isGeneratorOverridden(fieldName, enumRules)) {
-            return getOverriddenGenerator(fieldName, enumRules);
+    private IGenerator<?> getEnumGenerator(String fieldName, EnumRule enumRule) {
+        if (isGeneratorOverridden(fieldName, enumRule)) {
+            return getOverriddenGenerator(fieldName, enumRule);
         } else {
             IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
                     generatorRemarksProvider.getBasicRuleRemark(fieldName) :
-                    enumRules.ruleRemark();
+                    enumRule.ruleRemark();
             return BasicGeneratorsBuilders.enumBuilder()
-                    .enumClass(enumRules.enumClass())
-                    .possibleEnumNames(enumRules.possibleEnumNames())
+                    .enumClass(enumRule.enumClass())
+                    .possibleEnumNames(enumRule.possibleEnumNames())
                     .ruleRemark(remark)
                     .build();
         }
     }
 
-    private IGenerator<?> getLocalDateTimeGenerator(String fieldName, LocalDateTimeRules localDateTimeRules) {
-        if (isGeneratorOverridden(fieldName, localDateTimeRules)) {
-            return getOverriddenGenerator(fieldName, localDateTimeRules);
+    private IGenerator<?> getLocalDateTimeGenerator(String fieldName, LocalDateTimeRule localDateTimeRule) {
+        if (isGeneratorOverridden(fieldName, localDateTimeRule)) {
+            return getOverriddenGenerator(fieldName, localDateTimeRule);
         } else {
             IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
                     generatorRemarksProvider.getBasicRuleRemark(fieldName) :
-                    localDateTimeRules.ruleRemark();
+                    localDateTimeRule.ruleRemark();
             return BasicGeneratorsBuilders.localDateTimeBuilder()
-                    .leftShiftDays(localDateTimeRules.leftShiftDays())
-                    .rightShiftDays(localDateTimeRules.rightShiftDays())
+                    .leftShiftDays(localDateTimeRule.leftShiftDays())
+                    .rightShiftDays(localDateTimeRule.rightShiftDays())
                     .ruleRemark(remark)
                     .build();
         }
@@ -298,17 +298,17 @@ public class GeneratorBuildersProvider {
         }
     }
 
-    IGenerator<?> getSetGenerator(String fieldName, Class<?> fieldType, SetRules setRules, IGenerator<?> listItemGenerator) {
-        if (isGeneratorOverridden(fieldName, setRules)) {
-            return getOverriddenGenerator(fieldName, setRules);
+    IGenerator<?> getSetGenerator(String fieldName, Class<?> fieldType, SetRule setRule, IGenerator<?> listItemGenerator) {
+        if (isGeneratorOverridden(fieldName, setRule)) {
+            return getOverriddenGenerator(fieldName, setRule);
         } else {
             IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
                     generatorRemarksProvider.getBasicRuleRemark(fieldName) :
-                    setRules.ruleRemark();
+                    setRule.ruleRemark();
             return BasicGeneratorsBuilders.collectionBuilder()
-                    .minSize(setRules.minSize())
-                    .maxSize(setRules.maxSize())
-                    .listInstance(createCollectionFieldInstance(fieldType, setRules.setClass()))
+                    .minSize(setRule.minSize())
+                    .maxSize(setRule.maxSize())
+                    .listInstance(createCollectionFieldInstance(fieldType, setRule.setClass()))
                     .itemGenerator(listItemGenerator)
                     .ruleRemark(remark)
                     .build();

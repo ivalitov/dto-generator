@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 public class DtoVer1 {
 
-    @LocalDateTimeRules(leftShiftDays = 365 * 3, rightShiftDays = 0)
+    @LocalDateTimeRule(leftShiftDays = 365 * 3, rightShiftDays = 0)
     LocalDateTime openDate;
 
     @CustomGenerator(generatorClass = ClosedDateGenerator.class, args = {"1", "5"})
@@ -21,10 +21,10 @@ public class DtoVer1 {
     @StringRule(maxSymbols = 25, charset = {CharSet.ENG, CharSet.NUM}, chars = "*^()")
     String fieldString;
 
-    @LongRules(minValue = 1, maxValue = 10)
+    @LongRule(minValue = 1, maxValue = 10)
     Long fieldInteger;
 
-    @DoubleRules(minValue = 0, maxValue = 100000, precision = 10)
+    @DoubleRule(minValue = 0, maxValue = 100000, precision = 10)
     Double fieldDecimal;
 
     @CustomGenerator(generatorClass = ArrearsGenerator2.class, args = {"5"})
@@ -33,7 +33,7 @@ public class DtoVer1 {
     @NestedDtoRules
     Arrears arrearsBlock_3;
 
-    @EnumRules(possibleEnumNames = {"NBCH", "EI", "GP", "ASSD"}, enumClass = SystemType.class)
+    @EnumRule(possibleEnumNames = {"NBCH", "EI", "GP", "ASSD"}, enumClass = SystemType.class)
     SystemType system;
 
 }

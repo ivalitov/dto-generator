@@ -3,6 +3,7 @@ package laoruga.dtogenerator.api.markup.rules;
 import laoruga.dtogenerator.api.constants.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.BoundType;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
+import laoruga.dtogenerator.api.markup.rules.meta.RuleForCollection;
 
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;

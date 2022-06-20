@@ -4,7 +4,7 @@ import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.constants.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
-import laoruga.dtogenerator.api.markup.rules.DoubleRules;
+import laoruga.dtogenerator.api.markup.rules.DoubleRule;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.util.Precision;
 
@@ -46,10 +46,10 @@ public class DoubleGenerator implements IGenerator<Double> {
     }
 
     public static final class DoubleGeneratorBuilder implements IGeneratorBuilder {
-        private double maxValue = DoubleRules.DEFAULT_MAX;
-        private double minValue = DoubleRules.DEFAULT_MIN;
-        private int precision = DoubleRules.DEFAULT_PRECISION;
-        private IRuleRemark ruleRemark = DoubleRules.DEFAULT_RULE_REMARK;
+        private double maxValue = DoubleRule.DEFAULT_MAX;
+        private double minValue = DoubleRule.DEFAULT_MIN;
+        private int precision = DoubleRule.DEFAULT_PRECISION;
+        private IRuleRemark ruleRemark = DoubleRule.DEFAULT_RULE_REMARK;
 
         private DoubleGeneratorBuilder() {}
 

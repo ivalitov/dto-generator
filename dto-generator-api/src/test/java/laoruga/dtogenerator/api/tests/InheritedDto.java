@@ -4,7 +4,7 @@ import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.markup.rules.IntegerRule;
 import laoruga.dtogenerator.api.markup.rules.ListRule;
-import laoruga.dtogenerator.api.markup.rules.LocalDateTimeRules;
+import laoruga.dtogenerator.api.markup.rules.LocalDateTimeRule;
 import laoruga.dtogenerator.api.markup.rules.StringRule;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,7 +40,7 @@ public class InheritedDto {
         @ListRule
         @StringRule
         private List<String> superList;
-        @LocalDateTimeRules
+        @LocalDateTimeRule
         private LocalDateTime superDateTime;
     }
 
