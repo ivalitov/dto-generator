@@ -5,6 +5,7 @@ import laoruga.dtogenerator.api.constants.CharSet;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.meta.Rule;
 
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -16,6 +17,7 @@ import static laoruga.dtogenerator.api.constants.Group.DEFAULT;
 @Retention(RUNTIME)
 @Target(FIELD)
 @Rule
+@Repeatable(StringRules.class)
 public @interface StringRule {
 
     int DEFAULT_MIN_SYMBOLS_NUMBER = 0;

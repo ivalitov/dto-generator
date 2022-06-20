@@ -3,16 +3,22 @@ package laoruga.dtogenerator.api.tests;
 import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.constants.Group;
-import laoruga.dtogenerator.api.markup.rules.IntegerRule;
-import laoruga.dtogenerator.api.markup.rules.ListRule;
+import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
+import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
+import laoruga.dtogenerator.api.markup.rules.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static laoruga.dtogenerator.api.constants.BasicRuleRemark.*;
+import static laoruga.dtogenerator.api.constants.CharSet.ENG;
+import static laoruga.dtogenerator.api.constants.CharSet.NUM;
 import static laoruga.dtogenerator.api.constants.Group.GROUP_1;
 import static laoruga.dtogenerator.api.constants.Group.GROUP_2;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -42,7 +48,6 @@ public class RulesGroupingTests {
 
         @IntegerRule(minValue = 0, maxValue = 0)
         private Integer defaultGroup;
-
     }
 
     @Getter
@@ -63,7 +68,6 @@ public class RulesGroupingTests {
         @ListRule(minSize = 6, maxSize = 6)
         @IntegerRule
         private List<Integer> intListDefault;
-
     }
 
     @DisplayName("Default group")
@@ -75,7 +79,6 @@ public class RulesGroupingTests {
                 () -> assertThat(dto.getIntSecond(), nullValue()),
                 () -> assertThat(dto.getDefaultGroup(), equalTo(0))
         );
-
     }
 
     @DisplayName("Include group")
@@ -101,10 +104,94 @@ public class RulesGroupingTests {
                 .generateDto(DtoList.class);
         assertAll(
                 () -> assertThat(dto.getIntList(), both(hasSize(3))
-                                .and(everyItem(equalTo(10)))),
+                        .and(everyItem(equalTo(10)))),
                 () -> assertThat(dto.getIntListDefault(), hasSize(6)),
                 () -> assertThat(dto.getIntListDefault(), everyItem(both(
                         greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX)))));
+    }
+
+    /*
+     * All types test
+     */
+
+    @DisplayName("All rules grouping")
+    @Test
+    public void allRulesGrouping() {
+        DtoAllRules dto = DtoGenerator.builder()
+                .build()
+                .generateDto(DtoAllRules.class);
+        System.out.println();
+    }
+
+    @Getter
+    @NoArgsConstructor
+    static class DtoAllRules {
+
+        @StringRule(group = GROUP_1, charset = NUM)
+        @StringRule(charset = ENG)
+        private String string;
+
+        @SetRule(group = GROUP_1, minSize = 1, maxSize = 1)
+        @IntegerRule(group = GROUP_1, minValue = 1, maxValue = 1)
+        @SetRule(minSize = 2, maxSize = 2)
+        @IntegerRule(minValue = 2, maxValue = 2)
+        private Set<Integer> set;
+
+        @LongRule(group = GROUP_1, minValue = 1, maxValue = 1)
+        @LongRule(minValue = 2, maxValue = 2)
+        private Long aLong;
+
+        @LocalDateTimeRule(group = GROUP_1, leftShiftDays = 0, rightShiftDays = 0)
+        @LocalDateTimeRule(leftShiftDays = 0, rightShiftDays = 1)
+        private LocalDateTime localDateTime;
+
+        @ListRule(group = GROUP_1, minSize = 1, maxSize = 1)
+        @DoubleRule(group = GROUP_1, minValue = 1, maxValue = 1)
+        @ListRule(minSize = 2, maxSize = 2)
+        @DoubleRule(minValue = 2, maxValue = 2)
+        private List<Double> list;
+
+        @IntegerRule(group = GROUP_1, minValue = 1, maxValue = 1)
+        @IntegerRule(minValue = 2, maxValue = 2)
+        private int integer;
+
+        @DoubleRule(group = GROUP_1, minValue = 1, maxValue = 1)
+        @DoubleRule(minValue = 2, maxValue = 2)
+        private Double aDouble;
+
+        @EnumRule(group = GROUP_1, enumClass = SomeEnum.class, possibleEnumNames = "FOO")
+        @EnumRule(enumClass = SomeEnum.class, possibleEnumNames = "BAR")
+        private SomeEnum aEnum;
+
+        @CustomGenerator(group = GROUP_1, generatorClass = CustomGen.class, args = "1")
+        @CustomGenerator(generatorClass = CustomGen.class, args = "2")
+        private CustomDto customDto;
+
+    }
+
+    enum SomeEnum {
+        FOO,
+        BAR
+    }
+
+    @AllArgsConstructor
+    static class CustomDto {
+        String arg;
+    }
+
+    static class CustomGen implements ICustomGeneratorArgs<CustomDto> {
+
+        String arg;
+
+        @Override
+        public CustomDto generate() {
+            return new CustomDto(arg);
+        }
+
+        @Override
+        public void setArgs(String[] args) {
+            arg = args[0];
+        }
     }
 
 }
