@@ -94,7 +94,20 @@ public class RulesGroupingTests {
                 () -> assertThat(dto.getIntSecond(), equalTo(IntegerRule.DEFAULT_MIN)),
                 () -> assertThat(dto.getDefaultGroup(), nullValue())
         );
+    }
 
+    @DisplayName("Include groups")
+    @Test
+    public void includeGroups() {
+        Dto dto = DtoGenerator.builder()
+                .includeGroups(GROUP_2, GROUP_3)
+                .build()
+                .generateDto(Dto.class);
+        assertAll(
+                () -> assertThat(dto.getIntFirst(), equalTo(IntegerRule.DEFAULT_MIN)),
+                () -> assertThat(dto.getIntSecond(), equalTo(99)),
+                () -> assertThat(dto.getDefaultGroup(), nullValue())
+        );
     }
 
     @DisplayName("List rules group")
