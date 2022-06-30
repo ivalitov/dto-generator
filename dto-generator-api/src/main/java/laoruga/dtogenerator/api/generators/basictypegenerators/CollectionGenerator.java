@@ -1,5 +1,6 @@
 package laoruga.dtogenerator.api.generators.basictypegenerators;
 
+import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.ICollectionGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
@@ -18,6 +19,7 @@ import java.util.Collection;
 @AllArgsConstructor
 public class CollectionGenerator<ITEM_TYPE> implements ICollectionGenerator<Collection<ITEM_TYPE>> {
 
+    public static int MAX_GENERATION_ATTEMPTS = 100;
     private final int minSize;
     private final int maxSize;
     private final Collection<ITEM_TYPE> listInstance;
@@ -42,8 +44,17 @@ public class CollectionGenerator<ITEM_TYPE> implements ICollectionGenerator<Coll
             default:
                 throw new IllegalStateException("Unexpected value: " + ruleRemark);
         }
+        int prevSize;
+        int ineffectiveAttempts = 0;
         while (listInstance.size() < size) {
+            prevSize = listInstance.size();
             listInstance.add(itemGenerator.generate());
+            if (prevSize == listInstance.size()) {
+                ineffectiveAttempts++;
+                if (ineffectiveAttempts == MAX_GENERATION_ATTEMPTS) {
+                    throw new DtoGeneratorException("Expected size of collection can't be reached");
+                }
+            }
         }
         return listInstance;
     }
