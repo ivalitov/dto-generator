@@ -460,7 +460,7 @@ public class DtoGenerator {
                 Annotation rule = (Annotation) Array.get(ruleAnnotationsArray, i);
                 String checkedGroup = getRuleGroup(rule);
                 if (uniqueGroups.contains(rule)) {
-                    throw new DtoGeneratorException("Rule group '" + checkedGroup + "' is repeating for field.");
+                    throw new DtoGeneratorException("Rule group '" + checkedGroup + "' is repeating for field '" + fieldName + "'");
                 } else {
                     uniqueGroups.add(rule);
                 }

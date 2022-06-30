@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Il'dar Valitov
  * Created on 31.05.2022
  */
-@DisplayName("Set Type Generators Tests")
-@Epic("SET_RULES")
+@DisplayName("Fields grouping")
+@Epic("FIELDS_GROUPING")
 public class FieldsGroupingTests {
 
     @Getter
@@ -51,7 +51,6 @@ public class FieldsGroupingTests {
         @NestedDtoRules
         DtoInner defaultInnerDto;
 
-        @IntegerRule(group = GROUP_1)
         @IntegerRule(group = GROUP_1)
         Integer firstGroupInt;
 

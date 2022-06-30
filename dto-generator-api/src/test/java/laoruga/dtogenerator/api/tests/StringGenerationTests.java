@@ -53,10 +53,10 @@ public class StringGenerationTests {
         Dto dto = DtoGenerator.builder().build().generateDto(Dto.class);
         assertAll(
                 () -> assertThat(dto.getPhoneNum(), hasLength(19)),
-                () -> assertThat(dto.getPhoneNum(), matchesRegex("[+]89 [(]\\d{3}[)] \\d{3}[-]\\d{2}-\\d{2}")),
+                () -> assertThat(dto.getPhoneNum(), matchesRegex("^[+]89 [(]\\d{3}[)] \\d{3}[-]\\d{2}-\\d{2}$")),
 
                 () -> assertThat(dto.getPhoneNumLetters(), hasLength(24)),
-                () -> assertThat(dto.getPhoneNum(), matchesRegex("[a-zA-Z] [+]89 [(]\\d{3}[)] \\d{3}[-]\\d{2}-\\d{2} [а-яА-Я]{2}"))
+                () -> assertThat(dto.getPhoneNumLetters(), matchesRegex("^[a-zA-Z] [+]89 [(]\\d{3}[)] \\d{3}[-]\\d{2}-\\d{2} [а-яёА-ЯЁ]{2}$"))
         );
         dto.getPhoneNumLetters();
         assertNotNull(dto);
@@ -128,7 +128,7 @@ public class StringGenerationTests {
                                 .charset(NUM))
                 .build().generateDto(Dto_2.class);
         assertAll(
-                () -> assertThat(dto.getString(), matchesRegex("^%ENG%[*] [(][0-9]{3}[)] [0-9]{3}[-][0-9]{2}[-][0-9]{2} [а-яА-Я]{3} [*]{3} [%]{3}$"))
+                () -> assertThat(dto.getString(), matchesRegex("^%ENG%[*] [(][0-9]{3}[)] [0-9]{3}[-][0-9]{2}[-][0-9]{2} [а-яёА-ЯЁ]{3} [*]{3} [%]{3}$"))
         );
     }
 

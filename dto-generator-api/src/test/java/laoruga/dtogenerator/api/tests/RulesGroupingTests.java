@@ -183,7 +183,7 @@ public class RulesGroupingTests {
         private Long aLong;
 
         @LocalDateTimeRule(group = GROUP_1, leftShiftDays = 0, rightShiftDays = 0)
-        @LocalDateTimeRule(leftShiftDays = 0, rightShiftDays = 1)
+        @LocalDateTimeRule(leftShiftDays = -1, rightShiftDays = 1)
         private LocalDateTime localDateTime;
 
         @ListRule(group = GROUP_1, minSize = 1, maxSize = 1)
