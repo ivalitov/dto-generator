@@ -321,13 +321,13 @@ public class GeneratorBuildersProvider {
 
     private boolean isGeneratorOverridden(String fieldName, Annotation rules) {
         return overriddenBuildersSpecificFields.containsKey(fieldName) ||
-                overriddenBuilders.containsKey(rules.getClass());
+                overriddenBuilders.containsKey(rules.annotationType());
     }
 
     private IGenerator<?> getOverriddenGenerator(String fieldName, Annotation rules) {
         return overriddenBuildersSpecificFields.getOrDefault(
                 fieldName,
-                overriddenBuilders.get(rules.getClass())
+                overriddenBuilders.get(rules.annotationType())
         ).build();
     }
 }

@@ -37,7 +37,7 @@ public class ArrearsGenerator2 implements
     }
 
     @Override
-    public void setArgs(String[] args) {
+    public ArrearsGenerator2 setArgs(String[] args) {
         if (args.length == 1) {
             arrearsCount = Integer.parseInt(args[0]);
         } else if (args.length == 2) {
@@ -45,6 +45,7 @@ public class ArrearsGenerator2 implements
         } else {
             throw new IllegalArgumentException("2 args expected, but was: " + Arrays.asList(args));
         }
+        return this;
     }
 
     @Override

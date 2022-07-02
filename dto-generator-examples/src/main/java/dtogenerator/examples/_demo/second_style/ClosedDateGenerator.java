@@ -63,8 +63,9 @@ public class ClosedDateGenerator implements ICustomGeneratorArgs<LocalDateTime>,
     }
 
     @Override
-    public void setArgs(String[] args) {
+    public ClosedDateGenerator setArgs(String[] args) {
         this.args = args;
+        return this;
     }
 
     @Override

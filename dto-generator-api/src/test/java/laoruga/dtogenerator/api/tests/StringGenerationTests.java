@@ -83,7 +83,7 @@ public class StringGenerationTests {
     @DisplayName("Generated string by mask (type chars + wildcard)")
     public void maskTypeCharsAndWildCard(String mask, String regexpCheck) {
         Dto_2 dto = DtoGenerator.builder()
-                .setGeneratorForField("string",
+                .setFieldGenerator("string",
                         BasicGeneratorsBuilders.stringBuilder()
                                 .mask(mask)
                                 .charset(NUM))
@@ -106,7 +106,7 @@ public class StringGenerationTests {
     @DisplayName("Generated string by mask (compound types)")
     public void maskDifferentCharsets(String mask, String regexpCheck) {
         Dto_2 dto = DtoGenerator.builder()
-                .setGeneratorForField("string",
+                .setFieldGenerator("string",
                         BasicGeneratorsBuilders.stringBuilder()
                                 .mask(mask)
                                 .charset(NUM))
@@ -120,7 +120,7 @@ public class StringGenerationTests {
     @DisplayName("Generated string by mask (custom wildcard and type symbols)")
     public void maskDifferentMarker() {
         Dto_2 dto = DtoGenerator.builder()
-                .setGeneratorForField("string",
+                .setFieldGenerator("string",
                         BasicGeneratorsBuilders.stringBuilder()
                                 .maskWildcard('^')
                                 .maskTypeMarker('#')

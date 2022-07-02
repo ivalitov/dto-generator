@@ -29,8 +29,9 @@ public class ClientInfoGenerator implements
     private String[] generatorArgs;
 
     @Override
-    public void setArgs(String[] args) {
+    public ClientInfoGenerator setArgs(String[] args) {
         this.generatorArgs = args;
+        return this;
     }
 
     @Override

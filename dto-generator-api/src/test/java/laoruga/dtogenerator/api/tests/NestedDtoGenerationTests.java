@@ -136,8 +136,6 @@ public class NestedDtoGenerationTests {
         Dto dto = DtoGenerator.builder()
                 .setRuleRemarkForField("dtoNested.intDefaultRules", MIN_VALUE)
                 .setRuleRemarkForField("dtoNested.intRightBound", MAX_VALUE)
-                .setGeneratorForField("dtoNested.intPrimitiveDefaultRules",
-                        BasicGeneratorsBuilders.integerBuilder().maxValue(5).minValue(5))
                 .build().generateDto(Dto.class);
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
@@ -145,7 +143,8 @@ public class NestedDtoGenerationTests {
 
         assertThat(dto.getDtoNested().getIntDefaultRules(), equalTo(IntegerRule.DEFAULT_MIN));
         assertThat(dto.getDtoNested().getIntRightBound(), equalTo(maxValueRightBound));
-        assertThat(dto.getDtoNested().getIntPrimitiveDefaultRules(), equalTo(5));
+        assertThat(dto.getDtoNested().getIntPrimitiveDefaultRules(), both(
+                greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX)));
 
         simpleIntegerGenerationAssertions(dto.getDtoNested());
     }

@@ -230,8 +230,9 @@ public class RulesGroupingTests {
         }
 
         @Override
-        public void setArgs(String[] args) {
+        public CustomGen setArgs(String[] args) {
             arg = args[0];
+            return this;
         }
     }
 

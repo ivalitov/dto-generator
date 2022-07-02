@@ -1,7 +1,6 @@
 package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.constants.BasicRuleRemark;
-import laoruga.dtogenerator.api.constants.Group;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
@@ -60,14 +59,14 @@ public class DtoGeneratorBuilder {
         this.fieldGroupFilter = toCopy.fieldGroupFilter;
     }
 
-    public DtoGeneratorBuilder overrideBasicGenerator(@NonNull Class<? extends Annotation> rules,
-                                                      @NonNull IGeneratorBuilder newGeneratorBuilder) throws DtoGeneratorException {
+    public DtoGeneratorBuilder setBasicGenerator(@NonNull Class<? extends Annotation> rules,
+                                                 @NonNull IGeneratorBuilder newGeneratorBuilder) throws DtoGeneratorException {
         gensBuildersProvider.overrideGenerator(rules, newGeneratorBuilder);
         return this;
     }
 
-    public DtoGeneratorBuilder setGeneratorForField(@NonNull String fieldName,
-                                                    @NonNull IGeneratorBuilder explicitGenerator) throws DtoGeneratorException {
+    public DtoGeneratorBuilder setFieldGenerator(@NonNull String fieldName,
+                                                 @NonNull IGeneratorBuilder explicitGenerator) throws DtoGeneratorException {
         Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
         DtoGeneratorBuilder builder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
         builder.gensBuildersProvider.setGeneratorForFields(fieldAndPath.getFirst(), explicitGenerator);
