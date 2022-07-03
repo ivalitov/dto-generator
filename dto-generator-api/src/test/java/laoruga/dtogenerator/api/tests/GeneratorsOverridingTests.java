@@ -3,6 +3,7 @@ package laoruga.dtogenerator.api.tests;
 import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
+import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.rules.IntegerRule;
 import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
 import laoruga.dtogenerator.api.markup.rules.StringRule;
@@ -10,6 +11,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -35,6 +39,8 @@ public class GeneratorsOverridingTests {
 
         @NestedDtoRules
         InnerDto innerDto;
+
+        Map<String, Integer> stringIntegerMap;
     }
 
     @Getter
@@ -70,6 +76,7 @@ public class GeneratorsOverridingTests {
         assertAll(
                 () -> assertThat(dto.getInteger(), equalTo(123)),
                 () -> assertThat(dto.getString(), notNullValue()),
+                () -> assertThat(dto.getStringIntegerMap(), nullValue()),
                 () -> assertThat(dto.getInnerDto().getInnerInteger(), equalTo(123)),
                 () -> assertThat(dto.getInnerDto().getInnerString(), notNullValue())
         );
@@ -81,11 +88,17 @@ public class GeneratorsOverridingTests {
         Dto dto = DtoGenerator.builder()
                 .setFieldGenerator("integer", () -> new NumberGenerator().setArgs("123"))
                 .setFieldGenerator("innerDto.innerInteger", () -> new NumberGenerator().setArgs("456"))
+                .setFieldGenerator("stringIntegerMap", () -> (IGenerator<Map<String, Integer>>) () -> {
+                    Map<String, Integer> map = new HashMap<>();
+                    map.put("1", 1);
+                    return map;
+                })
                 .build().generateDto(Dto.class);
 
         assertAll(
                 () -> assertThat(dto.getInteger(), equalTo(123)),
                 () -> assertThat(dto.getString(), notNullValue()),
+                () -> assertThat(dto.getStringIntegerMap().get("1"), equalTo(1)),
                 () -> assertThat(dto.getInnerDto().getInnerInteger(), equalTo(456)),
                 () -> assertThat(dto.getInnerDto().getInnerString(), notNullValue())
         );

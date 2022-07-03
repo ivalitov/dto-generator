@@ -35,6 +35,7 @@ public class GeneratorBuildersProvider {
     @Getter(AccessLevel.PACKAGE)
     private final Map<Class<? extends Annotation>, IGeneratorBuilder> overriddenBuilders;
     private final Map<String, IGeneratorBuilder> overriddenBuildersSpecificFields = new HashMap<>();
+    private final Map<String, IGeneratorBuilder> overriddenCollectionBuildersSpecificFields = new HashMap<>();
 
     GeneratorBuildersProvider(GeneratorRemarksProvider generatorRemarksProvider) {
         this.generatorRemarksProvider = generatorRemarksProvider;
@@ -51,7 +52,7 @@ public class GeneratorBuildersProvider {
         return generatorRemarksProvider;
     }
 
-    void setGeneratorForFields(String fieldName, IGeneratorBuilder genBuilder) throws DtoGeneratorException {
+    void setGeneratorForField(String fieldName, IGeneratorBuilder genBuilder) throws DtoGeneratorException {
         if (overriddenBuildersSpecificFields.containsKey(fieldName)) {
             throw new DtoGeneratorException("Generator has already been explicitly added for field: '" + fieldName + "'");
         }
@@ -320,8 +321,12 @@ public class GeneratorBuildersProvider {
      */
 
     private boolean isGeneratorOverridden(String fieldName, Annotation rules) {
-        return overriddenBuildersSpecificFields.containsKey(fieldName) ||
+        return isGeneratorWasExplicitlySet(fieldName) ||
                 overriddenBuilders.containsKey(rules.annotationType());
+    }
+
+    boolean isGeneratorWasExplicitlySet(String fieldName) {
+        return overriddenBuildersSpecificFields.containsKey(fieldName);
     }
 
     private IGenerator<?> getOverriddenGenerator(String fieldName, Annotation rules) {

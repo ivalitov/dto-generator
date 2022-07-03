@@ -69,7 +69,7 @@ public class DtoGeneratorBuilder {
                                                  @NonNull IGeneratorBuilder explicitGenerator) throws DtoGeneratorException {
         Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
         DtoGeneratorBuilder builder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
-        builder.gensBuildersProvider.setGeneratorForFields(fieldAndPath.getFirst(), explicitGenerator);
+        builder.gensBuildersProvider.setGeneratorForField(fieldAndPath.getFirst(), explicitGenerator);
         return this;
     }
 

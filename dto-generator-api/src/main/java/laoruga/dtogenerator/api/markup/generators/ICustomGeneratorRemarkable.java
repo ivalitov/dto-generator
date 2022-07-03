@@ -25,5 +25,4 @@ public interface ICustomGeneratorRemarkable<GENERATED_TYPE> extends ICustomGener
         }
         return null;
     }
-
 }

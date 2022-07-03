@@ -214,9 +214,10 @@ public class DtoGenerator {
             Class<?> fieldType = field.getType();
             String fieldName = field.getName();
             Pair<RulesType, RuleWrapper> rulesInfo = checkAndWrapRulesInfo(field);
+            RulesType rulesType = rulesInfo.getFirst();
             RuleWrapper rulesInfoWrapper = rulesInfo.getSecond();
 
-            switch (rulesInfo.getFirst()) {
+            switch (rulesType) {
                 case BASIC:
                     generator = getGenBuildersProvider().getBasicTypeGenerator(field, rulesInfoWrapper.getItemGenerationRules());
                     break;
@@ -274,6 +275,7 @@ public class DtoGenerator {
         COLLECTION_BASIC,
         COLLECTION_CUSTOM,
         NOT_ANNOTATED,
+        NOT_ANNOTATED_AND_EXPLICITLY_SET,
         SKIP
     }
 
@@ -289,7 +291,9 @@ public class DtoGenerator {
         Class<?> fieldType = field.getType();
 
         if (annotations.length == 0) {
-            return new Pair<>(RulesType.NOT_ANNOTATED, null);
+           return getGenBuildersProvider().isGeneratorWasExplicitlySet(fieldName) ?
+                   new Pair<>(RulesType.NOT_ANNOTATED_AND_EXPLICITLY_SET, null) :
+                   new Pair<>(RulesType.NOT_ANNOTATED, null);
         }
 
         // extracting rules annotations

@@ -10,5 +10,4 @@ public interface ICustomGeneratorDtoDependent<GENERATED_TYPE, DTO_TYPE> extends 
     void setDto(DTO_TYPE generatedDto);
 
     boolean isDtoReady();
-
 }
