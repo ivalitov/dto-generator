@@ -41,7 +41,7 @@ public class IntegerGenerator implements IGenerator<Integer> {
         return new IntegerGeneratorBuilder();
     }
 
-    public static final class IntegerGeneratorBuilder implements IGeneratorBuilder {
+    public static final class IntegerGeneratorBuilder implements IGeneratorBuilder<IGenerator<?>> {
         private int maxValue = IntegerRule.DEFAULT_MAX;
         private int minValue = IntegerRule.DEFAULT_MIN;
         private IRuleRemark ruleRemark = IntegerRule.DEFAULT_RULE_REMARK;

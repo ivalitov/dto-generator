@@ -44,7 +44,7 @@ public class CustomDtoGenerationTests {
     @Feature("CUSTOM_RULES")
     @DisplayName("Custom Dto Generation With Dependent Dto")
     public void customDtoGenerationWithDependentDto() {
-        ClientDto dto = DtoGenerator.builder().build().generateDto(ClientDto.class);
+        ClientDto dto = DtoGenerator.builder(ClientDto.class).build().generateDto();
         assertNotNull(dto);
         baseAssertions(dto);
     }
@@ -62,12 +62,12 @@ public class CustomDtoGenerationTests {
     @DisplayName("Custom Dto Generation With Remarks")
     @MethodSource("customDtoGenerationWithRemarksTestData")
     public void customDtoGenerationWithRemarks(ClientType clientType, DocType docType) {
-        DtoGeneratorBuilder builder = DtoGenerator.builder();
+        DtoGeneratorBuilder<ClientDto> builder = DtoGenerator.builder(ClientDto.class);
         builder.addRuleRemarkForFields(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
         if (docType != null) {
             builder.addRuleRemarkForFields(ClientRemark.DOCUMENT.wrap(docType.name()));
         }
-        ClientDto dto = builder.build().generateDto(ClientDto.class);
+        ClientDto dto = builder.build().generateDto();
 
         baseAssertions(dto);
         assertEquals(clientType, dto.getClientInfo().getClientType());
@@ -85,12 +85,12 @@ public class CustomDtoGenerationTests {
     @DisplayName("Custom Dto Generation With Args")
     @MethodSource("customDtoGenerationWithRemarksTestData")
     public void customDtoGenerationWithDefaultArgs(ClientType clientType, DocType docType) {
-        DtoGeneratorBuilder builder = DtoGenerator.builder();
+        DtoGeneratorBuilder<ClientDto> builder = DtoGenerator.builder(ClientDto.class);
         builder.addRuleRemarkForFields(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
         if (docType != null) {
             builder.addRuleRemarkForFields(ClientRemark.DOCUMENT.wrap(docType.name()));
         }
-        ClientDto dto = builder.build().generateDto(ClientDto.class);
+        ClientDto dto = builder.build().generateDto();
 
         baseAssertions(dto);
         assertEquals(clientType, dto.getClientInfo().getClientType());

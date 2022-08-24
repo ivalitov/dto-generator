@@ -12,6 +12,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(FIELD)
 @Rules
 public @interface CustomGenerators {
-
     CustomGenerator[] value();
 }

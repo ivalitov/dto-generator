@@ -103,9 +103,9 @@ public class FieldsGroupingTests {
     @Test
     @DisplayName("Generating required fields only")
     public void requiredGroup() {
-        Dto dto = DtoGenerator.builder()
+        Dto dto = DtoGenerator.builder(Dto.class)
                 .includeGroups(REQUIRED)
-                .build().generateDto(Dto.class);
+                .build().generateDto();
 
         assertNotNull(dto);
         assertAll(
@@ -134,9 +134,9 @@ public class FieldsGroupingTests {
     @Test
     @DisplayName("Generating GROUP_1 fields only")
     public void firstGroup() {
-        Dto dto = DtoGenerator.builder()
+        Dto dto = DtoGenerator.builder(Dto.class)
                 .includeGroups(GROUP_1)
-                .build().generateDto(Dto.class);
+                .build().generateDto();
 
         assertNotNull(dto);
         assertAll(
@@ -157,9 +157,9 @@ public class FieldsGroupingTests {
     @Test
     @DisplayName("Generating required and GROUP_1 fields only")
     public void requiredAndFirstGroup() {
-        Dto dto = DtoGenerator.builder()
+        Dto dto = DtoGenerator.builder(Dto.class)
                 .includeGroups(REQUIRED, GROUP_1)
-                .build().generateDto(Dto.class);
+                .build().generateDto();
 
         assertNotNull(dto);
 

@@ -71,7 +71,7 @@ public class ReflectionUtils {
         }
     }
 
-    public static Object createInstance(Class<?> dtoClass) {
+    public static <T> T createInstance(Class<T> dtoClass) {
         try {
             Constructor<?>[] declaredConstructors = dtoClass.getDeclaredConstructors();
             if (declaredConstructors.length == 0) {
@@ -90,7 +90,7 @@ public class ReflectionUtils {
             constructor.setAccessible(true);
             Object instance = constructor.newInstance();
             constructor.setAccessible(isAccessible);
-            return instance;
+            return (T) instance;
         } catch (InstantiationException ie) {
             throw new DtoGeneratorException("Failed to instantiate class: '" + dtoClass + "'. " +
                     "Maybe no-args constructor was not found.", ie);

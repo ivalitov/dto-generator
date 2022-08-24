@@ -60,7 +60,7 @@ public class CollectionGenerator<ITEM_TYPE> implements ICollectionGenerator<Coll
     }
 
     @Override
-    public IGenerator<?> getInnerGenerator() {
+    public IGenerator<?> getItemGenerator() {
         return itemGenerator;
     }
 
@@ -68,7 +68,7 @@ public class CollectionGenerator<ITEM_TYPE> implements ICollectionGenerator<Coll
         return new CollectionGeneratorBuilder<>();
     }
 
-    public static final class CollectionGeneratorBuilder<ITEM_TYPE> implements IGeneratorBuilder {
+    public static final class CollectionGeneratorBuilder<ITEM_TYPE> implements IGeneratorBuilder<ICollectionGenerator<?>> {
         private int minSize;
         private int maxSize;
         private Collection<ITEM_TYPE> listInstance;

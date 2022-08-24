@@ -55,7 +55,7 @@ public class ListGenerationTests {
     @Test
     @DisplayName("List Of Integer Generation (default rules params)")
     public void listOfIntegerWithDefaultRulesPrams() {
-        ClientDto dto = DtoGenerator.builder().build().generateDto(ClientDto.class);
+        ClientDto dto = DtoGenerator.builder(ClientDto.class).build().generateDto();
 
         assertNotNull(dto);
         List<Integer> numbers = dto.getArrayListIntegerRules();
@@ -71,7 +71,7 @@ public class ListGenerationTests {
     @Test
     @DisplayName("List Of Integer Generation (explicit rules params)")
     public void listOfIntegerWithExplicitRulesPrams() {
-        ClientDto dto = DtoGenerator.builder().build().generateDto(ClientDto.class);
+        ClientDto dto = DtoGenerator.builder(ClientDto.class).build().generateDto();
 
         assertNotNull(dto);
         List<Integer> numbers = dto.getLinkedListExplicitRules();
@@ -89,7 +89,7 @@ public class ListGenerationTests {
     @Test
     @DisplayName("List Of Strings Generation (explicit rules params)")
     public void listOfStingsWithExplicitRulesPrams() {
-        DtoList dto = DtoGenerator.builder().build().generateDto(DtoList.class);
+        DtoList dto = DtoGenerator.builder(DtoList.class).build().generateDto();
 
         assertNotNull(dto);
 
@@ -149,9 +149,8 @@ public class ListGenerationTests {
     @Feature("NEGATIVE_TESTS")
     @DisplayName("Wildcard generic type")
     public void wildcardGenericType() {
-        DtoGenerator generator = DtoGenerator.builder().build();
-        assertThrows(DtoGeneratorException.class,
-                () -> generator.generateDto(DtoWithWildcardList.class));
+        DtoGenerator<DtoWithWildcardList> generator = DtoGenerator.builder(DtoWithWildcardList.class).build();
+        assertThrows(DtoGeneratorException.class, generator::generateDto);
 
         Map<String, Exception> errorsMap = getErrorsMap(generator);
 
@@ -164,9 +163,8 @@ public class ListGenerationTests {
     @Feature("NEGATIVE_TESTS")
     @DisplayName("Raw list")
     public void rawList() {
-        DtoGenerator generator = DtoGenerator.builder().build();
-        assertThrows(DtoGeneratorException.class,
-                () -> generator.generateDto(DtoWithRawList.class));
+        DtoGenerator<DtoWithRawList> generator = DtoGenerator.builder(DtoWithRawList.class).build();
+        assertThrows(DtoGeneratorException.class, generator::generateDto);
 
         Map<String, Exception> errorsMap = getErrorsMap(generator);
 
@@ -179,12 +177,11 @@ public class ListGenerationTests {
     @Feature("NEGATIVE_TESTS")
     @DisplayName("List Of Collection")
     public void listOfCollection() {
-        DtoGenerator generator = DtoGenerator.builder().build();
-        assertThrows(DtoGeneratorException.class,
-                () -> generator.generateDto(DtoWithListOfCollections.class));
+        DtoGenerator<DtoWithListOfCollections> generator = DtoGenerator.builder(DtoWithListOfCollections.class).build();
+        assertThrows(DtoGeneratorException.class, generator::generateDto);
 
         Map<String, Exception> errorsMap = getErrorsMap(generator);
-        final String ERROR_PART = "There is also generation rules annotation expected";
+        final String ERROR_PART = "depended on types: '[COLLECTION]";
 
         assertEquals(2, errorsMap.size());
         assertTrue(errorsMap.containsKey("listOfSet"));

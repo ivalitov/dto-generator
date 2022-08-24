@@ -29,4 +29,8 @@ class FieldGroupFilter {
         return include.contains(group);
     }
 
+    int getGroupsCount() {
+        return include.size();
+    }
+
 }

@@ -69,9 +69,9 @@ public class GeneratorsOverridingTests {
     @Test
     @DisplayName("Basic generator overridden")
     public void basicGeneratorOverridden() {
-        Dto dto = DtoGenerator.builder()
-                .setBasicGenerator(IntegerRule.class, () -> new NumberGenerator().setArgs("123")).build()
-                .generateDto(Dto.class);
+        Dto dto = DtoGenerator.builder(Dto.class)
+                .setGenerator(IntegerRule.class, () -> new NumberGenerator().setArgs("123")).build()
+                .generateDto();
 
         assertAll(
                 () -> assertThat(dto.getInteger(), equalTo(123)),
@@ -85,15 +85,14 @@ public class GeneratorsOverridingTests {
     @Test
     @DisplayName("Field generator overridden")
     public void fieldGeneratorOverridden() {
-        Dto dto = DtoGenerator.builder()
-                .setFieldGenerator("integer", () -> new NumberGenerator().setArgs("123"))
-                .setFieldGenerator("innerDto.innerInteger", () -> new NumberGenerator().setArgs("456"))
-                .setFieldGenerator("stringIntegerMap", () -> (IGenerator<Map<String, Integer>>) () -> {
+        Dto dto = DtoGenerator.builder(Dto.class)
+                .setGeneratorForField("innerDto.innerInteger", () -> new NumberGenerator().setArgs("456"))
+                .setGeneratorForField("stringIntegerMap", () -> (IGenerator<Map<String, Integer>>) () -> {
                     Map<String, Integer> map = new HashMap<>();
                     map.put("1", 1);
                     return map;
                 })
-                .build().generateDto(Dto.class);
+                .build().generateDto();
 
         assertAll(
                 () -> assertThat(dto.getInteger(), equalTo(123)),

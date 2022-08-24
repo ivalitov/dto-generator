@@ -55,7 +55,7 @@ public class EnumGenerator implements IGenerator<Enum<?>> {
         return new EnumGeneratorBuilder();
     }
 
-    public static final class EnumGeneratorBuilder implements IGeneratorBuilder {
+    public static final class EnumGeneratorBuilder implements IGeneratorBuilder<IGenerator<?>> {
         private String[] possibleEnumNames;
         private Class<? extends Enum<?>> enumClass;
         private IRuleRemark ruleRemark;

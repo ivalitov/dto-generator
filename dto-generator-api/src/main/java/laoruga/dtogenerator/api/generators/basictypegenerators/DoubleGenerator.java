@@ -45,7 +45,7 @@ public class DoubleGenerator implements IGenerator<Double> {
         return new DoubleGeneratorBuilder();
     }
 
-    public static final class DoubleGeneratorBuilder implements IGeneratorBuilder {
+    public static final class DoubleGeneratorBuilder implements IGeneratorBuilder<IGenerator<?>> {
         private double maxValue = DoubleRule.DEFAULT_MAX;
         private double minValue = DoubleRule.DEFAULT_MIN;
         private int precision = DoubleRule.DEFAULT_PRECISION;

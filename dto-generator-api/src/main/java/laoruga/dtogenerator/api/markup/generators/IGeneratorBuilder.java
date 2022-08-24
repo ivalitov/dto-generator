@@ -5,7 +5,8 @@ package laoruga.dtogenerator.api.markup.generators;
  * Created on 18.05.2022
  */
 
-public interface IGeneratorBuilder {
+@FunctionalInterface
+public interface IGeneratorBuilder<GENERATOR_TYPE extends IGenerator<?>> {
 
-    IGenerator<?> build();
+    GENERATOR_TYPE build();
 }

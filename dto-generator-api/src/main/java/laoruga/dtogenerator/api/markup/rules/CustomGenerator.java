@@ -16,6 +16,8 @@ import static laoruga.dtogenerator.api.constants.Group.DEFAULT;
 @Repeatable(CustomGenerators.class)
 public @interface CustomGenerator {
 
+    Class<?>[] APPLICABLE_TYPES = {Object.class};
+
     Class<?> generatorClass();
 
     String[] args() default {};

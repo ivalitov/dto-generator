@@ -136,7 +136,7 @@ public class StringGenerator implements IGenerator<String> {
         return new StringGeneratorBuilder();
     }
 
-    public static final class StringGeneratorBuilder implements IGeneratorBuilder {
+    public static final class StringGeneratorBuilder implements IGeneratorBuilder<IGenerator<?>> {
         private int maxLength = StringRule.DEFAULT_MAX_SYMBOLS_NUMBER;
         private int minLength = StringRule.DEFAULT_MIN_SYMBOLS_NUMBER;
         private CharSet[] charset = StringRule.DEFAULT_CHARSET;

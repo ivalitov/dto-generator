@@ -39,7 +39,7 @@ public class LongGenerator implements IGenerator<Long> {
         return new LongGeneratorBuilder();
     }
 
-    public static final class LongGeneratorBuilder implements IGeneratorBuilder {
+    public static final class LongGeneratorBuilder implements IGeneratorBuilder<IGenerator<?>> {
         private long maxValue;
         private long minValue;
         private IRuleRemark ruleRemark;

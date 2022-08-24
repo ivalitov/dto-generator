@@ -3,26 +3,17 @@ package laoruga.dtogenerator.api;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.ICollectionGenerator;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
-import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
-import laoruga.dtogenerator.api.markup.rules.*;
-import laoruga.dtogenerator.api.markup.rules.meta.Rule;
-import laoruga.dtogenerator.api.markup.rules.meta.RuleForCollection;
-import laoruga.dtogenerator.api.markup.rules.meta.Rules;
-import laoruga.dtogenerator.api.markup.rules.meta.RulesForCollection;
-import laoruga.dtogenerator.api.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.math3.util.Pair;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -34,47 +25,36 @@ import static laoruga.dtogenerator.api.util.ReflectionUtils.createInstance;
  */
 
 @Slf4j
-public class DtoGenerator {
+public class DtoGenerator<DTO_TYPE> {
 
-    private Object dtoInstance;
+    private final DTO_TYPE dtoInstance;
 
     @Getter(AccessLevel.PACKAGE)
-    private final String[] fieldsFromRoot;
-    @Getter(AccessLevel.PACKAGE)
-    private final GeneratorBuildersProvider genBuildersProvider;
+    private final TypeGeneratorsProvider typeGeneratorsProvider;
     @Getter(AccessLevel.PACKAGE)
     private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
     @Getter(AccessLevel.PACKAGE)
-    private final FieldGroupFilter fieldsGroupFilter;
-    @Getter(AccessLevel.PACKAGE)
-    private final DtoGeneratorBuilder builderInstance;
+    private final DtoGeneratorBuilder<DTO_TYPE> builderInstance;
+
 
     private final Map<Field, Exception> errors = new HashMap<>();
 
-    protected DtoGenerator(String[] fieldsFromRoot,
-                           GeneratorBuildersProvider generatorBuildersProvider,
-                           FieldGroupFilter fieldsGroupFilter,
-                           DtoGeneratorBuilder dtoGeneratorBuilder) {
-        this.fieldsFromRoot = fieldsFromRoot;
-        this.genBuildersProvider = generatorBuildersProvider;
-        this.fieldsGroupFilter = fieldsGroupFilter;
+    protected DtoGenerator(TypeGeneratorsProvider typeGeneratorsProvider, DtoGeneratorBuilder<DTO_TYPE> dtoGeneratorBuilder) {
+        this.typeGeneratorsProvider = typeGeneratorsProvider;
         this.builderInstance = dtoGeneratorBuilder;
+        this.dtoInstance = (DTO_TYPE) typeGeneratorsProvider.getDtoInstance();
     }
 
-    public static DtoGeneratorBuilder builder() {
-        return new DtoGeneratorBuilder();
+    public static <T> DtoGeneratorBuilder<T> builder(Class<T> dtoClass) {
+        return new DtoGeneratorBuilder<>(createInstance(dtoClass));
     }
 
-    public <T> T generateDto(Class<T> dtoClass) {
-        dtoInstance = createInstance(dtoClass);
-        prepareGeneratorsRecursively(dtoClass);
-        applyGenerators();
-        return (T) dtoInstance;
+    public static <T> DtoGeneratorBuilder<T> builder(T dtoInstance) {
+        return new DtoGeneratorBuilder<>(dtoInstance);
     }
 
-    public <T> T generateDto(T dtoInstance) {
-        this.dtoInstance = dtoInstance;
-        prepareGenerators(dtoInstance.getClass());
+    public DTO_TYPE generateDto() {
+        prepareGeneratorsRecursively(dtoInstance.getClass());
         applyGenerators();
         return dtoInstance;
     }
@@ -134,7 +114,7 @@ public class DtoGenerator {
                     }
                     // if it's collection generator + dto dependent generator - checking if dto is ready for this generator
                     if (generator instanceof ICollectionGenerator) {
-                        IGenerator<?> innerGenerator = ((ICollectionGenerator<?>) generator).getInnerGenerator();
+                        IGenerator<?> innerGenerator = ((ICollectionGenerator<?>) generator).getItemGenerator();
                         if (innerGenerator instanceof ICustomGeneratorDtoDependent) {
                             if (doesDtoDependentGeneratorNotReady(innerGenerator, attempts, maxAttempts)) {
                                 continue;
@@ -178,7 +158,12 @@ public class DtoGenerator {
 
     void prepareGenerators(Class<?> dtoClass) {
         for (Field field : dtoClass.getDeclaredFields()) {
-            IGenerator<?> generator = prepareGenerator(field);
+            IGenerator<?> generator = null;
+            try {
+                generator = getTypeGeneratorsProvider().getGenerator(field);
+            } catch (Exception e) {
+                errors.put(field, e);
+            }
             if (generator != null) {
                 getFieldGeneratorMap().put(field, generator);
             }
@@ -201,287 +186,4 @@ public class DtoGenerator {
             log.debug(getFieldGeneratorMap().size() + " generators was created for fields: " + getFieldGeneratorMap().keySet());
         }
     }
-
-    @Value
-    static class RuleWrapper {
-        Annotation collectionGenerationRules;
-        Annotation itemGenerationRules;
-    }
-
-    IGenerator<?> prepareGenerator(Field field) {
-        IGenerator<?> generator = null;
-        try {
-            Class<?> fieldType = field.getType();
-            String fieldName = field.getName();
-            Pair<RulesType, RuleWrapper> rulesInfo = checkAndWrapRulesInfo(field);
-            RulesType rulesType = rulesInfo.getFirst();
-            RuleWrapper rulesInfoWrapper = rulesInfo.getSecond();
-
-            switch (rulesType) {
-                case BASIC:
-                    generator = getGenBuildersProvider().getBasicTypeGenerator(field, rulesInfoWrapper.getItemGenerationRules());
-                    break;
-                case CUSTOM:
-                    generator = getGenBuildersProvider().getCustomGenerator(rulesInfoWrapper.getItemGenerationRules(), dtoInstance);
-                    break;
-                case NESTED:
-                    generator = getGenBuildersProvider().getNestedDtoGenerator(field, getFieldsFromRoot(), getBuilderInstance());
-                    break;
-                case COLLECTION_BASIC:
-                    IGenerator<?> collectionItemGenerator = getGenBuildersProvider().getBasicTypeGenerator(
-                            field.getName() + " " + field.getGenericType().getClass(),
-                            ReflectionUtils.getGenericType(field),
-                            rulesInfoWrapper.getItemGenerationRules());
-                    generator = getGenBuildersProvider().getCollectionTypeGenerator(
-                            fieldName, fieldType,
-                            rulesInfoWrapper.getCollectionGenerationRules(),
-                            collectionItemGenerator);
-                    break;
-                case COLLECTION_CUSTOM:
-                    collectionItemGenerator = getGenBuildersProvider().getCustomGenerator(
-                            rulesInfoWrapper.getItemGenerationRules(), dtoInstance);
-                    generator = getGenBuildersProvider().getCollectionTypeGenerator(
-                            fieldName, fieldType,
-                            rulesInfoWrapper.getCollectionGenerationRules(),
-                            collectionItemGenerator);
-                    break;
-                case NOT_ANNOTATED:
-                case SKIP:
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + rulesInfo);
-            }
-        } catch (Exception e) {
-            errors.put(field, e);
-        }
-        prepareCustomRemarks(generator);
-        return generator;
-    }
-
-    void prepareCustomRemarks(IGenerator<?> generator) {
-        if (generator instanceof ICustomGeneratorRemarkable) {
-            ICustomGeneratorRemarkable<?> remarkableGenerator = (ICustomGeneratorRemarkable<?>) generator;
-            if (getGenBuildersProvider().getGeneratorRemarksProvider().isCustomRuleRemarkExists(remarkableGenerator)) {
-                remarkableGenerator.setRuleRemarks(getGenBuildersProvider().getGeneratorRemarksProvider()
-                        .getCustomRuleRemarks(remarkableGenerator));
-            }
-        }
-    }
-
-    enum RulesType {
-        BASIC,
-        CUSTOM,
-        NESTED,
-        COLLECTION_BASIC,
-        COLLECTION_CUSTOM,
-        NOT_ANNOTATED,
-        NOT_ANNOTATED_AND_EXPLICITLY_SET,
-        SKIP
-    }
-
-    /**
-     * Correctness checks and evaluation of field's annotations type.
-     *
-     * @param field field to check
-     * @return type field's annotations
-     */
-    private Pair<RulesType, RuleWrapper> checkAndWrapRulesInfo(Field field) {
-        Annotation[] annotations = field.getDeclaredAnnotations();
-        String fieldName = field.getName();
-        Class<?> fieldType = field.getType();
-
-        if (annotations.length == 0) {
-           return getGenBuildersProvider().isGeneratorWasExplicitlySet(fieldName) ?
-                   new Pair<>(RulesType.NOT_ANNOTATED_AND_EXPLICITLY_SET, null) :
-                   new Pair<>(RulesType.NOT_ANNOTATED, null);
-        }
-
-        // extracting rules annotations
-
-        Annotation rule = null;
-        boolean isRulesArray = false;
-        String ruleGroup;
-
-        Annotation collectionRule = null;
-        boolean isCollectionRulesArray = false;
-        String collectionRuleGroup = null;
-
-        for (Annotation annotation : annotations) {
-            if (isItRule(annotation)) {
-                if (rule != null) {
-                    throw new DtoGeneratorException("Field '" + fieldName + "' annotated with different type rules annotations");
-                }
-                rule = annotation;
-            } else if (isItRules(annotation)) {
-                if (rule != null) {
-                    throw new DtoGeneratorException("Field '" + fieldName + "' annotated more then one rules annotation");
-                }
-                isRulesArray = true;
-                rule = annotation;
-            } else if (isItCollectionRule(annotation)) {
-                if (collectionRule != null) {
-                    throw new DtoGeneratorException("Field '" + fieldName + "' annotated with more then one collection rules annotations");
-                }
-                collectionRule = annotation;
-            } else if (isItCollectionRules(annotation)) {
-                if (collectionRule != null) {
-                    throw new DtoGeneratorException("Field '" + fieldName + "' annotated more then one collection rules annotation");
-                }
-                isCollectionRulesArray = true;
-                collectionRule = annotation;
-            }
-        }
-        if (rule == null && collectionRule == null) {
-            return new Pair<>(RulesType.NOT_ANNOTATED, null);
-        } else if (rule == null) {
-            throw new DtoGeneratorException("Field '" + fieldName + "' annotated with collection generation rules, " +
-                    "but not annotated with collection's item generation rules. There is also generation rules annotation expected.");
-        }
-
-        // selecting from annotation arrays
-
-        if (isRulesArray) {
-            Pair<String, Annotation> groupAndRule = getRuleByGroupOrNull(rule, fieldName);
-            ruleGroup = groupAndRule == null ? null : groupAndRule.getFirst();
-            rule = groupAndRule == null ? null : groupAndRule.getSecond();
-        } else {
-            ruleGroup = getRuleGroup(rule);
-        }
-
-        if (isCollectionRulesArray) {
-            Pair<String, Annotation> groupAndRule = getRuleByGroupOrNull(collectionRule, fieldName);
-            collectionRuleGroup = groupAndRule == null ? null : groupAndRule.getFirst();
-            collectionRule = groupAndRule == null ? null : groupAndRule.getSecond();
-        } else if (collectionRule != null) {
-            collectionRuleGroup = getRuleGroup(collectionRule);
-        }
-
-        if (rule == null && collectionRule == null) {
-            return new Pair<>(RulesType.SKIP, null);
-        }
-
-        if (rule == null) {
-            throw new DtoGeneratorException("Item rules exists, but Collection rules missed for the field '" + fieldName + "'");
-        }
-
-        // check if collection's group and item's group are equal
-
-        if (collectionRule != null) {
-            if (!ruleGroup.equals(collectionRuleGroup)) {
-                throw new DtoGeneratorException("Rules annotations not matched with passed include group filters.\n" +
-                        "Collection and item rules groups have matched with different include filters.\n" +
-                        "Item group: '" + ruleGroup + "'\n" +
-                        "Collection group: '" + collectionRuleGroup + "'\n" +
-                        "Rule: '" + rule + "'\n" +
-                        "Collection rule: '" + collectionRule + "'");
-            }
-        }
-
-        if (!getFieldsGroupFilter().isContainsIncludeGroup(ruleGroup)) {
-            return new Pair<>(RulesType.SKIP, null);
-        }
-
-        // selecting rules type
-
-        if (collectionRule != null) {
-            if (isItCustomRule(rule)) {
-                return new Pair<>(RulesType.COLLECTION_CUSTOM, new RuleWrapper(collectionRule, rule));
-            } else {
-                return new Pair<>(RulesType.COLLECTION_BASIC, new RuleWrapper(collectionRule, rule));
-            }
-        } else {
-            if (isItCustomRule(rule)) {
-                return new Pair<>(RulesType.CUSTOM, new RuleWrapper(null, rule));
-            }
-            if (isItNestedRule(rule)) {
-                return new Pair<>(RulesType.NESTED, new RuleWrapper(null, rule));
-            }
-            if (!checkGeneratorCompatibility(fieldType, rule)) {
-                throw new DtoGeneratorException("Field '" + fieldName + "' annotated with inappropriate generation " +
-                        "rule annotation: '" + rule.annotationType() + "'.");
-            }
-            return new Pair<>(RulesType.BASIC, new RuleWrapper(null, rule));
-        }
-    }
-
-    private static boolean checkGeneratorCompatibility(Class<?> fieldType, Annotation rules) {
-        try {
-            Class<? extends Annotation> rulesAnnotationClass = rules.annotationType();
-            Class<?>[] applicableTypes = (Class<?>[]) rulesAnnotationClass.getField("APPLICABLE_TYPES")
-                    .get(rulesAnnotationClass);
-            for (Class<?> applicableType : applicableTypes) {
-                if (applicableType == fieldType ||
-                        fieldType.isAssignableFrom(applicableType) || applicableType.isAssignableFrom(fieldType)) {
-                    return true;
-                }
-            }
-        } catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
-            throw new DtoGeneratorException("Unexpected exception. Can't get APPLICABLE_TYPES from rules annotation", e);
-        }
-        return false;
-    }
-
-    private static boolean isItCollectionRule(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType().getDeclaredAnnotation(RuleForCollection.class) != null;
-    }
-
-    private static boolean isItCollectionRules(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType().getDeclaredAnnotation(RulesForCollection.class) != null;
-    }
-
-    private static boolean isItCustomRule(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType() == CustomGenerator.class;
-    }
-
-    private static boolean isItNestedRule(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType() == NestedDtoRules.class;
-    }
-
-
-    private static boolean isItRule(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType().getDeclaredAnnotation(Rule.class) != null;
-    }
-
-    private static boolean isItRules(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType().getDeclaredAnnotation(Rules.class) != null;
-    }
-
-    private static String getRuleGroup(Annotation rule) {
-        try {
-            return (String) rule.annotationType().getMethod("group").invoke(rule);
-        } catch (IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
-            throw new DtoGeneratorException("Unexpected exception. Can't get 'group' from rules annotation", e);
-        }
-    }
-
-    private Pair<String, Annotation> getRuleByGroupOrNull(Annotation rules, String fieldName) {
-        try {
-            LinkedList<Object> uniqueGroups = new LinkedList<>();
-            Object ruleAnnotationsArray = rules.getClass().getMethod("value").invoke(rules);
-            int length = Array.getLength(ruleAnnotationsArray);
-            Pair<String, Annotation> matched = null;
-            for (int i = 0; i < length; i++) {
-                Annotation rule = (Annotation) Array.get(ruleAnnotationsArray, i);
-                String checkedGroup = getRuleGroup(rule);
-                if (uniqueGroups.contains(rule)) {
-                    throw new DtoGeneratorException("Rule group '" + checkedGroup + "' is repeating for field '" + fieldName + "'");
-                } else {
-                    uniqueGroups.add(rule);
-                }
-                if (getFieldsGroupFilter().isContainsIncludeGroup(checkedGroup)) {
-                    if (matched == null) {
-                        matched = Pair.create(checkedGroup, rule);
-                    } else {
-                        throw new DtoGeneratorException("Ambiguous grouping of the field: '" + fieldName + "'." +
-                                " Check groups of generators and include filters.");
-                    }
-                }
-            }
-            return matched;
-        } catch (IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
-            throw new DtoGeneratorException("Unexpected exception. Can't get 'group' from rules annotation", e);
-        }
-
-    }
-
 }

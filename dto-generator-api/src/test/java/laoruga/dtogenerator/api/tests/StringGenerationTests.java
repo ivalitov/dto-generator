@@ -50,7 +50,7 @@ public class StringGenerationTests {
     @RepeatedTest(1)
     @DisplayName("Generated string by mask (phone number)")
     public void maskPhoneNumber() {
-        Dto dto = DtoGenerator.builder().build().generateDto(Dto.class);
+        Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
         assertAll(
                 () -> assertThat(dto.getPhoneNum(), hasLength(19)),
                 () -> assertThat(dto.getPhoneNum(), matchesRegex("^[+]89 [(]\\d{3}[)] \\d{3}[-]\\d{2}-\\d{2}$")),
@@ -82,12 +82,12 @@ public class StringGenerationTests {
     @MethodSource("maskTypeCharsAndWildCardSource")
     @DisplayName("Generated string by mask (type chars + wildcard)")
     public void maskTypeCharsAndWildCard(String mask, String regexpCheck) {
-        Dto_2 dto = DtoGenerator.builder()
-                .setFieldGenerator("string",
+        Dto_2 dto = DtoGenerator.builder(Dto_2.class)
+                .setGeneratorForField("string",
                         BasicGeneratorsBuilders.stringBuilder()
                                 .mask(mask)
                                 .charset(NUM))
-                .build().generateDto(Dto_2.class);
+                .build().generateDto();
         assertAll(
                 () -> assertThat(dto.getString(), matchesRegex(regexpCheck))
         );
@@ -105,12 +105,12 @@ public class StringGenerationTests {
     @MethodSource("maskDifferentCharsetsSource")
     @DisplayName("Generated string by mask (compound types)")
     public void maskDifferentCharsets(String mask, String regexpCheck) {
-        Dto_2 dto = DtoGenerator.builder()
-                .setFieldGenerator("string",
+        Dto_2 dto = DtoGenerator.builder(Dto_2.class)
+                .setGeneratorForField("string",
                         BasicGeneratorsBuilders.stringBuilder()
                                 .mask(mask)
                                 .charset(NUM))
-                .build().generateDto(Dto_2.class);
+                .build().generateDto();
         assertAll(
                 () -> assertThat(dto.getString(), matchesRegex(regexpCheck))
         );
@@ -119,14 +119,14 @@ public class StringGenerationTests {
     @Test
     @DisplayName("Generated string by mask (custom wildcard and type symbols)")
     public void maskDifferentMarker() {
-        Dto_2 dto = DtoGenerator.builder()
-                .setFieldGenerator("string",
+        Dto_2 dto = DtoGenerator.builder(Dto_2.class)
+                .setGeneratorForField("string",
                         BasicGeneratorsBuilders.stringBuilder()
                                 .maskWildcard('^')
                                 .maskTypeMarker('#')
                                 .mask("%ENG%* (^^^) ^^^-^^-^^ #RUS#^^^ *** %%%")
                                 .charset(NUM))
-                .build().generateDto(Dto_2.class);
+                .build().generateDto();
         assertAll(
                 () -> assertThat(dto.getString(), matchesRegex("^%ENG%[*] [(][0-9]{3}[)] [0-9]{3}[-][0-9]{2}[-][0-9]{2} [а-яёА-ЯЁ]{3} [*]{3} [%]{3}$"))
         );
