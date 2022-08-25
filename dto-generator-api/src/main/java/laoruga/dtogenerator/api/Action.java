@@ -6,5 +6,6 @@ package laoruga.dtogenerator.api;
  */
 enum Action {
     GENERATE,
-    SKIP
+    SKIP,
+    CHECK_EXPLICIT_GENERATOR
 }

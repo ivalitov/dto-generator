@@ -26,7 +26,7 @@ public @interface SetRule {
     int DEFAULT_MIN_SIZE = 1;
     int DEFAULT_MAX_SIZE = 10;
     IRuleRemark DEFAULT_RULE_REMARK = RANDOM_VALUE;
-    Class<?>[] APPLICABLE_TYPES = {List.class};
+    Class<?>[] APPLICABLE_TYPES = {Set.class};
 
     Class<? extends Set> setClass() default HashSet.class;
 

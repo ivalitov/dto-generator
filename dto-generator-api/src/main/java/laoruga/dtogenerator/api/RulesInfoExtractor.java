@@ -88,7 +88,7 @@ public class RulesInfoExtractor {
             }
         }
         if (foundRules.isEmpty()) {
-            return rulesInfoBuilder.action(Action.SKIP).build();
+            return rulesInfoBuilder.action(Action.CHECK_EXPLICIT_GENERATOR).build();
         }
 
         // select rule if exists
@@ -116,7 +116,6 @@ public class RulesInfoExtractor {
                     paramDto.setRuleType(BASIC);
                 }
             }
-
         }
 
         // select collection rule
@@ -137,7 +136,7 @@ public class RulesInfoExtractor {
             paramDto.setRuleType(COLLECTION);
         }
 
-        // maybe excluded by group
+        // may be excluded by group filter
         if (foundRules.isEmpty()) {
             return rulesInfoBuilder.action(Action.SKIP).build();
         }
@@ -234,10 +233,7 @@ public class RulesInfoExtractor {
             Class<?>[] applicableTypes = (Class<?>[]) rulesAnnotationClass.getField("APPLICABLE_TYPES")
                     .get(rulesAnnotationClass);
             for (Class<?> applicableType : applicableTypes) {
-                if (applicableType == fieldType ||
-//                        fieldType.isAssignableFrom(applicableType)
-                        applicableType.isAssignableFrom(fieldType)
-                ) {
+                if (applicableType == fieldType || applicableType.isAssignableFrom(fieldType)) {
                     return true;
                 }
             }

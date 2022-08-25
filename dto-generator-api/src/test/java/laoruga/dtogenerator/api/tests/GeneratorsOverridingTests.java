@@ -86,6 +86,7 @@ public class GeneratorsOverridingTests {
     @DisplayName("Field generator overridden")
     public void fieldGeneratorOverridden() {
         Dto dto = DtoGenerator.builder(Dto.class)
+                .setGeneratorForField("integer", () -> new NumberGenerator().setArgs("123"))
                 .setGeneratorForField("innerDto.innerInteger", () -> new NumberGenerator().setArgs("456"))
                 .setGeneratorForField("stringIntegerMap", () -> (IGenerator<Map<String, Integer>>) () -> {
                     Map<String, Integer> map = new HashMap<>();

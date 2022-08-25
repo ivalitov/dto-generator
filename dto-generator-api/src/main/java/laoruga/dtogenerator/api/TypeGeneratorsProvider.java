@@ -104,13 +104,20 @@ public class TypeGeneratorsProvider<DTO_TYPE> {
      */
     IGenerator<?> getGenerator(Field field) {
         RulesInfo rulesInfo = rulesInfoExtractor.checkAndWrapRulesInfo(field);
+        // TODO only BASIC type generators may be overridden
+        boolean isOverridden = isGeneratorOverridden(field.getName(), rulesInfo.getItemGenerationRules());
         switch (rulesInfo.getAction()) {
             case GENERATE:
-                IGenerator<?> generator = selectGenerator(field, rulesInfo);
+                IGenerator<?> generator = isOverridden ?
+                        getOverriddenGenerator(field.getName(), rulesInfo.getItemGenerationRules()) :
+                        selectGenerator(field, rulesInfo);
                 prepareCustomRemarks(generator);
                 return generator;
             case SKIP:
                 return null;
+            case CHECK_EXPLICIT_GENERATOR:
+                return isOverridden ?
+                        getOverriddenGenerator(field.getName(), rulesInfo.getItemGenerationRules()) : null;
             default:
                 throw new IllegalStateException("Unexpected value: " + rulesInfo.getAction());
         }
@@ -121,11 +128,7 @@ public class TypeGeneratorsProvider<DTO_TYPE> {
         Annotation fieldRules = rulesInfo.getItemGenerationRules();
 
         if (rulesInfo.checkType(BASIC)) {
-            if (isGeneratorOverridden(fieldName, fieldRules)) {
-                return getOverriddenGenerator(fieldName, fieldRules);
-            } else {
-                return getBasicTypeGenerator(fieldName, field.getType(), fieldRules);
-            }
+            return getBasicTypeGenerator(fieldName, field.getType(), fieldRules);
         }
 
         if (rulesInfo.checkType(CUSTOM)) {
@@ -305,14 +308,14 @@ public class TypeGeneratorsProvider<DTO_TYPE> {
      */
 
     private boolean isGeneratorOverridden(String fieldName, Annotation rules) {
-        return overriddenBuildersForFields.containsKey(fieldName) |
+        return overriddenBuildersForFields.containsKey(fieldName) ||
                 overriddenCollectionBuildersForFields.containsKey(fieldName) ||
-                overriddenBuilders.containsKey(rules.annotationType());
+                (rules != null && overriddenBuilders.containsKey(rules.annotationType()));
     }
 
     private IGenerator<?> getOverriddenGenerator(@NonNull String fieldName, Annotation rules) {
         if (rules != null) {
-           return overriddenBuildersForFields.getOrDefault(fieldName, overriddenBuilders.get(rules.annotationType())).build();
+            return overriddenBuildersForFields.getOrDefault(fieldName, overriddenBuilders.get(rules.annotationType())).build();
         } else {
             return overriddenBuildersForFields.get(fieldName).build();
         }
