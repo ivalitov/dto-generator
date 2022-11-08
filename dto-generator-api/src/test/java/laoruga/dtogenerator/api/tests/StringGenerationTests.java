@@ -95,9 +95,9 @@ public class StringGenerationTests {
 
     public static Stream<Arguments> maskDifferentCharsetsSource() {
         return Stream.of(
-                Arguments.of("num:*** eng:%ENG%*** rus:%RUS%***;", "^num:[0-9]{3} eng:[a-zA-Z]{3} rus:[а-яА-Я]{3};$"),
-                Arguments.of("%ENG%*%%%%%*%RUS%*", "^[a-zA-Z]{1}[%]{5}[0-9][а-яА-Я]$"),
-                Arguments.of("%%ENG%*%%%%%*%RUS%*%*%", "^[%][a-zA-Z]{1}[%]{5}[0-9][а-яА-Я][%][0-9][%]$")
+                Arguments.of("num:*** eng:%ENG%*** rus:%RUS%***;", "^num:[0-9]{3} eng:[a-zA-Z]{3} rus:[а-яА-ЯёЁ]{3};$"),
+                Arguments.of("%ENG%*%%%%%*%RUS%*", "^[a-zA-Z]{1}[%]{5}[0-9][а-яА-ЯёЁ]$"),
+                Arguments.of("%%ENG%*%%%%%*%RUS%*%*%", "^[%][a-zA-Z]{1}[%]{5}[0-9][а-яА-ЯёЁ][%][0-9][%]$")
         );
     }
 
