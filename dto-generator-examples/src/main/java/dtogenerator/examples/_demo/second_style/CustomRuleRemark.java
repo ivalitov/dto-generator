@@ -2,7 +2,6 @@ package dtogenerator.examples._demo.second_style;
 
 import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
 import laoruga.dtogenerator.api.markup.remarks.ICustomRuleRemark;
-import laoruga.dtogenerator.api.markup.generators.IGenerator;
 
 public enum CustomRuleRemark implements ICustomRuleRemark {
     WITH_ARREARS(ArrearsGenerator2.class, 2),

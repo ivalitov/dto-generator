@@ -12,7 +12,8 @@ import org.apache.commons.text.RandomStringGenerator;
 import java.time.LocalDate;
 import java.util.List;
 
-import static laoruga.dtogenerator.api.tests.data.customgenerator.ClientRemark.*;
+import static laoruga.dtogenerator.api.tests.data.customgenerator.ClientRemark.CLIENT_TYPE;
+import static laoruga.dtogenerator.api.tests.data.customgenerator.ClientRemark.DOCUMENT;
 
 /**
  * @author Il'dar Valitov

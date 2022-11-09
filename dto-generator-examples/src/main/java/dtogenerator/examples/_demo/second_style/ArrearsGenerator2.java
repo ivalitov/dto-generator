@@ -2,9 +2,9 @@ package dtogenerator.examples._demo.second_style;
 
 import dtogenerator.examples.Arrears;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
+import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
 import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.ICustomRuleRemark;
-import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
 import lombok.NoArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
 

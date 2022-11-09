@@ -1,8 +1,8 @@
 package laoruga.dtogenerator.api.generators.basictypegenerators;
 
+import laoruga.dtogenerator.api.constants.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
-import laoruga.dtogenerator.api.constants.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.util.RandomUtils;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,6 @@ import lombok.SneakyThrows;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Random;
 
 /**
  * @author Il'dar Valitov

@@ -2,7 +2,6 @@ package laoruga.dtogenerator.api.tests;
 
 import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
-import laoruga.dtogenerator.api.generators.basictypegenerators.BasicGeneratorsBuilders;
 import laoruga.dtogenerator.api.markup.rules.IntegerRule;
 import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
 import laoruga.dtogenerator.api.markup.rules.StringRule;

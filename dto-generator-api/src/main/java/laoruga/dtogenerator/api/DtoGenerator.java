@@ -1,8 +1,10 @@
 package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
-import laoruga.dtogenerator.api.markup.generators.ICollectionGenerator;
-import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
+import laoruga.dtogenerator.api.generatorsexecutor.BatchGeneratorsExecutor;
+import laoruga.dtogenerator.api.generatorsexecutor.ExecutorOfCollectionGenerator;
+import laoruga.dtogenerator.api.generatorsexecutor.ExecutorOfDtoDependentGenerator;
+import laoruga.dtogenerator.api.generatorsexecutor.ExecutorOfGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,7 +13,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -66,94 +67,19 @@ public class DtoGenerator<DTO_TYPE> {
         prepareGenerators(dtoClass);
     }
 
-    /**
-     * Check whether DTO is ready for using CustomGeneratorDtoDependent or not.
-     * There is limited attempts to prevent infinite loops.
-     *
-     * @param generator   - generator to check
-     * @param attempts    - attempts counter
-     * @param maxAttempts - max limit
-     * @return - doesn't DTO ready?
-     * @throws DtoGeneratorException - throws if all attempts are spent
-     */
-    private boolean doesDtoDependentGeneratorNotReady(IGenerator<?> generator,
-                                                      AtomicInteger attempts,
-                                                      AtomicInteger maxAttempts) throws DtoGeneratorException {
-        if (generator instanceof ICustomGeneratorDtoDependent) {
-            if (!((ICustomGeneratorDtoDependent<?, ?>) generator).isDtoReady()) {
-                if (attempts.get() < maxAttempts.get() - 1) {
-                    log.debug("Object is not ready to generate dependent field value");
-                    return true;
-                } else {
-                    throw new DtoGeneratorException("Generator " + generator.getClass() +
-                            " wasn't prepared in " + attempts + " attempts");
-                }
-            }
-        }
-        return false;
-    }
-
     void applyGenerators() {
-        AtomicInteger attempts = new AtomicInteger(0);
-        AtomicInteger maxAttempts = new AtomicInteger(100);
-        while (!getFieldGeneratorMap().isEmpty() && attempts.get() < maxAttempts.get()) {
-            attempts.incrementAndGet();
-            log.debug("Attempt {} to generate field values", attempts);
-            Iterator<Map.Entry<Field, IGenerator<?>>> iterator = getFieldGeneratorMap().entrySet().iterator();
-            while (iterator.hasNext()) {
+        // TODO move into params
+        int maxAttempts = 100;
 
-                Map.Entry<Field, IGenerator<?>> nextFieldAndGenerator = iterator.next();
-                Field field = nextFieldAndGenerator.getKey();
-                IGenerator<?> generator = nextFieldAndGenerator.getValue();
-                try {
-                    // if it's dto dependent generator - checking if dto is ready for this generator
-                    if (generator instanceof ICustomGeneratorDtoDependent) {
-                        if (doesDtoDependentGeneratorNotReady(generator, attempts, maxAttempts)) {
-                            continue;
-                        }
-                    }
-                    // if it's collection generator + dto dependent generator - checking if dto is ready for this generator
-                    if (generator instanceof ICollectionGenerator) {
-                        IGenerator<?> innerGenerator = ((ICollectionGenerator<?>) generator).getItemGenerator();
-                        if (innerGenerator instanceof ICustomGeneratorDtoDependent) {
-                            if (doesDtoDependentGeneratorNotReady(innerGenerator, attempts, maxAttempts)) {
-                                continue;
-                            }
-                        }
-                    }
-                    boolean isFieldAccessible = field.isAccessible();
-                    try {
-                        if (!isFieldAccessible) field.setAccessible(true);
-                        field.set(dtoInstance, generator.generate());
-                    } catch (IllegalAccessException e) {
-                        log.error("Access error while generation value for a field: " + field, e);
-                        errors.put(field, e);
-                    } catch (Exception e) {
-                        log.error("Error while generation value for the field: " + field, e);
-                        errors.put(field, e);
-                    } finally {
-                        iterator.remove();
-                        if (!isFieldAccessible) field.setAccessible(false);
-                    }
-                } catch (Exception e) {
-                    log.error("Error while generation value for the field: " + field, e);
-                    errors.put(field, e);
-                    iterator.remove();
-                }
+        ExecutorOfDtoDependentGenerator executorsChain =
+                new ExecutorOfDtoDependentGenerator(
+                        new ExecutorOfCollectionGenerator(
+                                new ExecutorOfGenerator(dtoInstance)));
 
-            }
-        }
-        if (!getFieldGeneratorMap().isEmpty() || !errors.isEmpty()) {
-            if (!getFieldGeneratorMap().isEmpty()) {
-                log.error("Unexpected state. There {} unused generator(s) left. Fields vs Generators: " +
-                        getFieldGeneratorMap(), getFieldGeneratorMap().size());
-            }
-            if (!errors.isEmpty()) {
-                log.error("{} error(s) while generators execution. Fields vs Generators: " + errors, errors.size());
-            }
-            throw new RuntimeException("Error while generators execution (see log above)");
-        }
+        BatchGeneratorsExecutor batchGeneratorsExecutor = new BatchGeneratorsExecutor(
+                executorsChain, getFieldGeneratorMap(), maxAttempts);
 
+        batchGeneratorsExecutor.execute();
     }
 
     void prepareGenerators(Class<?> dtoClass) {

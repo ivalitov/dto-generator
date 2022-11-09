@@ -2,17 +2,16 @@ package dtogenerator.examples._demo.second_style;
 
 import dtogenerator.examples.DtoVer1;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
-import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
-import laoruga.dtogenerator.api.markup.remarks.ICustomRuleRemark;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
+import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
+import laoruga.dtogenerator.api.markup.remarks.ICustomRuleRemark;
 import laoruga.dtogenerator.api.util.RandomUtils;
 import lombok.NoArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
 
 import static dtogenerator.examples._demo.second_style.CustomRuleRemark.CLOSED;
 import static dtogenerator.examples._demo.second_style.CustomRuleRemark.OPEN;
