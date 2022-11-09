@@ -5,6 +5,7 @@ import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.constants.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.DoubleRule;
+import laoruga.dtogenerator.api.util.RandomUtils;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.util.Precision;
 
@@ -32,7 +33,7 @@ public class DoubleGenerator implements IGenerator<Double> {
             return maxValue;
         }
         if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
-            double generated = minValue + new Random().nextDouble() * (maxValue - minValue);
+            double generated = minValue + RandomUtils.getRandom().nextDouble() * (maxValue - minValue);
             return Precision.round(generated, precision);
         }
         if (ruleRemark == BasicRuleRemark.NULL_VALUE) {

@@ -3,6 +3,7 @@ package laoruga.dtogenerator.api.generators.basictypegenerators;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.constants.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
+import laoruga.dtogenerator.api.util.RandomUtils;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -30,7 +31,7 @@ public class LocalDateTimeGenerator implements IGenerator<LocalDateTime> {
             return now.plusDays(rightShiftDays);
         }
         if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
-            int randomInt = new Random().nextInt(leftShiftDays + rightShiftDays + 1);
+            int randomInt = RandomUtils.getRandom().nextInt(leftShiftDays + rightShiftDays + 1);
             LocalDateTime minDate = now.minusDays(leftShiftDays);
             return minDate.plusDays(randomInt);
         }
