@@ -1,5 +1,6 @@
 package laoruga.dtogenerator.api.util;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -19,7 +20,8 @@ import java.util.stream.IntStream;
 @Slf4j
 public class RandomUtils {
 
-    static final Random random = new Random();
+    @Getter
+    private static final Random random = new Random();
 
     private static final String HEX_CHARSET = "0123456789abcdefABCDEF";
 

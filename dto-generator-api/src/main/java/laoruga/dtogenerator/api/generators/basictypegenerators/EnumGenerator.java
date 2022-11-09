@@ -4,6 +4,7 @@ import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.constants.BasicRuleRemark;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
+import laoruga.dtogenerator.api.util.RandomUtils;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -36,7 +37,7 @@ public class EnumGenerator implements IGenerator<Enum<?>> {
             enumInstanceName = sortedEnumNames[sortedEnumNames.length - 1];
         } else if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
             int count = sortedEnumNames.length;
-            enumInstanceName = sortedEnumNames[new Random().nextInt(count)];
+            enumInstanceName = sortedEnumNames[RandomUtils.getRandom().nextInt(count)];
         } else if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
             return null;
         } else {

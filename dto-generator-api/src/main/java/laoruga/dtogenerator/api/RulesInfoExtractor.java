@@ -150,7 +150,7 @@ public class RulesInfoExtractor {
             }
         }
 
-        String ruleGroup = foundRules.values().stream().findAny().get().getGroupName();
+        String ruleGroup = foundRules.values().iterator().next().getGroupName();
 
         // skip by group
         if (!getFieldsGroupFilter().isContainsIncludeGroup(ruleGroup)) {

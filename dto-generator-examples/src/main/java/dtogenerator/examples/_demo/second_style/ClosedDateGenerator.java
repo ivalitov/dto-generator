@@ -6,6 +6,7 @@ import laoruga.dtogenerator.api.markup.remarks.CustomRuleRemarkWrapper;
 import laoruga.dtogenerator.api.markup.remarks.ICustomRuleRemark;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
+import laoruga.dtogenerator.api.util.RandomUtils;
 import lombok.NoArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
@@ -29,7 +30,7 @@ public class ClosedDateGenerator implements ICustomGeneratorArgs<LocalDateTime>,
 
         if (ruleRemarks == null) {
             ruleRemarks = new ICustomRuleRemark[1];
-            ruleRemarks[0] = new Random().nextInt(2) == 1 ? OPEN : CLOSED;
+            ruleRemarks[0] = RandomUtils.getRandom().nextInt(2) == 1 ? OPEN : CLOSED;
         }
 
         if (ruleRemarks.length > 1) {

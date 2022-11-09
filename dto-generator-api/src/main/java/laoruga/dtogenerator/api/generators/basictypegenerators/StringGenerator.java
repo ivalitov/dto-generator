@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.RandomStringGenerator;
 
+import java.util.Objects;
+
 /**
  * @author Il'dar Valitov
  * Created on 19.05.2022
@@ -74,7 +76,7 @@ public class StringGenerator implements IGenerator<String> {
         for (int currentPos = 0; currentPos < maskChars.length; currentPos++) {
             currentChar = maskChars[currentPos];
             nextChar = maskChars.length == currentPos + 1 ? null : maskChars[currentPos + 1];
-            if (currentChar == maskWildcard) {
+            if (Objects.equals(currentChar, maskWildcard)) {
                 if (wildcardGathering) {
                     wildCardEndIdx = currentPos;
                 } else {
@@ -82,17 +84,19 @@ public class StringGenerator implements IGenerator<String> {
                     wildCardBeginIdx = currentPos;
                     wildCardEndIdx = currentPos;
                 }
-                if (nextChar == maskWildcard) {
+                if (Objects.equals(nextChar, maskWildcard)) {
                     continue;
                 } else {
                     wildcardGathering = false;
                     wildcardGathered = true;
                 }
-            } else if (currentChar == maskTypeMarker) {
+            } else if (Objects.equals(currentChar, maskTypeMarker)) {
                 // begin of type gathering
                 if (!typeGathering) {
                     // exclusion of paris: %% %*
-                    if (nextChar != null && nextChar != maskWildcard && nextChar != maskTypeMarker) {
+                    if (nextChar != null &&
+                            !Objects.equals(nextChar, maskWildcard) &&
+                            !Objects.equals(nextChar, maskTypeMarker)) {
                         typeGathering = true;
                         typeChars = new StringBuilder();
                         continue;
@@ -100,15 +104,14 @@ public class StringGenerator implements IGenerator<String> {
                 }
                 if (typeGathering) {
                     CharSet charSet = CharSet.getCharSetOrNull(typeChars.toString());
-                    if (nextChar == maskWildcard && charSet != null) {
+                    if (Objects.equals(nextChar, maskWildcard) && charSet != null) {
                         partitionChars = charSet.getChars();
                         typeGathering = false;
-                        continue;
                     } else {
                         stringBuilder.append(maskChars);
                         currentPos--;
-                        continue;
                     }
+                    continue;
                 }
             }
             if (typeGathering) {
