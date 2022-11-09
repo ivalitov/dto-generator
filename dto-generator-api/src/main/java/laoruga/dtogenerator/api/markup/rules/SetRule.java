@@ -9,7 +9,6 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static java.lang.annotation.ElementType.FIELD;
