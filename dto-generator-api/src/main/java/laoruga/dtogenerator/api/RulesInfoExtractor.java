@@ -38,10 +38,10 @@ public class RulesInfoExtractor {
     @Builder
     @Data
     @ToString
-    private static class ParamDto {
+    private static class RuleWrapper {
         String groupName;
         Annotation rule;
-        boolean areRulesGrouped;
+        boolean rulesGrouped;
         String ruleGroup;
         RuleType ruleType;
     }
@@ -58,80 +58,57 @@ public class RulesInfoExtractor {
         String fieldName = field.getName();
         Class<?> fieldType = field.getType();
 
-        Map<RuleType, ParamDto> foundRules = new HashMap<>();
+        Map<RuleType, RuleWrapper> foundRules = checkAndWrapAnnotations(field);
 
         RulesInfo.RulesInfoBuilder rulesInfoBuilder = RulesInfo.builder();
 
-        for (Annotation annotation : field.getDeclaredAnnotations()) {
-            if (isItRule(annotation)) {
-                if (foundRules.containsKey(NOT_COLLECTION)) {
-                    throw new DtoGeneratorException("Field '" + fieldName + "' annotated with different type rules annotations");
-                }
-                foundRules.putIfAbsent(NOT_COLLECTION, ParamDto.builder().rule(annotation).build());
-            } else if (isItRules(annotation)) {
-                if (foundRules.containsKey(NOT_COLLECTION)) {
-                    throw new DtoGeneratorException("Field '" + fieldName + "' annotated more then one rules annotation");
-                }
-                foundRules.put(NOT_COLLECTION, ParamDto.builder().rule(annotation).areRulesGrouped(true).build());
-            } else if (isItCollectionRule(annotation)) {
-                if (foundRules.containsKey(COLLECTION)) {
-                    throw new DtoGeneratorException("Field '" + fieldName + "' annotated with more then one collection rules annotations");
-                }
-                foundRules.put(COLLECTION, ParamDto.builder().rule(annotation).build());
-            } else if (isItCollectionRules(annotation)) {
-                if (foundRules.containsKey(COLLECTION)) {
-                    throw new DtoGeneratorException("Field '" + fieldName + "' annotated more then one collection rules annotation");
-                }
-                foundRules.put(COLLECTION, ParamDto.builder().rule(annotation).areRulesGrouped(true).build());
-            }
-        }
         if (foundRules.isEmpty()) {
             return rulesInfoBuilder.action(Action.CHECK_EXPLICIT_GENERATOR).build();
         }
 
-        // select rule if exists
+        // select rule/item rule if exists
         if (foundRules.containsKey(NOT_COLLECTION)) {
-            ParamDto paramDto = foundRules.get(NOT_COLLECTION);
-            if (paramDto.isAreRulesGrouped()) {
-                Pair<String, Annotation> groupAndRule = getRuleByGroupOrNull(paramDto.getRule(), fieldName);
+            RuleWrapper ruleWrapper = foundRules.get(NOT_COLLECTION);
+            if (ruleWrapper.isRulesGrouped()) {
+                Pair<String, Annotation> groupAndRule = getRuleByGroupOrNull(ruleWrapper.getRule(), fieldName);
                 if (groupAndRule != null) {
-                    paramDto.setGroupName(groupAndRule.getFirst());
-                    paramDto.setRule(groupAndRule.getSecond());
+                    ruleWrapper.setGroupName(groupAndRule.getFirst());
+                    ruleWrapper.setRule(groupAndRule.getSecond());
                 } else {
                     log.debug("Not collection rules excluded by group for field: '{}'", fieldName);
                     foundRules.remove(NOT_COLLECTION);
                 }
             } else {
-                paramDto.setGroupName(getRuleGroup(paramDto.getRule()));
+                ruleWrapper.setGroupName(getRuleGroup(ruleWrapper.getRule()));
             }
             if (foundRules.containsKey(NOT_COLLECTION)) {
-                Annotation rule = paramDto.getRule();
+                Annotation rule = ruleWrapper.getRule();
                 if (isItCustomRule(rule)) {
-                    paramDto.setRuleType(CUSTOM);
+                    ruleWrapper.setRuleType(CUSTOM);
                 } else if (isItNestedRule(rule)) {
-                    paramDto.setRuleType(NESTED);
+                    ruleWrapper.setRuleType(NESTED);
                 } else {
-                    paramDto.setRuleType(BASIC);
+                    ruleWrapper.setRuleType(BASIC);
                 }
             }
         }
 
         // select collection rule
         if (foundRules.containsKey(COLLECTION)) {
-            ParamDto paramDto = foundRules.get(COLLECTION);
-            if (paramDto.isAreRulesGrouped()) {
-                Pair<String, Annotation> groupAndRule = getRuleByGroupOrNull(paramDto.getRule(), fieldName);
+            RuleWrapper ruleWrapper = foundRules.get(COLLECTION);
+            if (ruleWrapper.isRulesGrouped()) {
+                Pair<String, Annotation> groupAndRule = getRuleByGroupOrNull(ruleWrapper.getRule(), fieldName);
                 if (groupAndRule != null) {
-                    paramDto.setGroupName(groupAndRule.getFirst());
-                    paramDto.setRule(groupAndRule.getSecond());
+                    ruleWrapper.setGroupName(groupAndRule.getFirst());
+                    ruleWrapper.setRule(groupAndRule.getSecond());
                 } else {
                     log.debug("Collection rules excluded by group for field: '{}'", fieldName);
                     foundRules.remove(COLLECTION);
                 }
             } else {
-                paramDto.setGroupName(getRuleGroup(paramDto.getRule()));
+                ruleWrapper.setGroupName(getRuleGroup(ruleWrapper.getRule()));
             }
-            paramDto.setRuleType(COLLECTION);
+            ruleWrapper.setRuleType(COLLECTION);
         }
 
         // may be excluded by group filter
@@ -141,7 +118,7 @@ public class RulesInfoExtractor {
 
         // check groups equality
         if (foundRules.size() > 1) {
-            long differentGroupsCount = foundRules.values().stream().map(ParamDto::getRuleGroup).distinct().count();
+            long differentGroupsCount = foundRules.values().stream().map(RuleWrapper::getRuleGroup).distinct().count();
             if (differentGroupsCount > 1) {
                 throw new DtoGeneratorException(
                         "Collection and item rules groups have matched with different include filters:\n" + foundRules);
@@ -158,12 +135,12 @@ public class RulesInfoExtractor {
         List<RuleType> ruleTypes = new LinkedList<>();
         rulesInfoBuilder.action(GENERATE);
         rulesInfoBuilder.ruleType(ruleTypes);
-        foundRules.forEach((ruleType, paramDto) -> {
-                    ruleTypes.add(paramDto.getRuleType());
+        foundRules.forEach((ruleType, ruleWrapper) -> {
+                    ruleTypes.add(ruleWrapper.getRuleType());
                     if (ruleType == NOT_COLLECTION) {
-                        rulesInfoBuilder.itemGenerationRules(paramDto.getRule());
+                        rulesInfoBuilder.itemGenerationRules(ruleWrapper.getRule());
                     } else if (ruleType == COLLECTION) {
-                        rulesInfoBuilder.collectionGenerationRules(paramDto.getRule());
+                        rulesInfoBuilder.collectionGenerationRules(ruleWrapper.getRule());
                     } else {
                         throw new RuntimeException("Error. Unexpected rules type: " + ruleType);
                     }
@@ -196,6 +173,45 @@ public class RulesInfoExtractor {
         return resultRulesInfo;
     }
 
+
+    /**
+     * @param field - field whose annotations are to be examined
+     * @return - rules for generation value of the field
+     */
+    Map<RuleType, RuleWrapper> checkAndWrapAnnotations(Field field) {
+        Map<RuleType, RuleWrapper> foundRules = new HashMap<>();
+
+        // Break on bad annotation errors
+        for (Annotation annotation : field.getDeclaredAnnotations()) {
+            if (isItRule(annotation)) {
+                if (foundRules.containsKey(NOT_COLLECTION)) {
+                    throw new DtoGeneratorException(
+                            "Field '" + field.getName() + "' annotated with different type rules annotations");
+                }
+                foundRules.putIfAbsent(NOT_COLLECTION, RuleWrapper.builder().rule(annotation).build());
+            } else if (isItRules(annotation)) {
+                if (foundRules.containsKey(NOT_COLLECTION)) {
+                    throw new DtoGeneratorException(
+                            "Field '" + field.getName() + "' annotated more then one rules annotation");
+                }
+                foundRules.put(NOT_COLLECTION, RuleWrapper.builder().rule(annotation).rulesGrouped(true).build());
+            } else if (isItCollectionRule(annotation)) {
+                if (foundRules.containsKey(COLLECTION)) {
+                    throw new DtoGeneratorException(
+                            "Field '" + field.getName() + "' annotated with more then one collection rules annotations");
+                }
+                foundRules.put(COLLECTION, RuleWrapper.builder().rule(annotation).build());
+            } else if (isItCollectionRules(annotation)) {
+                if (foundRules.containsKey(COLLECTION)) {
+                    throw new DtoGeneratorException(
+                            "Field '" + field.getName() + "' annotated more then one collection rules annotation");
+                }
+                foundRules.put(COLLECTION, RuleWrapper.builder().rule(annotation).rulesGrouped(true).build());
+            }
+        }
+        return foundRules;
+    }
+    
     private Pair<String, Annotation> getRuleByGroupOrNull(Annotation rules, String fieldName) {
         try {
             LinkedList<Object> uniqueGroups = new LinkedList<>();
