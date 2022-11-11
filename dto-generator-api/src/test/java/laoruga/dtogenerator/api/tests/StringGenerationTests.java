@@ -49,7 +49,7 @@ public class StringGenerationTests {
 
     @RepeatedTest(1)
     @DisplayName("Generated string by mask (phone number)")
-    public void maskPhoneNumber() {
+    void maskPhoneNumber() {
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
         assertAll(
                 () -> assertThat(dto.getPhoneNum(), hasLength(19)),
@@ -81,7 +81,7 @@ public class StringGenerationTests {
     @ParameterizedTest
     @MethodSource("maskTypeCharsAndWildCardSource")
     @DisplayName("Generated string by mask (type chars + wildcard)")
-    public void maskTypeCharsAndWildCard(String mask, String regexpCheck) {
+    void maskTypeCharsAndWildCard(String mask, String regexpCheck) {
         Dto_2 dto = DtoGenerator.builder(Dto_2.class)
                 .setGeneratorForField("string",
                         BasicGeneratorsBuilders.stringBuilder()
@@ -104,7 +104,7 @@ public class StringGenerationTests {
     @ParameterizedTest
     @MethodSource("maskDifferentCharsetsSource")
     @DisplayName("Generated string by mask (compound types)")
-    public void maskDifferentCharsets(String mask, String regexpCheck) {
+    void maskDifferentCharsets(String mask, String regexpCheck) {
         Dto_2 dto = DtoGenerator.builder(Dto_2.class)
                 .setGeneratorForField("string",
                         BasicGeneratorsBuilders.stringBuilder()
@@ -118,7 +118,7 @@ public class StringGenerationTests {
 
     @Test
     @DisplayName("Generated string by mask (custom wildcard and type symbols)")
-    public void maskDifferentMarker() {
+    void maskDifferentMarker() {
         Dto_2 dto = DtoGenerator.builder(Dto_2.class)
                 .setGeneratorForField("string",
                         BasicGeneratorsBuilders.stringBuilder()

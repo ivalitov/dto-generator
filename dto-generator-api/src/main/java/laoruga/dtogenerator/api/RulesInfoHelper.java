@@ -8,31 +8,18 @@ import laoruga.dtogenerator.api.markup.rules.meta.RuleForCollection;
 import laoruga.dtogenerator.api.markup.rules.meta.Rules;
 import laoruga.dtogenerator.api.markup.rules.meta.RulesForCollection;
 import laoruga.dtogenerator.api.util.ReflectionUtils;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.Collection;
 
 /**
  * @author Il'dar Valitov
  * Created on 11.11.2022
  */
-public class RulesInfoHelper {
-
-    public static void checkIfItemRuleExist(Collection<RuleInfo> foundRules) {
-        if (foundRules.size() != 2) {
-            throw new DtoGeneratorException(
-                    "Unexpected number of rule Annotations for collection: " + foundRules.size() + ", expected: 2\n." +
-                            "Found annotations: " + foundRules.stream().map(RuleInfo::getRule));
-        }
-        long differentGroupsCount = foundRules.stream().map(RuleInfo::getGroup).distinct().count();
-       // TODO проверку групп надо сделать в билдере
-          if (differentGroupsCount > 1) {
-            throw new DtoGeneratorException(
-                    "Collection and item rules groups have matched with different include filters:\n" + foundRules);
-        }
-
-    }
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RulesInfoHelper {
 
     public static void checkItemGeneratorCompatibility(Annotation itemRuleInfo,
                                                        Annotation collectionRuleInfo,
@@ -49,11 +36,9 @@ public class RulesInfoHelper {
         }
 
         // Checking of Collection Generator Compatibility
-        if (collectionRuleInfo != null) {
-            if (!checkGeneratorCompatibility(fieldType, collectionRuleInfo)) {
-                throw new DtoGeneratorException("Field '" + fieldName + "' annotated with inappropriate generation " +
-                        "rule annotation: '" + collectionRuleInfo.annotationType() + "'.");
-            }
+        if (collectionRuleInfo != null && !checkGeneratorCompatibility(fieldType, collectionRuleInfo)) {
+            throw new DtoGeneratorException("Field '" + fieldName + "' annotated with inappropriate generation " +
+                    "rule annotation: '" + collectionRuleInfo.annotationType() + "'.");
         }
     }
 

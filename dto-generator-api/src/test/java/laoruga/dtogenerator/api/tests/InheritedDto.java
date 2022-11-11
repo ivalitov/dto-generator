@@ -46,7 +46,7 @@ public class InheritedDto {
 
     @Test
     @DisplayName("Super Class Generation")
-    public void test() {
+    void test() {
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
 
         assertNotNull(dto);

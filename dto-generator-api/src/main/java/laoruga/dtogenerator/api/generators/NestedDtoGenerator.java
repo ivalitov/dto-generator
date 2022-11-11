@@ -8,16 +8,16 @@ import laoruga.dtogenerator.api.markup.generators.IGenerator;
  * Created on 23.04.2022
  */
 
-public class NestedDtoGenerator<GENERATED_TYPE> implements IGenerator<GENERATED_TYPE> {
+public class NestedDtoGenerator<T> implements IGenerator<T> {
 
-    private final DtoGenerator<GENERATED_TYPE> dtoGenerator;
+    private final DtoGenerator<T> dtoGenerator;
 
-    public NestedDtoGenerator(DtoGenerator<GENERATED_TYPE> dtoGenerator) {
+    public NestedDtoGenerator(DtoGenerator<T> dtoGenerator) {
         this.dtoGenerator = dtoGenerator;
     }
 
     @Override
-    public GENERATED_TYPE generate() {
+    public T generate() {
         return dtoGenerator.generateDto();
     }
 }

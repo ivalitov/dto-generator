@@ -1,5 +1,6 @@
 package laoruga.dtogenerator.api.generatorsexecutor;
 
+import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +42,7 @@ public class BatchGeneratorsExecutor {
         }
 
         if (!checkIfAllGeneratorsExecuted()) {
-            throw new RuntimeException("Error while generators execution (see log above)");
+            throw new DtoGeneratorException("Error while generators execution (see log above)");
         }
     }
 

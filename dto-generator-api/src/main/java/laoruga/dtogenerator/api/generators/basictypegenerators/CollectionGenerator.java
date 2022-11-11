@@ -17,17 +17,18 @@ import java.util.Collection;
  */
 
 @AllArgsConstructor
-public class CollectionGenerator<ITEM_TYPE> implements ICollectionGenerator<Collection<ITEM_TYPE>> {
+public class CollectionGenerator<T> implements ICollectionGenerator<Collection<T>> {
 
-    public static int MAX_GENERATION_ATTEMPTS = 100;
+    //TODO move to the properties
+    public static int maxGenerationAttempts = 100;
     private final int minSize;
     private final int maxSize;
-    private final Collection<ITEM_TYPE> listInstance;
-    private final IGenerator<ITEM_TYPE> itemGenerator;
+    private final Collection<T> listInstance;
+    private final IGenerator<T> itemGenerator;
     private final IRuleRemark ruleRemark;
 
     @Override
-    public Collection<ITEM_TYPE> generate() {
+    public Collection<T> generate() {
         int size;
         switch ((BasicRuleRemark) ruleRemark) {
             case MIN_VALUE:
@@ -51,7 +52,7 @@ public class CollectionGenerator<ITEM_TYPE> implements ICollectionGenerator<Coll
             listInstance.add(itemGenerator.generate());
             if (prevSize == listInstance.size()) {
                 ineffectiveAttempts++;
-                if (ineffectiveAttempts == MAX_GENERATION_ATTEMPTS) {
+                if (ineffectiveAttempts == maxGenerationAttempts) {
                     throw new DtoGeneratorException("Expected size of collection can't be reached");
                 }
             }
@@ -68,42 +69,42 @@ public class CollectionGenerator<ITEM_TYPE> implements ICollectionGenerator<Coll
         return new CollectionGeneratorBuilder<>();
     }
 
-    public static final class CollectionGeneratorBuilder<ITEM_TYPE> implements IGeneratorBuilder<ICollectionGenerator<?>> {
+    public static final class CollectionGeneratorBuilder<V> implements IGeneratorBuilder<ICollectionGenerator<?>> {
         private int minSize;
         private int maxSize;
-        private Collection<ITEM_TYPE> listInstance;
-        private IGenerator<ITEM_TYPE> itemGenerator;
+        private Collection<V> listInstance;
+        private IGenerator<V> itemGenerator;
         private IRuleRemark ruleRemark;
 
         private CollectionGeneratorBuilder() {
         }
 
-        public CollectionGeneratorBuilder<ITEM_TYPE> minSize(int minSize) {
+        public CollectionGeneratorBuilder<V> minSize(int minSize) {
             this.minSize = minSize;
             return this;
         }
 
-        public CollectionGeneratorBuilder<ITEM_TYPE> maxSize(int maxSize) {
+        public CollectionGeneratorBuilder<V> maxSize(int maxSize) {
             this.maxSize = maxSize;
             return this;
         }
 
-        public CollectionGeneratorBuilder<ITEM_TYPE> listInstance(Collection<ITEM_TYPE> listInstance) {
+        public CollectionGeneratorBuilder<V> listInstance(Collection<V> listInstance) {
             this.listInstance = listInstance;
             return this;
         }
 
-        public CollectionGeneratorBuilder<ITEM_TYPE> itemGenerator(IGenerator<ITEM_TYPE> itemGenerator) {
+        public CollectionGeneratorBuilder<V> itemGenerator(IGenerator<V> itemGenerator) {
             this.itemGenerator = itemGenerator;
             return this;
         }
 
-      public CollectionGeneratorBuilder<ITEM_TYPE> ruleRemark(IRuleRemark ruleRemark) {
+      public CollectionGeneratorBuilder<V> ruleRemark(IRuleRemark ruleRemark) {
             this.ruleRemark = ruleRemark;
             return this;
         }
 
-        public CollectionGenerator<ITEM_TYPE> build() {
+        public CollectionGenerator<V> build() {
             return new CollectionGenerator<>(minSize, maxSize, listInstance, itemGenerator, ruleRemark);
         }
     }

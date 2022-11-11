@@ -49,7 +49,7 @@ public class SetGeneratorTests {
 
     @Test
     @DisplayName("Set Of Integers Generation (default rules params)")
-    public void listOfIntegerWithDefaultRulesPrams() {
+    void listOfIntegerWithDefaultRulesPrams() {
         DtoSet dto = DtoGenerator.builder(DtoSet.class).build().generateDto();
 
         assertNotNull(dto);

@@ -5,9 +5,9 @@ package laoruga.dtogenerator.api.markup.generators;
  * Created on 16.04.2022
  */
 
-public interface ICustomGeneratorDtoDependent<GENERATED_TYPE, DTO_TYPE> extends ICustomGenerator<GENERATED_TYPE> {
+public interface ICustomGeneratorDtoDependent<T, V> extends ICustomGenerator<T> {
 
-    void setDto(DTO_TYPE generatedDto);
+    void setDto(V generatedDto);
 
     boolean isDtoReady();
 }
