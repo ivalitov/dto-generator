@@ -55,7 +55,7 @@ public class SimpleTypeGeneratorsFactory {
             return getLocalDateTimeGenerator(fieldName, (LocalDateTimeRule) rules, maybeRemark);
         }
 
-        throw new DtoGeneratorException("Field " + fieldName + " hasn't been mapped with any basic generator.");
+        throw new DtoGeneratorException("Field '" + fieldName + "' hasn't been mapped with any basic generator.");
     }
 
     /*

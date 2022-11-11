@@ -6,10 +6,12 @@ import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.rules.IntegerRule;
 import laoruga.dtogenerator.api.markup.rules.ListRule;
+import laoruga.dtogenerator.api.markup.rules.SetRule;
 import laoruga.dtogenerator.api.markup.rules.StringRule;
 import laoruga.dtogenerator.api.tests.data.dtoclient.ClientDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -139,6 +141,7 @@ public class ListGenerationTests {
     @Getter
     static class DtoWithListOfCollections {
         @ListRule()
+        @SetRule()
         List<Set<String>> listOfSet;
 
         @ListRule(listClass = LinkedList.class)
@@ -176,18 +179,21 @@ public class ListGenerationTests {
     @Test
     @Feature("NEGATIVE_TESTS")
     @DisplayName("List Of Collection")
+    // TODO fix
     public void listOfCollection() {
         DtoGenerator<DtoWithListOfCollections> generator = DtoGenerator.builder(DtoWithListOfCollections.class).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);
 
         Map<String, Exception> errorsMap = getErrorsMap(generator);
-        final String ERROR_PART = "depended on types: '[COLLECTION]";
 
         assertEquals(2, errorsMap.size());
         assertTrue(errorsMap.containsKey("listOfSet"));
-        assertThat(errorsMap.get("listOfSet").getMessage(), stringContainsInOrder(ERROR_PART));
+        assertThat(errorsMap.get("listOfSet").getCause().getMessage(),
+                stringContainsInOrder("Found '2' @CollectionRule annotations for various collection types"));
         assertTrue(errorsMap.containsKey("listOfString"));
-        assertThat(errorsMap.get("listOfString").getMessage(), stringContainsInOrder(ERROR_PART));
+        assertThat(errorsMap.get("listOfString").getCause().getMessage(),
+                stringContainsInOrder("Missed @Rule annotation for item of collection"));
+
     }
 
 }
