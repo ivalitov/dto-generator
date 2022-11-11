@@ -80,7 +80,7 @@ public class NestedDtoGenerationTests {
 
     @Test
     @DisplayName("Nested Dto Generation With Integer Rules")
-    public void nestedDtoWithIntegerRules() {
+    void nestedDtoWithIntegerRules() {
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
@@ -90,7 +90,7 @@ public class NestedDtoGenerationTests {
 
     @RepeatedTest(10)
     @DisplayName("Nested Dto Generation With Custom Rules")
-    public void nestedDtoWithCustomRules() {
+    void nestedDtoWithCustomRules() {
         DtoCustomNested dto = DtoGenerator.builder(DtoCustomNested.class).build().generateDto();
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
@@ -131,7 +131,7 @@ public class NestedDtoGenerationTests {
 
     @Test
     @DisplayName("Nested Dto Remark")
-    public void nestedDtoRemark() {
+    void nestedDtoRemark() {
         Dto dto = DtoGenerator.builder(Dto.class)
                 .setRuleRemarkForField("dtoNested.intDefaultRules", MIN_VALUE)
                 .setRuleRemarkForField("dtoNested.intRightBound", MAX_VALUE)
@@ -150,7 +150,7 @@ public class NestedDtoGenerationTests {
 
     @Test
     @DisplayName("Multilevel Nested Dto")
-    public void multiLeveNestedDto() {
+    void multiLeveNestedDto() {
         DtoWithNestedLevels dto = DtoGenerator.builder(DtoWithNestedLevels.class).build().generateDto();
 
         assertNotNull(dto);
@@ -173,7 +173,7 @@ public class NestedDtoGenerationTests {
 
     @RepeatedTest(10)
     @DisplayName("Multilevel Nested Dto With Remarks")
-    public void multiLevelNestedDtoWithRemarks() {
+    void multiLevelNestedDtoWithRemarks() {
         DtoWithNestedLevels dto = DtoGenerator.builder(DtoWithNestedLevels.class)
                 .setRuleRemarkForFields(MIN_VALUE)
                 .build().generateDto();

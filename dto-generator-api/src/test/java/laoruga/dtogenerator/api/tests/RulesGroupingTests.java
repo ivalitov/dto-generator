@@ -73,7 +73,7 @@ public class RulesGroupingTests {
 
     @DisplayName("Default group")
     @Test
-    public void defaultGroup() {
+    void defaultGroup() {
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
         assertAll(
                 () -> assertThat(dto.getIntFirst(), equalTo(10)),
@@ -84,7 +84,7 @@ public class RulesGroupingTests {
 
     @DisplayName("Include group")
     @Test
-    public void includeGroup() {
+    void includeGroup() {
         Dto dto = DtoGenerator.builder(Dto.class)
                 .includeGroups(GROUP_1)
                 .build()
@@ -98,7 +98,7 @@ public class RulesGroupingTests {
 
     @DisplayName("Include groups")
     @Test
-    public void includeGroups() {
+    void includeGroups() {
         Dto dto = DtoGenerator.builder(Dto.class)
                 .includeGroups(GROUP_2, GROUP_3)
                 .build()
@@ -112,7 +112,7 @@ public class RulesGroupingTests {
 
     @DisplayName("List rules group")
     @Test
-    public void listRulesDefault() {
+    void listRulesDefault() {
         DtoList dto = DtoGenerator.builder(DtoList.class)
                 .build()
                 .generateDto();
@@ -130,7 +130,7 @@ public class RulesGroupingTests {
 
     @DisplayName("All rules grouping")
     @Test
-    public void allRulesGrouping() {
+    void allRulesGrouping() {
         DtoAllRules dtoGroup = DtoGenerator.builder(DtoAllRules.class)
                 .includeGroups(GROUP_1)
                 .build()

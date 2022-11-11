@@ -1,6 +1,7 @@
 package laoruga.dtogenerator.api.generators.basictypegenerators;
 
 import laoruga.dtogenerator.api.constants.BasicRuleRemark;
+import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
@@ -47,7 +48,7 @@ public class EnumGenerator implements IGenerator<Enum<?>> {
                 return enumConstant;
             }
         }
-        throw new RuntimeException("Enum instance with name: '" + enumInstanceName +
+        throw new DtoGeneratorException("Enum instance with name: '" + enumInstanceName +
                 "' has not been found in Class: '" + enumClass + "'");
     }
 

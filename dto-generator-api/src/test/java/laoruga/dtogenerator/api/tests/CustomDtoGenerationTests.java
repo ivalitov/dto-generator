@@ -43,7 +43,7 @@ public class CustomDtoGenerationTests {
     @Test
     @Feature("CUSTOM_RULES")
     @DisplayName("Custom Dto Generation With Dependent Dto")
-    public void customDtoGenerationWithDependentDto() {
+    void customDtoGenerationWithDependentDto() {
         ClientDto dto = DtoGenerator.builder(ClientDto.class).build().generateDto();
         assertNotNull(dto);
         baseAssertions(dto);
@@ -61,7 +61,7 @@ public class CustomDtoGenerationTests {
     @Feature("CUSTOM_RULES")
     @DisplayName("Custom Dto Generation With Remarks")
     @MethodSource("customDtoGenerationWithRemarksTestData")
-    public void customDtoGenerationWithRemarks(ClientType clientType, DocType docType) {
+    void customDtoGenerationWithRemarks(ClientType clientType, DocType docType) {
         DtoGeneratorBuilder<ClientDto> builder = DtoGenerator.builder(ClientDto.class);
         builder.addRuleRemarkForFields(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
         if (docType != null) {
@@ -84,7 +84,7 @@ public class CustomDtoGenerationTests {
     @Feature("CUSTOM_RULES")
     @DisplayName("Custom Dto Generation With Args")
     @MethodSource("customDtoGenerationWithRemarksTestData")
-    public void customDtoGenerationWithDefaultArgs(ClientType clientType, DocType docType) {
+    void customDtoGenerationWithDefaultArgs(ClientType clientType, DocType docType) {
         DtoGeneratorBuilder<ClientDto> builder = DtoGenerator.builder(ClientDto.class);
         builder.addRuleRemarkForFields(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
         if (docType != null) {

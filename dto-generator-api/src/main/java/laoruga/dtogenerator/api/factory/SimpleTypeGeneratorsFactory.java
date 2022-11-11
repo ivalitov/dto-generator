@@ -48,11 +48,11 @@ public class SimpleTypeGeneratorsFactory {
         }
 
         if (EnumRule.class == rulesClass) {
-            return getEnumGenerator(fieldName, (EnumRule) rules, maybeRemark);
+            return getEnumGenerator((EnumRule) rules, maybeRemark);
         }
 
         if (LocalDateTimeRule.class == rulesClass) {
-            return getLocalDateTimeGenerator(fieldName, (LocalDateTimeRule) rules, maybeRemark);
+            return getLocalDateTimeGenerator((LocalDateTimeRule) rules, maybeRemark);
         }
 
         throw new DtoGeneratorException("Field '" + fieldName + "' hasn't been mapped with any basic generator.");
@@ -81,7 +81,7 @@ public class SimpleTypeGeneratorsFactory {
                                              AtomicReference<IRuleRemark> maybeRemark) {
         IRuleRemark remark = maybeRemark.get() == null ? doubleRule.ruleRemark() : maybeRemark.get();
         if (remark == NULL_VALUE && isPrimitive) {
-            log.debug("Primitive field '" + fieldName + "' can't be null, it will be assigned to '0'");
+            reportPrimitiveCannotBeNull(fieldName);
             return (IGenerator<Double>) () -> 0D;
         }
         return BasicGeneratorsBuilders.doubleBuilder()
@@ -96,7 +96,7 @@ public class SimpleTypeGeneratorsFactory {
                                               AtomicReference<IRuleRemark> maybeRemark) {
         IRuleRemark remark = maybeRemark.get() == null ? integerRule.ruleRemark() : maybeRemark.get();
         if (remark == NULL_VALUE && isPrimitive) {
-            log.debug("Primitive field '" + fieldName + "' can't be null, it will be assigned to '0'");
+            reportPrimitiveCannotBeNull(fieldName);
             return (IGenerator<Integer>) () -> 0;
         }
         return BasicGeneratorsBuilders.integerBuilder()
@@ -110,7 +110,7 @@ public class SimpleTypeGeneratorsFactory {
                                            AtomicReference<IRuleRemark> maybeRemark) {
         IRuleRemark remark = maybeRemark.get() == null ? longRule.ruleRemark() : maybeRemark.get();
         if (remark == NULL_VALUE && isPrimitive) {
-            log.debug("Primitive field '" + fieldName + "' can't be null, it will be assigned to '0'");
+            reportPrimitiveCannotBeNull(fieldName);
             return (IGenerator<Long>) () -> 0L;
         }
         return BasicGeneratorsBuilders.longBuilder()
@@ -120,7 +120,7 @@ public class SimpleTypeGeneratorsFactory {
                 .build();
     }
 
-    private IGenerator<?> getEnumGenerator(String fieldName, EnumRule enumRule, AtomicReference<IRuleRemark> maybeRemark) {
+    private IGenerator<?> getEnumGenerator(EnumRule enumRule, AtomicReference<IRuleRemark> maybeRemark) {
         IRuleRemark remark = maybeRemark.get() == null ? enumRule.ruleRemark() : maybeRemark.get();
         return BasicGeneratorsBuilders.enumBuilder()
                 .enumClass(enumRule.enumClass())
@@ -129,7 +129,7 @@ public class SimpleTypeGeneratorsFactory {
                 .build();
     }
 
-    private IGenerator<?> getLocalDateTimeGenerator(String fieldName, LocalDateTimeRule localDateTimeRule,
+    private IGenerator<?> getLocalDateTimeGenerator(LocalDateTimeRule localDateTimeRule,
                                                     AtomicReference<IRuleRemark> maybeRemark) {
         IRuleRemark remark = maybeRemark.get() == null ? localDateTimeRule.ruleRemark() : maybeRemark.get();
 
@@ -138,5 +138,9 @@ public class SimpleTypeGeneratorsFactory {
                 .rightShiftDays(localDateTimeRule.rightShiftDays())
                 .ruleRemark(remark)
                 .build();
+    }
+
+    private void reportPrimitiveCannotBeNull(String fieldName){
+        log.debug("Primitive field '" + fieldName + "' can't be null, it will be assigned to '0'");
     }
 }

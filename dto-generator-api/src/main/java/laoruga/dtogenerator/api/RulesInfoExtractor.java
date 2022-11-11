@@ -3,7 +3,6 @@ package laoruga.dtogenerator.api;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Pair;
 
@@ -55,8 +54,6 @@ public class RulesInfoExtractor {
                             .ruleType(RuleType.getType(groupAndRule.get().getSecond()))
                             .groupName(groupAndRule.get().getFirst())
                             .rulesGrouped(true);
-                } else {
-                    log.debug("None of the rules matched the group for field");
                 }
 
             } else if (isItCollectionRule(annotation)) {
@@ -90,8 +87,6 @@ public class RulesInfoExtractor {
                                     ruleInfoBuilder.getRule(),
                                     collectionRuleInfo.getRule(),
                                     field));
-                } else {
-                    log.debug("None of the rules matched the group for field");
                 }
 
             }

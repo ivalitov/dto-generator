@@ -6,6 +6,7 @@ import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.StringRule;
+import laoruga.dtogenerator.api.util.RandomUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.RandomStringGenerator;
@@ -38,7 +39,7 @@ public class StringGenerator implements IGenerator<String> {
         } else if (ruleRemark == BasicRuleRemark.MAX_VALUE) {
             length = maxLength;
         } else if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
-            length = minLength + (int) (Math.random() * (maxLength - minLength));
+            length = RandomUtils.nextInt(minLength, maxLength);
         } else if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
             return null;
         } else {

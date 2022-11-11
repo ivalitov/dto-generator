@@ -35,15 +35,15 @@ import static laoruga.dtogenerator.api.util.ReflectionUtils.createInstance;
 
 @Slf4j
 @Getter(AccessLevel.PACKAGE)
-public class TypeGeneratorsProvider<DTO_TYPE> {
+public class TypeGeneratorsProvider<T> {
 
-    private DTO_TYPE dtoInstance;
+    private T dtoInstance;
     private final String[] fieldsFromRoot;
     private final DtoGeneratorBuilder.GeneratorBuildersTree generatorBuildersTree;
     private final GeneratorRemarksProvider generatorRemarksProvider;
     private final SimpleTypeGeneratorsFactory simpleTypeGeneratorsFactory = SimpleTypeGeneratorsFactory.getInstance();
     private final Map<Class<? extends Annotation>, IGeneratorBuilder<IGenerator<?>>> overriddenBuilders;
-    // TODO копировать эти карты тоже через конструктор
+    // TODO copy these maps via the constructor
     private final Map<String, IGeneratorBuilder<IGenerator<?>>> overriddenBuildersForFields = new HashMap<>();
     private final Map<String, IGeneratorBuilder<ICollectionGenerator<?>>> overriddenCollectionBuildersForFields = new HashMap<>();
 
@@ -83,10 +83,10 @@ public class TypeGeneratorsProvider<DTO_TYPE> {
      */
     void setDtoInstance(Object dtoInstance) {
         if (this.dtoInstance != null) {
-            throw new RuntimeException("Dto instance has already been set: '" + this.dtoInstance.getClass() + "'");
+            throw new DtoGeneratorException("Dto instance has already been set: '" + this.dtoInstance.getClass() + "'");
         }
         try {
-            this.dtoInstance = (DTO_TYPE) dtoInstance;
+            this.dtoInstance = (T) dtoInstance;
         } catch (ClassCastException e) {
             throw new DtoGeneratorException("Unexpected error", e);
         }
@@ -255,23 +255,11 @@ public class TypeGeneratorsProvider<DTO_TYPE> {
             generatorClass = customRules.generatorClass();
             Object generatorInstance = createInstance(generatorClass);
             if (generatorInstance instanceof ICustomGeneratorArgs) {
-                log.debug("Args {} have been obtained from Annotation: {}",
-                        Arrays.asList(customRules.args()), customRules);
+                log.debug("Args {} have been obtained from Annotation: {}", Arrays.asList(customRules.args()), customRules);
                 ((ICustomGeneratorArgs<?>) generatorInstance).setArgs(customRules.args());
             }
             if (generatorInstance instanceof ICustomGeneratorDtoDependent) {
-                try {
-                    ((ICustomGeneratorDtoDependent) generatorInstance).setDto(dtoInstance);
-                } catch (ClassCastException e) {
-                    throw new DtoGeneratorException("ClassCastException while trying to set basic DTO into " +
-                            "DTO dependent custom generator. Perhaps there is wrong argument type is passing into " +
-                            "'setDto' method of generator class. " +
-                            "Generator class: '" + generatorInstance.getClass() + "', " +
-                            "Passing argument type: '" + dtoInstance.getClass() + "'", e);
-                } catch (Exception e) {
-                    throw new DtoGeneratorException("Exception was thrown while trying to set DTO into " +
-                            "DTO dependent custom generator: " + generatorInstance.getClass(), e);
-                }
+                setDto(generatorInstance);
             }
             if (generatorInstance instanceof ICustomGenerator) {
                 return (ICustomGenerator<?>) generatorInstance;
@@ -283,6 +271,21 @@ public class TypeGeneratorsProvider<DTO_TYPE> {
             throw new DtoGeneratorException("Error while preparing custom generator from class: " + generatorClass, e);
         }
 
+    }
+
+    private void setDto(Object generatorInstance) {
+        try {
+            ((ICustomGeneratorDtoDependent) generatorInstance).setDto(dtoInstance);
+        } catch (ClassCastException e) {
+            throw new DtoGeneratorException("ClassCastException while trying to set basic DTO into " +
+                    "DTO dependent custom generator. Perhaps there is wrong argument type is passing into " +
+                    "'setDto' method of generator class. " +
+                    "Generator class: '" + generatorInstance.getClass() + "', " +
+                    "Passing argument type: '" + dtoInstance.getClass() + "'", e);
+        } catch (Exception e) {
+            throw new DtoGeneratorException("Exception was thrown while trying to set DTO into " +
+                    "DTO dependent custom generator: " + generatorInstance.getClass(), e);
+        }
     }
 
     /*

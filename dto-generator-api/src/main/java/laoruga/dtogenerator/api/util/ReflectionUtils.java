@@ -1,6 +1,8 @@
 package laoruga.dtogenerator.api.util;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Pair;
 
@@ -15,11 +17,14 @@ import java.util.Optional;
  * Created on 25.05.2022
  */
 @Slf4j
-public class ReflectionUtils {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class ReflectionUtils {
 
     public static Class<?> getGenericType(Field field) throws DtoGeneratorException {
         return (Class<?>) getGenericTypeOrPair(field);
     }
+
+    private static final String CREATE_GENERATOR_MSG_PATTERN = " please create custom generator for type: %s";
 
     static Object getGenericTypeOrPair(Field field) throws DtoGeneratorException {
         String typeName = field.getGenericType().getTypeName();
@@ -32,26 +37,26 @@ public class ReflectionUtils {
                 if (leftIdx == null) {
                     leftIdx = i + 1;
                 } else {
-                    throw new DtoGeneratorException("Can't generate via default generator," +
-                            " please create custom generator for type: " + typeName);
+                    throw new DtoGeneratorException("Can't generate via default generator,"
+                            + String.format(CREATE_GENERATOR_MSG_PATTERN, typeName));
                 }
             } else if (chars[i] == '>') {
                 rightIdx = i;
                 break;
             } else if (chars[i] == ',') {
                 if (multipleTypes) {
-                    throw new DtoGeneratorException("Can't generate via default generator, " +
-                            "please create custom generator for type: " + typeName);
+                    throw new DtoGeneratorException("Can't generate via default generator,"
+                            + String.format(CREATE_GENERATOR_MSG_PATTERN, typeName));
                 }
                 multipleTypes = true;
             } else if (chars[i] == '?') {
-                throw new DtoGeneratorException("Can't generate wildcard type via default generator," +
-                        " please create custom generator for type: " + typeName);
+                throw new DtoGeneratorException("Can't generate wildcard type via default generator,"
+                        + String.format(CREATE_GENERATOR_MSG_PATTERN, typeName));
             }
         }
         if (rightIdx == null || leftIdx == null) {
-            throw new DtoGeneratorException("Can't generate raw type via default generator," +
-                    " please create custom generator for type: " + typeName);
+            throw new DtoGeneratorException("Can't generate raw type via default generator,"
+                    + String.format(CREATE_GENERATOR_MSG_PATTERN, typeName));
         } else {
             String className = typeName.substring(leftIdx, rightIdx);
             if (multipleTypes) {
@@ -72,19 +77,21 @@ public class ReflectionUtils {
         }
     }
 
+    private static final String FAILED_MSG_PATTERN = "Failed to instantiate class: '%s'";
+
     public static <T> T createInstance(Class<T> dtoClass) {
         try {
             Constructor<?>[] declaredConstructors = dtoClass.getDeclaredConstructors();
             if (declaredConstructors.length == 0) {
-                throw new DtoGeneratorException("Failed to instantiate class: '" + dtoClass + "'. " +
-                        "Class don't have public constructors. It must have public no-args constructor.");
+                throw new DtoGeneratorException(String.format(FAILED_MSG_PATTERN, dtoClass) +
+                        " Class don't have public constructors. It must have public no-args constructor.");
             }
             Optional<Constructor<?>> maybeNoArgsConstructor = Arrays.stream(declaredConstructors)
                     .filter(constructor -> constructor.getParameterCount() == 0)
                     .findAny();
             if (!maybeNoArgsConstructor.isPresent()) {
-                throw new DtoGeneratorException("Failed to instantiate class: '" + dtoClass + "'. " +
-                        "Class must have public no-args constructor.");
+                throw new DtoGeneratorException(String.format(FAILED_MSG_PATTERN, dtoClass) +
+                        " Class must have public no-args constructor.");
             }
             Constructor<?> constructor = maybeNoArgsConstructor.get();
             boolean isAccessible = constructor.isAccessible();
@@ -93,10 +100,10 @@ public class ReflectionUtils {
             constructor.setAccessible(isAccessible);
             return (T) instance;
         } catch (InstantiationException ie) {
-            throw new DtoGeneratorException("Failed to instantiate class: '" + dtoClass + "'. " +
-                    "Maybe no-args constructor was not found.", ie);
+            throw new DtoGeneratorException(String.format(FAILED_MSG_PATTERN, dtoClass) +
+                    " Maybe no-args constructor was not found.", ie);
         } catch (Exception e) {
-            throw new DtoGeneratorException("Failed to instantiate class: '" + dtoClass + "'.", e);
+            throw new DtoGeneratorException(String.format(FAILED_MSG_PATTERN, dtoClass), e);
         }
     }
 

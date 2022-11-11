@@ -1,6 +1,8 @@
 package laoruga.dtogenerator.api.util;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 
@@ -18,7 +20,8 @@ import java.util.stream.IntStream;
  */
 
 @Slf4j
-public class RandomUtils {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RandomUtils {
 
     @Getter
     private static final Random random = new Random();

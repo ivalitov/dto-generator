@@ -11,7 +11,6 @@ import laoruga.dtogenerator.api.markup.rules.StringRule;
 import laoruga.dtogenerator.api.tests.data.dtoclient.ClientDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +55,7 @@ public class ListGenerationTests {
 
     @Test
     @DisplayName("List Of Integer Generation (default rules params)")
-    public void listOfIntegerWithDefaultRulesPrams() {
+    void listOfIntegerWithDefaultRulesPrams() {
         ClientDto dto = DtoGenerator.builder(ClientDto.class).build().generateDto();
 
         assertNotNull(dto);
@@ -72,7 +71,7 @@ public class ListGenerationTests {
 
     @Test
     @DisplayName("List Of Integer Generation (explicit rules params)")
-    public void listOfIntegerWithExplicitRulesPrams() {
+    void listOfIntegerWithExplicitRulesPrams() {
         ClientDto dto = DtoGenerator.builder(ClientDto.class).build().generateDto();
 
         assertNotNull(dto);
@@ -90,7 +89,7 @@ public class ListGenerationTests {
 
     @Test
     @DisplayName("List Of Strings Generation (explicit rules params)")
-    public void listOfStingsWithExplicitRulesPrams() {
+    void listOfStingsWithExplicitRulesPrams() {
         DtoList dto = DtoGenerator.builder(DtoList.class).build().generateDto();
 
         assertNotNull(dto);
@@ -151,7 +150,7 @@ public class ListGenerationTests {
     @Test
     @Feature("NEGATIVE_TESTS")
     @DisplayName("Wildcard generic type")
-    public void wildcardGenericType() {
+    void wildcardGenericType() {
         DtoGenerator<DtoWithWildcardList> generator = DtoGenerator.builder(DtoWithWildcardList.class).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);
 
@@ -165,7 +164,7 @@ public class ListGenerationTests {
     @Test
     @Feature("NEGATIVE_TESTS")
     @DisplayName("Raw list")
-    public void rawList() {
+    void rawList() {
         DtoGenerator<DtoWithRawList> generator = DtoGenerator.builder(DtoWithRawList.class).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);
 
@@ -180,7 +179,7 @@ public class ListGenerationTests {
     @Feature("NEGATIVE_TESTS")
     @DisplayName("List Of Collection")
     // TODO fix
-    public void listOfCollection() {
+    void listOfCollection() {
         DtoGenerator<DtoWithListOfCollections> generator = DtoGenerator.builder(DtoWithListOfCollections.class).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);
 

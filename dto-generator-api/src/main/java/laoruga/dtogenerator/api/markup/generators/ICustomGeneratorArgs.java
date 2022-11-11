@@ -5,7 +5,7 @@ package laoruga.dtogenerator.api.markup.generators;
  * Created on 18.04.2022
  */
 
-public interface ICustomGeneratorArgs<GENERATED_TYPE> extends ICustomGenerator<GENERATED_TYPE> {
-
+public interface ICustomGeneratorArgs<T> extends ICustomGenerator<T> {
+    
     ICustomGeneratorArgs setArgs(String... args);
 }

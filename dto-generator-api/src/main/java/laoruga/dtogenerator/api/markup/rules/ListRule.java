@@ -38,6 +38,4 @@ public @interface ListRule {
     BasicRuleRemark ruleRemark() default RANDOM_VALUE;
 
     String group() default DEFAULT;
-
-    //TODO exactSize
 }

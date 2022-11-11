@@ -10,7 +10,7 @@ import java.util.List;
  * Created on 16.04.2022
  */
 
-public interface ICustomGeneratorRemarkable<GENERATED_TYPE> extends ICustomGenerator<GENERATED_TYPE> {
+public interface ICustomGeneratorRemarkable<T> extends ICustomGenerator<T> {
 
     void setRuleRemarks(List<CustomRuleRemarkWrapper> iRuleRemarks);
 

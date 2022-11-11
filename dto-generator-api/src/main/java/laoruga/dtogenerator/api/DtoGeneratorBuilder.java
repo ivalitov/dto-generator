@@ -43,20 +43,10 @@ public class DtoGeneratorBuilder<T> {
     private final GeneratorBuildersTree generatorBuildersTree;
     private final FieldGroupFilter fieldGroupFilter;
 
-    /**
-     * key - field name;
-     * if key == null - rule remark is passing to all basic fields generators;
-     * if key != null - rule remarks is passing to field with this name.
-     */
-
-//    DtoGeneratorBuilder() {
-//        this(null);
-//    }
-
     DtoGeneratorBuilder(T dtoInstance) {
         this.fieldGroupFilter = new FieldGroupFilter();
         this.generatorBuildersTree = new GeneratorBuildersTree(this);
-        this.typeGeneratorsProvider = new TypeGeneratorsProvider<T>(
+        this.typeGeneratorsProvider = new TypeGeneratorsProvider<>(
                 new GeneratorRemarksProvider(),
                 fieldGroupFilter,
                 new String[]{GeneratorBuildersTree.ROOT},
@@ -166,7 +156,7 @@ public class DtoGeneratorBuilder<T> {
         if (fieldGroupFilter.getGroupsCount() == 0) {
             fieldGroupFilter.includeGroups(Group.DEFAULT);
         }
-        return new DtoGenerator<T>(typeGeneratorsProvider, this);
+        return new DtoGenerator<>(typeGeneratorsProvider, this);
     }
 
     DtoGenerator<?> buildNestedFieldGenerator(String[] pathToNestedDtoField, Class<?> generatedType) {

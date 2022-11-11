@@ -27,24 +27,24 @@ import static laoruga.dtogenerator.api.util.ReflectionUtils.createInstance;
  */
 
 @Slf4j
-public class DtoGenerator<DTO_TYPE> {
+public class DtoGenerator<T> {
 
-    private final DTO_TYPE dtoInstance;
+    private final T dtoInstance;
 
     @Getter(AccessLevel.PACKAGE)
     private final TypeGeneratorsProvider typeGeneratorsProvider;
     @Getter(AccessLevel.PACKAGE)
     private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
     @Getter(AccessLevel.PACKAGE)
-    private final DtoGeneratorBuilder<DTO_TYPE> builderInstance;
+    private final DtoGeneratorBuilder<T> builderInstance;
 
 
     private final Map<Field, Exception> errors = new HashMap<>();
 
-    protected DtoGenerator(TypeGeneratorsProvider typeGeneratorsProvider, DtoGeneratorBuilder<DTO_TYPE> dtoGeneratorBuilder) {
+    protected DtoGenerator(TypeGeneratorsProvider typeGeneratorsProvider, DtoGeneratorBuilder<T> dtoGeneratorBuilder) {
         this.typeGeneratorsProvider = typeGeneratorsProvider;
         this.builderInstance = dtoGeneratorBuilder;
-        this.dtoInstance = (DTO_TYPE) typeGeneratorsProvider.getDtoInstance();
+        this.dtoInstance = (T) typeGeneratorsProvider.getDtoInstance();
     }
 
     public static <T> DtoGeneratorBuilder<T> builder(Class<T> dtoClass) {
@@ -55,7 +55,7 @@ public class DtoGenerator<DTO_TYPE> {
         return new DtoGeneratorBuilder<>(dtoInstance);
     }
 
-    public DTO_TYPE generateDto() {
+    public T generateDto() {
         prepareGeneratorsRecursively(dtoInstance.getClass());
         applyGenerators();
         return dtoInstance;

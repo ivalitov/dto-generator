@@ -67,7 +67,7 @@ public class GeneratorsOverridingTests {
 
     @Test
     @DisplayName("Basic generator overridden")
-    public void basicGeneratorOverridden() {
+    void basicGeneratorOverridden() {
         Dto dto = DtoGenerator.builder(Dto.class)
                 .setGenerator(IntegerRule.class, () -> new NumberGenerator().setArgs("123")).build()
                 .generateDto();
@@ -83,7 +83,7 @@ public class GeneratorsOverridingTests {
 
     @Test
     @DisplayName("Field generator overridden")
-    public void fieldGeneratorOverridden() {
+    void fieldGeneratorOverridden() {
         Dto dto = DtoGenerator.builder(Dto.class)
                 .setGeneratorForField("integer", () -> new NumberGenerator().setArgs("123"))
                 .setGeneratorForField("innerDto.innerInteger", () -> new NumberGenerator().setArgs("456"))

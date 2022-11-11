@@ -67,7 +67,7 @@ public class IntegerGenerationTests {
     @Test
     @Feature("SIMPLE_GENERATION")
     @DisplayName("Simple Integer Generation")
-    public void simpleIntegerGeneration() {
+    void simpleIntegerGeneration() {
         DtoInteger dto = DtoGenerator.builder(DtoInteger.class).build().generateDto();
         simpleIntegerGenerationAssertions(dto);
     }
@@ -75,7 +75,7 @@ public class IntegerGenerationTests {
     @Test
     @Feature("ALL_FIELDS_REMARK")
     @DisplayName("MIN Values Integer Generation")
-    public void minIntegerGeneration() {
+    void minIntegerGeneration() {
         DtoInteger dto = DtoGenerator.builder(DtoInteger.class).setRuleRemarkForFields(MIN_VALUE).build().generateDto();
         assertNotNull(dto);
         assertAll(
@@ -92,7 +92,7 @@ public class IntegerGenerationTests {
     @Test
     @Feature("ALL_FIELDS_REMARK")
     @DisplayName("MAX Values Integer Generation")
-    public void maxIntegerGeneration() {
+    void maxIntegerGeneration() {
         DtoInteger dto = DtoGenerator.builder(DtoInteger.class).setRuleRemarkForFields(MAX_VALUE).build().generateDto();
         assertNotNull(dto);
         assertAll(
@@ -109,7 +109,7 @@ public class IntegerGenerationTests {
     @Test
     @Feature("EXPLICIT_FIELDS_REMARK")
     @DisplayName("Integer Generation with field remarks")
-    public void integerGenerationExplicitFields() {
+    void integerGenerationExplicitFields() {
         DtoInteger dto = DtoGenerator.builder(DtoInteger.class)
                 .setRuleRemarkForField("intDefaultRules", NULL_VALUE)
                 .setRuleRemarkForField("intPrimitiveDefaultRules", NULL_VALUE)
@@ -133,7 +133,7 @@ public class IntegerGenerationTests {
     @Test
     @Feature("EXPLICIT_FIELDS_REMARK")
     @DisplayName("Integer Generation with field remarks and all fields remarks")
-    public void maxIntegerGenerationExplicitFields() {
+    void maxIntegerGenerationExplicitFields() {
         DtoInteger dto = DtoGenerator.builder(DtoInteger.class)
                 .setRuleRemarkForFields(MIN_VALUE)
                 .setRuleRemarkForField("intDefaultRules", NULL_VALUE)
