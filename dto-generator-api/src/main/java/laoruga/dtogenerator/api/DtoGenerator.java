@@ -15,6 +15,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -84,15 +85,13 @@ public class DtoGenerator<DTO_TYPE> {
 
     void prepareGenerators(Class<?> dtoClass) {
         for (Field field : dtoClass.getDeclaredFields()) {
-            IGenerator<?> generator = null;
+            Optional<IGenerator<?>> generator = Optional.empty();
             try {
                 generator = getTypeGeneratorsProvider().getGenerator(field);
             } catch (Exception e) {
                 errors.put(field, e);
             }
-            if (generator != null) {
-                getFieldGeneratorMap().put(field, generator);
-            }
+            generator.ifPresent(iGenerator -> getFieldGeneratorMap().put(field, iGenerator));
         }
         if (!errors.isEmpty()) {
             final AtomicInteger counter = new AtomicInteger(0);

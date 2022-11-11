@@ -8,12 +8,7 @@ import laoruga.dtogenerator.api.markup.generators.*;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
 import laoruga.dtogenerator.api.markup.rules.ListRule;
-import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
 import laoruga.dtogenerator.api.markup.rules.SetRule;
-import laoruga.dtogenerator.api.markup.rules.meta.Rule;
-import laoruga.dtogenerator.api.markup.rules.meta.RuleForCollection;
-import laoruga.dtogenerator.api.markup.rules.meta.Rules;
-import laoruga.dtogenerator.api.markup.rules.meta.RulesForCollection;
 import laoruga.dtogenerator.api.util.ReflectionUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,6 +20,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -102,65 +98,78 @@ public class TypeGeneratorsProvider<DTO_TYPE> {
      * @param field
      * @return generator instance or null if field should not be generated
      */
-    IGenerator<?> getGenerator(Field field) {
-        RulesInfo rulesInfo = rulesInfoExtractor.checkAndWrapRulesInfo(field);
-        // TODO only BASIC type generators may be overridden
-        boolean isOverridden = isGeneratorOverridden(field.getName(), rulesInfo.getItemGenerationRules());
-        switch (rulesInfo.getAction()) {
-            case GENERATE:
-                IGenerator<?> generator = isOverridden ?
-                        getOverriddenGenerator(field.getName(), rulesInfo.getItemGenerationRules()) :
-                        selectGenerator(field, rulesInfo);
-                prepareCustomRemarks(generator);
-                return generator;
-            case SKIP:
-                return null;
-            case CHECK_EXPLICIT_GENERATOR:
-                return isOverridden ?
-                        getOverriddenGenerator(field.getName(), rulesInfo.getItemGenerationRules()) : null;
-            default:
-                throw new IllegalStateException("Unexpected value: " + rulesInfo.getAction());
+    Optional<IGenerator<?>> getGenerator(Field field) {
+        Optional<IRuleInfo> rulesInfo;
+        try {
+            rulesInfo = rulesInfoExtractor.checkAndWrapAnnotations(field);
+        } catch (Exception e) {
+            throw new DtoGeneratorException("Error while extracting rule annotations from field: '" + field + "'", e);
         }
+
+        IGenerator<?> generator;
+
+        if (rulesInfo.isPresent()) {
+            // TODO by now, only BASIC type generators may be overridden
+            Annotation unitRule = rulesInfo.get().isTypesEqual(COLLECTION) ?
+                    ((RuleInfoCollection) rulesInfo.get()).getItemRule().getRule() :
+                    rulesInfo.get().getRule();
+            boolean isOverridden = isGeneratorOverridden(field.getName(), unitRule);
+            generator = isOverridden ?
+                    getOverriddenGenerator(field.getName(), unitRule) :
+                    selectGenerator(field, rulesInfo.get());
+            prepareCustomRemarks(generator);
+        } else {
+            boolean isOverridden = isGeneratorOverridden(field.getName());
+            generator = isOverridden ?
+                    getOverriddenGenerator(field.getName()) : null;
+        }
+        return generator == null ? Optional.empty() : Optional.of(generator);
     }
 
-    IGenerator<?> selectGenerator(Field field, RulesInfo rulesInfo) {
+    IGenerator<?> selectGenerator(Field field, IRuleInfo ruleInfo) {
         String fieldName = field.getName();
-        Annotation fieldRules = rulesInfo.getItemGenerationRules();
+        Annotation fieldRules = ruleInfo.getRule();
 
-        if (rulesInfo.checkType(BASIC)) {
+        if (ruleInfo.isTypesEqual(BASIC)) {
             return getBasicTypeGenerator(fieldName, field.getType(), fieldRules);
         }
 
-        if (rulesInfo.checkType(CUSTOM)) {
+        if (ruleInfo.isTypesEqual(CUSTOM)) {
             return getCustomGenerator(fieldRules);
         }
 
-        if (rulesInfo.checkType(NESTED)) {
+        if (ruleInfo.isTypesEqual(NESTED)) {
             return getNestedDtoGenerator(field, getFieldsFromRoot());
         }
 
-        if (rulesInfo.checkType(COLLECTION, BASIC)) {
-            //TODO item generator cannot be overridden
-            IGenerator<?> collectionItemGenerator = getBasicTypeGenerator(
-                    fieldName + " " + field.getGenericType().getClass(),
-                    ReflectionUtils.getGenericType(field),
-                    fieldRules);
-            return getCollectionTypeGenerator(
-                    fieldName, field.getType(),
-                    rulesInfo.getCollectionGenerationRules(),
-                    collectionItemGenerator);
-        }
+        if (ruleInfo.isTypesEqual(COLLECTION)) {
+            RuleInfoCollection collectionRuleInfo = (RuleInfoCollection) ruleInfo;
 
-        if (rulesInfo.checkType(COLLECTION, CUSTOM)) {
-            IGenerator<?> collectionItemGenerator = getCustomGenerator(fieldRules);
-            return getCollectionTypeGenerator(
-                    fieldName, field.getType(),
-                    rulesInfo.getCollectionGenerationRules(),
-                    collectionItemGenerator);
+            if (collectionRuleInfo.getItemRule().isTypesEqual(BASIC)) {
+                //TODO item generator cannot be overridden
+                IGenerator<?> collectionItemGenerator = getBasicTypeGenerator(
+                        fieldName + " " + field.getGenericType().getClass(),
+                        ReflectionUtils.getGenericType(field),
+                        collectionRuleInfo.getItemRule().getRule());
+                return getCollectionTypeGenerator(
+                        fieldName, field.getType(),
+                        collectionRuleInfo.getCollectionRule().getRule(),
+                        collectionItemGenerator);
+            }
+
+            if (collectionRuleInfo.getItemRule().isTypesEqual(CUSTOM)) {
+                IGenerator<?> collectionItemGenerator = getCustomGenerator(
+                        collectionRuleInfo.getItemRule().getRule());
+                return getCollectionTypeGenerator(
+                        fieldName, field.getType(),
+                        collectionRuleInfo.getCollectionRule().getRule(),
+                        collectionItemGenerator);
+            }
+
         }
 
         throw new DtoGeneratorException("Unexpected error. Unable to create generator for field '" + field + "' depended on types:" +
-                " '" + rulesInfo.getRuleType() + "'");
+                " '" + ruleInfo + "'");
     }
 
     void prepareCustomRemarks(IGenerator<?> generator) {
@@ -308,41 +317,27 @@ public class TypeGeneratorsProvider<DTO_TYPE> {
      */
 
     private boolean isGeneratorOverridden(String fieldName, Annotation rules) {
+        return isGeneratorOverridden(fieldName) || isGeneratorOverridden(rules);
+    }
+
+    private boolean isGeneratorOverridden(String fieldName) {
         return overriddenBuildersForFields.containsKey(fieldName) ||
-                overriddenCollectionBuildersForFields.containsKey(fieldName) ||
-                (rules != null && overriddenBuilders.containsKey(rules.annotationType()));
+                overriddenCollectionBuildersForFields.containsKey(fieldName);
+    }
+
+    private boolean isGeneratorOverridden(Annotation rules) {
+        return rules != null && overriddenBuilders.containsKey(rules.annotationType());
+    }
+
+    private IGenerator<?> getOverriddenGenerator(@NonNull String fieldName) {
+        return overriddenBuildersForFields.get(fieldName).build();
     }
 
     private IGenerator<?> getOverriddenGenerator(@NonNull String fieldName, Annotation rules) {
         if (rules != null) {
             return overriddenBuildersForFields.getOrDefault(fieldName, overriddenBuilders.get(rules.annotationType())).build();
         } else {
-            return overriddenBuildersForFields.get(fieldName).build();
+            return getOverriddenGenerator(fieldName);
         }
-    }
-
-    private static boolean isItCollectionRule(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType().getDeclaredAnnotation(RuleForCollection.class) != null;
-    }
-
-    private static boolean isItCollectionRules(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType().getDeclaredAnnotation(RulesForCollection.class) != null;
-    }
-
-    private static boolean isItCustomRule(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType() == CustomGenerator.class;
-    }
-
-    private static boolean isItNestedRule(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType() == NestedDtoRules.class;
-    }
-
-
-    private static boolean isItRule(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType().getDeclaredAnnotation(Rule.class) != null;
-    }
-
-    private static boolean isItRules(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType().getDeclaredAnnotation(Rules.class) != null;
     }
 }
