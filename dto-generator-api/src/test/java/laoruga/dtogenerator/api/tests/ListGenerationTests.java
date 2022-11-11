@@ -180,19 +180,20 @@ public class ListGenerationTests {
     @Feature("NEGATIVE_TESTS")
     @DisplayName("List Of Collection")
     // TODO fix
-    @Disabled
     public void listOfCollection() {
         DtoGenerator<DtoWithListOfCollections> generator = DtoGenerator.builder(DtoWithListOfCollections.class).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);
 
         Map<String, Exception> errorsMap = getErrorsMap(generator);
-        final String ERROR_PART = "Failed to construct collection generator";
 
         assertEquals(2, errorsMap.size());
         assertTrue(errorsMap.containsKey("listOfSet"));
-        assertThat(errorsMap.get("listOfSet").getMessage(), stringContainsInOrder(ERROR_PART));
+        assertThat(errorsMap.get("listOfSet").getCause().getMessage(),
+                stringContainsInOrder("Found '2' @CollectionRule annotations for various collection types"));
         assertTrue(errorsMap.containsKey("listOfString"));
-        assertThat(errorsMap.get("listOfString").getMessage(), stringContainsInOrder(ERROR_PART));
+        assertThat(errorsMap.get("listOfString").getCause().getMessage(),
+                stringContainsInOrder("Missed @Rule annotation for item of collection"));
+
     }
 
 }

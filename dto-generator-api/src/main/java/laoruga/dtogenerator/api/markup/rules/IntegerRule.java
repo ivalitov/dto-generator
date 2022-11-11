@@ -9,13 +9,13 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static laoruga.dtogenerator.api.constants.BasicRuleRemark.RANDOM_VALUE;
 import static laoruga.dtogenerator.api.constants.Group.DEFAULT;
 
 @Retention(RUNTIME)
-@Target(FIELD)
+@Target({FIELD, TYPE_USE})
 @Rule
 @Repeatable(IntegerRules.class)
 public @interface IntegerRule {

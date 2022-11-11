@@ -99,31 +99,35 @@ public class TypeGeneratorsProvider<DTO_TYPE> {
      * @return generator instance or null if field should not be generated
      */
     Optional<IGenerator<?>> getGenerator(Field field) {
+        String fieldName = field.getName();
+
+        if (isGeneratorOverridden(fieldName)) {
+            return Optional.of(getOverriddenGenerator(fieldName));
+        }
+
         Optional<IRuleInfo> rulesInfo;
         try {
+            String validationResult = new AnnotationErrorsHandler(field.getDeclaredAnnotations()).validate();
+            if (!validationResult.isEmpty()) {
+                throw new DtoGeneratorException("Field annotated wrong:\n" + validationResult);
+            }
             rulesInfo = rulesInfoExtractor.checkAndWrapAnnotations(field);
         } catch (Exception e) {
             throw new DtoGeneratorException("Error while extracting rule annotations from field: '" + field + "'", e);
         }
 
-        IGenerator<?> generator;
-
         if (rulesInfo.isPresent()) {
-            // TODO by now, only BASIC type generators may be overridden
+            // TODO by now, only BASIC type generators may be overridden by Class
             Annotation unitRule = rulesInfo.get().isTypesEqual(COLLECTION) ?
                     ((RuleInfoCollection) rulesInfo.get()).getItemRule().getRule() :
                     rulesInfo.get().getRule();
-            boolean isOverridden = isGeneratorOverridden(field.getName(), unitRule);
-            generator = isOverridden ?
-                    getOverriddenGenerator(field.getName(), unitRule) :
-                    selectGenerator(field, rulesInfo.get());
+            IGenerator<?> generator = isGeneratorOverridden(unitRule) ?
+                    getOverriddenGenerator(unitRule) : selectGenerator(field, rulesInfo.get());
             prepareCustomRemarks(generator);
+            return Optional.of(generator);
         } else {
-            boolean isOverridden = isGeneratorOverridden(field.getName());
-            generator = isOverridden ?
-                    getOverriddenGenerator(field.getName()) : null;
+            return Optional.empty();
         }
-        return generator == null ? Optional.empty() : Optional.of(generator);
     }
 
     IGenerator<?> selectGenerator(Field field, IRuleInfo ruleInfo) {
@@ -331,6 +335,10 @@ public class TypeGeneratorsProvider<DTO_TYPE> {
 
     private IGenerator<?> getOverriddenGenerator(@NonNull String fieldName) {
         return overriddenBuildersForFields.get(fieldName).build();
+    }
+
+    private IGenerator<?> getOverriddenGenerator(Annotation rules) {
+        return overriddenBuilders.get(rules.annotationType()).build();
     }
 
     private IGenerator<?> getOverriddenGenerator(@NonNull String fieldName, Annotation rules) {
