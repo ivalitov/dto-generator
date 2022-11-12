@@ -1,5 +1,6 @@
 package laoruga.dtogenerator.api.generators.basictypegenerators;
 
+import com.mifmif.common.regex.Generex;
 import laoruga.dtogenerator.api.constants.BasicRuleRemark;
 import laoruga.dtogenerator.api.constants.CharSet;
 import laoruga.dtogenerator.api.markup.generators.IGenerator;
@@ -10,8 +11,6 @@ import laoruga.dtogenerator.api.util.RandomUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.RandomStringGenerator;
-
-import java.util.Objects;
 
 /**
  * @author Il'dar Valitov
@@ -26,10 +25,7 @@ public class StringGenerator implements IGenerator<String> {
     private final int minLength;
     private final char[] chars;
     private final IRuleRemark ruleRemark;
-    private final String mask;
-    private final Character maskWildcard;
-    private final Character maskTypeMarker;
-
+    private final String regexp;
 
     @Override
     public String generate() {
@@ -45,8 +41,8 @@ public class StringGenerator implements IGenerator<String> {
         } else {
             throw new IllegalStateException("Unexpected value " + ruleRemark);
         }
-        if (mask != null && !mask.isEmpty()) {
-            return generateStringForMask();
+        if (regexp != null && !regexp.isEmpty()) {
+            return generateStringByRegexp();
         } else {
             return generateString(length);
         }
@@ -57,80 +53,8 @@ public class StringGenerator implements IGenerator<String> {
                 .selectFrom(chars).build().generate(length);
     }
 
-    /*
-    1) parse mask      * 1) mask: +89 (%NUM%***) ***-**-** and charset: NUM
-     */
-
-
-    private String generateStringForMask() {
-        StringBuilder stringBuilder = new StringBuilder();
-        char[] maskChars = mask.toCharArray();
-        int wildCardBeginIdx = 0;
-        int wildCardEndIdx = 0;
-        boolean wildcardGathering = false;
-        boolean wildcardGathered = false;
-        char[] partitionChars = chars;
-        char currentChar;
-        Character nextChar;
-        boolean typeGathering = false;
-        StringBuilder typeChars = null;
-        for (int currentPos = 0; currentPos < maskChars.length; currentPos++) {
-            currentChar = maskChars[currentPos];
-            nextChar = maskChars.length == currentPos + 1 ? null : maskChars[currentPos + 1];
-            if (Objects.equals(currentChar, maskWildcard)) {
-                if (wildcardGathering) {
-                    wildCardEndIdx = currentPos;
-                } else {
-                    wildcardGathering = true;
-                    wildCardBeginIdx = currentPos;
-                    wildCardEndIdx = currentPos;
-                }
-                if (Objects.equals(nextChar, maskWildcard)) {
-                    continue;
-                } else {
-                    wildcardGathering = false;
-                    wildcardGathered = true;
-                }
-            } else if (Objects.equals(currentChar, maskTypeMarker)) {
-                // begin of type gathering
-                if (!typeGathering) {
-                    // exclusion of paris: %% %*
-                    if (nextChar != null &&
-                            !Objects.equals(nextChar, maskWildcard) &&
-                            !Objects.equals(nextChar, maskTypeMarker)) {
-                        typeGathering = true;
-                        typeChars = new StringBuilder();
-                        continue;
-                    }
-                }
-                if (typeGathering) {
-                    CharSet charSet = CharSet.getCharSetOrNull(typeChars.toString());
-                    if (Objects.equals(nextChar, maskWildcard) && charSet != null) {
-                        partitionChars = charSet.getChars();
-                        typeGathering = false;
-                    } else {
-                        stringBuilder.append(maskChars);
-                        currentPos--;
-                    }
-                    continue;
-                }
-            }
-            if (typeGathering) {
-                typeChars.append(currentChar);
-            } else if (wildcardGathered) {
-                //appending generated substring instead of wildcard substring
-                stringBuilder.append(
-                        new RandomStringGenerator.Builder().selectFrom(partitionChars).build().generate(
-                                wildCardEndIdx - wildCardBeginIdx + 1));
-                partitionChars = chars;
-                wildcardGathered = false;
-            } else {
-                //appending char as is
-                stringBuilder.append(currentChar);
-            }
-        }
-
-        return stringBuilder.toString();
+    private String generateStringByRegexp() {
+        return new Generex(regexp).random(minLength, maxLength);
     }
 
     /**
@@ -146,9 +70,7 @@ public class StringGenerator implements IGenerator<String> {
         private CharSet[] charset = StringRule.DEFAULT_CHARSET;
         private String chars = StringRule.DEFAULT_CHARS;
         private IRuleRemark ruleRemark = StringRule.DEFAULT_RULE_REMARK;
-        private String mask = StringRule.DEFAULT_MASK;
-        private char maskWildcard = StringRule.DEFAULT_WILDCARD;
-        private char maskTypeMarker = StringRule.DEFAULT_TYPE_MARKER;
+        private String regexp = StringRule.DEFAULT_REGEXP;
 
         private StringGeneratorBuilder() {
         }
@@ -178,18 +100,8 @@ public class StringGenerator implements IGenerator<String> {
             return this;
         }
 
-        public StringGeneratorBuilder mask(String mask) {
-            this.mask = mask;
-            return this;
-        }
-
-        public StringGeneratorBuilder maskWildcard(char maskWildcard) {
-            this.maskWildcard = maskWildcard;
-            return this;
-        }
-
-        public StringGeneratorBuilder maskTypeMarker(char maskTypeMarker) {
-            this.maskTypeMarker = maskTypeMarker;
+        public StringGeneratorBuilder regexp(String regexp) {
+            this.regexp = regexp;
             return this;
         }
 
@@ -218,9 +130,7 @@ public class StringGenerator implements IGenerator<String> {
                     this.minLength,
                     getChars(),
                     this.ruleRemark,
-                    this.mask,
-                    this.maskWildcard,
-                    this.maskTypeMarker
+                    this.regexp
             );
         }
     }
