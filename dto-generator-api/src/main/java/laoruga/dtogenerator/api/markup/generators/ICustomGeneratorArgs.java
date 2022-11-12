@@ -7,5 +7,5 @@ package laoruga.dtogenerator.api.markup.generators;
 
 public interface ICustomGeneratorArgs<T> extends ICustomGenerator<T> {
     
-    ICustomGeneratorArgs setArgs(String... args);
+    ICustomGeneratorArgs<T> setArgs(String... args);
 }

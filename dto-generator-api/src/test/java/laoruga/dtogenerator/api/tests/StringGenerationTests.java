@@ -28,11 +28,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 @DisplayName("String Rules Tests")
 @Epic("STRING_RULES")
-public class StringGenerationTests {
+class StringGenerationTests {
 
     @Getter
     @NoArgsConstructor
-    public static class Dto {
+    static class Dto {
         @StringRule(regexp = "[+]89 [(]\\d{3}[)] \\d{3}[-]\\d{2}-\\d{2}")
         private String phoneNum;
         @StringRule(regexp = "[a-zA-Z] [+]89 [(]\\d{3}[)] \\d{3}[-]\\d{2}-\\d{2} [а-яёА-ЯЁ]{2}")

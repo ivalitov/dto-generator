@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayName("Basic Type Generators Tests")
 @Epic("NESTED_DTO")
-public class NestedDtoGenerationTests {
+class NestedDtoGenerationTests {
 
     @Getter
     @NoArgsConstructor

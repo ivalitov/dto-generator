@@ -1,6 +1,7 @@
 package dtogenerator.examples._demo.second_style;
 
 import dtogenerator.examples.DtoVer1;
+import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
@@ -48,7 +49,7 @@ public class ClosedDateGenerator implements ICustomGeneratorArgs<LocalDateTime>,
             }
             return closedDate;
         } else {
-            throw new RuntimeException("Unexpected rule remark " + ruleRemark);
+            throw new DtoGeneratorException("Unexpected rule remark " + ruleRemark);
         }
     }
 
@@ -70,6 +71,6 @@ public class ClosedDateGenerator implements ICustomGeneratorArgs<LocalDateTime>,
 
     @Override
     public void setRuleRemarks(List<CustomRuleRemarkWrapper> ruleRemarks) {
-//        this.ruleRemarks = ruleRemarks;
+        System.out.println(ruleRemarks);
     }
 }

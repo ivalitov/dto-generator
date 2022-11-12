@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  */
 @DisplayName("Overriding of generators")
 @Epic("GENERATORS_OVERRIDING")
-public class GeneratorsOverridingTests {
+class GeneratorsOverridingTests {
 
     @Getter
     @NoArgsConstructor

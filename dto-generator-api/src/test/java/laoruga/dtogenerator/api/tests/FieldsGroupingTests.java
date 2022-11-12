@@ -24,11 +24,11 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @DisplayName("Fields grouping")
 @Epic("FIELDS_GROUPING")
-public class FieldsGroupingTests {
+class FieldsGroupingTests {
 
     @Getter
     @NoArgsConstructor
-    public static class Dto {
+    static class Dto {
 
         @StringRule(group = REQUIRED)
         String reqStr;
