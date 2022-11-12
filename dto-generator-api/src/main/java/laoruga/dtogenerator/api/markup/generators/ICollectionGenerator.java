@@ -1,11 +1,13 @@
 package laoruga.dtogenerator.api.markup.generators;
 
+import java.util.Collection;
+
 /**
  * @author Il'dar Valitov
  * Created on 28.04.2022
  */
 
-public interface ICollectionGenerator<T> extends IGenerator<T> {
+public interface ICollectionGenerator<T> extends IGenerator<Collection<T>> {
 
-    IGenerator<?> getItemGenerator();
+    IGenerator<T> getItemGenerator();
 }
