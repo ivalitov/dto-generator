@@ -28,7 +28,7 @@ public @interface StringRule {
     Class<?>[] APPLICABLE_TYPES = {String.class};
     char DEFAULT_WILDCARD = '*';
     char DEFAULT_TYPE_MARKER = '%';
-    String DEFAULT_MASK = "";
+    String DEFAULT_REGEXP = "";
 
     int minSymbols() default DEFAULT_MIN_SYMBOLS_NUMBER;
 
@@ -42,15 +42,7 @@ public @interface StringRule {
 
     String group() default DEFAULT;
 
-    /**
-     * Mask examples:
-     * 1) mask: +89 (***) ***-**-** and charset: NUM
-     * result: +89 (923) 152-12-64
-     * 2) mask: %ENG%{*} +89 (***) ***-**-** %ENG%** and charset: NUM
-     *
-     * @return mask for resulting string
-     */
-    String mask() default DEFAULT_MASK;
+    String regexp() default DEFAULT_REGEXP;
 
     char maskWildcard() default DEFAULT_WILDCARD;
 

@@ -28,7 +28,7 @@ public final class RulesInfoHelper {
         Class<?> fieldType = field.getType();
 
         if (itemRuleInfo != null) {
-            Class<?> type = collectionRuleInfo == null ? fieldType : ReflectionUtils.getGenericType(field);
+            Class<?> type = collectionRuleInfo == null ? fieldType : ReflectionUtils.getSingleGenericType(field);
             if (!checkGeneratorCompatibility(type, itemRuleInfo)) {
                 throw new DtoGeneratorException("Field '" + fieldName + "' annotated with inappropriate generation " +
                         "rule annotation: '" + itemRuleInfo.annotationType() + "'.");

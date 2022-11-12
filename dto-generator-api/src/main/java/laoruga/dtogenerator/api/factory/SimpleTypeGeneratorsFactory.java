@@ -70,9 +70,7 @@ public class SimpleTypeGeneratorsFactory {
                 .charset(stringRule.charset())
                 .chars(stringRule.chars())
                 .ruleRemark(stringRuleRemark)
-                .mask(stringRule.mask())
-                .maskWildcard(stringRule.maskWildcard())
-                .maskTypeMarker(stringRule.maskTypeMarker())
+                .regexp(stringRule.regexp())
                 .build();
 
     }

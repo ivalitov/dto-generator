@@ -28,7 +28,7 @@ public class FieldsGroupingTests {
 
     @Getter
     @NoArgsConstructor
-    static class Dto {
+    public static class Dto {
 
         @StringRule(group = REQUIRED)
         String reqStr;

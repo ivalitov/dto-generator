@@ -12,4 +12,12 @@
     <artifactId>dto-generator-api</artifactId>
     <version>0.1-ALPHA</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.github.mifmif</groupId>
+            <artifactId>generex</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+    </dependencies>
+
 </project>

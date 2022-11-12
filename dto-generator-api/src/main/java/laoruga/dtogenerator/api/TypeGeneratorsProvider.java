@@ -153,7 +153,7 @@ public class TypeGeneratorsProvider<T> {
                 //TODO item generator cannot be overridden
                 IGenerator<?> collectionItemGenerator = getBasicTypeGenerator(
                         fieldName + " " + field.getGenericType().getClass(),
-                        ReflectionUtils.getGenericType(field),
+                        ReflectionUtils.getSingleGenericType(field),
                         collectionRuleInfo.getItemRule().getRule());
                 return getCollectionTypeGenerator(
                         fieldName, field.getType(),
