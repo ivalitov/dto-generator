@@ -13,6 +13,7 @@ import java.lang.reflect.Field;
 public class ExecutorOfGenerator extends AbstractExecutor {
 
     private final Object dtoInstance;
+
     public <T> ExecutorOfGenerator(T dtoInstance) {
         super(null);
         this.dtoInstance = dtoInstance;
@@ -20,9 +21,8 @@ public class ExecutorOfGenerator extends AbstractExecutor {
 
     @Override
     public boolean execute(Field field, IGenerator<?> generator) {
-        boolean isFieldAccessible = field.isAccessible();
         try {
-            if (!isFieldAccessible) field.setAccessible(true);
+            field.setAccessible(true);
             field.set(dtoInstance, generator.generate());
         } catch (IllegalAccessException e) {
             log.error("Access error while generation value for a field: " + field, e);
