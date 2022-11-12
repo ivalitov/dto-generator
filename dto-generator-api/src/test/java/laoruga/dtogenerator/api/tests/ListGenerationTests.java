@@ -34,7 +34,7 @@ public class ListGenerationTests {
 
     @Getter
     @NoArgsConstructor
-    static class DtoList {
+    public static class DtoList {
 
         @ListRule(listClass = LinkedList.class)
         @StringRule
@@ -158,7 +158,8 @@ public class ListGenerationTests {
 
         assertEquals(1, errorsMap.size());
         assertTrue(errorsMap.containsKey("wildCardList"));
-        assertThat(errorsMap.get("wildCardList").getMessage(), stringContainsInOrder("Can't generate wildcard type"));
+        assertThat(errorsMap.get("wildCardList").getMessage(),
+                equalTo("Next type must have single generic type: 'java.util.List<?>'"));
     }
 
     @Test
@@ -172,13 +173,13 @@ public class ListGenerationTests {
 
         assertEquals(1, errorsMap.size());
         assertTrue(errorsMap.containsKey("rawList"));
-        assertThat(errorsMap.get("rawList").getMessage(), stringContainsInOrder("Can't generate raw type"));
+        assertThat(errorsMap.get("rawList").getMessage(),
+                equalTo("Next type must have single generic type: 'java.util.List'"));
     }
 
     @Test
     @Feature("NEGATIVE_TESTS")
     @DisplayName("List Of Collection")
-    // TODO fix
     void listOfCollection() {
         DtoGenerator<DtoWithListOfCollections> generator = DtoGenerator.builder(DtoWithListOfCollections.class).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);

@@ -32,7 +32,7 @@ public class StringGenerationTests {
 
     @Getter
     @NoArgsConstructor
-    static class Dto {
+    public static class Dto {
         @StringRule(mask = "+89 (***) ***-**-**", charset = NUM)
         private String phoneNum;
         @StringRule(mask = "%ENG%* +89 (***) ***-**-** %RUS%**", charset = NUM)

@@ -11,6 +11,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Il'dar Valitov
@@ -19,53 +21,26 @@ import java.util.Optional;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReflectionUtils {
+    private static final String TYPE_WITH_SINGLE_GENERIC_TYPE_REGEXP = "[a-zA-Z0-9_.]*<[a-zA-Z0-9_.]*>";
+    private static final Pattern SINGLE_GENERIC_TYPE_REGEXP = Pattern.compile("<([a-zA-Z0-9_.]*)>");
 
-    public static Class<?> getGenericType(Field field) throws DtoGeneratorException {
-        return (Class<?>) getGenericTypeOrPair(field);
+    public static Object extractSingeGenericType(String typeName) {
+
+        if (!typeName.matches(TYPE_WITH_SINGLE_GENERIC_TYPE_REGEXP)) {
+            throw new DtoGeneratorException("Next type must have single generic type: '" + typeName + "'");
+        }
+
+        Matcher matcher = SINGLE_GENERIC_TYPE_REGEXP.matcher(typeName);
+
+        if (!matcher.find()) {
+            throw new DtoGeneratorException("Cannot find generic type using next regex pattern: "
+                    + SINGLE_GENERIC_TYPE_REGEXP.pattern() + " in type: '" + typeName + "'");
+        }
+        return getClass(matcher.group(1), typeName);
     }
 
-    private static final String CREATE_GENERATOR_MSG_PATTERN = " please create custom generator for type: %s";
-
-    static Object getGenericTypeOrPair(Field field) throws DtoGeneratorException {
-        String typeName = field.getGenericType().getTypeName();
-        char[] chars = typeName.toCharArray();
-        Integer leftIdx = null;
-        Integer rightIdx = null;
-        boolean multipleTypes = false;
-        for (int i = 0; i < chars.length; i++) {
-            if (chars[i] == '<') {
-                if (leftIdx == null) {
-                    leftIdx = i + 1;
-                } else {
-                    throw new DtoGeneratorException("Can't generate via default generator,"
-                            + String.format(CREATE_GENERATOR_MSG_PATTERN, typeName));
-                }
-            } else if (chars[i] == '>') {
-                rightIdx = i;
-                break;
-            } else if (chars[i] == ',') {
-                if (multipleTypes) {
-                    throw new DtoGeneratorException("Can't generate via default generator,"
-                            + String.format(CREATE_GENERATOR_MSG_PATTERN, typeName));
-                }
-                multipleTypes = true;
-            } else if (chars[i] == '?') {
-                throw new DtoGeneratorException("Can't generate wildcard type via default generator,"
-                        + String.format(CREATE_GENERATOR_MSG_PATTERN, typeName));
-            }
-        }
-        if (rightIdx == null || leftIdx == null) {
-            throw new DtoGeneratorException("Can't generate raw type via default generator,"
-                    + String.format(CREATE_GENERATOR_MSG_PATTERN, typeName));
-        } else {
-            String className = typeName.substring(leftIdx, rightIdx);
-            if (multipleTypes) {
-                String[] split = className.split(",");
-                return new Pair<>(getClass(split[0], typeName), getClass(split[1], typeName));
-            } else {
-                return getClass(className, typeName);
-            }
-        }
+    public static Class<?> getSingleGenericType(Field field) throws DtoGeneratorException {
+        return (Class<?>) extractSingeGenericType(field.getGenericType().getTypeName());
     }
 
     private static Class<?> getClass(String className, String typeName) {
