@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -29,15 +31,23 @@ public class DtoGeneratorParams {
     }
 
     protected Properties loadProperties() {
-        return loadProperties(Thread.currentThread().getContextClassLoader(), "dtogenerator.properties");
+        Optional<Properties> defaultProps = loadProperties(DtoGeneratorParams.class.getClassLoader(), "default-dtogenerator.properties");
+        Optional<Properties> customProps = loadProperties(Thread.currentThread().getContextClassLoader(), "dtogenerator.properties");
+        Properties props = defaultProps.orElseGet(Properties::new);
+        customProps.ifPresent(props::putAll);
+        return props;
     }
 
-    private static Properties loadProperties(ClassLoader classLoader, String fileName) {
+    private static Optional<Properties> loadProperties(ClassLoader classLoader, String fileName) {
+        Properties properties = new Properties();
+        URL resource = classLoader.getResource(fileName);
+        if (resource == null) {
+            return Optional.empty();
+        }
         try (InputStream propertiesStream = classLoader.getResourceAsStream(fileName)) {
-            log.debug("Reading properties from {}", classLoader.getResource(fileName));
-            Properties properties = new Properties();
+            log.debug("Reading properties from {}", resource);
             properties.load(propertiesStream);
-            return properties;
+            return Optional.of(properties);
         } catch (Exception e) {
             throw new DtoGeneratorException("Failed to read properties file '" + fileName + "' from classpath", e);
         }
