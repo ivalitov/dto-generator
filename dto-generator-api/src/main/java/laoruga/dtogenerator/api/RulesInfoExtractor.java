@@ -29,7 +29,7 @@ public class RulesInfoExtractor {
 
     /**
      * @param field            - field whose annotations are to be examined
-     * @param validationResult
+     * @param validationResult - aggregated info about of Rules annotations
      * @return - rules for generation value of the field
      */
     Optional<IRuleInfo> checkAndWrapAnnotations(Field field, AnnotationErrorsHandler.ResultDto validationResult) {
@@ -48,7 +48,7 @@ public class RulesInfoExtractor {
                         .ruleType(RuleType.getType(annotation))
                         .rulesGrouped(false)
                         .groupName(getGroupNameFromRuleAnnotation(annotation))
-                        .setAsserter(() -> {
+                        .setRuleInfoAsserter(() -> {
                             if (!rulesForCollection && !RulesInfoHelper.checkGeneratorCompatibility(fieldType, annotation)) {
                                 throw new DtoGeneratorException("Inappropriate generation rule annotation: '" +
                                         annotation.annotationType().getName() + "' for field: '" + field + "'");
@@ -65,7 +65,7 @@ public class RulesInfoExtractor {
                             .ruleType(RuleType.getType(ruleSelectedByGroup))
                             .groupName(groupAndRule.get().getFirst())
                             .rulesGrouped(true)
-                            .setAsserter(() -> {
+                            .setRuleInfoAsserter(() -> {
                                 if (!rulesForCollection && !RulesInfoHelper.checkGeneratorCompatibility(fieldType, ruleSelectedByGroup)) {
                                     throw new DtoGeneratorException("Inappropriate generation rule annotation: '" +
                                             ruleSelectedByGroup.annotationType().getName() + "' for field: '" + field + "'");
@@ -83,7 +83,7 @@ public class RulesInfoExtractor {
                                         .ruleType(RuleType.getType(annotation))
                                         .rulesGrouped(false)
                                         .groupName(getGroupNameFromRuleAnnotation(annotation)))
-                        .setAsserter(() -> RulesInfoHelper.checkItemGeneratorCompatibility(
+                        .setRuleInfoAsserter(() -> RulesInfoHelper.checkItemGeneratorCompatibility(
                                 ruleInfoBuilder.getRule(),
                                 collectionRuleInfo.getRule(),
                                 field));
@@ -100,7 +100,7 @@ public class RulesInfoExtractor {
                                             .ruleType(RuleType.getType(groupAndRule.get().getSecond()))
                                             .groupName(groupAndRule.get().getFirst())
                                             .rulesGrouped(true))
-                            .setAsserter(() -> RulesInfoHelper.checkItemGeneratorCompatibility(
+                            .setRuleInfoAsserter(() -> RulesInfoHelper.checkItemGeneratorCompatibility(
                                     ruleInfoBuilder.getRule(),
                                     collectionRuleInfo.getRule(),
                                     field));

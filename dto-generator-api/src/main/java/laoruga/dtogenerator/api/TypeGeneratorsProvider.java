@@ -95,8 +95,12 @@ public class TypeGeneratorsProvider<T> {
     /**
      * Returns generator Instance for field value generation
      *
-     * @param field
-     * @return generator instance or null if field should not be generated
+     * @param field - validated field
+     * @return empty optional if:
+     *      - no rules annotations found
+     *      - rules annotations skipped by group
+     *      - no explicit generators attached for the field
+     *      else generator instance
      */
     Optional<IGenerator<?>> getGenerator(Field field) {
         String fieldName = field.getName();
