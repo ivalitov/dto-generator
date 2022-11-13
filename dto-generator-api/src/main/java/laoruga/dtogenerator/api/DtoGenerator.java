@@ -32,19 +32,18 @@ public class DtoGenerator<T> {
     private final T dtoInstance;
 
     @Getter(AccessLevel.PACKAGE)
-    private final TypeGeneratorsProvider typeGeneratorsProvider;
+    private final TypeGeneratorsProvider<T> typeGeneratorsProvider;
     @Getter(AccessLevel.PACKAGE)
     private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
     @Getter(AccessLevel.PACKAGE)
     private final DtoGeneratorBuilder<T> builderInstance;
-
-
     private final Map<Field, Exception> errors = new HashMap<>();
 
-    protected DtoGenerator(TypeGeneratorsProvider typeGeneratorsProvider, DtoGeneratorBuilder<T> dtoGeneratorBuilder) {
+    protected DtoGenerator(TypeGeneratorsProvider<T> typeGeneratorsProvider,
+                           DtoGeneratorBuilder<T> dtoGeneratorBuilder) {
         this.typeGeneratorsProvider = typeGeneratorsProvider;
         this.builderInstance = dtoGeneratorBuilder;
-        this.dtoInstance = (T) typeGeneratorsProvider.getDtoInstance();
+        this.dtoInstance = typeGeneratorsProvider.getDtoInstance();
     }
 
     public static <T> DtoGeneratorBuilder<T> builder(Class<T> dtoClass) {

@@ -28,10 +28,10 @@ public class DtoVer1 {
     Double fieldDecimal;
 
     @CustomGenerator(generatorClass = ArrearsGenerator2.class, args = {"5"})
-    Arrears arrearsBlock_2;
+    Arrears arrearsBlock2;
 
     @NestedDtoRules
-    Arrears arrearsBlock_3;
+    Arrears arrearsBlock3;
 
     @EnumRule(possibleEnumNames = {"NBCH", "EI", "GP", "ASSD"}, enumClass = SystemType.class)
     SystemType system;

@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 @DisplayName("Inherited Dto Tests")
 @Epic("INHERITED_DTO")
-public class InheritedDto {
+class InheritedDtoTests {
 
     @Getter
     @NoArgsConstructor

@@ -20,8 +20,7 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
     private Boolean rulesGrouped;
     private String groupName;
     private RuleInfoBuilder collectionBuilder;
-
-    private Runnable asserter = () -> {
+    private Runnable ruleInfoAsserter = () -> {
     };
 
     public boolean isEmpty() {
@@ -68,13 +67,14 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
         return this;
     }
 
-    public RuleInfoBuilder setAsserter(Runnable asserter) {
-        this.asserter = asserter;
+    public RuleInfoBuilder setRuleInfoAsserter(Runnable ruleInfoAsserter) {
+        this.ruleInfoAsserter = ruleInfoAsserter;
         return this;
     }
 
     @Override
     public IRuleInfo build() {
+        ruleInfoAsserter.run();
         if (collectionBuilder == null) {
             return buildUnit();
         } else {

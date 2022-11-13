@@ -30,11 +30,11 @@ import static org.junit.jupiter.api.Assertions.*;
 // TODO Add feature - remarks for item generator (maybe already exists?)
 @DisplayName("List Type Generators Tests")
 @Epic("LIST_RULES")
-public class ListGenerationTests {
+class ListGenerationTests {
 
     @Getter
     @NoArgsConstructor
-    public static class DtoList {
+    static class DtoList {
 
         @ListRule(listClass = LinkedList.class)
         @StringRule

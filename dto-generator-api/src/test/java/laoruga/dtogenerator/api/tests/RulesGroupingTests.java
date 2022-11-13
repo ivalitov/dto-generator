@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  */
 @DisplayName("String Rules Tests")
 @Epic("RULES_GROUPING")
-public class RulesGroupingTests {
+class RulesGroupingTests {
 
     @Getter
     @NoArgsConstructor

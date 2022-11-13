@@ -17,7 +17,7 @@ import java.util.Collection;
  */
 
 @AllArgsConstructor
-public class CollectionGenerator<T> implements ICollectionGenerator<Collection<T>> {
+public class CollectionGenerator<T> implements ICollectionGenerator<T> {
 
     //TODO move to the properties
     public static int maxGenerationAttempts = 100;
@@ -61,7 +61,7 @@ public class CollectionGenerator<T> implements ICollectionGenerator<Collection<T
     }
 
     @Override
-    public IGenerator<?> getItemGenerator() {
+    public IGenerator<T> getItemGenerator() {
         return itemGenerator;
     }
 

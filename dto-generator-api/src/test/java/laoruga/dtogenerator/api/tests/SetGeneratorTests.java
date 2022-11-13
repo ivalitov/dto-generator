@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 @DisplayName("Set Type Generators Tests")
 @Epic("SET_RULES")
-public class SetGeneratorTests {
+class SetGeneratorTests {
 
     @Getter
     @NoArgsConstructor

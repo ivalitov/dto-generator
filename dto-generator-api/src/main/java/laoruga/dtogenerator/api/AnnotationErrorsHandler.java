@@ -1,5 +1,6 @@
 package laoruga.dtogenerator.api;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.lang.annotation.Annotation;
@@ -13,64 +14,82 @@ import static laoruga.dtogenerator.api.RulesInfoHelper.*;
 @RequiredArgsConstructor
 class AnnotationErrorsHandler {
 
-    StringBuilder result = new StringBuilder();
     private final Annotation[] annotations;
-
-    int generalRule = 0;
-    int groupOfGeneralRules = 0;
-    int collectionRule = 0;
-    int groupOfCollectionRules = 0;
+    private final ResultDto resultDto = new ResultDto();
 
     void count() {
         for (Annotation annotation : annotations) {
 
             if (isItRule(annotation)) {
-                generalRule++;
+                resultDto.generalRule++;
             }
 
             if (isItRules(annotation)) {
-                groupOfGeneralRules++;
+                resultDto.groupOfGeneralRules++;
             }
 
             if (isItCollectionRule(annotation)) {
-                collectionRule++;
+                resultDto.collectionRule++;
             }
 
             if (isItCollectionRules(annotation)) {
-                groupOfCollectionRules++;
+                resultDto.groupOfCollectionRules++;
             }
         }
     }
 
-    public String validate() {
+    public ResultDto validate() {
         count();
         int idx = 0;
 
-        if (generalRule > 1) {
-            result.append(++idx + ". Found '" + generalRule + "' @Rule annotations for various types, " +
+        if (resultDto.generalRule > 1) {
+            resultDto.resultString.append(++idx + ". Found '" + resultDto.generalRule + "' @Rule annotations for various types, " +
                     "expected 1 or 0.").append("\n");
         }
 
-        if (groupOfGeneralRules > 1) {
-            result.append(++idx + ". Found '" + generalRule + "' @Rules annotations for various types, " +
+        if (resultDto.groupOfGeneralRules > 1) {
+            resultDto.resultString.append(++idx + ". Found '" + resultDto.generalRule + "' @Rules annotations for various types, " +
                     "expected @Rules for single type only.").append("\n");
         }
 
-        if (collectionRule > 1) {
-            result.append(++idx + ". Found '" + collectionRule + "' @CollectionRule annotations for various collection types, " +
+        if (resultDto.collectionRule > 1) {
+            resultDto.resultString.append(++idx + ". Found '" + resultDto.collectionRule + "' @CollectionRule annotations for various collection types, " +
                     "expected 1 or 0.").append("\n");
         }
 
-        if (groupOfGeneralRules > 1) {
-            result.append(++idx + ". Found '" + generalRule + "' @CollectionRules annotations for various collection types, " +
+        if (resultDto.groupOfGeneralRules > 1) {
+            resultDto.resultString.append(++idx + ". Found '" + resultDto.generalRule + "' @CollectionRules annotations for various collection types, " +
                     "expected @CollectionRules for single collection type only.").append("\n");
         }
 
-        if ((collectionRule + groupOfCollectionRules > 0) && (generalRule + groupOfGeneralRules == 0)) {
-            result.append(++idx + ". Missed @Rule annotation for item of collection.").append("\n");
+        if ((resultDto.getSumOfCollectionRules() > 0) &&
+                (resultDto.getSumOfCollectionRules() != resultDto.getSumOfGeneralRules())) {
+            resultDto.resultString.append(++idx + ". Missed @Rule annotation for item of collection.").append("\n");
         }
 
-        return result.toString();
+        return resultDto;
+    }
+
+    @Getter
+    static class ResultDto {
+
+        private final StringBuilder resultString = new StringBuilder();
+        private int generalRule = 0;
+        private int groupOfGeneralRules = 0;
+        private int collectionRule = 0;
+        private int groupOfCollectionRules = 0;
+
+        public String getResultString() {
+            return resultString.toString();
+        }
+
+        int getSumOfCollectionRules() {
+            return collectionRule + groupOfCollectionRules;
+        }
+
+        int getSumOfGeneralRules() {
+            return generalRule + groupOfGeneralRules;
+        }
     }
 
 }

@@ -14,13 +14,6 @@ class FieldGroupFilter {
 
     private final Set<String> include = new HashSet<>();
 
-    FieldGroupFilter validateGroups() {
-        if (include.isEmpty()) {
-            include.add(Group.DEFAULT);
-        }
-        return this;
-    }
-
     void includeGroups(String... groups) {
         include.addAll(Arrays.asList(groups));
     }

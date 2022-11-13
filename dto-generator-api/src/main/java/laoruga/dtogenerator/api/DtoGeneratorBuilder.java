@@ -60,7 +60,7 @@ public class DtoGeneratorBuilder<T> {
      * @param toCopy         from
      * @param fieldsFromRoot - path to nested DTO field
      */
-    private DtoGeneratorBuilder(DtoGeneratorBuilder<?> toCopy, String[] fieldsFromRoot) {
+    private DtoGeneratorBuilder(DtoGeneratorBuilder<T> toCopy, String[] fieldsFromRoot) {
         this.typeGeneratorsProvider = new TypeGeneratorsProvider<>(toCopy.typeGeneratorsProvider, fieldsFromRoot);
         this.generatorBuildersTree = toCopy.generatorBuildersTree;
         this.fieldGroupFilter = toCopy.fieldGroupFilter;
