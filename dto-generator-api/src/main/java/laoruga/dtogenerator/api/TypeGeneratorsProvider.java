@@ -107,11 +107,12 @@ public class TypeGeneratorsProvider<T> {
 
         Optional<IRuleInfo> rulesInfo;
         try {
-            String validationResult = new AnnotationErrorsHandler(field.getDeclaredAnnotations()).validate();
-            if (!validationResult.isEmpty()) {
-                throw new DtoGeneratorException("Field annotated wrong:\n" + validationResult);
+            AnnotationErrorsHandler.ResultDto validationResult =
+                    new AnnotationErrorsHandler(field.getDeclaredAnnotations()).validate();
+            if (!validationResult.getResultString().isEmpty()) {
+                throw new DtoGeneratorException("Field annotated wrong:\n" + validationResult.getResultString());
             }
-            rulesInfo = rulesInfoExtractor.checkAndWrapAnnotations(field);
+            rulesInfo = rulesInfoExtractor.checkAndWrapAnnotations(field, validationResult);
         } catch (Exception e) {
             throw new DtoGeneratorException("Error while extracting rule annotations from field: '" + field + "'", e);
         }

@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 @DisplayName("String Rules Tests")
 @Epic("STRING_RULES")
-class StringGenerationTests {
+ class StringGenerationTests {
 
     @Getter
     @NoArgsConstructor

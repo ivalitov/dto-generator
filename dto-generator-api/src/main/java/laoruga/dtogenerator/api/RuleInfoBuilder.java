@@ -75,6 +75,7 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
 
     @Override
     public IRuleInfo build() {
+        asserter.run();
         if (collectionBuilder == null) {
             return buildUnit();
         } else {

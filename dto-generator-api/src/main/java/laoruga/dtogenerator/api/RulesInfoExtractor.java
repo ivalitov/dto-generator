@@ -28,12 +28,16 @@ public class RulesInfoExtractor {
     private final FieldGroupFilter fieldsGroupFilter;
 
     /**
-     * @param field - field whose annotations are to be examined
+     * @param field            - field whose annotations are to be examined
+     * @param validationResult
      * @return - rules for generation value of the field
      */
-    Optional<IRuleInfo> checkAndWrapAnnotations(Field field) {
+    Optional<IRuleInfo> checkAndWrapAnnotations(Field field, AnnotationErrorsHandler.ResultDto validationResult) {
 
         RuleInfoBuilder ruleInfoBuilder = new RuleInfoBuilder();
+        Class<?> fieldType = field.getType();
+
+        boolean rulesForCollection = validationResult.getSumOfCollectionRules() > 0;
 
         for (Annotation annotation : field.getDeclaredAnnotations()) {
 
@@ -43,17 +47,30 @@ public class RulesInfoExtractor {
                         .rule(annotation)
                         .ruleType(RuleType.getType(annotation))
                         .rulesGrouped(false)
-                        .groupName(getGroupNameFromRuleAnnotation(annotation));
+                        .groupName(getGroupNameFromRuleAnnotation(annotation))
+                        .setAsserter(() -> {
+                            if (!rulesForCollection && !RulesInfoHelper.checkGeneratorCompatibility(fieldType, annotation)) {
+                                throw new DtoGeneratorException("Inappropriate generation rule annotation: '" +
+                                        annotation.annotationType().getName() + "' for field: '" + field + "'");
+                            }
+                        });
 
             } else if (isItRules(annotation)) {
 
                 Optional<Pair<String, Annotation>> groupAndRule = selectRuleByGroup(annotation);
                 if (groupAndRule.isPresent()) {
+                    Annotation ruleSelectedByGroup = groupAndRule.get().getSecond();
                     ruleInfoBuilder
-                            .rule(groupAndRule.get().getSecond())
-                            .ruleType(RuleType.getType(groupAndRule.get().getSecond()))
+                            .rule(ruleSelectedByGroup)
+                            .ruleType(RuleType.getType(ruleSelectedByGroup))
                             .groupName(groupAndRule.get().getFirst())
-                            .rulesGrouped(true);
+                            .rulesGrouped(true)
+                            .setAsserter(() -> {
+                                if (!rulesForCollection && !RulesInfoHelper.checkGeneratorCompatibility(fieldType, ruleSelectedByGroup)) {
+                                    throw new DtoGeneratorException("Inappropriate generation rule annotation: '" +
+                                            ruleSelectedByGroup.annotationType().getName() + "' for field: '" + field + "'");
+                                }
+                            });
                 }
 
             } else if (isItCollectionRule(annotation)) {
