@@ -43,28 +43,49 @@ class AnnotationErrorsHandler {
         int idx = 0;
 
         if (resultDto.generalRule > 1) {
-            resultDto.resultString.append(++idx + ". Found '" + resultDto.generalRule + "' @Rule annotations for various types, " +
-                    "expected 1 or 0.").append("\n");
+            resultDto.resultString
+                    .append(++idx)
+                    .append(". Found '")
+                    .append(resultDto.generalRule)
+                    .append("' @Rule annotations for various types, ")
+                    .append("expected 1 or 0.")
+                    .append("\n");
         }
 
         if (resultDto.groupOfGeneralRules > 1) {
-            resultDto.resultString.append(++idx + ". Found '" + resultDto.generalRule + "' @Rules annotations for various types, " +
-                    "expected @Rules for single type only.").append("\n");
+            resultDto.resultString
+                    .append(++idx)
+                    .append(". Found '")
+                    .append(resultDto.generalRule)
+                    .append("' @Rules annotations for various types, expected @Rules for single type only.")
+                    .append("\n");
         }
 
         if (resultDto.collectionRule > 1) {
-            resultDto.resultString.append(++idx + ". Found '" + resultDto.collectionRule + "' @CollectionRule annotations for various collection types, " +
-                    "expected 1 or 0.").append("\n");
+            resultDto.resultString
+                    .append(++idx)
+                    .append(". Found '")
+                    .append(resultDto.collectionRule)
+                    .append("' @CollectionRule annotations for various collection types, expected 1 or 0.")
+                    .append("\n");
         }
 
         if (resultDto.groupOfGeneralRules > 1) {
-            resultDto.resultString.append(++idx + ". Found '" + resultDto.generalRule + "' @CollectionRules annotations for various collection types, " +
-                    "expected @CollectionRules for single collection type only.").append("\n");
+            resultDto.resultString
+                    .append(++idx)
+                    .append(". Found '")
+                    .append(resultDto.generalRule)
+                    .append("' @CollectionRules annotations for various collection types, ")
+                    .append("expected @CollectionRules for single collection type only.")
+                    .append("\n");
         }
 
         if ((resultDto.getSumOfCollectionRules() > 0) &&
                 (resultDto.getSumOfCollectionRules() != resultDto.getSumOfGeneralRules())) {
-            resultDto.resultString.append(++idx + ". Missed @Rule annotation for item of collection.").append("\n");
+            resultDto.resultString
+                    .append(++idx)
+                    .append(". Missed @Rule annotation for item of collection.")
+                    .append("\n");
         }
 
         return resultDto;

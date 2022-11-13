@@ -54,26 +54,23 @@ public final class ReflectionUtils {
 
     private static final String FAILED_MSG_PATTERN = "Failed to instantiate class: '%s'";
 
+    /**
+     * @param dtoClass class to instantiate, must have no-args constructor
+     * @return instance of class
+     */
     public static <T> T createInstance(Class<T> dtoClass) {
         try {
             Constructor<?>[] declaredConstructors = dtoClass.getDeclaredConstructors();
-            if (declaredConstructors.length == 0) {
-                throw new DtoGeneratorException(String.format(FAILED_MSG_PATTERN, dtoClass) +
-                        " Class don't have public constructors. It must have public no-args constructor.");
-            }
             Optional<Constructor<?>> maybeNoArgsConstructor = Arrays.stream(declaredConstructors)
                     .filter(constructor -> constructor.getParameterCount() == 0)
                     .findAny();
             if (!maybeNoArgsConstructor.isPresent()) {
                 throw new DtoGeneratorException(String.format(FAILED_MSG_PATTERN, dtoClass) +
-                        " Class must have public no-args constructor.");
+                        " Class must have no-args constructor.");
             }
             Constructor<?> constructor = maybeNoArgsConstructor.get();
-            boolean isAccessible = constructor.isAccessible();
             constructor.setAccessible(true);
-            Object instance = constructor.newInstance();
-            constructor.setAccessible(isAccessible);
-            return (T) instance;
+            return (T) constructor.newInstance();
         } catch (InstantiationException ie) {
             throw new DtoGeneratorException(String.format(FAILED_MSG_PATTERN, dtoClass) +
                     " Maybe no-args constructor was not found.", ie);

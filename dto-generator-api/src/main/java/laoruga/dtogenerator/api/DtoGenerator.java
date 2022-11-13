@@ -1,5 +1,6 @@
 package laoruga.dtogenerator.api;
 
+import laoruga.dtogenerator.api.config.DtoGeneratorConfig;
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.generatorsexecutor.BatchGeneratorsExecutor;
 import laoruga.dtogenerator.api.generatorsexecutor.ExecutorOfCollectionGenerator;
@@ -68,8 +69,8 @@ public class DtoGenerator<T> {
     }
 
     void applyGenerators() {
-        // TODO move into params
-        int maxAttempts = 100;
+
+        int maxAttempts = DtoGeneratorConfig.maxDependentGenerationCycles;
 
         ExecutorOfDtoDependentGenerator executorsChain =
                 new ExecutorOfDtoDependentGenerator(
