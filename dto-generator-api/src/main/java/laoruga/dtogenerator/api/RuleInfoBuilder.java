@@ -98,7 +98,7 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
         ruleInfo.setRule(Objects.requireNonNull(rule));
         ruleInfo.setRuleType(Objects.requireNonNull(ruleType));
         ruleInfo.setGroup(Objects.requireNonNull(groupName));
-        ruleInfo.setRulesGrouped(Objects.requireNonNull(multipleRules));
+        ruleInfo.setMultipleRules(Objects.requireNonNull(multipleRules));
         return ruleInfo;
     }
 

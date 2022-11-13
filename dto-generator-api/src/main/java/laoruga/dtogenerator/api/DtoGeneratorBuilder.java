@@ -153,9 +153,6 @@ public class DtoGeneratorBuilder<T> {
      * @return dto builder instance
      */
     public DtoGenerator<T> build() {
-        if (fieldGroupFilter.getGroupsCount() == 0) {
-            fieldGroupFilter.includeGroups(Group.DEFAULT);
-        }
         return new DtoGenerator<>(typeGeneratorsProvider, this);
     }
 

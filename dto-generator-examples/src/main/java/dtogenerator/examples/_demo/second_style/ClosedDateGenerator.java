@@ -24,6 +24,7 @@ public class ClosedDateGenerator implements ICustomGeneratorArgs<LocalDateTime>,
     DtoVer1 dtoVer1;
     String[] args;
     ICustomRuleRemark[] ruleRemarks;
+    List<CustomRuleRemarkWrapper> ruleRemarksList;
 
     @Override
     public LocalDateTime generate() {
@@ -71,6 +72,7 @@ public class ClosedDateGenerator implements ICustomGeneratorArgs<LocalDateTime>,
 
     @Override
     public void setRuleRemarks(List<CustomRuleRemarkWrapper> ruleRemarks) {
-        System.out.println(ruleRemarks);
+        this.ruleRemarksList = ruleRemarks;
+
     }
 }

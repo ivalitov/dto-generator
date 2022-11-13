@@ -1,6 +1,7 @@
 package laoruga.dtogenerator.api.tests.util;
 
 import laoruga.dtogenerator.api.DtoGenerator;
+import lombok.SneakyThrows;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -27,5 +28,10 @@ public class TestUtils {
                 (e) -> e.getKey().getName(),
                 Map.Entry::getValue
         ));
+    }
+
+    @SneakyThrows
+    public static Field getField(Class<?> clazz, String fieldName) {
+        return clazz.getDeclaredField(fieldName);
     }
 }

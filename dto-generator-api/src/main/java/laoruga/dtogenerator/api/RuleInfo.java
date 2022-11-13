@@ -14,7 +14,7 @@ import java.lang.annotation.Annotation;
 class RuleInfo implements IRuleInfo {
     private Annotation rule;
     private RuleType ruleType;
-    private boolean rulesGrouped;
+    private boolean multipleRules;
     private String group;
 
     public static RuleInfoBuilder builder(){

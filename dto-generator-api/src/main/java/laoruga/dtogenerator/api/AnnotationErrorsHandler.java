@@ -1,6 +1,8 @@
 package laoruga.dtogenerator.api;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.lang.annotation.Annotation;
@@ -92,6 +94,8 @@ class AnnotationErrorsHandler {
     }
 
     @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
     static class ResultDto {
 
         private final StringBuilder resultString = new StringBuilder();

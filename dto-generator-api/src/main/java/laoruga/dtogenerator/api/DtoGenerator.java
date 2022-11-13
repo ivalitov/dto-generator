@@ -70,7 +70,7 @@ public class DtoGenerator<T> {
 
     void applyGenerators() {
 
-        int maxAttempts = DtoGeneratorConfig.maxDependentGenerationCycles;
+        int maxAttempts = DtoGeneratorConfig.getMaxDependentGenerationCycles();
 
         ExecutorOfDtoDependentGenerator executorsChain =
                 new ExecutorOfDtoDependentGenerator(

@@ -1,7 +1,9 @@
 package laoruga.dtogenerator.api.config;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author Il'dar Valitov
@@ -12,8 +14,12 @@ public final class DtoGeneratorConfig {
 
     private static final DtoGeneratorParams defaults = new DtoGeneratorParams();
 
-    public static int maxDependentGenerationCycles;
-    public static int maxCollectionGenerationCycles;
+    @Setter
+    @Getter
+    private static int maxDependentGenerationCycles;
+    @Setter
+    @Getter
+    private static int maxCollectionGenerationCycles;
 
     static {
         maxDependentGenerationCycles = defaults.getMaxDependentGenerationCycles();

@@ -28,7 +28,7 @@ public class CollectionGenerator<T> implements ICollectionGenerator<T> {
 
     @Override
     public Collection<T> generate() {
-        int maxAttempts = DtoGeneratorConfig.maxCollectionGenerationCycles;
+        int maxAttempts = DtoGeneratorConfig.getMaxCollectionGenerationCycles();
         int size;
         switch ((BasicRuleRemark) ruleRemark) {
             case MIN_VALUE:
