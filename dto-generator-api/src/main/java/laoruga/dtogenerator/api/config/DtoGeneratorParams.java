@@ -14,7 +14,7 @@ import java.util.Properties;
 
 @Data
 @Slf4j
-class DtoGeneratorParams {
+public class DtoGeneratorParams {
 
     Properties properties;
 
