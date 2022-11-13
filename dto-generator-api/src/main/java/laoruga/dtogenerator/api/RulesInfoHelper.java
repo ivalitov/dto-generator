@@ -80,7 +80,7 @@ public final class RulesInfoHelper {
         return ruleAnnotation.annotationType().getDeclaredAnnotation(Rule.class) != null;
     }
 
-    public static boolean isItRules(Annotation ruleAnnotation) {
+    public static boolean isItMultipleRules(Annotation ruleAnnotation) {
         return ruleAnnotation.annotationType().getDeclaredAnnotation(Rules.class) != null;
     }
 

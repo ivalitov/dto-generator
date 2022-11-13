@@ -25,8 +25,8 @@ public class SimpleTypeGeneratorsFactory {
         return INSTANCE;
     }
 
-    public <T> IGenerator<?> getBasicTypeGenerator(String fieldName,
-                                               Class<T> fieldType,
+    public IGenerator<?> getBasicTypeGenerator(String fieldName,
+                                               Class<?> fieldType,
                                                Annotation rules,
                                                AtomicReference<IRuleRemark> maybeRemark) {
         Class<? extends Annotation> rulesClass = rules.annotationType();

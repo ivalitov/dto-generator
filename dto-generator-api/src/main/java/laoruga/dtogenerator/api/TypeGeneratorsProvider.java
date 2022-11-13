@@ -122,12 +122,12 @@ public class TypeGeneratorsProvider<T> {
         }
 
         if (rulesInfo.isPresent()) {
-            // TODO by now, only BASIC type generators may be overridden by Class
-            Annotation unitRule = rulesInfo.get().isTypesEqual(COLLECTION) ?
+            // TODO by now, only non collection type generators may be overridden by Class
+            Annotation nonCollectionRule = rulesInfo.get().isTypesEqual(COLLECTION) ?
                     ((RuleInfoCollection) rulesInfo.get()).getItemRule().getRule() :
                     rulesInfo.get().getRule();
-            IGenerator<?> generator = isGeneratorOverridden(unitRule) ?
-                    getOverriddenGenerator(unitRule) : selectGenerator(field, rulesInfo.get());
+            IGenerator<?> generator = isGeneratorOverridden(nonCollectionRule) ?
+                    getOverriddenGenerator(nonCollectionRule) : selectGenerator(field, rulesInfo.get());
             prepareCustomRemarks(generator);
             return Optional.of(generator);
         } else {
