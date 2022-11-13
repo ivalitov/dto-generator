@@ -24,7 +24,7 @@ class AnnotationErrorsHandler {
                 resultDto.generalRule++;
             }
 
-            if (isItRules(annotation)) {
+            if (isItMultipleRules(annotation)) {
                 resultDto.groupOfGeneralRules++;
             }
 

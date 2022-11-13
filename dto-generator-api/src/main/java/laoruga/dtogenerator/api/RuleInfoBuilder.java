@@ -17,7 +17,7 @@ import java.util.Objects;
 class RuleInfoBuilder implements IRuleInfoBuilder {
     private Annotation rule;
     private RuleType ruleType;
-    private Boolean rulesGrouped;
+    private Boolean multipleRules;
     private String groupName;
     private RuleInfoBuilder collectionBuilder;
     private Runnable ruleInfoAsserter = () -> {
@@ -51,11 +51,11 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
         return this;
     }
 
-    public RuleInfoBuilder rulesGrouped(boolean rulesGrouped) {
-        if (this.rulesGrouped != null) {
+    public RuleInfoBuilder multipleRules(boolean multipleRules) {
+        if (this.multipleRules != null) {
             throwUnitException();
         }
-        this.rulesGrouped = rulesGrouped;
+        this.multipleRules = multipleRules;
         return this;
     }
 
@@ -98,7 +98,7 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
         ruleInfo.setRule(Objects.requireNonNull(rule));
         ruleInfo.setRuleType(Objects.requireNonNull(ruleType));
         ruleInfo.setGroup(Objects.requireNonNull(groupName));
-        ruleInfo.setRulesGrouped(Objects.requireNonNull(rulesGrouped));
+        ruleInfo.setRulesGrouped(Objects.requireNonNull(multipleRules));
         return ruleInfo;
     }
 
@@ -107,7 +107,7 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
             Objects.requireNonNull(rule);
             Objects.requireNonNull(ruleType);
             Objects.requireNonNull(groupName);
-            Objects.requireNonNull(rulesGrouped);
+            Objects.requireNonNull(multipleRules);
         } catch (Exception e) {
             throw new DtoGeneratorException("Failed to construct unit or collection item generator.", e);
         }
