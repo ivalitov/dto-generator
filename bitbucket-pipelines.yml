@@ -13,7 +13,7 @@ definitions:
           - maven
           - sonar
         script:
-          - mvn -B -Pcoverage verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          - mvn -B -P coverage verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
         artifacts:
           - target/**
 
