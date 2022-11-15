@@ -71,6 +71,8 @@ public class RulesInfoExtractor {
         return Optional.of(ruleInfo);
     }
 
+    private static final String ERROR_MSG_PATTERN = "Inappropriate generation rule annotation: '%s' for field: '%s'";
+
     private void extractRuleInfo(RuleInfoBuilder ruleInfoBuilder,
                                  Field field,
                                  Annotation rule,
@@ -84,8 +86,8 @@ public class RulesInfoExtractor {
                 .groupName(getGroupNameFromRuleAnnotation(rule))
                 .setRuleInfoAsserter(() -> {
                     if (!rulesForCollection && !RulesInfoHelper.checkGeneratorCompatibility(fieldType, rule)) {
-                        throw new DtoGeneratorException("Inappropriate generation rule annotation: '" +
-                                rule.annotationType().getName() + "' for field: '" + field + "'");
+                        throw new DtoGeneratorException(
+                                String.format(ERROR_MSG_PATTERN, rule.annotationType().getName(), field));
                     }
                 });
     }
@@ -106,8 +108,9 @@ public class RulesInfoExtractor {
                     .multipleRules(true)
                     .setRuleInfoAsserter(() -> {
                         if (!rulesForCollection && !RulesInfoHelper.checkGeneratorCompatibility(fieldType, ruleSelectedByGroup)) {
-                            throw new DtoGeneratorException("Inappropriate generation rule annotation: '" +
-                                    ruleSelectedByGroup.annotationType().getName() + "' for field: '" + field + "'");
+                            throw new DtoGeneratorException(
+                                    String.format(ERROR_MSG_PATTERN, ruleSelectedByGroup.annotationType().getName(), field));
+
                         }
                     });
         }

@@ -2,9 +2,10 @@ package laoruga.dtogenerator.api;
 
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
-import laoruga.dtogenerator.api.constants.Group;
+import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
 import laoruga.dtogenerator.api.markup.rules.*;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -18,9 +19,10 @@ import java.util.stream.Stream;
 
 import static laoruga.dtogenerator.api.constants.CharSet.NUM;
 import static laoruga.dtogenerator.api.constants.Group.*;
+import static laoruga.dtogenerator.api.tests.util.TestUtils.getErrorsMap;
 import static laoruga.dtogenerator.api.tests.util.TestUtils.getField;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -61,7 +63,6 @@ public class RulesInfoExtractorTests {
         @StringRule(group = GROUP_2)
         @StringRule
         String stringMultipleRules;
-
     }
 
     static RulesInfoExtractor getExtractorInstance(String... groups) {
@@ -177,6 +178,35 @@ public class RulesInfoExtractorTests {
                 () -> assertThat(itemRuleInfo.isMultipleRules(), equalTo(multipleRules)),
                 () -> assertThat(itemRuleInfo.getGroup(), equalTo(group))
         );
+    }
+
+    static class DtoNegative1 {
+        @IntegerRule
+        String string;
+    }
+
+    static class DtoNegative2 {
+        @IntegerRule
+        @IntegerRule(group = GROUP_1)
+        Long loong;
+    }
+
+    static Stream<Arguments> unappropriatedDataSet () {
+        return Stream.of(
+                Arguments.of("string", DtoNegative1.class),
+                Arguments.of("loong", DtoNegative2.class)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("unappropriatedDataSet")
+    @DisplayName("Unappropriated rule annotation")
+    void unappropriatedRule(String fieldName, Class<?> dtoClass) {
+        DtoGenerator<?> generator = DtoGenerator.builder(dtoClass).build();
+        assertThrows(DtoGeneratorException.class, generator::generateDto);
+        Exception exception = getErrorsMap(generator).get(fieldName);
+        assertThat(exception.getCause().getMessage(),
+                containsString("Inappropriate generation rule annotation"));
     }
 
 }
