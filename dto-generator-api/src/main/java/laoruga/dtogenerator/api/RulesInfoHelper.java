@@ -24,39 +24,34 @@ public final class RulesInfoHelper {
     public static void checkItemGeneratorCompatibility(Annotation itemRuleInfo,
                                                        Annotation collectionRuleInfo,
                                                        Field field) {
-        String fieldName = field.getName();
         Class<?> fieldType = field.getType();
 
         if (itemRuleInfo != null) {
             Class<?> type = collectionRuleInfo == null ? fieldType : ReflectionUtils.getSingleGenericType(field);
-            if (!checkGeneratorCompatibility(type, itemRuleInfo)) {
-                throw new DtoGeneratorException("Field '" + fieldName + "' annotated with inappropriate generation " +
-                        "rule annotation: '" + itemRuleInfo.annotationType() + "'.");
-            }
+            checkGeneratorCompatibility(type, itemRuleInfo);
         }
 
         // Checking of Collection Generator Compatibility
-        if (collectionRuleInfo != null && !checkGeneratorCompatibility(fieldType, collectionRuleInfo)) {
-            throw new DtoGeneratorException("Field '" + fieldName + "' annotated with inappropriate generation " +
-                    "rule annotation: '" + collectionRuleInfo.annotationType() + "'.");
+        if (collectionRuleInfo != null) {
+            checkGeneratorCompatibility(fieldType, collectionRuleInfo);
         }
     }
 
-    public static boolean checkGeneratorCompatibility(Class<?> fieldType, Annotation rules) {
+    public static void checkGeneratorCompatibility(Class<?> fieldType, Annotation rule) {
         try {
-            Class<? extends Annotation> rulesAnnotationClass = rules.annotationType();
+            Class<? extends Annotation> rulesAnnotationClass = rule.annotationType();
             Class<?>[] applicableTypes = (Class<?>[]) rulesAnnotationClass.getField("APPLICABLE_TYPES")
                     .get(rulesAnnotationClass);
             for (Class<?> applicableType : applicableTypes) {
                 if (applicableType == fieldType || applicableType.isAssignableFrom(fieldType)) {
-                    return true;
+                    return;
                 }
             }
         } catch (NoSuchFieldException | IllegalAccessException | ClassCastException e) {
             throw new DtoGeneratorException("Unexpected exception. Can't get APPLICABLE_TYPES from rules annotation '"
-                    + rules + "'", e);
+                    + rule + "'", e);
         }
-        return false;
+        throw new DtoGeneratorException("Inappropriate generation rule annotation: '" + rule + "'");
     }
 
     public static boolean isItCollectionRule(Annotation ruleAnnotation) {
