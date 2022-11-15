@@ -2,9 +2,7 @@ package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.constants.Group;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Il'dar Valitov
@@ -14,8 +12,12 @@ class FieldGroupFilter {
 
     private boolean isNew = true;
 
-    public FieldGroupFilter() {
-        include.add(Group.DEFAULT);
+    public FieldGroupFilter(String... groups) {
+        if (groups.length == 0) {
+            include.add(Group.DEFAULT);
+        } else {
+            include.addAll(Arrays.asList(groups));
+        }
     }
 
     private final Set<String> include = new HashSet<>();
