@@ -14,7 +14,8 @@ public interface ICustomGeneratorRemarkable<T> extends ICustomGenerator<T> {
 
     void setRuleRemarks(List<CustomRuleRemarkWrapper> iRuleRemarks);
 
-    static CustomRuleRemarkWrapper findWrappedRemarkOrReturnNull(ICustomRuleRemark remark, List<CustomRuleRemarkWrapper> wrappedRuleRemarks) {
+    static CustomRuleRemarkWrapper findWrappedRemarkOrReturnNull(ICustomRuleRemark remark,
+                                                                 List<CustomRuleRemarkWrapper> wrappedRuleRemarks) {
         if (wrappedRuleRemarks == null) {
             return null;
         }
