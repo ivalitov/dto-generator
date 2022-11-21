@@ -3,7 +3,7 @@ package laoruga.dtogenerator.api.tests;
 import io.qameta.allure.Epic;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.api.markup.generators.ICustomGenerator;
-import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
+import laoruga.dtogenerator.api.markup.rules.CustomRule;
 import laoruga.dtogenerator.api.markup.rules.IntegerRule;
 import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
 import laoruga.dtogenerator.api.markup.rules.StringRule;
@@ -39,7 +39,7 @@ class FieldsGroupingTests {
         @NestedDtoRules(group = REQUIRED)
         DtoInner reqInnerDto;
 
-        @CustomGenerator(group = REQUIRED, generatorClass = MapGen.class)
+        @CustomRule(group = REQUIRED, generatorClass = MapGen.class)
         Map<String, String> reqMap;
 
         @StringRule
@@ -57,7 +57,7 @@ class FieldsGroupingTests {
         @NestedDtoRules(group = GROUP_1)
         DtoInner firstGroupInnerDto;
 
-        @CustomGenerator(group = GROUP_1, generatorClass = MapGen.class)
+        @CustomRule(group = GROUP_1, generatorClass = MapGen.class)
         Map<String, String> firstGroupMap;
 
         @IntegerRule(group = GROUP_2)
@@ -80,13 +80,13 @@ class FieldsGroupingTests {
         @IntegerRule
         Integer defaultInt;
 
-        @CustomGenerator(generatorClass = MapGen.class)
+        @CustomRule(generatorClass = MapGen.class)
         Map<String, String> defaultMap;
 
         @IntegerRule(group = GROUP_1)
         Integer firstGroupInt;
 
-        @CustomGenerator(generatorClass = MapGen.class, group = GROUP_1)
+        @CustomRule(generatorClass = MapGen.class, group = GROUP_1)
         Map<String, String> firstGroupMap;
 
         @IntegerRule(group = GROUP_2)

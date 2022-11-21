@@ -1,6 +1,6 @@
 package laoruga.dtogenerator.api.tests.data.dtoclient;
 
-import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
+import laoruga.dtogenerator.api.markup.rules.CustomRule;
 import laoruga.dtogenerator.api.markup.rules.IntegerRule;
 import laoruga.dtogenerator.api.markup.rules.ListRule;
 import laoruga.dtogenerator.api.markup.rules.StringRule;
@@ -22,10 +22,10 @@ public class ClientDto {
 
     public static final String PREFIX = "PREFIX-";
 
-    @CustomGenerator(generatorClass = ClientInfoGenerator.class)
+    @CustomRule(generatorClass = ClientInfoGenerator.class)
     private ClientInfoDto clientInfo;
 
-    @CustomGenerator(args = PREFIX, generatorClass = ClientInfoGenerator.class)
+    @CustomRule(args = PREFIX, generatorClass = ClientInfoGenerator.class)
     private ClientInfoDto clientInfoWithPrefix;
 
     @StringRule
@@ -36,7 +36,7 @@ public class ClientDto {
      */
 
     @ListRule()
-    @CustomGenerator(generatorClass = ClientInfoGenerator.class)
+    @CustomRule(generatorClass = ClientInfoGenerator.class)
     private List<ClientInfoDto> clients;
 
     @ListRule()

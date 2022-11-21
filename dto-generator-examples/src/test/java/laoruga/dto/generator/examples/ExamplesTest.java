@@ -1,11 +1,13 @@
 package laoruga.dto.generator.examples;
 
-import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
 import laoruga.dtogenerator.api.DtoGenerator;
 import laoruga.dtogenerator.examples.dtos.Office;
-import laoruga.dtogenerator.examples.dtos.Person;
+import laoruga.dtogenerator.examples.dtos.TwoFields;
+import laoruga.dtogenerator.examples.dtos.SolarSystem;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
 
 import static laoruga.dtogenerator.examples.dtos.Gender.FEMALE;
 import static laoruga.dtogenerator.examples.generators.remark.PersonRemark.*;
@@ -22,12 +24,26 @@ public class ExamplesTest {
 
     @Test
     void customGeneratorSimple() {
+        SolarSystem solarSystem = DtoGenerator.builder(SolarSystem.class).build().generateDto();
 
+        log.info(Utils.toJson(solarSystem));
+
+        assertNotNull(solarSystem);
+        assertTrue(solarSystem.getPlanetHabitabilityMap().size() >= 3);
+        assertTrue(Arrays.asList("Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune")
+                .containsAll(solarSystem.getPlanetHabitabilityMap().keySet()));
+        assertTrue(Arrays.asList("inhabited", "uninhabited", "possibly inhabited")
+                .containsAll(solarSystem.getPlanetHabitabilityMap().values()));
     }
 
     @Test
     void customGeneratorDtoDependent() {
+        TwoFields twoFields = DtoGenerator.builder(TwoFields.class).build().generateDto();
 
+        log.info(Utils.toJson(twoFields));
+
+        assertNotNull(twoFields);
+        assertThat(twoFields.getFirstField(), containsString(twoFields.getSecondField()));
     }
 
     @Test

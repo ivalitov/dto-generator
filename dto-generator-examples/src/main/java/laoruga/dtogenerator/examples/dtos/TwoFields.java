@@ -1,6 +1,6 @@
 package laoruga.dtogenerator.examples.dtos;
 
-import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
+import laoruga.dtogenerator.api.markup.rules.CustomRule;
 import laoruga.dtogenerator.api.markup.rules.StringRule;
 import laoruga.dtogenerator.examples.generators.CustomGeneratorDtoDependent;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import lombok.Getter;
 @Getter
 public class TwoFields {
 
-    @CustomGenerator(generatorClass = CustomGeneratorDtoDependent.class)
+    @CustomRule(generatorClass = CustomGeneratorDtoDependent.class)
     String firstField;
 
     @StringRule(maxSymbols = 10)

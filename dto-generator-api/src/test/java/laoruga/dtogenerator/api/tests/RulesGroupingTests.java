@@ -204,8 +204,8 @@ class RulesGroupingTests {
         @EnumRule(enumClass = SomeEnum.class, possibleEnumNames = "BAR")
         private SomeEnum aEnum;
 
-        @CustomGenerator(group = GROUP_1, generatorClass = CustomGen.class, args = "1")
-        @CustomGenerator(generatorClass = CustomGen.class, args = "2")
+        @CustomRule(group = GROUP_1, generatorClass = CustomGen.class, args = "1")
+        @CustomRule(generatorClass = CustomGen.class, args = "2")
         private CustomDto customDto;
 
     }

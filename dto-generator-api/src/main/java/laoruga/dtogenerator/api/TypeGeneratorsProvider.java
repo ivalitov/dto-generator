@@ -6,7 +6,7 @@ import laoruga.dtogenerator.api.generators.NestedDtoGenerator;
 import laoruga.dtogenerator.api.generators.basictypegenerators.BasicGeneratorsBuilders;
 import laoruga.dtogenerator.api.markup.generators.*;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
-import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
+import laoruga.dtogenerator.api.markup.rules.CustomRule;
 import laoruga.dtogenerator.api.markup.rules.ListRule;
 import laoruga.dtogenerator.api.markup.rules.SetRule;
 import laoruga.dtogenerator.api.util.ReflectionUtils;
@@ -253,11 +253,11 @@ public class TypeGeneratorsProvider<T> {
     }
 
     IGenerator<?> getCustomGenerator(Annotation customGeneratorRules) throws DtoGeneratorException {
-        CustomGenerator customRules;
+        CustomRule customRules;
         try {
-            customRules = (CustomGenerator) customGeneratorRules;
+            customRules = (CustomRule) customGeneratorRules;
         } catch (ClassCastException e) {
-            throw new DtoGeneratorException("Unexpected error. Unexpected annotation instead of: " + CustomGenerator.class, e);
+            throw new DtoGeneratorException("Unexpected error. Unexpected annotation instead of: " + CustomRule.class, e);
         }
         Class<?> generatorClass = null;
         try {

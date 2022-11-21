@@ -1,7 +1,7 @@
 package laoruga.dtogenerator.api;
 
 import laoruga.dtogenerator.api.exceptions.DtoGeneratorException;
-import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
+import laoruga.dtogenerator.api.markup.rules.CustomRule;
 import laoruga.dtogenerator.api.markup.rules.NestedDtoRules;
 import laoruga.dtogenerator.api.markup.rules.meta.Rule;
 import laoruga.dtogenerator.api.markup.rules.meta.RuleForCollection;
@@ -63,7 +63,7 @@ public final class RulesInfoHelper {
     }
 
     public static boolean isItCustomRule(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType() == CustomGenerator.class;
+        return ruleAnnotation.annotationType() == CustomRule.class;
     }
 
     public static boolean isItNestedRule(Annotation ruleAnnotation) {

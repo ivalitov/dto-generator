@@ -13,8 +13,8 @@ import static laoruga.dtogenerator.api.constants.Group.DEFAULT;
 @Retention(RUNTIME)
 @Target(FIELD)
 @Rule
-@Repeatable(CustomGenerators.class)
-public @interface CustomGenerator {
+@Repeatable(CustomRules.class)
+public @interface CustomRule {
 
     Class<?>[] APPLICABLE_TYPES = {Object.class};
 

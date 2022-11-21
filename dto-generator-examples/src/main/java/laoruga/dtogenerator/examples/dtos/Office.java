@@ -1,6 +1,6 @@
 package laoruga.dtogenerator.examples.dtos;
 
-import laoruga.dtogenerator.api.markup.rules.CustomGenerator;
+import laoruga.dtogenerator.api.markup.rules.CustomRule;
 import laoruga.dtogenerator.api.markup.rules.ListRule;
 import laoruga.dtogenerator.examples.generators.CustomGeneratorRemarkable;
 import lombok.Data;
@@ -17,6 +17,6 @@ import java.util.List;
 public class Office {
 
     @ListRule(minSize = 2, maxSize = 2)
-    @CustomGenerator(generatorClass = CustomGeneratorRemarkable.class)
+    @CustomRule(generatorClass = CustomGeneratorRemarkable.class)
     List<Person> people;
 }
