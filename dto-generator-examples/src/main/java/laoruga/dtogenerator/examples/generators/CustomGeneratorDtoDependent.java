@@ -1,7 +1,6 @@
 package laoruga.dtogenerator.examples.generators;
 
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
-import laoruga.dtogenerator.api.util.RandomUtils;
 import laoruga.dtogenerator.examples.dtos.TwoFields;
 
 /**

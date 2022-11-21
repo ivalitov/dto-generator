@@ -69,6 +69,7 @@ public class SimpleTypeGeneratorsFactory {
                 .maxLength(stringRule.maxSymbols())
                 .charset(stringRule.charset())
                 .chars(stringRule.chars())
+                .words(stringRule.words())
                 .ruleRemark(stringRuleRemark)
                 .regexp(stringRule.regexp())
                 .build();

@@ -5,6 +5,7 @@ import laoruga.dtogenerator.api.markup.generators.IGenerator;
 import laoruga.dtogenerator.api.markup.generators.IGeneratorBuilder;
 import laoruga.dtogenerator.api.markup.remarks.IRuleRemark;
 import laoruga.dtogenerator.api.markup.rules.IntegerRule;
+import laoruga.dtogenerator.api.util.RandomUtils;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
@@ -29,7 +30,7 @@ public class IntegerGenerator implements IGenerator<Integer> {
             return maxValue;
         }
         if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
-            return new RandomDataGenerator().nextInt(minValue, maxValue);
+            return RandomUtils.nextInt(minValue, maxValue);
         }
         if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
             return null;

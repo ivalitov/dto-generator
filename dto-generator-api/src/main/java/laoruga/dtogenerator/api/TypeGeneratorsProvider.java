@@ -122,8 +122,9 @@ public class TypeGeneratorsProvider<T> {
         }
 
         if (rulesInfo.isPresent()) {
+            boolean isCollectionGenerator = rulesInfo.get().isTypesEqual(COLLECTION);
             // TODO by now, only non collection type generators may be overridden by Class
-            Annotation nonCollectionRule = rulesInfo.get().isTypesEqual(COLLECTION) ?
+            Annotation nonCollectionRule = isCollectionGenerator ?
                     ((RuleInfoCollection) rulesInfo.get()).getItemRule().getRule() :
                     rulesInfo.get().getRule();
             IGenerator<?> generator = isGeneratorOverridden(nonCollectionRule) ?
@@ -182,6 +183,9 @@ public class TypeGeneratorsProvider<T> {
     }
 
     void prepareCustomRemarks(IGenerator<?> generator) {
+        if (generator instanceof ICollectionGenerator) {
+            prepareCustomRemarks(((ICollectionGenerator<?>) generator).getItemGenerator());
+        }
         if (generator instanceof ICustomGeneratorRemarkable) {
             ICustomGeneratorRemarkable<?> remarkableGenerator = (ICustomGeneratorRemarkable<?>) generator;
             if (getGeneratorRemarksProvider().isCustomRuleRemarkExists(remarkableGenerator)) {

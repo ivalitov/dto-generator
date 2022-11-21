@@ -38,6 +38,10 @@ public final class RandomUtils {
         return random.nextInt((maxNumber - minNumber) + 1) + minNumber;
     }
 
+    public static Integer nextInt(String minNumber, String maxNumber) {
+        return nextInt(Integer.parseInt(minNumber), Integer.parseInt(maxNumber));
+    }
+
     public static boolean nextBoolean() {
         return nextInt(0, 1) == 1;
     }

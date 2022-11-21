@@ -1,5 +1,6 @@
 package laoruga.dtogenerator.api.tests.data.customgenerator;
 
+import laoruga.dtogenerator.api.markup.generators.AbstractCustomGeneratorRemarkable;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorArgs;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorDtoDependent;
 import laoruga.dtogenerator.api.markup.generators.ICustomGeneratorRemarkable;
@@ -11,6 +12,7 @@ import org.apache.commons.text.RandomStringGenerator;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static laoruga.dtogenerator.api.tests.data.customgenerator.ClientRemark.CLIENT_TYPE;
 import static laoruga.dtogenerator.api.tests.data.customgenerator.ClientRemark.DOCUMENT;
@@ -20,24 +22,17 @@ import static laoruga.dtogenerator.api.tests.data.customgenerator.ClientRemark.D
  * Created on 03.05.2022
  */
 
-public class ClientInfoGenerator implements
+public class ClientInfoGenerator extends AbstractCustomGeneratorRemarkable<ClientInfoDto> implements
         ICustomGeneratorArgs<ClientInfoDto>,
-        ICustomGeneratorRemarkable<ClientInfoDto>,
         ICustomGeneratorDtoDependent<ClientInfoDto, ClientDto> {
 
     ClientDto generatedDto;
-    List<CustomRuleRemarkWrapper> remarks;
     private String[] generatorArgs;
 
     @Override
     public ClientInfoGenerator setArgs(String[] args) {
         this.generatorArgs = args;
         return this;
-    }
-
-    @Override
-    public void setRuleRemarks(List<CustomRuleRemarkWrapper> iRuleRemarks) {
-        remarks = iRuleRemarks;
     }
 
     @Override
@@ -50,19 +45,17 @@ public class ClientInfoGenerator implements
         String prefix = RandomUtils.getRandomItemOrNull(generatorArgs);
         prefix = prefix == null ? "" : prefix;
 
-        CustomRuleRemarkWrapper clientTypeRemark = ICustomGeneratorRemarkable.findWrappedRemarkOrReturnNull(CLIENT_TYPE, remarks);
-        if (clientTypeRemark != null) {
-            clientType = ClientType.valueOf(String.valueOf(clientTypeRemark.getArgs()[0]).toUpperCase());
-        } else {
-            clientType = RandomUtils.getRandomItemOrNull(ClientType.values());
-        }
+        Optional<CustomRuleRemarkWrapper> maybeClientTypeRemark = getWrappedRemark(CLIENT_TYPE);
+        clientType = maybeClientTypeRemark
+                .map(customRuleRemarkWrapper -> ClientType.valueOf(
+                        String.valueOf(customRuleRemarkWrapper.getArgs()[0]).toUpperCase()))
+                .orElseGet(() -> RandomUtils.getRandomItemOrNull(ClientType.values()));
 
-        CustomRuleRemarkWrapper docTypeRemark = ICustomGeneratorRemarkable.findWrappedRemarkOrReturnNull(DOCUMENT, remarks);
-        if (docTypeRemark != null) {
-            docType = DocType.valueOf(String.valueOf(docTypeRemark.getArgs()[0]).toUpperCase());
-        } else {
-            docType = DocType.values()[randomGen.nextInt(0, DocType.values().length - 1)];
-        }
+        Optional<CustomRuleRemarkWrapper> maybeDocTypeRemark = getWrappedRemark(DOCUMENT);
+        docType = maybeDocTypeRemark
+                .map(customRuleRemarkWrapper -> DocType.valueOf(
+                        String.valueOf(customRuleRemarkWrapper.getArgs()[0]).toUpperCase()))
+                .orElseGet(() -> DocType.values()[randomGen.nextInt(0, DocType.values().length - 1)]);
 
         ClientInfoDto clientInfo;
 

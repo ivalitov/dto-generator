@@ -24,6 +24,7 @@ public class StringGenerator implements IGenerator<String> {
     private final int maxLength;
     private final int minLength;
     private final char[] chars;
+    private final String[] words;
     private final IRuleRemark ruleRemark;
     private final String regexp;
 
@@ -41,11 +42,14 @@ public class StringGenerator implements IGenerator<String> {
         } else {
             throw new IllegalStateException("Unexpected value " + ruleRemark);
         }
+        if (words.length != 0) {
+            return getRandomWord();
+        }
         if (regexp != null && !regexp.isEmpty()) {
             return generateStringByRegexp();
-        } else {
-            return generateString(length);
         }
+        return generateString(length);
+
     }
 
     private String generateString(int length) {
@@ -55,6 +59,14 @@ public class StringGenerator implements IGenerator<String> {
 
     private String generateStringByRegexp() {
         return new Generex(regexp).random(minLength, maxLength);
+    }
+
+    private String getRandomWord() {
+        String randomItemFromList = RandomUtils.getRandomItemFromList(words);
+        if (maxLength < randomItemFromList.length()) {
+            randomItemFromList = randomItemFromList.substring(0, maxLength);
+        }
+        return randomItemFromList;
     }
 
     /**
@@ -68,6 +80,7 @@ public class StringGenerator implements IGenerator<String> {
         private int maxLength = StringRule.DEFAULT_MAX_SYMBOLS_NUMBER;
         private int minLength = StringRule.DEFAULT_MIN_SYMBOLS_NUMBER;
         private CharSet[] charset = StringRule.DEFAULT_CHARSET;
+        private String[] words = StringRule.WORDS;
         private String chars = StringRule.DEFAULT_CHARS;
         private IRuleRemark ruleRemark = StringRule.DEFAULT_RULE_REMARK;
         private String regexp = StringRule.DEFAULT_REGEXP;
@@ -87,6 +100,11 @@ public class StringGenerator implements IGenerator<String> {
 
         public StringGeneratorBuilder charset(CharSet... charset) {
             this.charset = charset;
+            return this;
+        }
+
+        public StringGeneratorBuilder words(String[] words) {
+            this.words = words;
             return this;
         }
 
@@ -128,7 +146,8 @@ public class StringGenerator implements IGenerator<String> {
             return new StringGenerator(
                     this.maxLength,
                     this.minLength,
-                    getChars(),
+                    this.getChars(),
+                    this.words,
                     this.ruleRemark,
                     this.regexp
             );
