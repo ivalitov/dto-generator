@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>laoruga</groupId>
+    <groupId>org.laoruga</groupId>
     <artifactId>dto-generator-parent</artifactId>
     <packaging>pom</packaging>
     <version>0.1-ALPHA</version>
 
     <modules>
-        <module>dto-generator-api</module>
+        <module>dto-generator</module>
         <module>dto-generator-examples</module>
     </modules>
 
@@ -26,6 +26,7 @@
         <allure.junit5.assert.version>${allure.version}</allure.junit5.assert.version>
         <allure.maven.version>2.10.0</allure.maven.version>
         <hamcrest.verstion>2.2</hamcrest.verstion>
+        <jacoco.version>0.8.7</jacoco.version>
 
         <argLinePlaceholder></argLinePlaceholder>
         <maven.compiler.source>8</maven.compiler.source>
@@ -115,6 +116,35 @@
             <properties>
                 <argLinePlaceholder>@{argLine}</argLinePlaceholder>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${jacoco.version}</version>
+                        <executions>
+                            <execution>
+                                <id>prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                                <configuration>
+                                    <formats>
+                                        <format>XML</format>
+                                    </formats>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 
