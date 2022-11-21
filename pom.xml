@@ -27,7 +27,7 @@
         <allure.maven.version>2.10.0</allure.maven.version>
         <hamcrest.verstion>2.2</hamcrest.verstion>
 
-
+        <argLinePlaceholder></argLinePlaceholder>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
@@ -109,6 +109,15 @@
 
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>coverage</id>
+            <properties>
+                <argLinePlaceholder>@{argLine}</argLinePlaceholder>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>
@@ -122,7 +131,7 @@
                 <version>2.22.2</version>
                 <configuration>
                     <argLine>
-                        @{argLine}
+                        ${argLinePlaceholder}
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
                         -Dfile.encoding=UTF-8
                     </argLine>

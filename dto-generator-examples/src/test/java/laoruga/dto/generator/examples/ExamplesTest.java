@@ -1,16 +1,16 @@
 package laoruga.dto.generator.examples;
 
-import laoruga.dtogenerator.api.DtoGenerator;
-import laoruga.dtogenerator.examples.dtos.Office;
-import laoruga.dtogenerator.examples.dtos.TwoFields;
-import laoruga.dtogenerator.examples.dtos.SolarSystem;
+import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.examples.dto.Office;
+import org.laoruga.dtogenerator.examples.dto.TwoFields;
+import org.laoruga.dtogenerator.examples.dto.SolarSystem;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.laoruga.dtogenerator.examples.generators.custom.remark.PersonRemark;
 
 import java.util.Arrays;
 
-import static laoruga.dtogenerator.examples.dtos.Gender.FEMALE;
-import static laoruga.dtogenerator.examples.generators.remark.PersonRemark.*;
+import static org.laoruga.dtogenerator.examples.dto.Gender.FEMALE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,10 +50,10 @@ public class ExamplesTest {
     void customGeneratorRemarkable() {
         Office office = DtoGenerator.builder(Office.class)
                 .addRuleRemarkForFields(
-                        WEIGHT_RANGE.wrap("50", "70"),
-                        GROWTH_RANGE.wrap("130", "150"),
-                        AGE_RANGE.wrap("18", "30"),
-                        GENDER.wrap("FEMALE"))
+                        PersonRemark.WEIGHT_RANGE.wrap("50", "70"),
+                        PersonRemark.GROWTH_RANGE.wrap("130", "150"),
+                        PersonRemark.AGE_RANGE.wrap("18", "30"),
+                        PersonRemark.GENDER.wrap("FEMALE"))
                 .build()
                 .generateDto();
 
