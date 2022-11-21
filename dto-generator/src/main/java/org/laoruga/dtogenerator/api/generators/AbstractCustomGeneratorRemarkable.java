@@ -18,7 +18,7 @@ public abstract class AbstractCustomGeneratorRemarkable<T> implements ICustomGen
     private List<CustomRuleRemarkWrapper> ruleRemarkWrapperList;
 
     @Override
-    final public void setRuleRemarks(List<CustomRuleRemarkWrapper> ruleRemarkWrapperList) {
+    public final void setRuleRemarks(List<CustomRuleRemarkWrapper> ruleRemarkWrapperList) {
         this.ruleRemarkWrapperList = ruleRemarkWrapperList;
     }
 

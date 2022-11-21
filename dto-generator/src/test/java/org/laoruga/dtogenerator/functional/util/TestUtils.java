@@ -14,13 +14,12 @@ import java.util.stream.Collectors;
 public class TestUtils {
 
     public static Map<String, Exception> getErrorsMap(DtoGenerator dtoGenerator) {
-        Field errorsField = null;
+        Field errorsField;
         Map<Field, Exception> errors;
         try {
             errorsField = dtoGenerator.getClass().getDeclaredField("errors");
             errorsField.setAccessible(true);
             errors = (Map<Field, Exception>) errorsField.get(dtoGenerator);
-            errorsField.setAccessible(false);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

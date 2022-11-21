@@ -60,7 +60,7 @@ public class ExamplesTest {
         log.info(Utils.toJson(office));
 
         assertNotNull(office);
-        assertEquals(office.getPeople().size(), 2);
+        assertEquals(2, office.getPeople().size());
         office.getPeople().forEach(female ->
                 assertAll(
                         () -> assertThat(female.getFio(), matchesRegex("^[A-Z]{1}[a-z]{5} [A-Z]{1}[a-z]{5} [A-Z]{1}[a-z]{5}$")),

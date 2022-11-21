@@ -39,8 +39,7 @@ public class CustomGeneratorWithArgs implements ICustomGeneratorArgs<List<String
             char[] charset = args[2].toCharArray();
             params = new Args(size, maxLength, charset);
         } catch (Exception e) {
-            throw new IllegalArgumentException(
-                    "Two arguments must be passed, but was: " + (args != null ? Arrays.asList(args) : null));
+            throw new IllegalArgumentException("Two arguments must be passed, but was: " + Arrays.asList(args));
         }
         if (params.size <= 0) {
             throw new IllegalArgumentException("First argument must be more then 0, but was: " + params.size);
