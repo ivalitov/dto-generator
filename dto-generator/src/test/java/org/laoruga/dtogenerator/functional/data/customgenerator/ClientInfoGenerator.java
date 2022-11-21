@@ -1,7 +1,5 @@
 package org.laoruga.dtogenerator.functional.data.customgenerator;
 
-import org.apache.commons.math3.random.RandomDataGenerator;
-import org.apache.commons.text.RandomStringGenerator;
 import org.laoruga.dtogenerator.api.generators.AbstractCustomGeneratorRemarkable;
 import org.laoruga.dtogenerator.api.generators.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.generators.ICustomGeneratorDtoDependent;
@@ -35,51 +33,48 @@ public class ClientInfoGenerator extends AbstractCustomGeneratorRemarkable<Clien
 
     @Override
     public ClientInfoDto generate() {
-        RandomDataGenerator randomGen = new RandomDataGenerator();
-
         ClientType clientType;
         DocType docType;
 
-        String prefix = RandomUtils.getRandomItemOrNull(generatorArgs);
-        prefix = prefix == null ? "" : prefix;
+        String prefix = generatorArgs.length == 0 ? "" : RandomUtils.getRandomItem(generatorArgs);
 
         Optional<CustomRuleRemarkWrapper> maybeClientTypeRemark = getWrappedRemark(CLIENT_TYPE);
         clientType = maybeClientTypeRemark
                 .map(customRuleRemarkWrapper -> ClientType.valueOf(
                         String.valueOf(customRuleRemarkWrapper.getArgs()[0]).toUpperCase()))
-                .orElseGet(() -> RandomUtils.getRandomItemOrNull(ClientType.values()));
+                .orElseGet(() -> RandomUtils.getRandomItem(ClientType.values()));
 
         Optional<CustomRuleRemarkWrapper> maybeDocTypeRemark = getWrappedRemark(DOCUMENT);
         docType = maybeDocTypeRemark
                 .map(customRuleRemarkWrapper -> DocType.valueOf(
                         String.valueOf(customRuleRemarkWrapper.getArgs()[0]).toUpperCase()))
-                .orElseGet(() -> DocType.values()[randomGen.nextInt(0, DocType.values().length - 1)]);
+                .orElseGet(() -> DocType.values()[RandomUtils.nextInt(0, DocType.values().length - 1)]);
 
         ClientInfoDto clientInfo;
 
         switch (clientType) {
             case ORG:
-                clientInfo = new OrgInfoDto(prefix + new RandomStringGenerator.Builder().build().generate(10));
+                clientInfo = new OrgInfoDto(prefix + RandomUtils.nextString(10));
                 break;
             case PERSON:
             case LEGAL_PERSON:
                 clientInfo = new PersonInfoDto(
-                        prefix + new RandomStringGenerator.Builder().build().generate(10),
-                        prefix + new RandomStringGenerator.Builder().build().generate(10),
-                        prefix + new RandomStringGenerator.Builder().build().generate(10),
+                        prefix + RandomUtils.nextString(10),
+                        prefix + RandomUtils.nextString(10),
+                        prefix + RandomUtils.nextString(10),
                         new Document(
                                 docType,
-                                String.valueOf(randomGen.nextInt(100000, 999999)),
-                                String.valueOf(randomGen.nextInt(1000, 9999)),
+                                String.valueOf(RandomUtils.nextInt(100000, 999999)),
+                                String.valueOf(RandomUtils.nextInt(1000, 9999)),
                                 LocalDate.of(
-                                        randomGen.nextInt(1999, 2022),
-                                        randomGen.nextInt(1, 12),
-                                        randomGen.nextInt(1, 28)
+                                        RandomUtils.nextInt(1999, 2022),
+                                        RandomUtils.nextInt(1, 12),
+                                        RandomUtils.nextInt(1, 28)
                                 ),
                                 LocalDate.of(
-                                        randomGen.nextInt(1999, 2022),
-                                        randomGen.nextInt(1, 12),
-                                        randomGen.nextInt(1, 28)
+                                        RandomUtils.nextInt(1999, 2022),
+                                        RandomUtils.nextInt(1, 12),
+                                        RandomUtils.nextInt(1, 28)
                                 )
                         )
                 );

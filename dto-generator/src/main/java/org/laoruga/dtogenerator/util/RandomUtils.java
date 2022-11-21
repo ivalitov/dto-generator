@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.text.RandomStringGenerator;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -26,18 +26,26 @@ public final class RandomUtils {
     @Getter
     private static final Random random = new Random();
 
-    private static final String HEX_CHARSET = "0123456789abcdefABCDEF";
-
     public static Double nextDouble(int minNumber, int maxNumber) {
         double floatPart = random.nextDouble();
         int integerPart = nextInt(minNumber, maxNumber);
-        return integerPart + floatPart;
+        return integerPart == maxNumber ? maxNumber : integerPart + floatPart;
     }
 
+    /**
+     * @param minNumber min value inclusive
+     * @param maxNumber max value inclusive
+     * @return random int
+     */
     public static Integer nextInt(int minNumber, int maxNumber) {
         return random.nextInt((maxNumber - minNumber) + 1) + minNumber;
     }
 
+    /**
+     * @param minNumber min value inclusive
+     * @param maxNumber max value inclusive
+     * @return random int
+     */
     public static Integer nextInt(String minNumber, String maxNumber) {
         return nextInt(Integer.parseInt(minNumber), Integer.parseInt(maxNumber));
     }
@@ -46,13 +54,19 @@ public final class RandomUtils {
         return nextInt(0, 1) == 1;
     }
 
+    /**
+     * @param length   number of values
+     * @param minValue min int value
+     * @param maxValue max int value
+     * @return array of random values
+     */
     public static Integer[] nextIntArray(int length, int minValue, int maxValue) {
         List<Integer> possibleValues = IntStream.range(minValue, maxValue + 1)
                 .boxed()
                 .collect(Collectors.toList());
         Collections.shuffle(possibleValues);
         if (length > possibleValues.size()) {
-            throw new IllegalArgumentException("Уникальных значений меньше чем " + length);
+            throw new IllegalArgumentException("Unique values less than " + length);
         }
         return possibleValues.subList(0, length).toArray(new Integer[0]);
     }
@@ -61,45 +75,34 @@ public final class RandomUtils {
      * Receiving random item from list
      */
 
-    public static <T> T getRandomItemOrNull(T... items) {
-        if (items == null) {
-            return null;
-        }
-        return getRandomItemOrNull(Arrays.asList(items));
-    }
-
-    public static <T> T getRandomItemOrNull(Collection<T> collection) {
-        if (collection == null || collection.isEmpty()) {
-            return null;
-        }
-        List<T> asList = (collection instanceof List) ? (List<T>) collection : new ArrayList<>(collection);
-        return asList.get(RandomUtils.nextInt(0, asList.size() - 1));
-    }
-
-    /*
-     * Методы возрващают случайный элемент, если элементов нет - возникает ошибка
+    /**
+     * @param collection - collection to take a random element
+     * @return - random element from collection
      */
-    public static <T> T getRandomItemFromList(T... items) {
-        int index = org.apache.commons.lang3.RandomUtils.nextInt(0, items.length);
-        return items[index];
-    }
-
-    public static <T> T getRandomItemFromList(List<T> list) {
-        int index = org.apache.commons.lang3.RandomUtils.nextInt(0, list.size());
-        return list.get(index);
-    }
-
-    public static <T> List<T> getRandomItemsFromList(List<T> list, Integer maxCount) {
-        Set<T> set = new HashSet<>();
-        for (int i = 0; i < maxCount; i++) {
-            set.add(getRandomItemFromList(list));
+    public static <T> T getRandomItem(Collection<T> collection) {
+        Iterator<T> iterator = collection.iterator();
+        int randomIdx = nextInt(0, collection.size() - 1);
+        int idx = 0;
+        T result = iterator.next();
+        while (iterator.hasNext() && randomIdx != idx) {
+            result = iterator.next();
+            idx++;
         }
-        return Arrays.asList((T[]) set.toArray());
+        return result;
     }
 
-    // Генерация LONG
+    /**
+     * @param items - array to take a random element
+     * @return - random element from array
+     */
+    public static <T> T getRandomItem(T... items) {
+        if (items.length == 0) {
+            throw new IllegalArgumentException("Empty array passed");
+        }
+        return items[nextInt(0, items.length - 1)];
+    }
 
-    public static long generateRandomLong(long minNumber, long maxNumber) {
+    public static long nextLong(long minNumber, long maxNumber) {
         if (minNumber == maxNumber) {
             return minNumber;
         } else {
@@ -107,37 +110,21 @@ public final class RandomUtils {
         }
     }
 
-    public static String generateRandomAlphaNumericString(int stringLength) {
-        return RandomStringUtils.randomAlphanumeric(stringLength);
+    public static String nextString(char[] chars, int length) {
+        return new RandomStringGenerator.Builder()
+                .selectFrom(chars).build().generate(length);
     }
 
-    public static String generateRandomAlphaString(int stringLength) {
-        return RandomStringUtils.randomAlphabetic(stringLength);
+    public static String nextString(int length) {
+        return new RandomStringGenerator.Builder().selectFrom().build().generate(length);
     }
 
-    public static String generateRandomHexNumericString(int stringLength) {
-        return RandomStringUtils.random(stringLength, HEX_CHARSET);
-    }
-
-    public static String generateRandomNumericString(int stringLength) {
-        return RandomStringUtils.randomNumeric(stringLength);
-    }
-
-    public static int getRandomDuration() {
-        return (org.apache.commons.lang3.RandomUtils.nextInt(0, 120) + 1) * 60;
-    }
-
-    public static LocalDateTime getRandomDateTimeInCertainInterval(LocalDateTime startDate, LocalDateTime endDate) {
+    public static LocalDateTime nextLocalDateTime(LocalDateTime startDate, LocalDateTime endDate) {
         ZoneOffset offset = ZoneId.systemDefault().getRules().getOffset(startDate);
         long start = startDate.toEpochSecond(offset);
         long finish = endDate.toEpochSecond(offset);
-        long randomDate = RandomUtils.generateRandomLong(start, finish);
+        long randomDate = RandomUtils.nextLong(start, finish);
         return LocalDateTime.ofEpochSecond(randomDate, 0, offset);
-    }
-
-    public static LocalDateTime getRandomDateInCertainInterval(LocalDateTime startDate, LocalDateTime endDate) {
-        LocalDateTime random = getRandomDateTimeInCertainInterval(startDate, endDate);
-        return LocalDateTime.of(random.getYear(), random.getMonth(), random.getDayOfMonth(), 0, 0);
     }
 
 }

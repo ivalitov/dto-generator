@@ -25,7 +25,7 @@ public class CustomGenerator implements ICustomGenerator<Map<String, String>> {
         Integer numberOfPlanets = RandomUtils.nextInt(MIN_PLANETS_NUMBER, planets.size());
         return planets.subList(0, numberOfPlanets).stream().collect(Collectors.toMap(
                 i -> i,
-                i -> RandomUtils.getRandomItemFromList("inhabited", "uninhabited", "possibly inhabited")
+                i -> RandomUtils.getRandomItem("inhabited", "uninhabited", "possibly inhabited")
         ));
     }
 }

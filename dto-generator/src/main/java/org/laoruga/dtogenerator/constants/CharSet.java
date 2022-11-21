@@ -24,7 +24,7 @@ public enum CharSet {
 
     public static CharSet getCharSetOrNull(String charsetName) {
         try {
-           return CharSet.valueOf(charsetName);
+            return CharSet.valueOf(charsetName);
         } catch (Exception e) {
             return null;
         }

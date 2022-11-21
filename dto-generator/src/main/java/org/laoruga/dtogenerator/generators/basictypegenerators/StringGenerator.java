@@ -53,8 +53,7 @@ public class StringGenerator implements IGenerator<String> {
     }
 
     private String generateString(int length) {
-        return new RandomStringGenerator.Builder()
-                .selectFrom(chars).build().generate(length);
+        return RandomUtils.nextString(chars, length);
     }
 
     private String generateStringByRegexp() {
@@ -62,7 +61,7 @@ public class StringGenerator implements IGenerator<String> {
     }
 
     private String getRandomWord() {
-        String randomItemFromList = RandomUtils.getRandomItemFromList(words);
+        String randomItemFromList = RandomUtils.getRandomItem(words);
         if (maxLength < randomItemFromList.length()) {
             randomItemFromList = randomItemFromList.substring(0, maxLength);
         }
