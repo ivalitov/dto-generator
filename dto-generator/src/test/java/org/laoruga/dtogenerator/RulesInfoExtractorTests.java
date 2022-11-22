@@ -23,6 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.laoruga.dtogenerator.constants.Group.GROUP_1;
 
 /**
  * @author Il'dar Valitov
@@ -52,8 +53,8 @@ public class RulesInfoExtractorTests {
         @IntegerRule
         Set<Integer> setOfInts;
 
-        @ListRule(group = Group.GROUP_1)
-        @StringRule(group = Group.GROUP_1)
+        @ListRule(group = GROUP_1)
+        @StringRule(group = GROUP_1)
         @ListRule
         @StringRule
         List<String> listOfStringMultipleRules;
@@ -128,8 +129,8 @@ public class RulesInfoExtractorTests {
                         false),
                 Arguments.of(Dto.class, "listOfStringMultipleRules", ListRule.class, StringRule.class,
                         getResultDto(0, 1, 0, 1),
-                        getExtractorInstance(Group.GROUP_1),
-                        Group.GROUP_1,
+                        getExtractorInstance(GROUP_1),
+                        GROUP_1,
                         true)
         );
     }
@@ -186,26 +187,58 @@ public class RulesInfoExtractorTests {
 
     static class DtoNegative2 {
         @IntegerRule
-        @IntegerRule(group = Group.GROUP_1)
+        @IntegerRule(group = GROUP_1)
         Long loong;
     }
 
-    static Stream<Arguments> unappropriatedDataSet () {
+    static class DtoNegative3 {
+        @LongRule
+        @IntegerRule
+        Long loong;
+    }
+
+    static class DtoNegative4 {
+        @LongRule
+        @LongRule
+        @StringRule
+        @StringRule
+        Long loong;
+    }
+
+    static class DtoNegative5 {
+        @ListRule
+        @SetRule
+        List<String> list;
+    }
+
+    static class DtoNegative6 {
+        @ListRule
+        @ListRule(group = GROUP_1)
+        @SetRule
+        @SetRule(group = GROUP_1)
+        List<String> list;
+    }
+
+    static Stream<Arguments> unappropriatedDataSet() {
         return Stream.of(
-                Arguments.of("string", DtoNegative1.class),
-                Arguments.of("loong", DtoNegative2.class)
+                Arguments.of("string", DtoNegative1.class, "Inappropriate generation rule annotation"),
+                Arguments.of("loong", DtoNegative2.class, "Inappropriate generation rule annotation"),
+                Arguments.of("loong", DtoNegative3.class, "Found '2' @Rule annotations for various types, expected 1 or 0"),
+                Arguments.of("loong", DtoNegative4.class, "Found '2' @Rules annotations for various types, expected @Rules for single type only"),
+                Arguments.of("list", DtoNegative5.class, "Found '2' @CollectionRule annotations for various collection types, expected 1 or 0"),
+                Arguments.of("list", DtoNegative6.class, "Found '2' @CollectionRules annotations for various collection types, expected @CollectionRules for single collection type only")
         );
     }
 
     @ParameterizedTest
     @MethodSource("unappropriatedDataSet")
     @DisplayName("Unappropriated rule annotation")
-    void unappropriatedRule(String fieldName, Class<?> dtoClass) {
+    void unappropriatedRule(String fieldName, Class<?> dtoClass, String errMsgPart) {
         DtoGenerator<?> generator = DtoGenerator.builder(dtoClass).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);
         Exception exception = TestUtils.getErrorsMap(generator).get(fieldName);
         assertThat(exception.getCause().getMessage(),
-                containsString("Inappropriate generation rule annotation"));
+                containsString(errMsgPart));
     }
 
 }

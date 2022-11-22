@@ -56,7 +56,7 @@ class AnnotationErrorsHandler {
             resultDto.resultString
                     .append(++idx)
                     .append(". Found '")
-                    .append(resultDto.generalRule)
+                    .append(resultDto.groupOfGeneralRules)
                     .append("' @Rules annotations for various types, expected @Rules for single type only.")
                     .append("\n");
         }
@@ -70,11 +70,11 @@ class AnnotationErrorsHandler {
                     .append("\n");
         }
 
-        if (resultDto.groupOfGeneralRules > 1) {
+        if (resultDto.groupOfCollectionRules > 1) {
             resultDto.resultString
                     .append(++idx)
                     .append(". Found '")
-                    .append(resultDto.generalRule)
+                    .append(resultDto.groupOfCollectionRules)
                     .append("' @CollectionRules annotations for various collection types, ")
                     .append("expected @CollectionRules for single collection type only.")
                     .append("\n");
