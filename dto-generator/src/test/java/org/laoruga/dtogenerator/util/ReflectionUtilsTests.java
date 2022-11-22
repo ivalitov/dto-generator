@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DisplayName("Reflection utils tests")
 @Epic("UNIT_TESTS")
 @Feature("REFLECTION_UTILS")
-public class ReflectionUtilsTests {
+class ReflectionUtilsTests {
 
     @TestFactory
     @DisplayName("Create collection instance")

@@ -20,7 +20,7 @@ import static org.laoruga.dtogenerator.constants.BasicRuleRemark.*;
 @DisplayName("DtoGeneratorBuilder tests")
 @Epic("UNIT_TESTS")
 @Feature("DTO_GENERATOR_BUILDER")
-public class DtoGeneratorBuilderTests {
+class DtoGeneratorBuilderTests {
 
     @NoArgsConstructor
     static class Dto {

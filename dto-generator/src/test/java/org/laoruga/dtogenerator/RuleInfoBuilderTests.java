@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @DisplayName("RuleInfoBuilder tests")
 @Epic("UNIT_TESTS")
 @Feature("RULES_INFO_BUILDER")
-public class RuleInfoBuilderTests {
+class RuleInfoBuilderTests {
 
     private static final Annotation annotationMock = () -> null;
 

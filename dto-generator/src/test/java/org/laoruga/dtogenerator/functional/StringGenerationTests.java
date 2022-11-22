@@ -28,7 +28,7 @@ import static org.laoruga.dtogenerator.constants.CharSet.*;
  */
 @DisplayName("String Rules Tests")
 @Epic("STRING_RULES")
- class StringGenerationTests {
+class StringGenerationTests {
 
     @Getter
     @NoArgsConstructor

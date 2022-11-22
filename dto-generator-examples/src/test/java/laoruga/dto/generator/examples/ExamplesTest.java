@@ -1,26 +1,26 @@
 package laoruga.dto.generator.examples;
 
-import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.examples.dto.Office;
-import org.laoruga.dtogenerator.examples.dto.TwoFields;
-import org.laoruga.dtogenerator.examples.dto.SolarSystem;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.examples.dto.Office;
+import org.laoruga.dtogenerator.examples.dto.SolarSystem;
+import org.laoruga.dtogenerator.examples.dto.TwoFields;
 import org.laoruga.dtogenerator.examples.generators.custom.remark.PersonRemark;
 
 import java.util.Arrays;
 
-import static org.laoruga.dtogenerator.examples.dto.Gender.FEMALE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.laoruga.dtogenerator.examples.dto.Gender.FEMALE;
 
 /**
  * @author Il'dar Valitov
  * Created on 21.11.2022
  */
 @Slf4j
-public class ExamplesTest {
+class ExamplesTest {
 
     @Test
     void customGeneratorSimple() {

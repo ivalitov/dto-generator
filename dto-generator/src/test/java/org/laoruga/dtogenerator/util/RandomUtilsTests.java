@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.*;
 @DisplayName("Random utils tests")
 @Epic("UNIT_TESTS")
 @Feature("RANDOM_UTILS")
-public class RandomUtilsTests {
+class RandomUtilsTests {
 
     @RepeatedTest(10)
     @DisplayName("Random double")

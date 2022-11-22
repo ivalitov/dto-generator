@@ -32,7 +32,7 @@ import static org.laoruga.dtogenerator.constants.Group.GROUP_1;
 @DisplayName("RulesInfoExtractor tests")
 @Epic("UNIT_TESTS")
 @Feature("RULES_INFO_EXTRACTOR")
-public class RulesInfoExtractorTests {
+class RulesInfoExtractorTests {
 
     static class Dto {
         @StringRule(minSymbols = 1, maxSymbols = 1, charset = CharSet.NUM)
