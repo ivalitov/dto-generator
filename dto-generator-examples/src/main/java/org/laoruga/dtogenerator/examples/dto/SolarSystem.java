@@ -1,9 +1,9 @@
 package org.laoruga.dtogenerator.examples.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.examples.generators.custom.CustomGenerator;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
@@ -12,10 +12,10 @@ import java.util.Map;
  * Created on 15.11.2022
  */
 @NoArgsConstructor
-@Data
 public class SolarSystem {
 
     @CustomRule(generatorClass = CustomGenerator.class)
+    @Getter
     Map<String, String> planetHabitabilityMap;
 
 }

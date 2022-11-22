@@ -6,8 +6,6 @@ package org.laoruga.dtogenerator.exceptions;
  */
 
 public class DtoGeneratorException extends RuntimeException {
-    public DtoGeneratorException() {
-    }
 
     public DtoGeneratorException(String message) {
         super(message);

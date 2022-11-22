@@ -1,10 +1,10 @@
 package org.laoruga.dtogenerator.examples.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.api.rules.ListRule;
 import org.laoruga.dtogenerator.examples.generators.custom.CustomGeneratorRemarkable;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -12,8 +12,8 @@ import java.util.List;
  * @author Il'dar Valitov
  * Created on 21.11.2022
  */
-@Data
 @NoArgsConstructor
+@Getter
 public class Office {
 
     @ListRule(minSize = 2, maxSize = 2)

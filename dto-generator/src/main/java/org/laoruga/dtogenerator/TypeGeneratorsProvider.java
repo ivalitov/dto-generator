@@ -24,8 +24,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.laoruga.dtogenerator.util.ReflectionUtils.createCollectionFieldInstance;
-import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
+import static org.laoruga.dtogenerator.util.ReflectionUtils.*;
 
 /**
  * @author Il'dar Valitov
@@ -235,11 +234,14 @@ public class TypeGeneratorsProvider<T> {
         }
 
         if (ListRule.class == rulesClass) {
-            return getListGenerator(fieldName, fieldType, (ListRule) rules, itemGenerator);
+            ListRule listRule = (ListRule) rules;
+            assertTypeCompatibility(fieldType, listRule.listClass());
+            return getListGenerator(fieldName, listRule, itemGenerator);
         }
 
-        return getSetGenerator(fieldName, fieldType, (SetRule) rules, itemGenerator);
-
+        SetRule setRule = (SetRule) rules;
+        assertTypeCompatibility(fieldType, setRule.setClass());
+        return getSetGenerator(fieldName, setRule, itemGenerator);
     }
 
     IGenerator<?> getNestedDtoGenerator(Field field, String[] fieldsPath) {
@@ -300,27 +302,27 @@ public class TypeGeneratorsProvider<T> {
      * Collection generators providers
      */
 
-    IGenerator<?> getListGenerator(String fieldName, Class<?> fieldType, ListRule listRule, IGenerator<?> listItemGenerator) {
+    IGenerator<?> getListGenerator(String fieldName, ListRule listRule, IGenerator<?> listItemGenerator) {
         IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
                 generatorRemarksProvider.getBasicRuleRemark(fieldName) :
                 listRule.ruleRemark();
         return BasicGeneratorsBuilders.collectionBuilder()
                 .minSize(listRule.minSize())
                 .maxSize(listRule.maxSize())
-                .listInstance(createCollectionFieldInstance(fieldType, listRule.listClass()))
+                .listInstance(createCollectionFieldInstance(listRule.listClass()))
                 .itemGenerator(listItemGenerator)
                 .ruleRemark(remark)
                 .build();
     }
 
-    IGenerator<?> getSetGenerator(String fieldName, Class<?> fieldType, SetRule setRule, IGenerator<?> listItemGenerator) {
+    IGenerator<?> getSetGenerator(String fieldName, SetRule setRule, IGenerator<?> listItemGenerator) {
         IRuleRemark remark = generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
                 generatorRemarksProvider.getBasicRuleRemark(fieldName) :
                 setRule.ruleRemark();
         return BasicGeneratorsBuilders.collectionBuilder()
                 .minSize(setRule.minSize())
                 .maxSize(setRule.maxSize())
-                .listInstance(createCollectionFieldInstance(fieldType, setRule.setClass()))
+                .listInstance(createCollectionFieldInstance(setRule.setClass()))
                 .itemGenerator(listItemGenerator)
                 .ruleRemark(remark)
                 .build();

@@ -1,9 +1,10 @@
 package org.laoruga.dtogenerator.examples.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -11,8 +12,9 @@ import java.util.List;
  * @author Il'dar Valitov
  * Created on 21.11.2022
  */
-@Data
 @NoArgsConstructor
+@Getter
+@Setter
 public class Person {
 
     @StringRule(regexp = "[A-Z]{1}[a-z]{5} [A-Z]{1}[a-z]{5} [A-Z]{1}[a-z]{5}")

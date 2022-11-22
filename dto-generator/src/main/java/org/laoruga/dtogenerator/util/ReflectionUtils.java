@@ -81,14 +81,8 @@ public final class ReflectionUtils {
     /**
      * 1. Filed type should be assignable from required collectionClass
      * 2. CollectionClass should not be an interface or abstract
-     *
-     * @param fieldType checking dto field type
      */
-    public static <T> T createCollectionFieldInstance(Class<?> fieldType, Class<T> collectionClass) {
-        if (!fieldType.isAssignableFrom(collectionClass)) {
-            throw new DtoGeneratorException("CollectionClass from rules: '" + collectionClass + "' can't" +
-                    " be assign to the field: " + fieldType);
-        }
+    public static <T> T createCollectionFieldInstance(Class<T> collectionClass) {
         if (collectionClass.isInterface() || Modifier.isAbstract(collectionClass.getModifiers())) {
             throw new DtoGeneratorException("Can't create instance of '" + collectionClass + "' because" +
                     " it is interface or abstract.");
@@ -101,5 +95,16 @@ public final class ReflectionUtils {
             throw new DtoGeneratorException(e);
         }
         return collectionInstance;
+    }
+
+    /**
+     * @param fieldType         - type of field to assign collectionClass instance
+     * @param collectionClass   - type to be assigned to the field
+     */
+    public static void assertTypeCompatibility(Class<?> fieldType, Class<?> collectionClass) {
+        if (!fieldType.isAssignableFrom(collectionClass)) {
+            throw new DtoGeneratorException("CollectionClass from rules: '" + collectionClass + "' can't" +
+                    " be assign to the field: " + fieldType);
+        }
     }
 }
