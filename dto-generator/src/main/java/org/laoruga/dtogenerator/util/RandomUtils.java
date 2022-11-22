@@ -6,13 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.RandomStringGenerator;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * @author Il'dar Valitov
@@ -52,23 +49,6 @@ public final class RandomUtils {
 
     public static boolean nextBoolean() {
         return nextInt(0, 1) == 1;
-    }
-
-    /**
-     * @param length   number of values
-     * @param minValue min int value
-     * @param maxValue max int value
-     * @return array of random values
-     */
-    public static Integer[] nextIntArray(int length, int minValue, int maxValue) {
-        List<Integer> possibleValues = IntStream.range(minValue, maxValue + 1)
-                .boxed()
-                .collect(Collectors.toList());
-        Collections.shuffle(possibleValues);
-        if (length > possibleValues.size()) {
-            throw new IllegalArgumentException("Unique values less than " + length);
-        }
-        return possibleValues.subList(0, length).toArray(new Integer[0]);
     }
 
     /*
@@ -117,14 +97,6 @@ public final class RandomUtils {
 
     public static String nextString(int length) {
         return new RandomStringGenerator.Builder().selectFrom().build().generate(length);
-    }
-
-    public static LocalDateTime nextLocalDateTime(LocalDateTime startDate, LocalDateTime endDate) {
-        ZoneOffset offset = ZoneId.systemDefault().getRules().getOffset(startDate);
-        long start = startDate.toEpochSecond(offset);
-        long finish = endDate.toEpochSecond(offset);
-        long randomDate = RandomUtils.nextLong(start, finish);
-        return LocalDateTime.ofEpochSecond(randomDate, 0, offset);
     }
 
 }

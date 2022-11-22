@@ -47,5 +47,11 @@ public class ReflectionUtilsTests {
         );
     }
 
+    @DisplayName("Assert type compatibility")
+    void assertTypeCompatibility() {
+        assertThrows(DtoGeneratorException.class,
+                () -> ReflectionUtils.assertTypeCompatibility(Set.class, ArrayList.class));
+    }
+
 
 }

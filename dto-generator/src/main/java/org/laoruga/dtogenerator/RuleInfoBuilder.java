@@ -36,7 +36,7 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
     }
 
     public RuleInfoBuilder collectionRuleInfoBuilder(RuleInfoBuilder collectionBuilder) {
-        if (this.groupName != null) {
+        if (this.collectionBuilder != null) {
             throwCollectionException();
         }
         this.collectionBuilder = collectionBuilder;
@@ -67,9 +67,8 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
         return this;
     }
 
-    public RuleInfoBuilder setRuleInfoAsserter(Runnable ruleInfoAsserter) {
+    public void setRuleInfoAsserter(Runnable ruleInfoAsserter) {
         this.ruleInfoAsserter = ruleInfoAsserter;
-        return this;
     }
 
     @Override
@@ -84,21 +83,21 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
 
     private IRuleInfo buildCollection() {
         asserCollectionParams();
+        checkCollectionGroup();
         RuleInfoCollection ruleInfo = new RuleInfoCollection();
         ruleInfo.setItemRule(buildUnit());
         ruleInfo.setCollectionRule(collectionBuilder.buildUnit());
         ruleInfo.setGroup(groupName);
-        checkCollectionGroup();
         return ruleInfo;
     }
 
     private IRuleInfo buildUnit() {
         assertUnitParams();
         RuleInfo ruleInfo = new RuleInfo();
-        ruleInfo.setRule(Objects.requireNonNull(rule));
-        ruleInfo.setRuleType(Objects.requireNonNull(ruleType));
-        ruleInfo.setGroup(Objects.requireNonNull(groupName));
-        ruleInfo.setMultipleRules(Objects.requireNonNull(multipleRules));
+        ruleInfo.setRule(rule);
+        ruleInfo.setRuleType(ruleType);
+        ruleInfo.setGroup(groupName);
+        ruleInfo.setMultipleRules(multipleRules);
         return ruleInfo;
     }
 
@@ -109,18 +108,21 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
             Objects.requireNonNull(groupName);
             Objects.requireNonNull(multipleRules);
         } catch (Exception e) {
-            throw new DtoGeneratorException("Failed to construct unit or collection item generator.", e);
+            throw new DtoGeneratorException("Failed to construct unit or collection rules info.", e);
         }
 
     }
 
     private void asserCollectionParams() {
         try {
-            Objects.requireNonNull(collectionBuilder, "Collection rules not found");
             collectionBuilder.assertUnitParams();
+        } catch (Exception e) {
+            throw new DtoGeneratorException("Failed to construct collection item rules info.", e);
+        }
+        try {
             assertUnitParams();
         } catch (Exception e) {
-            throw new DtoGeneratorException("Failed to construct collection generator.", e);
+            throw new DtoGeneratorException("Failed to construct collection rules info.", e);
         }
     }
 

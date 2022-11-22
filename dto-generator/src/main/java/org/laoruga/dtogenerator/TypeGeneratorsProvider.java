@@ -95,10 +95,10 @@ public class TypeGeneratorsProvider<T> {
      *
      * @param field - validated field
      * @return empty optional if:
-     *      - no rules annotations found
-     *      - rules annotations skipped by group
-     *      - no explicit generators attached for the field
-     *      else generator instance
+     * - no rules annotations found
+     * - rules annotations skipped by group
+     * - no explicit generators attached for the field
+     * else generator instance
      */
     Optional<IGenerator<?>> getGenerator(Field field) {
         String fieldName = field.getName();
@@ -127,7 +127,7 @@ public class TypeGeneratorsProvider<T> {
                     rulesInfo.get().getRule();
             IGenerator<?> generator = isGeneratorOverridden(nonCollectionRule) ?
                     getOverriddenGenerator(nonCollectionRule) : selectGenerator(field, rulesInfo.get());
-            prepareCustomRemarks(generator);
+            prepareCustomRemarks(generator, fieldName);
             return Optional.of(generator);
         } else {
             return Optional.empty();
@@ -180,17 +180,14 @@ public class TypeGeneratorsProvider<T> {
                 " '" + ruleInfo + "'");
     }
 
-    void prepareCustomRemarks(IGenerator<?> generator) {
+    void prepareCustomRemarks(IGenerator<?> generator, String fieldName) {
         if (generator instanceof ICollectionGenerator) {
-            prepareCustomRemarks(((ICollectionGenerator<?>) generator).getItemGenerator());
+            prepareCustomRemarks(((ICollectionGenerator<?>) generator).getItemGenerator(), fieldName);
         }
         if (generator instanceof ICustomGeneratorRemarkable) {
             ICustomGeneratorRemarkable<?> remarkableGenerator = (ICustomGeneratorRemarkable<?>) generator;
-            if (getGeneratorRemarksProvider().isCustomRuleRemarkExists(remarkableGenerator)) {
-                remarkableGenerator
-                        .setRuleRemarks(getGeneratorRemarksProvider()
-                                .getCustomRuleRemarks(remarkableGenerator));
-            }
+            getGeneratorRemarksProvider().getRemarks(fieldName, remarkableGenerator)
+                    .ifPresent(remarkableGenerator::setRuleRemarks);
         }
     }
 

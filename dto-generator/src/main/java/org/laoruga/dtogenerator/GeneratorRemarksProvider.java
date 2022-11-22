@@ -45,7 +45,7 @@ public class GeneratorRemarksProvider {
     void setBasicRuleRemarkForField(@NonNull String filedName,
                                     @NonNull BasicRuleRemark ruleRemark) {
         if (basicRuleRemarksMapByField.containsKey(filedName)) {
-            throw new DtoGeneratorException("Trying to overwrite remark from: '" + getBasicRuleRemark(filedName) + "'" +
+            throw new DtoGeneratorException("Try to overwrite remark from: '" + getBasicRuleRemark(filedName) + "'" +
                     " to: '" + ruleRemark + "' for field '" + filedName + "'.");
         }
         basicRuleRemarksMapByField.put(filedName, ruleRemark);
@@ -53,7 +53,7 @@ public class GeneratorRemarksProvider {
 
     public void setBasicRuleRemarkForFields(BasicRuleRemark basicRuleRemark) {
         if (basicRuleRemarkForFields.get() != null && basicRuleRemarkForFields.get() != basicRuleRemark) {
-            throw new DtoGeneratorException("Trying to overwrite remark for all fields from: '"
+            throw new DtoGeneratorException("Try to overwrite remark for all fields from: '"
                     + basicRuleRemarkForFields.get() + "' to: '" + basicRuleRemark + "'.");
         }
         basicRuleRemarkForFields.set(basicRuleRemark);
@@ -74,8 +74,40 @@ public class GeneratorRemarksProvider {
         return customRuleRemarksMap.containsKey(customGenerator.getClass());
     }
 
+    boolean isCustomRuleRemarkExists(String fieldName) {
+        return customRuleRemarksMapByField.containsKey(fieldName);
+    }
+
     List<CustomRuleRemarkWrapper> getCustomRuleRemarks(ICustomGenerator<?> customGenerator) {
         return customRuleRemarksMap.get(customGenerator.getClass());
+    }
+
+    List<CustomRuleRemarkWrapper> getCustomRuleRemarks(String fieldName) {
+        return customRuleRemarksMapByField.get(fieldName);
+    }
+
+    Optional<List<CustomRuleRemarkWrapper>> getRemarks(String fieldName, ICustomGenerator<?> remarkableGenerator) {
+        List<CustomRuleRemarkWrapper> mappedByField = isCustomRuleRemarkExists(fieldName) ?
+                getCustomRuleRemarks(fieldName) : new ArrayList<>();
+        List<CustomRuleRemarkWrapper> mappedByGenerator = isCustomRuleRemarkExists(remarkableGenerator) ?
+                getCustomRuleRemarks(remarkableGenerator) : new ArrayList<>();
+        if (mappedByGenerator.isEmpty() && mappedByField.isEmpty()) {
+            return Optional.empty();
+        }
+        if (!mappedByField.isEmpty() && !mappedByGenerator.isEmpty()) {
+            Iterator<CustomRuleRemarkWrapper> iterator = mappedByGenerator.iterator();
+            while (iterator.hasNext()) {
+                CustomRuleRemarkWrapper remarkMappedByGenerator = iterator.next();
+                Optional<CustomRuleRemarkWrapper> sameRemark = mappedByField.stream()
+                        .filter(i -> i.getWrappedRuleRemark().equals(remarkMappedByGenerator.getWrappedRuleRemark()))
+                        .findAny();
+                if (sameRemark.isPresent()) {
+                    iterator.remove();
+                }
+            }
+        }
+        mappedByField.addAll(mappedByGenerator);
+        return Optional.of(mappedByField);
     }
 
     public void addCustomRuleRemarkForField(@NonNull String filedName,

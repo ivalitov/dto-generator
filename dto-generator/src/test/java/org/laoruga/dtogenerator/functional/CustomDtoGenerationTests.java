@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.functional.data.customgenerator.ClientRemark;
 import org.laoruga.dtogenerator.functional.data.dtoclient.*;
 
 import java.util.stream.Stream;
@@ -17,6 +16,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.laoruga.dtogenerator.functional.data.customgenerator.ClientRemark.CLIENT_TYPE;
+import static org.laoruga.dtogenerator.functional.data.customgenerator.ClientRemark.DOCUMENT;
 
 /**
  * @author Il'dar Valitov
@@ -63,9 +64,9 @@ class CustomDtoGenerationTests {
     @MethodSource("customDtoGenerationWithRemarksTestData")
     void customDtoGenerationWithRemarks(ClientType clientType, DocType docType) {
         DtoGeneratorBuilder<ClientDto> builder = DtoGenerator.builder(ClientDto.class);
-        builder.addRuleRemarkForFields(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
+        builder.addRuleRemarkForField("clientInfo", CLIENT_TYPE.wrap(clientType.name()));
         if (docType != null) {
-            builder.addRuleRemarkForFields(ClientRemark.DOCUMENT.wrap(docType.name()));
+            builder.addRuleRemarkForFields(DOCUMENT.wrap(docType.name()));
         }
         ClientDto dto = builder.build().generateDto();
 
@@ -73,10 +74,10 @@ class CustomDtoGenerationTests {
         assertEquals(clientType, dto.getClientInfo().getClientType());
 
         if (clientType == ClientType.ORG) {
-            assertEquals(dto.getClientInfo().getClass(), OrgInfoDto.class);
+            assertEquals(OrgInfoDto.class, dto.getClientInfo().getClass());
         } else {
-            assertEquals(dto.getClientInfo().getClass(), PersonInfoDto.class);
-            assertEquals(((PersonInfoDto) dto.getClientInfo()).getDocument().getType(), docType);
+            assertEquals(PersonInfoDto.class, dto.getClientInfo().getClass());
+            assertEquals(docType, ((PersonInfoDto) dto.getClientInfo()).getDocument().getType());
         }
     }
 
@@ -86,9 +87,9 @@ class CustomDtoGenerationTests {
     @MethodSource("customDtoGenerationWithRemarksTestData")
     void customDtoGenerationWithDefaultArgs(ClientType clientType, DocType docType) {
         DtoGeneratorBuilder<ClientDto> builder = DtoGenerator.builder(ClientDto.class);
-        builder.addRuleRemarkForFields(ClientRemark.CLIENT_TYPE.wrap(clientType.name()));
+        builder.addRuleRemarkForFields(CLIENT_TYPE.wrap(clientType.name()));
         if (docType != null) {
-            builder.addRuleRemarkForFields(ClientRemark.DOCUMENT.wrap(docType.name()));
+            builder.addRuleRemarkForFields(DOCUMENT.wrap(docType.name()));
         }
         ClientDto dto = builder.build().generateDto();
 

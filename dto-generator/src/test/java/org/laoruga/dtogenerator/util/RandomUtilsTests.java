@@ -131,4 +131,12 @@ public class RandomUtilsTests {
         assertThat(randomString, matchesRegex(".{100}"));
     }
 
+    @DisplayName("Random boolean")
+    void nextBoolean() {
+        Set<Boolean> result = IntStream.range(1, 50).boxed()
+                .map(i -> RandomUtils.nextBoolean())
+                .collect(Collectors.toSet());
+        assertThat(result, containsInAnyOrder(true, false));
+    }
+
 }
