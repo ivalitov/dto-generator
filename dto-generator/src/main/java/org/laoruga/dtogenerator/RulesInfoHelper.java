@@ -9,6 +9,7 @@ import org.laoruga.dtogenerator.api.rules.meta.RuleForCollection;
 import org.laoruga.dtogenerator.api.rules.meta.Rules;
 import org.laoruga.dtogenerator.api.rules.meta.RulesForCollection;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.generators.basictypegenerators.BasicGeneratorsBuilders;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
@@ -38,6 +39,12 @@ public final class RulesInfoHelper {
     }
 
     public static void checkGeneratorCompatibility(Class<?> fieldType, Annotation rule) {
+        if (!BasicGeneratorsBuilders.getInstance().isBuilderExist(fieldType, rule)) {
+            throw new DtoGeneratorException("Inappropriate generation rule annotation: '" + rule + "'");
+        };
+    }
+
+    public static void checkGeneratorCompatibility_old(Class<?> fieldType, Annotation rule) {
         try {
             Class<? extends Annotation> rulesAnnotationClass = rule.annotationType();
             Class<?>[] applicableTypes = (Class<?>[]) rulesAnnotationClass.getField("APPLICABLE_TYPES")
