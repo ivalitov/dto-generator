@@ -9,7 +9,7 @@ import org.laoruga.dtogenerator.api.rules.meta.RuleForCollection;
 import org.laoruga.dtogenerator.api.rules.meta.Rules;
 import org.laoruga.dtogenerator.api.rules.meta.RulesForCollection;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generators.basictypegenerators.GeneratorBuildersProvider;
+import org.laoruga.dtogenerator.generators.GeneratorBuildersProvider;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;

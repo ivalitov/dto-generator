@@ -20,10 +20,14 @@ public final class DtoGeneratorConfig {
     @Setter
     @Getter
     private static int maxCollectionGenerationCycles;
+    @Setter
+    @Getter
+    private static boolean generateAllKnownTypes;
 
     static {
         maxDependentGenerationCycles = defaults.getMaxDependentGenerationCycles();
         maxCollectionGenerationCycles = defaults.getMaxCollectionGenerationCycles();
+        generateAllKnownTypes = defaults.isGenerateAllKnownTypes();
     }
 
 }

@@ -6,9 +6,11 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.*;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
+import org.laoruga.dtogenerator.config.DtoGeneratorConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.generators.GeneratorBuildersProvider;
 import org.laoruga.dtogenerator.generators.GeneratorsFactory;
-import org.laoruga.dtogenerator.generators.NestedDtoGenerator;
+import org.laoruga.dtogenerator.generators.basictypegenerators.NestedDtoGenerator;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
@@ -96,8 +98,8 @@ public class GeneratorsProvider<T> {
     Optional<IGenerator<?>> getGenerator(Field field) {
         String fieldName = field.getName();
 
-        if (isGeneratorOverridden(fieldName)) {
-            return Optional.of(getOverriddenGenerator(fieldName));
+        if (isGeneratorExplicitlySetForField(fieldName)) {
+            return Optional.of(getGeneratorExplicitlySetForField(fieldName));
         }
 
         Optional<IRuleInfo> maybeRulesInfo;
@@ -121,8 +123,8 @@ public class GeneratorsProvider<T> {
                 RuleInfoCollection collectionRuleInfo = (RuleInfoCollection) ruleInfo;
                 IRuleInfo elementRuleInfo = collectionRuleInfo.getItemRule();
                 //TODO need to handle explicitly that collection generator may be overridden only by field name
-                if (isGeneratorOverridden(fieldName, collectionRuleInfo.getRule())) {
-                    generator = getOverriddenGenerator(fieldName, ruleInfo.getRule());
+                if (isGeneratorOverridden(collectionRuleInfo.getRule())) {
+                    generator = getOverriddenGenerator(collectionRuleInfo.getRule());
                 } else if (isGeneratorOverridden(elementRuleInfo.getRule())) {
                     IGenerator<?> elementGenerator = getOverriddenGenerator(elementRuleInfo.getRule());
                     generator = selectCollectionGenerator(field, collectionRuleInfo, elementGenerator);
@@ -140,6 +142,13 @@ public class GeneratorsProvider<T> {
 
             return Optional.of(generator);
         } else {
+            if (DtoGeneratorConfig.isGenerateAllKnownTypes()) {
+                Optional<IGeneratorBuilder<?>> maybeBuilder =
+                        GeneratorBuildersProvider.getInstance().getBuilder(field.getType());
+                if (maybeBuilder.isPresent()) {
+                    return Optional.of(maybeBuilder.get().build());
+                }
+            }
             return Optional.empty();
         }
     }
@@ -306,32 +315,20 @@ public class GeneratorsProvider<T> {
      * Utils
      */
 
-    private boolean isGeneratorOverridden(String fieldName, Annotation rules) {
-        return isGeneratorOverridden(fieldName) || isGeneratorOverridden(rules);
-    }
-
-    private boolean isGeneratorOverridden(String fieldName) {
+    private boolean isGeneratorExplicitlySetForField(String fieldName) {
         return overriddenBuildersForFields.containsKey(fieldName) ||
                 overriddenCollectionBuildersForFields.containsKey(fieldName);
+    }
+
+    private IGenerator<?> getGeneratorExplicitlySetForField(@NonNull String fieldName) {
+        return overriddenBuildersForFields.get(fieldName).build();
     }
 
     private boolean isGeneratorOverridden(Annotation rules) {
         return rules != null && overriddenBuilders.containsKey(rules.annotationType());
     }
 
-    private IGenerator<?> getOverriddenGenerator(@NonNull String fieldName) {
-        return overriddenBuildersForFields.get(fieldName).build();
-    }
-
     private IGenerator<?> getOverriddenGenerator(Annotation rules) {
         return overriddenBuilders.get(rules.annotationType()).build();
-    }
-
-    private IGenerator<?> getOverriddenGenerator(@NonNull String fieldName, Annotation rules) {
-        if (rules != null) {
-            return overriddenBuildersForFields.getOrDefault(fieldName, overriddenBuilders.get(rules.annotationType())).build();
-        } else {
-            return getOverriddenGenerator(fieldName);
-        }
     }
 }

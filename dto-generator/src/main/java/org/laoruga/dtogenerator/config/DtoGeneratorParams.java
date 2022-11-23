@@ -22,6 +22,7 @@ public class DtoGeneratorParams {
 
     private int maxDependentGenerationCycles = Integer.parseInt(getProperty("maxDependentGenerationCycles", "100"));
     private int maxCollectionGenerationCycles = Integer.parseInt(getProperty("maxCollectionGenerationCycles", "100"));
+    private boolean generateAllKnownTypes = Boolean.parseBoolean(getProperty("generateAllKnownTypes", "false"));
 
     private String getProperty(String name, String defaultValue) {
         if (properties == null) {

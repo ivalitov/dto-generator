@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.rules.EnumRule;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.util.RandomUtils;
@@ -59,7 +60,7 @@ public class EnumGenerator implements IGenerator<Enum<?>> {
     public static final class EnumGeneratorBuilder implements IGeneratorBuilder<IGenerator<?>> {
         private String[] possibleEnumNames;
         private Class<? extends Enum<?>> enumClass;
-        private IRuleRemark ruleRemark;
+        private IRuleRemark ruleRemark = EnumRule.DEFAULT_RULE_REMARK;
 
         private EnumGeneratorBuilder() {
         }

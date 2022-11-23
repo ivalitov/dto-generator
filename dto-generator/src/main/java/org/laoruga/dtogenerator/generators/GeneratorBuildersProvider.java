@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.generators.basictypegenerators;
+package org.laoruga.dtogenerator.generators;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -6,6 +6,7 @@ import lombok.Value;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.generators.basictypegenerators.*;
 
 import java.lang.annotation.Annotation;
 import java.time.LocalDateTime;

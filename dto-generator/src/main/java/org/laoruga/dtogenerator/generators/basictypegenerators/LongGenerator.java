@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.rules.LongRule;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
 
 /**
@@ -40,9 +41,9 @@ public class LongGenerator implements IGenerator<Long> {
     }
 
     public static final class LongGeneratorBuilder implements IGeneratorBuilder<IGenerator<?>> {
-        private long maxValue;
-        private long minValue;
-        private IRuleRemark ruleRemark;
+        private long maxValue = LongRule.DEFAULT_MAX;
+        private long minValue = LongRule.DEFAULT_MIN;
+        private IRuleRemark ruleRemark = LongRule.DEFAULT_RULE_REMARK;
 
         private LongGeneratorBuilder() {}
 

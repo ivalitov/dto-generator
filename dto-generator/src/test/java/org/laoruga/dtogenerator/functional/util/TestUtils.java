@@ -1,5 +1,6 @@
 package org.laoruga.dtogenerator.functional.util;
 
+import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.laoruga.dtogenerator.DtoGenerator;
 
@@ -32,5 +33,10 @@ public class TestUtils {
     @SneakyThrows
     public static Field getField(Class<?> clazz, String fieldName) {
         return clazz.getDeclaredField(fieldName);
+    }
+
+    @SneakyThrows
+    public static String toJson(Object object) {
+        return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(object);
     }
 }
