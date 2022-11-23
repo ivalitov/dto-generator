@@ -2,6 +2,7 @@ package org.laoruga.dtogenerator.generators.basictypegenerators;
 
 import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
 import org.laoruga.dtogenerator.util.RandomUtils;
@@ -44,7 +45,7 @@ public class LocalDateTimeGenerator implements IGenerator<LocalDateTime> {
         return new LocalDateTimeGeneratorBuilder();
     }
 
-    public static final class LocalDateTimeGeneratorBuilder {
+    public static final class LocalDateTimeGeneratorBuilder implements IGeneratorBuilder<IGenerator<?>> {
         private int leftShiftDays;
         private int rightShiftDays;
         private IRuleRemark ruleRemark;
