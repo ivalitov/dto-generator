@@ -1,6 +1,5 @@
 package org.laoruga.dtogenerator.api.rules;
 
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
 import org.laoruga.dtogenerator.constants.CharSet;
@@ -19,21 +18,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(StringRules.class)
 public @interface StringRule {
 
-    int DEFAULT_MIN_SYMBOLS_NUMBER = 0;
-    int DEFAULT_MAX_SYMBOLS_NUMBER = 1000;
-    String[] WORDS = new String[]{};
-    String DEFAULT_CHARS = CharSet.DEFAULT_CHARSET;
-    IRuleRemark DEFAULT_RULE_REMARK = BasicRuleRemark.RANDOM_VALUE;
     String DEFAULT_REGEXP = "";
 
-    int minSymbols() default DEFAULT_MIN_SYMBOLS_NUMBER;
+    int minSymbols() default 0;
 
-    int maxSymbols() default DEFAULT_MAX_SYMBOLS_NUMBER;
+    int maxSymbols() default 1000;
 
     // TODO realize
     String[] words() default {};
 
-    String chars() default DEFAULT_CHARS;
+    String chars() default CharSet.DEFAULT_CHARSET;
 
     BasicRuleRemark ruleRemark() default BasicRuleRemark.RANDOM_VALUE;
 

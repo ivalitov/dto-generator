@@ -9,13 +9,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.DoubleRule;
-import org.laoruga.dtogenerator.api.rules.IntegerRule;
-import org.laoruga.dtogenerator.api.rules.LongRule;
-import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.functional.data.dtoclient.ClientType;
 import org.laoruga.dtogenerator.functional.util.TestUtils;
+import org.laoruga.dtogenerator.generators.RulesInstance;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -66,17 +63,17 @@ public class ImplicitRulesTests {
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getString().length(), both(
-                        greaterThanOrEqualTo(StringRule.DEFAULT_MIN_SYMBOLS_NUMBER))
-                        .and(lessThanOrEqualTo(StringRule.DEFAULT_MAX_SYMBOLS_NUMBER))),
+                        greaterThanOrEqualTo(RulesInstance.stringRule.minSymbols()))
+                        .and(lessThanOrEqualTo(RulesInstance.stringRule.maxSymbols()))),
                 () -> assertThat(dto.getInteger(), both(
-                        greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN))
-                        .and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX))),
+                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue()))
+                        .and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue()))),
                 () -> assertThat(dto.getALong(), both(
-                        greaterThanOrEqualTo(LongRule.DEFAULT_MIN))
-                        .and(lessThanOrEqualTo(LongRule.DEFAULT_MAX))),
+                        greaterThanOrEqualTo(RulesInstance.longRule.minValue()))
+                        .and(lessThanOrEqualTo(RulesInstance.longRule.maxValue()))),
                 () -> assertThat(dto.getADouble(), both(
-                        greaterThanOrEqualTo(DoubleRule.DEFAULT_MIN))
-                        .and(lessThanOrEqualTo(DoubleRule.DEFAULT_MAX))),
+                        greaterThanOrEqualTo(RulesInstance.doubleRule.minValue()))
+                        .and(lessThanOrEqualTo(RulesInstance.doubleRule.maxValue()))),
                 () -> assertThat(dto.getLocalDateTime(), notNullValue()),
                 () -> assertThat(dto.getClientType(), notNullValue())
 

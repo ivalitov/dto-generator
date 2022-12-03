@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.api.rules.SetRule;
+import org.laoruga.dtogenerator.generators.RulesInstance;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -66,10 +67,10 @@ class SetGeneratorTests {
 
     private static void checkNumbers(Set<Integer> numbers) {
         assertThat(numbers.size(), both(
-                greaterThanOrEqualTo(SetRule.DEFAULT_MIN_SIZE)).and(lessThanOrEqualTo(SetRule.DEFAULT_MAX_SIZE)));
+                greaterThanOrEqualTo(RulesInstance.setRule.minSize())).and(lessThanOrEqualTo(RulesInstance.setRule.maxSize())));
         for (Integer number : numbers) {
             assertThat(number, both(
-                    greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX)));
+                    greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue())));
         }
     }
 

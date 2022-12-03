@@ -105,8 +105,8 @@ class ListGenerationTests {
 
             for (String str : list) {
                 assertThat(str.length(), both(
-                        greaterThanOrEqualTo(StringRule.DEFAULT_MIN_SYMBOLS_NUMBER))
-                        .and(lessThanOrEqualTo(StringRule.DEFAULT_MAX_SYMBOLS_NUMBER)));
+                        greaterThanOrEqualTo(RulesInstance.stringRule.minSymbols()))
+                        .and(lessThanOrEqualTo(RulesInstance.stringRule.maxSymbols())));
             }
         };
 

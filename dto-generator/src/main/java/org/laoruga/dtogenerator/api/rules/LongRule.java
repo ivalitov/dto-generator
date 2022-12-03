@@ -1,6 +1,5 @@
 package org.laoruga.dtogenerator.api.rules;
 
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
 import org.laoruga.dtogenerator.constants.Group;
@@ -18,13 +17,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(LongRules.class)
 public @interface LongRule {
 
-    long DEFAULT_MIN = 0L;
-    long DEFAULT_MAX = 999999999999999999L;
-    IRuleRemark DEFAULT_RULE_REMARK = BasicRuleRemark.RANDOM_VALUE;
+    long minValue() default 0L;
 
-    long minValue() default DEFAULT_MIN;
-
-    long maxValue() default DEFAULT_MAX;
+    long maxValue() default 999999999999999999L;
 
     BasicRuleRemark ruleRemark() default BasicRuleRemark.RANDOM_VALUE;
 

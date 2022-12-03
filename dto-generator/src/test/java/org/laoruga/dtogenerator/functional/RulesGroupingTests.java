@@ -10,6 +10,7 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.generators.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.Group;
+import org.laoruga.dtogenerator.generators.RulesInstance;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -90,8 +91,8 @@ class RulesGroupingTests {
                 .build()
                 .generateDto();
         assertAll(
-                () -> assertThat(dto.getIntFirst(), equalTo(IntegerRule.DEFAULT_MAX)),
-                () -> assertThat(dto.getIntSecond(), equalTo(IntegerRule.DEFAULT_MIN)),
+                () -> assertThat(dto.getIntFirst(), equalTo(RulesInstance.integerRule.maxValue())),
+                () -> assertThat(dto.getIntSecond(), equalTo(RulesInstance.integerRule.minValue())),
                 () -> assertThat(dto.getDefaultGroup(), nullValue())
         );
     }
@@ -104,7 +105,7 @@ class RulesGroupingTests {
                 .build()
                 .generateDto();
         assertAll(
-                () -> assertThat(dto.getIntFirst(), equalTo(IntegerRule.DEFAULT_MIN)),
+                () -> assertThat(dto.getIntFirst(), equalTo(RulesInstance.integerRule.minValue())),
                 () -> assertThat(dto.getIntSecond(), equalTo(99)),
                 () -> assertThat(dto.getDefaultGroup(), nullValue())
         );
@@ -121,7 +122,7 @@ class RulesGroupingTests {
                         .and(everyItem(equalTo(10)))),
                 () -> assertThat(dto.getIntListDefault(), hasSize(6)),
                 () -> assertThat(dto.getIntListDefault(), everyItem(both(
-                        greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX)))));
+                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue())))));
     }
 
     /*
