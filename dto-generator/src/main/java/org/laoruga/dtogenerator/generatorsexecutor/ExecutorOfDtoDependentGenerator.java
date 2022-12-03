@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.ICustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.generators.basictypegenerators.CustomGenerator;
 
 import java.lang.reflect.Field;
 
@@ -30,16 +31,20 @@ public class ExecutorOfDtoDependentGenerator extends AbstractExecutor {
      * Check whether DTO is ready for using CustomGeneratorDtoDependent or not.
      * There is limited attempts to prevent infinite loops.
      *
-     * @param generator   - generator to check
+     * @param generator - generator to check
      * @return - doesn't DTO ready?
      * @throws DtoGeneratorException - throws if all attempts are spent
      */
     protected boolean isDtoReadyForFieldGeneration(IGenerator<?> generator) throws DtoGeneratorException {
-        if (generator instanceof ICustomGeneratorDtoDependent) {
-            boolean dtoReady = ((ICustomGeneratorDtoDependent<?, ?>) generator).isDtoReady();
-            log.debug("Object {} ready to generate dependent field value", dtoReady ? "is" : "isn't");
-            return dtoReady;
+        if (generator instanceof CustomGenerator) {
+            IGenerator<?> usersGeneratorInstance = ((CustomGenerator) generator).getUsersGeneratorInstance();
+            if (usersGeneratorInstance instanceof ICustomGeneratorDtoDependent) {
+                boolean dtoReady = ((ICustomGeneratorDtoDependent<?, ?>) usersGeneratorInstance).isDtoReady();
+                log.debug("Object {} ready to generate dependent field value", dtoReady ? "is" : "isn't");
+                return dtoReady;
+            }
         }
+
         return true;
     }
 }

@@ -19,6 +19,7 @@ public class ExecutorOfGenerator extends AbstractExecutor {
         this.dtoInstance = dtoInstance;
     }
 
+    // TODO consolidate errors
     @Override
     public boolean execute(Field field, IGenerator<?> generator) {
         try {

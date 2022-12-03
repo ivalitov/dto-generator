@@ -3,8 +3,10 @@ package org.laoruga.dtogenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.laoruga.dtogenerator.constants.RuleType;
 
 import java.lang.annotation.Annotation;
+import java.util.Objects;
 
 
 /**
@@ -13,10 +15,14 @@ import java.lang.annotation.Annotation;
  */
 @Setter(AccessLevel.PACKAGE)
 @Getter
-class RuleInfoCollection implements IRuleInfo {
+public class RuleInfoCollection implements IRuleInfo {
     private IRuleInfo collectionRule;
-    private IRuleInfo itemRule;
+    private IRuleInfo elementRule;
     private String group;
+
+    public IRuleInfo getElementRule() {
+        return Objects.requireNonNull(elementRule, "Item rule wasn't set.");
+    }
 
     @Override
     public Annotation getRule() {
@@ -25,5 +31,9 @@ class RuleInfoCollection implements IRuleInfo {
 
     public boolean isTypesEqual(RuleType type) {
         return collectionRule.isTypesEqual(type);
+    }
+
+    public boolean isElementRulesExist() {
+        return elementRule != null;
     }
 }

@@ -1,7 +1,6 @@
 package org.laoruga.dtogenerator.api.rules;
 
 import org.laoruga.dtogenerator.api.BoundType;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.meta.RuleForCollection;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
 import org.laoruga.dtogenerator.constants.Group;
@@ -21,20 +20,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(ListRules.class)
 public @interface ListRule {
 
-    int DEFAULT_MIN_SIZE = 1;
-    int DEFAULT_MAX_SIZE = 10;
-    IRuleRemark DEFAULT_RULE_REMARK = BasicRuleRemark.RANDOM_VALUE;
-    Class<?>[] APPLICABLE_TYPES = {List.class};
-
     Class<? extends List> listClass() default ArrayList.class;
 
     @BoundType(BasicRuleRemark.MAX_VALUE)
-    int maxSize() default DEFAULT_MAX_SIZE;
+    int maxSize() default 10;
 
     @BoundType(BasicRuleRemark.MIN_VALUE)
-    int minSize() default DEFAULT_MIN_SIZE;
+    int minSize() default 1;
 
     BasicRuleRemark ruleRemark() default BasicRuleRemark.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
+
+    Class<?> generatedType() default List.class;
 }

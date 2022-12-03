@@ -76,7 +76,7 @@ class IntegerGenerationTests {
     @Feature("ALL_FIELDS_REMARK")
     @DisplayName("MIN Values Integer Generation")
     void minIntegerGeneration() {
-        DtoInteger dto = DtoGenerator.builder(DtoInteger.class).setRuleRemarkForFields(BasicRuleRemark.MIN_VALUE).build().generateDto();
+        DtoInteger dto = DtoGenerator.builder(DtoInteger.class).setRuleRemark(BasicRuleRemark.MIN_VALUE).build().generateDto();
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getIntDefaultRules(), equalTo(IntegerRule.DEFAULT_MIN)),
@@ -93,7 +93,7 @@ class IntegerGenerationTests {
     @Feature("ALL_FIELDS_REMARK")
     @DisplayName("MAX Values Integer Generation")
     void maxIntegerGeneration() {
-        DtoInteger dto = DtoGenerator.builder(DtoInteger.class).setRuleRemarkForFields(BasicRuleRemark.MAX_VALUE).build().generateDto();
+        DtoInteger dto = DtoGenerator.builder(DtoInteger.class).setRuleRemark(BasicRuleRemark.MAX_VALUE).build().generateDto();
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getIntDefaultRules(), equalTo(IntegerRule.DEFAULT_MAX)),
@@ -111,11 +111,11 @@ class IntegerGenerationTests {
     @DisplayName("Integer Generation with field remarks")
     void integerGenerationExplicitFields() {
         DtoInteger dto = DtoGenerator.builder(DtoInteger.class)
-                .setRuleRemarkForField("intDefaultRules", BasicRuleRemark.NULL_VALUE)
-                .setRuleRemarkForField("intPrimitiveDefaultRules", BasicRuleRemark.NULL_VALUE)
-                .setRuleRemarkForField("intLeftBound", BasicRuleRemark.MIN_VALUE)
-                .setRuleRemarkForField("intRightBound", BasicRuleRemark.MAX_VALUE)
-                .setRuleRemarkForField("intLeftAndRightBounds", BasicRuleRemark.RANDOM_VALUE)
+                .setRuleRemark("intDefaultRules", BasicRuleRemark.NULL_VALUE)
+                .setRuleRemark("intPrimitiveDefaultRules", BasicRuleRemark.NULL_VALUE)
+                .setRuleRemark("intLeftBound", BasicRuleRemark.MIN_VALUE)
+                .setRuleRemark("intRightBound", BasicRuleRemark.MAX_VALUE)
+                .setRuleRemark("intLeftAndRightBounds", BasicRuleRemark.RANDOM_VALUE)
                 .build().generateDto();
         assertNotNull(dto);
         assertAll(
@@ -135,10 +135,10 @@ class IntegerGenerationTests {
     @DisplayName("Integer Generation with field remarks and all fields remarks")
     void maxIntegerGenerationExplicitFields() {
         DtoInteger dto = DtoGenerator.builder(DtoInteger.class)
-                .setRuleRemarkForFields(BasicRuleRemark.MIN_VALUE)
-                .setRuleRemarkForField("intDefaultRules", BasicRuleRemark.NULL_VALUE)
-                .setRuleRemarkForField("intLeftBound", BasicRuleRemark.MAX_VALUE)
-                .setRuleRemarkForField("intLeftAndRightBounds", BasicRuleRemark.RANDOM_VALUE)
+                .setRuleRemark(BasicRuleRemark.MIN_VALUE)
+                .setRuleRemark("intDefaultRules", BasicRuleRemark.NULL_VALUE)
+                .setRuleRemark("intLeftBound", BasicRuleRemark.MAX_VALUE)
+                .setRuleRemark("intLeftAndRightBounds", BasicRuleRemark.RANDOM_VALUE)
                 .build().generateDto();
         assertNotNull(dto);
         assertAll(

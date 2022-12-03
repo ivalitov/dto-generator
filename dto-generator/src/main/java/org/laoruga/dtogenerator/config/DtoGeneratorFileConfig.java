@@ -1,6 +1,5 @@
 package org.laoruga.dtogenerator.config;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
@@ -14,29 +13,32 @@ import java.util.Properties;
  * Created on 13.11.2022
  */
 
-@Data
 @Slf4j
-public class DtoGeneratorParams {
+public class DtoGeneratorFileConfig extends DtoGeneratorConfig {
 
     Properties properties;
 
-    private int maxDependentGenerationCycles = Integer.parseInt(getProperty("maxDependentGenerationCycles", "100"));
-    private int maxCollectionGenerationCycles = Integer.parseInt(getProperty("maxCollectionGenerationCycles", "100"));
-    private boolean generateAllKnownTypes = Boolean.parseBoolean(getProperty("generateAllKnownTypes", "false"));
-
-    private String getProperty(String name, String defaultValue) {
-        if (properties == null) {
-            properties = loadProperties();
-        }
-        return properties.getProperty(name, defaultValue);
+    public DtoGeneratorFileConfig(String propsFile) {
+        this.properties = loadProperties(propsFile);
+        initPropsDto();
     }
 
-    protected Properties loadProperties() {
-        Optional<Properties> defaultProps = loadProperties(DtoGeneratorParams.class.getClassLoader(), "default-dtogenerator.properties");
-        Optional<Properties> customProps = loadProperties(Thread.currentThread().getContextClassLoader(), "dtogenerator.properties");
+    protected Properties loadProperties(String propsFile) {
+        Optional<Properties> defaultProps = loadProperties(DtoGeneratorFileConfig.class.getClassLoader(), "default-" + propsFile);
+        Optional<Properties> customProps = loadProperties(Thread.currentThread().getContextClassLoader(), propsFile);
         Properties props = defaultProps.orElseGet(Properties::new);
         customProps.ifPresent(props::putAll);
         return props;
+    }
+
+    private void initPropsDto() {
+        setMaxDependentGenerationCycles(Integer.parseInt(getProperty("maxDependentGenerationCycles", "100")));
+        setMaxCollectionGenerationCycles(Integer.parseInt(getProperty("maxCollectionGenerationCycles", "100")));
+        setGenerateAllKnownTypes(Boolean.parseBoolean(getProperty("generateAllKnownTypes", "false")));
+    }
+
+    private String getProperty(String name, String defaultValue) {
+        return properties.getProperty(name, defaultValue);
     }
 
     private static Optional<Properties> loadProperties(ClassLoader classLoader, String fileName) {

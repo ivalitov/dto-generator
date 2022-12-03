@@ -9,7 +9,7 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.generators.ICustomGenerator;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.api.rules.IntegerRule;
-import org.laoruga.dtogenerator.api.rules.NestedDtoRules;
+import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 
 import java.util.HashMap;
@@ -36,7 +36,7 @@ class FieldsGroupingTests {
         @IntegerRule(group = REQUIRED)
         Integer reqInt;
 
-        @NestedDtoRules(group = REQUIRED)
+        @NestedDtoRule(group = REQUIRED)
         DtoInner reqInnerDto;
 
         @CustomRule(group = REQUIRED, generatorClass = MapGen.class)
@@ -48,13 +48,13 @@ class FieldsGroupingTests {
         @IntegerRule
         Integer defaultInt;
 
-        @NestedDtoRules
+        @NestedDtoRule
         DtoInner defaultInnerDto;
 
         @IntegerRule(group = GROUP_1)
         Integer firstGroupInt;
 
-        @NestedDtoRules(group = GROUP_1)
+        @NestedDtoRule(group = GROUP_1)
         DtoInner firstGroupInnerDto;
 
         @CustomRule(group = GROUP_1, generatorClass = MapGen.class)

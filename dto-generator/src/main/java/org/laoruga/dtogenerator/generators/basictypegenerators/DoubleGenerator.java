@@ -1,9 +1,11 @@
 package org.laoruga.dtogenerator.generators.basictypegenerators;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.math3.util.Precision;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.DoubleRule;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
@@ -44,36 +46,73 @@ public class DoubleGenerator implements IGenerator<Double> {
         return new DoubleGeneratorBuilder();
     }
 
-    public static final class DoubleGeneratorBuilder implements IGeneratorBuilder<IGenerator<?>> {
-        private double maxValue = DoubleRule.DEFAULT_MAX;
-        private double minValue = DoubleRule.DEFAULT_MIN;
-        private int precision = DoubleRule.DEFAULT_PRECISION;
-        private IRuleRemark ruleRemark = DoubleRule.DEFAULT_RULE_REMARK;
+    public static final class DoubleGeneratorBuilder implements IGeneratorBuilderConfigurable {
+        private final ConfigDto configDto;
 
-        private DoubleGeneratorBuilder() {}
+        private DoubleGeneratorBuilder() {
+            this.configDto = new ConfigDto();
+        }
 
         public DoubleGeneratorBuilder maxValue(double maxValue) {
-            this.maxValue = maxValue;
+            configDto.maxValue = maxValue;
             return this;
         }
 
         public DoubleGeneratorBuilder minValue(double minValue) {
-            this.minValue = minValue;
+            configDto.minValue = minValue;
             return this;
         }
 
         public DoubleGeneratorBuilder precision(int precision) {
-            this.precision = precision;
+            configDto.precision = precision;
             return this;
         }
 
         public DoubleGeneratorBuilder ruleRemark(IRuleRemark ruleRemark) {
-            this.ruleRemark = ruleRemark;
+            configDto.ruleRemark = ruleRemark;
             return this;
         }
 
+        public DoubleGenerator build(IConfigDto configDto, boolean merge) {
+            if (merge) {
+                configDto.merge(this.configDto);
+            }
+            DoubleGenerator.ConfigDto doubleConfigDto = (DoubleGenerator.ConfigDto) configDto;
+            return new DoubleGenerator(
+                    doubleConfigDto.maxValue,
+                    doubleConfigDto.minValue,
+                    doubleConfigDto.precision,
+                    doubleConfigDto.ruleRemark);
+        }
+
         public DoubleGenerator build() {
-            return new DoubleGenerator(maxValue, minValue, precision, ruleRemark);
+            return build(configDto, false);
+        }
+    }
+
+    @Getter
+    public static class ConfigDto implements IConfigDto {
+        private Double maxValue;
+        private Double minValue;
+        private Integer precision;
+        @Setter
+        private IRuleRemark ruleRemark;
+
+        public ConfigDto() {}
+
+        public ConfigDto(DoubleRule rule) {
+            this.maxValue = rule.maxValue();
+            this.minValue = rule.minValue();
+            this.precision = rule.precision();
+            this.ruleRemark = rule.ruleRemark();
+        }
+
+        public void merge(IConfigDto from) {
+            DoubleGenerator.ConfigDto fromConfigDto = (DoubleGenerator.ConfigDto) from;
+            if (fromConfigDto.getMaxValue() != null) this.maxValue = fromConfigDto.getMaxValue();
+            if (fromConfigDto.getMinValue() != null) this.minValue = fromConfigDto.getMinValue();
+            if (fromConfigDto.getPrecision() != null) this.precision = fromConfigDto.getPrecision();
+            if (fromConfigDto.getRuleRemark() != null) this.ruleRemark = fromConfigDto.getRuleRemark();
         }
     }
 }

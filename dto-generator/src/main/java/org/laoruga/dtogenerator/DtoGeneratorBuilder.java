@@ -5,9 +5,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.math3.util.Pair;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWrapper;
+import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
@@ -38,14 +38,17 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
  */
 public class DtoGeneratorBuilder<T> {
 
+    private final DtoGeneratorInstanceConfig configuration;
     private final GeneratorsProvider<T> generatorsProvider;
     private final GeneratorBuildersTree generatorBuildersTree;
     private final FieldGroupFilter fieldGroupFilter;
 
     DtoGeneratorBuilder(T dtoInstance) {
+        this.configuration = new DtoGeneratorInstanceConfig();
         this.fieldGroupFilter = new FieldGroupFilter();
         this.generatorBuildersTree = new GeneratorBuildersTree(this);
         this.generatorsProvider = new GeneratorsProvider<>(
+                configuration,
                 new GeneratorRemarksProvider(),
                 fieldGroupFilter,
                 new String[]{GeneratorBuildersTree.ROOT},
@@ -60,30 +63,46 @@ public class DtoGeneratorBuilder<T> {
      * @param fieldsFromRoot - path to nested DTO field
      */
     private DtoGeneratorBuilder(DtoGeneratorBuilder<T> toCopy, String[] fieldsFromRoot) {
+        this.configuration = toCopy.configuration;
         this.generatorsProvider = new GeneratorsProvider<>(toCopy.generatorsProvider, fieldsFromRoot);
         this.generatorBuildersTree = toCopy.generatorBuildersTree;
         this.fieldGroupFilter = toCopy.fieldGroupFilter;
     }
 
     /**
-     * @param rules - not collection only
-     * @param generatorBuilder - builder of not collection type
+     * @param rulesAnnotationClass - not collection only
+     * @param generatorBuilder     - builder of not collection type
      */
-    public DtoGeneratorBuilder<T> setGenerator(@NonNull Class<? extends Annotation> rules,
-                                               @NonNull IGeneratorBuilder<IGenerator<?>> generatorBuilder) throws DtoGeneratorException {
-        generatorsProvider.overrideGenerator(rules, generatorBuilder);
+    public DtoGeneratorBuilder<T> setGeneratorBuilder(@NonNull Class<? extends Annotation> rulesAnnotationClass,
+                                                      @NonNull IGeneratorBuilder generatorBuilder) throws DtoGeneratorException {
+        generatorsProvider.overrideGenerator(rulesAnnotationClass, generatorBuilder);
+        return this;
+    }
+
+
+    public DtoGeneratorBuilder<T> setCollectionGeneratorBuilder(@NonNull Class<? extends Annotation> rulesAnnotationClass,
+                                                                @NonNull IGeneratorBuilder generatorBuilder) throws DtoGeneratorException {
+        generatorsProvider.overrideGenerator(rulesAnnotationClass, generatorBuilder);
         return this;
     }
 
     /**
-     * @param fieldName name of field to generate value
+     * @param fieldName        name of field to generate value
      * @param generatorBuilder builder of generator of any type
      */
-    public DtoGeneratorBuilder<T> setGeneratorForField(@NonNull String fieldName,
-                                                       @NonNull IGeneratorBuilder<IGenerator<?>> generatorBuilder) throws DtoGeneratorException {
+    public DtoGeneratorBuilder<T> setGeneratorBuilder(@NonNull String fieldName,
+                                                      @NonNull IGeneratorBuilder generatorBuilder) throws DtoGeneratorException {
         Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
         DtoGeneratorBuilder<?> dtoGeneratorBuilder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
-        dtoGeneratorBuilder.generatorsProvider.setGeneratorForField(fieldAndPath.getFirst(), generatorBuilder);
+        dtoGeneratorBuilder.generatorsProvider.setGeneratorBuilderForField(fieldAndPath.getFirst(), generatorBuilder);
+        return this;
+    }
+
+    public DtoGeneratorBuilder<T> setCollectionGeneratorBuilder(@NonNull String fieldName,
+                                                                @NonNull IGeneratorBuilder generatorBuilder) throws DtoGeneratorException {
+        Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
+        DtoGeneratorBuilder<?> dtoGeneratorBuilder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
+        dtoGeneratorBuilder.generatorsProvider.setGeneratorBuilderForField(fieldAndPath.getFirst(), generatorBuilder);
         return this;
     }
 
@@ -91,8 +110,8 @@ public class DtoGeneratorBuilder<T> {
      * Basic Rule Remarks
      */
 
-    public DtoGeneratorBuilder<T> setRuleRemarkForField(@NonNull String fieldName,
-                                                        @NonNull BasicRuleRemark ruleRemark) throws DtoGeneratorException {
+    public DtoGeneratorBuilder<T> setRuleRemark(@NonNull String fieldName,
+                                                @NonNull BasicRuleRemark ruleRemark) throws DtoGeneratorException {
         Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
         DtoGeneratorBuilder<?> fieldAndBuilder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
         fieldAndBuilder.generatorsProvider.getGeneratorRemarksProvider().setBasicRuleRemarkForField(
@@ -100,7 +119,7 @@ public class DtoGeneratorBuilder<T> {
         return this;
     }
 
-    public DtoGeneratorBuilder<T> setRuleRemarkForFields(@NonNull BasicRuleRemark basicRuleRemark) throws DtoGeneratorException {
+    public DtoGeneratorBuilder<T> setRuleRemark(@NonNull BasicRuleRemark basicRuleRemark) throws DtoGeneratorException {
         this.generatorsProvider.getGeneratorRemarksProvider().setBasicRuleRemarkForFields(basicRuleRemark);
         return this;
     }
@@ -109,8 +128,8 @@ public class DtoGeneratorBuilder<T> {
      * Custom Rule Remarks
      */
 
-    public DtoGeneratorBuilder<T> addRuleRemarkForField(@NonNull String fieldName,
-                                                        @NonNull CustomRuleRemarkWrapper... ruleRemark) {
+    public DtoGeneratorBuilder<T> addRuleRemark(@NonNull String fieldName,
+                                                @NonNull CustomRuleRemarkWrapper... ruleRemark) {
         Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
         DtoGeneratorBuilder<?> fieldAndBuilder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
         fieldAndBuilder.generatorsProvider.getGeneratorRemarksProvider().addCustomRuleRemarkForField(
@@ -118,7 +137,7 @@ public class DtoGeneratorBuilder<T> {
         return this;
     }
 
-    public DtoGeneratorBuilder<T> addRuleRemarkForFields(@NonNull CustomRuleRemarkWrapper... ruleRemarks) {
+    public DtoGeneratorBuilder<T> addRuleRemark(@NonNull CustomRuleRemarkWrapper... ruleRemarks) {
         this.generatorsProvider.getGeneratorRemarksProvider().addRuleRemarkForAllFields(ruleRemarks);
         return this;
     }
@@ -144,6 +163,10 @@ public class DtoGeneratorBuilder<T> {
         return this;
     }
 
+    public DtoGeneratorInstanceConfig getUserConfig() {
+        return configuration;
+    }
+
     /*
      * Build
      */
@@ -155,7 +178,8 @@ public class DtoGeneratorBuilder<T> {
         return new DtoGenerator<>(generatorsProvider, this);
     }
 
-    DtoGenerator<?> buildNestedFieldGenerator(String[] pathToNestedDtoField, Class<?> generatedType) {
+    //TODO move it from this
+    public DtoGenerator<?> buildNestedFieldGenerator(String[] pathToNestedDtoField, Class<?> generatedType) {
         DtoGeneratorBuilder<?> nestedDtoGenBuilder = getBuilderFromTreeOrThis(pathToNestedDtoField);
         nestedDtoGenBuilder.generatorsProvider.setDtoInstance(createInstance(generatedType));
         return nestedDtoGenBuilder.build();
@@ -184,7 +208,7 @@ public class DtoGeneratorBuilder<T> {
      * Tree of generator builders when nested DTOs exist.
      */
     @RequiredArgsConstructor
-    static class GeneratorBuildersTree {
+    public static class GeneratorBuildersTree {
 
         public static final String ROOT = "%ROOT%";
 
@@ -194,7 +218,7 @@ public class DtoGeneratorBuilder<T> {
             this.tree = new Node(ROOT, rootBuilder);
         }
 
-        DtoGeneratorBuilder<?> getBuilder(String[] fields) {
+        public DtoGeneratorBuilder<?> getBuilder(String[] fields) {
             Node prev = tree;
             Node next = null;
             for (String field : fields) {

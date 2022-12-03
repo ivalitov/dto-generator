@@ -5,8 +5,10 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Optional;
@@ -82,7 +84,7 @@ public final class ReflectionUtils {
      * 1. Filed type should be assignable from required collectionClass
      * 2. CollectionClass should not be an interface or abstract
      */
-    public static <T> T createCollectionFieldInstance(Class<T> collectionClass) {
+    public static <T> T createCollectionInstance(Class<T> collectionClass) {
         if (collectionClass.isInterface() || Modifier.isAbstract(collectionClass.getModifiers())) {
             throw new DtoGeneratorException("Can't create instance of '" + collectionClass + "' because" +
                     " it is interface or abstract.");
@@ -98,13 +100,24 @@ public final class ReflectionUtils {
     }
 
     /**
-     * @param fieldType         - type of field to assign collectionClass instance
-     * @param collectionClass   - type to be assigned to the field
+     * @param fieldType       - type of field to assign collectionClass instance
+     * @param collectionClass - type to be assigned to the field
      */
     public static void assertTypeCompatibility(Class<?> fieldType, Class<?> collectionClass) {
         if (!fieldType.isAssignableFrom(collectionClass)) {
             throw new DtoGeneratorException("CollectionClass from rules: '" + collectionClass + "' can't" +
                     " be assign to the field: " + fieldType);
         }
+    }
+
+    public static <T> T getDefaultMethodValue(Class<? extends Annotation> annotationClass,
+                                              String methodName,
+                                              Class<T> valueType) throws NoSuchMethodException {
+        Method declaredMethod = annotationClass.getDeclaredMethod(methodName);
+        Object defaultValue = declaredMethod.getDefaultValue();
+        if (defaultValue.getClass() == valueType) {
+            return (T) defaultValue;
+        }
+        throw new ClassCastException("Field");
     }
 }

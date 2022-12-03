@@ -3,6 +3,7 @@ package org.laoruga.dtogenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
@@ -20,8 +21,6 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
     private Boolean multipleRules;
     private String groupName;
     private RuleInfoBuilder collectionBuilder;
-    private Runnable ruleInfoAsserter = () -> {
-    };
 
     public boolean isEmpty() {
         return rule == null && collectionBuilder == null;
@@ -67,13 +66,8 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
         return this;
     }
 
-    public void setRuleInfoAsserter(Runnable ruleInfoAsserter) {
-        this.ruleInfoAsserter = ruleInfoAsserter;
-    }
-
     @Override
     public IRuleInfo build() {
-        ruleInfoAsserter.run();
         if (collectionBuilder == null) {
             return buildUnit();
         } else {
@@ -85,7 +79,7 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
         asserCollectionParams();
         checkCollectionGroup();
         RuleInfoCollection ruleInfo = new RuleInfoCollection();
-        ruleInfo.setItemRule(buildUnit());
+        ruleInfo.setElementRule(rule != null ? buildUnit() : null);
         ruleInfo.setCollectionRule(collectionBuilder.buildUnit());
         ruleInfo.setGroup(groupName);
         return ruleInfo;

@@ -22,7 +22,6 @@ public @interface DoubleRule {
     double DEFAULT_MAX = 999999999999999999D;
     int DEFAULT_PRECISION = 2;
     IRuleRemark DEFAULT_RULE_REMARK = BasicRuleRemark.RANDOM_VALUE;
-    Class<?>[] APPLICABLE_TYPES = {Double.class, Double.TYPE};
 
     double maxValue() default DEFAULT_MAX;
 
@@ -33,4 +32,6 @@ public @interface DoubleRule {
     BasicRuleRemark ruleRemark() default BasicRuleRemark.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
+
+    Class<?> generatedType() default Double.class;
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 
 import java.lang.annotation.Annotation;
 
@@ -16,6 +17,7 @@ class AnnotationErrorsHandler {
 
     private final Annotation[] annotations;
     private final ResultDto resultDto = new ResultDto();
+    private final DtoGeneratorInstanceConfig configuration;
 
     void count() {
         for (Annotation annotation : annotations) {
@@ -80,7 +82,8 @@ class AnnotationErrorsHandler {
                     .append("\n");
         }
 
-        if ((resultDto.getSumOfCollectionRules() > 0) &&
+        if (!configuration.getGenerateAllKnownTypes() &&
+                (resultDto.getSumOfCollectionRules() > 0) &&
                 (resultDto.getSumOfCollectionRules() != resultDto.getSumOfGeneralRules())) {
             resultDto.resultString
                     .append(++idx)

@@ -2,14 +2,15 @@ package org.laoruga.dtogenerator.generators.basictypegenerators;
 
 import com.mifmif.common.regex.Generex;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.RandomStringGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
-import org.laoruga.dtogenerator.constants.CharSet;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 /**
@@ -75,81 +76,100 @@ public class StringGenerator implements IGenerator<String> {
         return new StringGeneratorBuilder();
     }
 
-    public static final class StringGeneratorBuilder implements IGeneratorBuilder<IGenerator<?>> {
-        private int maxLength = StringRule.DEFAULT_MAX_SYMBOLS_NUMBER;
-        private int minLength = StringRule.DEFAULT_MIN_SYMBOLS_NUMBER;
-        private CharSet[] charset = StringRule.DEFAULT_CHARSET;
-        private String[] words = StringRule.WORDS;
-        private String chars = StringRule.DEFAULT_CHARS;
-        private IRuleRemark ruleRemark = StringRule.DEFAULT_RULE_REMARK;
-        private String regexp = StringRule.DEFAULT_REGEXP;
+    public static final class StringGeneratorBuilder implements IGeneratorBuilderConfigurable {
+
+        private ConfigDto configDto;
 
         private StringGeneratorBuilder() {
+            this.configDto = new ConfigDto();
         }
 
         public StringGeneratorBuilder maxLength(int maxLength) {
-            this.maxLength = maxLength;
+            this.configDto.maxLength = maxLength;
             return this;
         }
 
         public StringGeneratorBuilder minLength(int minLength) {
-            this.minLength = minLength;
-            return this;
-        }
-
-        public StringGeneratorBuilder charset(CharSet... charset) {
-            this.charset = charset;
+            this.configDto.minLength = minLength;
             return this;
         }
 
         public StringGeneratorBuilder words(String[] words) {
-            this.words = words;
+            this.configDto.words = words;
             return this;
         }
 
         public StringGeneratorBuilder chars(String chars) {
-            this.chars = chars;
+            this.configDto.chars = chars;
             return this;
         }
 
         public StringGeneratorBuilder ruleRemark(IRuleRemark ruleRemark) {
-            this.ruleRemark = ruleRemark;
+            this.configDto.ruleRemark = ruleRemark;
             return this;
         }
 
         public StringGeneratorBuilder regexp(String regexp) {
-            this.regexp = regexp;
+            this.configDto.regexp = regexp;
             return this;
-        }
-
-        private char[] getChars() {
-            if (charset.length == 1) {
-                return charset[0].getChars();
-            }
-            int newLength = this.chars.length();
-            int nextCopyPos = 0;
-            for (CharSet charSet : charset) {
-                newLength += charSet.getChars().length;
-            }
-            char[] resultChars = new char[newLength];
-            for (CharSet charSet : charset) {
-                System.arraycopy(charSet.getChars(), 0, resultChars, nextCopyPos, charSet.getChars().length);
-                nextCopyPos += charSet.getChars().length;
-            }
-            System.arraycopy(chars.toCharArray(), 0, resultChars, nextCopyPos, chars.length());
-            return resultChars;
         }
 
         @Override
         public StringGenerator build() {
+            return build(this.configDto, false);
+        }
+
+        public StringGenerator build(IConfigDto configDto, boolean merge) {
+            if (merge) {
+                configDto.merge(this.configDto);
+            }
+            ConfigDto stringConfigDto = (ConfigDto) configDto;
             return new StringGenerator(
-                    this.maxLength,
-                    this.minLength,
-                    this.getChars(),
-                    this.words,
-                    this.ruleRemark,
-                    this.regexp
+                    stringConfigDto.maxLength,
+                    stringConfigDto.minLength,
+                    stringConfigDto.chars.toCharArray(),
+                    stringConfigDto.words,
+                    stringConfigDto.ruleRemark,
+                    stringConfigDto.regexp
             );
         }
+
     }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    public static class ConfigDto implements IConfigDto {
+
+        private Integer maxLength;
+        private Integer minLength;
+        private String[] words;
+        private String chars;
+
+        @Setter
+        private IRuleRemark ruleRemark;
+        private String regexp;
+
+        public ConfigDto(StringRule stringRule) {
+            this.maxLength = stringRule.maxSymbols();
+            this.minLength = stringRule.minSymbols();
+            this.words = stringRule.words();
+            this.chars = stringRule.chars();
+            this.ruleRemark = stringRule.ruleRemark();
+            this.regexp = stringRule.regexp();
+        }
+
+        public ConfigDto() {}
+
+        public void merge(IConfigDto from) {
+            ConfigDto configDto = (ConfigDto) from;
+            if (configDto.getMaxLength() != null) this.maxLength = configDto.getMaxLength();
+            if (configDto.getMinLength() != null) this.minLength = configDto.getMinLength();
+            if (configDto.getWords() != null) this.words = configDto.getWords();
+            if (configDto.getChars() != null) this.chars = configDto.getChars();
+            if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();
+            if (configDto.getRegexp() != null) this.regexp = configDto.getRegexp();
+        }
+    }
+
 }

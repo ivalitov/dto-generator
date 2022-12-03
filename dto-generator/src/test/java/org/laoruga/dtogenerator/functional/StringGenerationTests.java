@@ -11,8 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import org.laoruga.dtogenerator.constants.CharSet;
-import org.laoruga.dtogenerator.generators.GeneratorBuildersProvider;
+import org.laoruga.dtogenerator.generators.GeneratorBuilders;
 
 import java.util.stream.Stream;
 
@@ -78,10 +77,10 @@ class StringGenerationTests {
     @DisplayName("Generated string by regexp")
     void generateByRegexp(String regexp) {
         Dto_2 dto = DtoGenerator.builder(Dto_2.class)
-                .setGeneratorForField("string",
-                        GeneratorBuildersProvider.stringBuilder()
+                .setGeneratorBuilder("string",
+                        GeneratorBuilders.stringBuilder()
                                 .regexp(regexp)
-                                .charset(NUM))
+                                .chars(NUM))
                 .build().generateDto();
         assertAll(
                 () -> assertThat(dto.getString(), matchesRegex("^" + regexp + "$"))
@@ -102,13 +101,13 @@ class StringGenerationTests {
     @ParameterizedTest
     @MethodSource("regexpAndLengthBounds")
     @DisplayName("Generated string by mask (type chars + wildcard)")
-    void generateByLength(CharSet charSet, Integer minLength, Integer maxLength, String regexpForAssert) {
+    void generateByLength(String charSet, Integer minLength, Integer maxLength, String regexpForAssert) {
         Dto_2 dto = DtoGenerator.builder(Dto_2.class)
-                .setGeneratorForField("string",
-                        GeneratorBuildersProvider.stringBuilder()
+                .setGeneratorBuilder("string",
+                        GeneratorBuilders.stringBuilder()
                                 .minLength(minLength)
                                 .maxLength(maxLength)
-                                .charset(charSet))
+                                .chars(charSet))
                 .build().generateDto();
         assertAll(
                 () -> assertThat(dto.getString().length(), both(lessThanOrEqualTo(maxLength))

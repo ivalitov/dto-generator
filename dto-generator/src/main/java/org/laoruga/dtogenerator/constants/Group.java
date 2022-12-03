@@ -15,5 +15,7 @@ public final class Group {
     public static final String GROUP_1 = "GROUP_1";
     public static final String GROUP_2 = "GROUP_2";
     public static final String GROUP_3 = "GROUP_3";
+    public static final String GROUP_4 = "GROUP_4";
+    public static final String GROUP_5 = "GROUP_5";
 
 }

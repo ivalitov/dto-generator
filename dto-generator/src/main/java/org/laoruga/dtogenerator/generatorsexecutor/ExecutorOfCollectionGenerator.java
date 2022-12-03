@@ -18,7 +18,7 @@ public class ExecutorOfCollectionGenerator extends ExecutorOfDtoDependentGenerat
     @Override
     public boolean execute(Field field, IGenerator<?> generator) {
         if (generator instanceof ICollectionGenerator) {
-            IGenerator<?> innerGenerator = ((ICollectionGenerator<?>) generator).getItemGenerator();
+            IGenerator<?> innerGenerator = ((ICollectionGenerator<?>) generator).getElementGenerator();
             if (!isDtoReadyForFieldGeneration(innerGenerator)) {
                 return false;
             }

@@ -32,8 +32,8 @@ class DtoGeneratorBuilderTests {
     void tryToOverwriteRemarkForField() {
         DtoGeneratorException e = assertThrows(DtoGeneratorException.class,
                 () -> DtoGenerator.builder(Dto.class)
-                        .setRuleRemarkForField("string", MAX_VALUE)
-                        .setRuleRemarkForField("string", MIN_VALUE));
+                        .setRuleRemark("string", MAX_VALUE)
+                        .setRuleRemark("string", MIN_VALUE));
         assertThat(e.getMessage(), containsString("Try to overwrite remark"));
     }
 
@@ -42,8 +42,8 @@ class DtoGeneratorBuilderTests {
     void tryToOverwriteRemarkForAllFields() {
         DtoGeneratorException e = assertThrows(DtoGeneratorException.class,
                 () -> DtoGenerator.builder(Dto.class)
-                        .setRuleRemarkForFields(RANDOM_VALUE)
-                        .setRuleRemarkForFields(NULL_VALUE));
+                        .setRuleRemark(RANDOM_VALUE)
+                        .setRuleRemark(NULL_VALUE));
         assertThat(e.getMessage(), containsString("Try to overwrite remark for all fields"));
     }
 

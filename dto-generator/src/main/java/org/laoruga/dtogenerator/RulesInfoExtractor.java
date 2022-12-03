@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Pair;
+import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
@@ -29,11 +30,9 @@ public class RulesInfoExtractor {
 
     /**
      * @param field            - field whose annotations are to be examined
-     * @param validationResult - aggregated info about of Rules annotations
      * @return - rules for generation value of the field
      */
-    Optional<IRuleInfo> checkAndWrapAnnotations(Field field,
-                                                AnnotationErrorsHandler.ResultDto validationResult) {
+    Optional<IRuleInfo> checkAndWrapAnnotations(Field field) {
 
         RuleInfoBuilder ruleInfoBuilder = new RuleInfoBuilder();
 
@@ -41,19 +40,19 @@ public class RulesInfoExtractor {
 
             if (isItRule(annotation)) {
 
-                extractRuleInfo(ruleInfoBuilder, field, annotation, validationResult);
+                extractRuleInfo(ruleInfoBuilder, annotation);
 
             } else if (isItMultipleRules(annotation)) {
 
-                extractRuleInfoFromMultipleRules(ruleInfoBuilder, field, annotation, validationResult);
+                extractRuleInfoFromMultipleRules(ruleInfoBuilder, annotation);
 
             } else if (isItCollectionRule(annotation)) {
 
-                extractCollectionRuleInfo(ruleInfoBuilder, field, annotation);
+                extractCollectionRuleInfo(ruleInfoBuilder, annotation);
 
             } else if (isItCollectionRules(annotation)) {
 
-                extractCollectionRuleInfoFromMultipleRules(ruleInfoBuilder, field, annotation);
+                extractCollectionRuleInfoFromMultipleRules(ruleInfoBuilder, annotation);
 
             }
         }
@@ -74,29 +73,16 @@ public class RulesInfoExtractor {
     private static final String ERROR_MSG_PATTERN = "Inappropriate generation rule annotation: '%s' for field: '%s'";
 
     private void extractRuleInfo(RuleInfoBuilder ruleInfoBuilder,
-                                 Field field,
-                                 Annotation rule,
-                                 AnnotationErrorsHandler.ResultDto validationResult) {
-        Class<?> fieldType = field.getType();
-        boolean rulesForCollection = validationResult.getSumOfCollectionRules() > 0;
+                                 Annotation rule) {
         ruleInfoBuilder
                 .rule(rule)
                 .ruleType(RuleType.getType(rule))
                 .multipleRules(false)
-                .groupName(getGroupNameFromRuleAnnotation(rule))
-                .setRuleInfoAsserter(() -> {
-                    if (!rulesForCollection) {
-                        RulesInfoHelper.checkGeneratorCompatibility(fieldType, rule);
-                    }
-                });
+                .groupName(getGroupNameFromRuleAnnotation(rule));
     }
 
     private void extractRuleInfoFromMultipleRules(RuleInfoBuilder ruleInfoBuilder,
-                                                  Field field,
-                                                  Annotation rule,
-                                                  AnnotationErrorsHandler.ResultDto validationResult) {
-        Class<?> fieldType = field.getType();
-        boolean rulesForCollection = validationResult.getSumOfCollectionRules() > 0;
+                                                  Annotation rule) {
         Optional<Pair<String, Annotation>> groupAndRule = selectRuleByGroup(rule);
         if (groupAndRule.isPresent()) {
             Annotation ruleSelectedByGroup = groupAndRule.get().getSecond();
@@ -104,17 +90,11 @@ public class RulesInfoExtractor {
                     .rule(ruleSelectedByGroup)
                     .ruleType(RuleType.getType(ruleSelectedByGroup))
                     .groupName(groupAndRule.get().getFirst())
-                    .multipleRules(true)
-                    .setRuleInfoAsserter(() -> {
-                        if (!rulesForCollection) {
-                            RulesInfoHelper.checkGeneratorCompatibility(fieldType, ruleSelectedByGroup);
-                        }
-                    });
+                    .multipleRules(true);
         }
     }
 
     private void extractCollectionRuleInfo(RuleInfoBuilder ruleInfoBuilder,
-                                           Field field,
                                            Annotation rule) {
         RuleInfoBuilder collectionRuleInfo = RuleInfo.builder();
         ruleInfoBuilder
@@ -123,15 +103,10 @@ public class RulesInfoExtractor {
                                 .rule(rule)
                                 .ruleType(RuleType.getType(rule))
                                 .multipleRules(false)
-                                .groupName(getGroupNameFromRuleAnnotation(rule)))
-                .setRuleInfoAsserter(() -> RulesInfoHelper.checkItemGeneratorCompatibility(
-                        ruleInfoBuilder.getRule(),
-                        collectionRuleInfo.getRule(),
-                        field));
+                                .groupName(getGroupNameFromRuleAnnotation(rule)));
     }
 
     private void extractCollectionRuleInfoFromMultipleRules(RuleInfoBuilder ruleInfoBuilder,
-                                                            Field field,
                                                             Annotation rule) {
         Optional<Pair<String, Annotation>> groupAndRule = selectRuleByGroup(rule);
         if (groupAndRule.isPresent()) {
@@ -142,11 +117,7 @@ public class RulesInfoExtractor {
                                     .rule(groupAndRule.get().getSecond())
                                     .ruleType(RuleType.getType(groupAndRule.get().getSecond()))
                                     .groupName(groupAndRule.get().getFirst())
-                                    .multipleRules(true))
-                    .setRuleInfoAsserter(() -> RulesInfoHelper.checkItemGeneratorCompatibility(
-                            ruleInfoBuilder.getRule(),
-                            collectionRuleInfo.getRule(),
-                            field));
+                                    .multipleRules(true));
         }
     }
 

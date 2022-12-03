@@ -86,7 +86,7 @@ public class GeneratorRemarksProvider {
         return customRuleRemarksMapByField.get(fieldName);
     }
 
-    Optional<List<CustomRuleRemarkWrapper>> getRemarks(String fieldName, ICustomGenerator<?> remarkableGenerator) {
+    public Optional<List<CustomRuleRemarkWrapper>> getRemarks(String fieldName, ICustomGenerator<?> remarkableGenerator) {
         List<CustomRuleRemarkWrapper> mappedByField = isCustomRuleRemarkExists(fieldName) ?
                 getCustomRuleRemarks(fieldName) : new ArrayList<>();
         List<CustomRuleRemarkWrapper> mappedByGenerator = isCustomRuleRemarkExists(remarkableGenerator) ?

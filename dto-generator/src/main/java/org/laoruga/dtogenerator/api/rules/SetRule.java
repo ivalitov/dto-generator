@@ -24,7 +24,6 @@ public @interface SetRule {
     int DEFAULT_MIN_SIZE = 1;
     int DEFAULT_MAX_SIZE = 10;
     IRuleRemark DEFAULT_RULE_REMARK = BasicRuleRemark.RANDOM_VALUE;
-    Class<?>[] APPLICABLE_TYPES = {Set.class};
 
     Class<? extends Set> setClass() default HashSet.class;
 
@@ -37,4 +36,6 @@ public @interface SetRule {
     BasicRuleRemark ruleRemark() default BasicRuleRemark.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
+
+    Class<?> generatedType() default Set.class;
 }

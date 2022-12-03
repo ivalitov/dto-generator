@@ -1,5 +1,7 @@
 package org.laoruga.dtogenerator;
 
+import org.laoruga.dtogenerator.constants.RuleType;
+
 import java.lang.annotation.Annotation;
 
 /**

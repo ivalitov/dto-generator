@@ -168,8 +168,8 @@ class RulesGroupingTests {
     @NoArgsConstructor
     static class DtoAllRules {
 
-        @StringRule(group = GROUP_1, minSymbols = 1, maxSymbols = 1, charset = NUM)
-        @StringRule(charset = ENG)
+        @StringRule(group = GROUP_1, minSymbols = 1, maxSymbols = 1, chars = NUM)
+        @StringRule(chars = ENG)
         private String string;
 
         @SetRule(group = GROUP_1, minSize = 1, maxSize = 1)
@@ -200,8 +200,8 @@ class RulesGroupingTests {
         @DoubleRule(minValue = 2, maxValue = 2)
         private Double aDouble;
 
-        @EnumRule(group = GROUP_1, enumClass = SomeEnum.class, possibleEnumNames = "FOO")
-        @EnumRule(enumClass = SomeEnum.class, possibleEnumNames = "BAR")
+        @EnumRule(group = GROUP_1, possibleEnumNames = "FOO")
+        @EnumRule(possibleEnumNames = "BAR")
         private SomeEnum aEnum;
 
         @CustomRule(group = GROUP_1, generatorClass = CustomGen.class, args = "1")

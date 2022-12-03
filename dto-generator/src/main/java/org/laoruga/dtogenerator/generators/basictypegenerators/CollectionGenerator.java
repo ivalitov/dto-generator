@@ -1,16 +1,23 @@
 package org.laoruga.dtogenerator.generators.basictypegenerators;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.config.DtoGeneratorConfig;
+import org.laoruga.dtogenerator.api.rules.ListRule;
+import org.laoruga.dtogenerator.api.rules.SetRule;
+import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.util.Collection;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * @author Il'dar Valitov
@@ -18,17 +25,21 @@ import java.util.Collection;
  */
 
 @AllArgsConstructor
-public class CollectionGenerator<T> implements ICollectionGenerator<T> {
+public class CollectionGenerator implements ICollectionGenerator<Object> {
 
     private final int minSize;
     private final int maxSize;
-    private final Collection<T> listInstance;
-    private final IGenerator<T> itemGenerator;
+    private final Collection<Object> collectionInstance;
+    private final IGenerator<Object> elementGenerator;
     private final IRuleRemark ruleRemark;
 
+    public static CollectionGeneratorBuilder<?> builder() {
+        return new CollectionGeneratorBuilder<>();
+    }
+
     @Override
-    public Collection<T> generate() {
-        int maxAttempts = DtoGeneratorConfig.getMaxCollectionGenerationCycles();
+    public Collection<Object> generate() {
+        int maxAttempts = DtoGeneratorStaticConfig.getInstance().getMaxCollectionGenerationCycles();
         int size;
         switch ((BasicRuleRemark) ruleRemark) {
             case MIN_VALUE:
@@ -47,65 +58,134 @@ public class CollectionGenerator<T> implements ICollectionGenerator<T> {
         }
         int prevSize;
         int ineffectiveAttempts = 0;
-        while (listInstance.size() < size) {
-            prevSize = listInstance.size();
-            listInstance.add(itemGenerator.generate());
-            if (prevSize == listInstance.size()) {
+        while (collectionInstance.size() < size) {
+            prevSize = collectionInstance.size();
+            collectionInstance.add(elementGenerator.generate());
+            if (prevSize == collectionInstance.size()) {
                 ineffectiveAttempts++;
                 if (ineffectiveAttempts == maxAttempts) {
-                    throw new DtoGeneratorException("Expected size of collection can't be reached");
+                    throw new DtoGeneratorException("Expected size: '" + size + "' of collection: '"
+                            + collectionInstance.getClass() + "' can't be reached. After '" + ineffectiveAttempts
+                            + "' attempts collection size is: '"
+                            + collectionInstance.size() + "'");
                 }
             }
         }
-        return listInstance;
+        return collectionInstance;
     }
 
-    @Override
-    public IGenerator<T> getItemGenerator() {
-        return itemGenerator;
+    public IGenerator<Object> getElementGenerator() {
+        return elementGenerator;
     }
 
-    public static CollectionGeneratorBuilder<?> builder() {
-        return new CollectionGeneratorBuilder<>();
-    }
+    public static class CollectionGeneratorBuilder<V> implements IGeneratorBuilderConfigurable {
+        protected final ConfigDto configDto;
 
-    public static final class CollectionGeneratorBuilder<V> implements IGeneratorBuilder<ICollectionGenerator<?>> {
-        private int minSize;
-        private int maxSize;
-        private Collection<V> listInstance;
-        private IGenerator<V> itemGenerator;
-        private IRuleRemark ruleRemark;
-
-        private CollectionGeneratorBuilder() {
+        public CollectionGeneratorBuilder() {
+            this.configDto = new ConfigDto();
         }
 
         public CollectionGeneratorBuilder<V> minSize(int minSize) {
-            this.minSize = minSize;
+            configDto.minSize = minSize;
             return this;
         }
 
         public CollectionGeneratorBuilder<V> maxSize(int maxSize) {
-            this.maxSize = maxSize;
+            configDto.maxSize = maxSize;
             return this;
         }
 
-        public CollectionGeneratorBuilder<V> listInstance(Collection<V> listInstance) {
-            this.listInstance = listInstance;
+        @SuppressWarnings("unchecked")
+        public CollectionGeneratorBuilder<?> collectionInstance(Supplier<Collection<?>> listInstance) {
+            configDto.collectionInstance = listInstance;
             return this;
         }
 
-        public CollectionGeneratorBuilder<V> itemGenerator(IGenerator<V> itemGenerator) {
-            this.itemGenerator = itemGenerator;
+        @SuppressWarnings("unchecked")
+        public CollectionGeneratorBuilder<?> elementGenerator(IGenerator<?> itemGenerator) {
+            configDto.elementGenerator = (IGenerator<Object>) itemGenerator;
             return this;
         }
 
-      public CollectionGeneratorBuilder<V> ruleRemark(IRuleRemark ruleRemark) {
-            this.ruleRemark = ruleRemark;
+        public CollectionGeneratorBuilder<?> ruleRemark(IRuleRemark ruleRemark) {
+            configDto.ruleRemark = ruleRemark;
             return this;
         }
 
-        public CollectionGenerator<V> build() {
-            return new CollectionGenerator<>(minSize, maxSize, listInstance, itemGenerator, ruleRemark);
+        public CollectionGenerator build() {
+            return build(configDto, false);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public CollectionGenerator build(IConfigDto configDto, boolean merge) {
+            if (merge) {
+                configDto.merge(this.configDto);
+            }
+            ConfigDto collectionConfig = (ConfigDto) configDto;
+            return new CollectionGenerator(
+                    collectionConfig.minSize,
+                    collectionConfig.maxSize,
+                    (Collection<Object>) Objects.requireNonNull(collectionConfig.collectionInstance, "Collection instance must be set.").get(),
+                    Objects.requireNonNull(collectionConfig.elementGenerator, "Collection element generator must be set"),
+                    Objects.requireNonNull(collectionConfig.ruleRemark, "Unexpected error, rule remark haven't set."));
+        }
+
+    }
+
+    @Getter
+    public static class ConfigDto implements IConfigDto {
+        private Integer minSize;
+        private Integer maxSize;
+        private Supplier<Collection<?>> collectionInstance;
+        private IGenerator<Object> elementGenerator;
+        @Setter
+        private IRuleRemark ruleRemark;
+
+        public ConfigDto() {
+        }
+
+        public ConfigDto(SetRule rule) {
+            this.minSize = rule.minSize();
+            this.maxSize = rule.maxSize();
+            this.collectionInstance = () -> ReflectionUtils.createCollectionInstance(rule.setClass());
+            this.ruleRemark = rule.ruleRemark();
+        }
+
+        public ConfigDto(ListRule rule) {
+            this.minSize = rule.minSize();
+            this.maxSize = rule.maxSize();
+            this.collectionInstance = () -> ReflectionUtils.createCollectionInstance(rule.listClass());
+            this.ruleRemark = rule.ruleRemark();
+        }
+
+        public ConfigDto setCollectionInstance(Supplier<Collection<?>> collectionInstance) {
+            this.collectionInstance = collectionInstance;
+            return this;
+        }
+
+        public ConfigDto setElementGenerator(IGenerator<Object> elementGenerator) {
+            this.elementGenerator = elementGenerator;
+            return this;
+        }
+
+        public void merge(ConfigDto from) {
+            if (from.getMinSize() != null) this.minSize = from.getMinSize();
+            if (from.getMaxSize() != null) this.maxSize = from.getMaxSize();
+            if (from.getCollectionInstance() != null) this.collectionInstance = from.getCollectionInstance();
+            if (from.getElementGenerator() != null) this.elementGenerator = from.getElementGenerator();
+            if (from.getRuleRemark() != null) this.ruleRemark = from.getRuleRemark();
+        }
+
+        @Override
+        public void merge(IConfigDto from) {
+            ConfigDto fromConfig = (ConfigDto) from;
+            if (fromConfig.getMinSize() != null) this.minSize = fromConfig.getMinSize();
+            if (fromConfig.getMaxSize() != null) this.maxSize = fromConfig.getMaxSize();
+            if (fromConfig.getCollectionInstance() != null)
+                this.collectionInstance = fromConfig.getCollectionInstance();
+            if (fromConfig.getElementGenerator() != null) this.elementGenerator = fromConfig.getElementGenerator();
+            if (fromConfig.getRuleRemark() != null) this.ruleRemark = fromConfig.getRuleRemark();
         }
     }
 }

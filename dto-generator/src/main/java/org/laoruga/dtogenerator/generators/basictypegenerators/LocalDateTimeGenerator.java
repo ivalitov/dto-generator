@@ -1,8 +1,11 @@
 package org.laoruga.dtogenerator.generators.basictypegenerators;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.LocalDateTimeRule;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
@@ -46,31 +49,67 @@ public class LocalDateTimeGenerator implements IGenerator<LocalDateTime> {
         return new LocalDateTimeGeneratorBuilder();
     }
 
-    public static final class LocalDateTimeGeneratorBuilder implements IGeneratorBuilder<IGenerator<?>> {
-        private int leftShiftDays = LocalDateTimeRule.DEFAULT_LEFT_SHIFT_DAYS;
-        private int rightShiftDays = LocalDateTimeRule.DEFAULT_LEFT_RIGHT_DAYS;
-        private IRuleRemark ruleRemark = LocalDateTimeRule.DEFAULT_RULE_REMARK;
+    public static final class LocalDateTimeGeneratorBuilder implements IGeneratorBuilderConfigurable {
+
+        private final ConfigDto configDto;
 
         private LocalDateTimeGeneratorBuilder() {
+            this.configDto = new ConfigDto();
         }
 
         public LocalDateTimeGeneratorBuilder leftShiftDays(int leftShiftDays) {
-            this.leftShiftDays = leftShiftDays;
+            configDto.leftShiftDays = leftShiftDays;
             return this;
         }
 
         public LocalDateTimeGeneratorBuilder rightShiftDays(int rightShiftDays) {
-            this.rightShiftDays = rightShiftDays;
+            configDto.rightShiftDays = rightShiftDays;
             return this;
         }
 
         public LocalDateTimeGeneratorBuilder ruleRemark(IRuleRemark ruleRemark) {
-            this.ruleRemark = ruleRemark;
+            configDto.ruleRemark = ruleRemark;
             return this;
         }
 
         public LocalDateTimeGenerator build() {
-            return new LocalDateTimeGenerator(leftShiftDays, rightShiftDays, ruleRemark);
+            return build(configDto, false);
+        }
+
+        public LocalDateTimeGenerator build(IConfigDto configDto, boolean merge) {
+            if (merge) {
+                configDto.merge(this.configDto);
+            }
+            ConfigDto localDateTimeConfigDto = (ConfigDto) configDto;
+            return new LocalDateTimeGenerator(
+                    localDateTimeConfigDto.leftShiftDays,
+                    localDateTimeConfigDto.rightShiftDays,
+                    localDateTimeConfigDto.ruleRemark);
+        }
+    }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    public static class ConfigDto implements IConfigDto {
+        private Integer leftShiftDays;
+        private Integer rightShiftDays;
+        @Setter
+        private IRuleRemark ruleRemark;
+
+        public ConfigDto(LocalDateTimeRule rule) {
+            this.leftShiftDays = rule.leftShiftDays();
+            this.rightShiftDays = rule.rightShiftDays();
+            this.ruleRemark = rule.ruleRemark();
+        }
+
+        public ConfigDto(){}
+
+        public void merge(IConfigDto from) {
+            ConfigDto configDto = (ConfigDto) from;
+            if (configDto.getLeftShiftDays() != null) this.leftShiftDays = configDto.getLeftShiftDays();
+            if (configDto.getRightShiftDays() != null) this.rightShiftDays = configDto.getRightShiftDays();
+            if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();
         }
     }
 }

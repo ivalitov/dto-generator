@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.config.DtoGeneratorConfig;
+import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generatorsexecutor.BatchGeneratorsExecutor;
 import org.laoruga.dtogenerator.generatorsexecutor.ExecutorOfCollectionGenerator;
@@ -69,7 +69,7 @@ public class DtoGenerator<T> {
 
     void applyGenerators() {
 
-        int maxAttempts = DtoGeneratorConfig.getMaxDependentGenerationCycles();
+        int maxAttempts = DtoGeneratorStaticConfig.getInstance().getMaxDependentGenerationCycles();
 
         ExecutorOfDtoDependentGenerator executorsChain =
                 new ExecutorOfDtoDependentGenerator(
@@ -105,7 +105,7 @@ public class DtoGenerator<T> {
             throw new DtoGeneratorException("Error while generators preparation (see log above)");
         }
         if (getFieldGeneratorMap().isEmpty()) {
-            log.debug("No generators have been found");
+            log.debug("Generators not found");
         } else {
             log.debug(getFieldGeneratorMap().size() + " generators was created for fields: " + getFieldGeneratorMap().keySet());
         }

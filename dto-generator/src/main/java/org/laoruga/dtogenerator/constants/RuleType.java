@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator;
+package org.laoruga.dtogenerator.constants;
 
 import java.lang.annotation.Annotation;
 
@@ -8,7 +8,7 @@ import static org.laoruga.dtogenerator.RulesInfoHelper.*;
  * @author Il'dar Valitov
  * Created on 23.07.2022
  */
-enum RuleType {
+public enum RuleType {
     BASIC,
     CUSTOM,
     NESTED,

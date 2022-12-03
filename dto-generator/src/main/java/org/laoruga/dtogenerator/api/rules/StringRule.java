@@ -21,21 +21,16 @@ public @interface StringRule {
 
     int DEFAULT_MIN_SYMBOLS_NUMBER = 0;
     int DEFAULT_MAX_SYMBOLS_NUMBER = 1000;
-    CharSet[] DEFAULT_CHARSET = new CharSet[]{CharSet.NUM, CharSet.ENG, CharSet.RUS};
     String[] WORDS = new String[]{};
-    String DEFAULT_CHARS = "";
+    String DEFAULT_CHARS = CharSet.DEFAULT_CHARSET;
     IRuleRemark DEFAULT_RULE_REMARK = BasicRuleRemark.RANDOM_VALUE;
-    Class<?>[] APPLICABLE_TYPES = {String.class};
-    char DEFAULT_WILDCARD = '*';
-    char DEFAULT_TYPE_MARKER = '%';
     String DEFAULT_REGEXP = "";
 
     int minSymbols() default DEFAULT_MIN_SYMBOLS_NUMBER;
 
     int maxSymbols() default DEFAULT_MAX_SYMBOLS_NUMBER;
 
-    CharSet[] charset() default {CharSet.NUM, CharSet.ENG, CharSet.RUS};
-
+    // TODO realize
     String[] words() default {};
 
     String chars() default DEFAULT_CHARS;
@@ -46,7 +41,5 @@ public @interface StringRule {
 
     String regexp() default DEFAULT_REGEXP;
 
-    char maskWildcard() default DEFAULT_WILDCARD;
-
-    char maskTypeMarker() default DEFAULT_TYPE_MARKER;
+    Class<?> generatedType() default String.class;
 }

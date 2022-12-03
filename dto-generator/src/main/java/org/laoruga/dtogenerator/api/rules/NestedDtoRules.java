@@ -1,7 +1,6 @@
 package org.laoruga.dtogenerator.api.rules;
 
-import org.laoruga.dtogenerator.api.rules.meta.Rule;
-import org.laoruga.dtogenerator.constants.Group;
+import org.laoruga.dtogenerator.api.rules.meta.Rules;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -11,10 +10,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(FIELD)
-@Rule
+@Rules
 public @interface NestedDtoRules {
 
-    Class<?>[] APPLICABLE_TYPES = {Object.class};
-
-    String group() default Group.DEFAULT;
+    NestedDtoRule[] value();
 }

@@ -22,7 +22,6 @@ public @interface LocalDateTimeRule {
     int DEFAULT_LEFT_SHIFT_DAYS = 365 * 5;
     int DEFAULT_LEFT_RIGHT_DAYS = 365 * 5;
     IRuleRemark DEFAULT_RULE_REMARK = BasicRuleRemark.RANDOM_VALUE;
-    Class<?>[] APPLICABLE_TYPES = {LocalDateTime.class};
 
     int leftShiftDays() default DEFAULT_LEFT_SHIFT_DAYS;
 
@@ -31,4 +30,6 @@ public @interface LocalDateTimeRule {
     BasicRuleRemark ruleRemark() default BasicRuleRemark.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
+
+    Class<?> generatedType() default LocalDateTime.class;
 }

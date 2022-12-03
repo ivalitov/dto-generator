@@ -8,7 +8,7 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.IntegerRule;
-import org.laoruga.dtogenerator.api.rules.NestedDtoRules;
+import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
 import org.laoruga.dtogenerator.functional.data.dtoclient.*;
@@ -25,7 +25,7 @@ import static org.laoruga.dtogenerator.functional.IntegerGenerationTests.simpleI
  * Created on 03.05.2022
  */
 
-@DisplayName("Basic Type Generators Tests")
+@DisplayName("Nested dto Generators Tests")
 @Epic("NESTED_DTO")
 class NestedDtoGenerationTests {
 
@@ -34,7 +34,7 @@ class NestedDtoGenerationTests {
     static class Dto {
         @IntegerRule()
         private Integer intDefaultRules;
-        @NestedDtoRules()
+        @NestedDtoRule()
         private IntegerGenerationTests.DtoInteger dtoNested;
     }
 
@@ -43,7 +43,7 @@ class NestedDtoGenerationTests {
     static class DtoCustomNested {
         @IntegerRule()
         private Integer intDefaultRules;
-        @NestedDtoRules()
+        @NestedDtoRule()
         private ClientDto clientDto;
     }
 
@@ -52,9 +52,9 @@ class NestedDtoGenerationTests {
     static class DtoWithNestedLevels {
         @IntegerRule()
         private Integer simpleInt;
-        @NestedDtoRules()
+        @NestedDtoRule()
         private Nested_1 nested_1;
-        @NestedDtoRules()
+        @NestedDtoRule()
         private IntegerGenerationTests.DtoInteger dtoNestedInteger;
     }
 
@@ -64,7 +64,7 @@ class NestedDtoGenerationTests {
 
         @IntegerRule(minValue = 1, maxValue = 2)
         private Integer oneTwo;
-        @NestedDtoRules()
+        @NestedDtoRule()
         private Nested_2 nested_2;
     }
 
@@ -132,8 +132,8 @@ class NestedDtoGenerationTests {
     @DisplayName("Nested Dto Remark")
     void nestedDtoRemark() {
         Dto dto = DtoGenerator.builder(Dto.class)
-                .setRuleRemarkForField("dtoNested.intDefaultRules", BasicRuleRemark.MIN_VALUE)
-                .setRuleRemarkForField("dtoNested.intRightBound", BasicRuleRemark.MAX_VALUE)
+                .setRuleRemark("dtoNested.intDefaultRules", BasicRuleRemark.MIN_VALUE)
+                .setRuleRemark("dtoNested.intRightBound", BasicRuleRemark.MAX_VALUE)
                 .build().generateDto();
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
@@ -174,7 +174,7 @@ class NestedDtoGenerationTests {
     @DisplayName("Multilevel Nested Dto With Remarks")
     void multiLevelNestedDtoWithRemarks() {
         DtoWithNestedLevels dto = DtoGenerator.builder(DtoWithNestedLevels.class)
-                .setRuleRemarkForFields(BasicRuleRemark.MIN_VALUE)
+                .setRuleRemark(BasicRuleRemark.MIN_VALUE)
                 .build().generateDto();
 
         assertNotNull(dto);

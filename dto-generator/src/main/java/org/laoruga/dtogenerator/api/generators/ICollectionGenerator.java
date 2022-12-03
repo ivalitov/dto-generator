@@ -9,5 +9,5 @@ import java.util.Collection;
 
 public interface ICollectionGenerator<T> extends IGenerator<Collection<T>> {
 
-    IGenerator<T> getItemGenerator();
+    IGenerator<T> getElementGenerator();
 }

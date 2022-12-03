@@ -6,7 +6,7 @@ package org.laoruga.dtogenerator.api.generators;
  */
 
 @FunctionalInterface
-public interface IGeneratorBuilder<T extends IGenerator<?>> {
+public interface IGeneratorBuilder {
 
-    T build();
+    IGenerator<?> build();
 }

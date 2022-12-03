@@ -1,9 +1,8 @@
 package org.laoruga.dtogenerator.generators.basictypegenerators;
 
-import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.*;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.EnumRule;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
@@ -22,7 +21,7 @@ import java.util.Comparator;
 public class EnumGenerator implements IGenerator<Enum<?>> {
 
     private final String[] possibleEnumNames;
-    private final Class<? extends Enum<?>> enumClass;
+    private final Class<? extends Enum> enumClass;
     private final IRuleRemark ruleRemark;
 
     @Override
@@ -50,38 +49,88 @@ public class EnumGenerator implements IGenerator<Enum<?>> {
             }
         }
         throw new DtoGeneratorException("Enum instance with name: '" + enumInstanceName +
-                "' has not been found in Class: '" + enumClass + "'");
+                "' not found in Class: '" + enumClass + "'");
     }
 
     public static EnumGeneratorBuilder builder() {
         return new EnumGeneratorBuilder();
     }
 
-    public static final class EnumGeneratorBuilder implements IGeneratorBuilder<IGenerator<?>> {
-        private String[] possibleEnumNames;
-        private Class<? extends Enum<?>> enumClass;
-        private IRuleRemark ruleRemark = EnumRule.DEFAULT_RULE_REMARK;
+    public static final class EnumGeneratorBuilder implements IGeneratorBuilderConfigurable {
+
+        ConfigDto configDto;
 
         private EnumGeneratorBuilder() {
+            this.configDto = new ConfigDto();
         }
 
-        public EnumGeneratorBuilder possibleEnumNames(String[] possibleEnumNames) {
-            this.possibleEnumNames = possibleEnumNames;
+        public EnumGeneratorBuilder possibleEnumNames(String... possibleEnumNames) {
+            configDto.possibleEnumNames = possibleEnumNames;
             return this;
         }
 
-        public EnumGeneratorBuilder enumClass(Class<? extends Enum<?>> enumClass) {
-            this.enumClass = enumClass;
+        @SuppressWarnings("unchecked")
+        public EnumGeneratorBuilder enumClass(Class<?> enumClass) {
+            if (enumClass.isEnum()) {
+                configDto.enumClass = (Class<? extends Enum<?>>) enumClass;
+            } else {
+                throw new DtoGeneratorException(new ClassCastException("Enum class expected"));
+            }
             return this;
         }
 
         public EnumGeneratorBuilder ruleRemark(IRuleRemark ruleRemark) {
-            this.ruleRemark = ruleRemark;
+            configDto.ruleRemark = ruleRemark;
             return this;
         }
 
         public EnumGenerator build() {
-            return new EnumGenerator(possibleEnumNames, enumClass, ruleRemark);
+            return build(configDto, false);
+        }
+
+        public EnumGenerator build(IConfigDto configDto, boolean merge) {
+            if (merge) {
+                configDto.merge(this.configDto);
+            }
+            ConfigDto enumConfigDto = (ConfigDto) configDto;
+
+            if (enumConfigDto.enumClass == null) {
+                throw new DtoGeneratorException("Enum class wasn't set for generator.");
+            }
+            if (enumConfigDto.possibleEnumNames.length == 0) {
+                enumConfigDto.possibleEnumNames = Arrays
+                        .stream(enumConfigDto.enumClass.getEnumConstants())
+                        .map(Enum::name).toArray(String[]::new);
+            }
+            return new EnumGenerator(
+                    enumConfigDto.possibleEnumNames,
+                    enumConfigDto.enumClass,
+                    enumConfigDto.ruleRemark);
+        }
+    }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    public static class ConfigDto implements IConfigDto{
+        private String[] possibleEnumNames;
+        @Setter
+        private Class<? extends Enum> enumClass;
+        @Setter
+        private IRuleRemark ruleRemark;
+
+        public ConfigDto(EnumRule enumRule) {
+            possibleEnumNames = enumRule.possibleEnumNames();
+            ruleRemark = enumRule.ruleRemark();
+        }
+
+        public ConfigDto() {}
+
+        public void merge(IConfigDto from) {
+            ConfigDto configDto = (ConfigDto) from;
+            if (configDto.getPossibleEnumNames() != null) this.possibleEnumNames = configDto.getPossibleEnumNames();
+            if (configDto.getEnumClass() != null) this.enumClass = configDto.getEnumClass();
+            if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();
         }
     }
 }

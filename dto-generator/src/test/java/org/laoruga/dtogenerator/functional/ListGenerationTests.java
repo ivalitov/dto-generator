@@ -14,6 +14,7 @@ import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.functional.data.dtoclient.ClientDto;
 import org.laoruga.dtogenerator.functional.util.TestUtils;
+import org.laoruga.dtogenerator.generators.RulesInstance;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -61,10 +62,10 @@ class ListGenerationTests {
         assertNotNull(dto);
         List<Integer> numbers = dto.getArrayListIntegerRules();
         assertThat(numbers.size(), both(
-                greaterThanOrEqualTo(ListRule.DEFAULT_MIN_SIZE)).and(lessThanOrEqualTo(ListRule.DEFAULT_MAX_SIZE)));
+                greaterThanOrEqualTo(RulesInstance.listRule.minSize())).and(lessThanOrEqualTo(RulesInstance.listRule.maxSize())));
         for (Integer number : numbers) {
             assertThat(number, both(
-                    greaterThanOrEqualTo(IntegerRule.DEFAULT_MIN)).and(lessThanOrEqualTo(IntegerRule.DEFAULT_MAX)));
+                    greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue())));
         }
     }
 
@@ -96,7 +97,8 @@ class ListGenerationTests {
 
         Consumer<List<String>> assertListOfStrings = (list) -> {
             assertThat(list.size(), both(
-                    greaterThanOrEqualTo(ListRule.DEFAULT_MIN_SIZE)).and(lessThanOrEqualTo(ListRule.DEFAULT_MAX_SIZE)));
+                    greaterThanOrEqualTo(RulesInstance.listRule.minSize()))
+                    .and(lessThanOrEqualTo(RulesInstance.listRule.maxSize())));
             assertThat(list, everyItem(
                     notNullValue()
             ));

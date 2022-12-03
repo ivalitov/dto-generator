@@ -3,23 +3,27 @@ package org.laoruga.dtogenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.*;
-import org.laoruga.dtogenerator.api.rules.CustomRule;
-import org.laoruga.dtogenerator.config.DtoGeneratorConfig;
+import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
+import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generators.GeneratorBuildersProvider;
-import org.laoruga.dtogenerator.generators.GeneratorsFactory;
-import org.laoruga.dtogenerator.generators.basictypegenerators.NestedDtoGenerator;
-import org.laoruga.dtogenerator.util.ReflectionUtils;
+import org.laoruga.dtogenerator.generators.GeneratorBuildersHolder;
+import org.laoruga.dtogenerator.generators.builders.AbstractGeneratorBuildersProvider;
+import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersProviderByAnnotation;
+import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersProviderByField;
+import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersProviderByType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
-import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
+import static org.laoruga.dtogenerator.util.ReflectionUtils.getDefaultMethodValue;
 
 /**
  * @author Il'dar Valitov
@@ -30,28 +34,36 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 @Getter(AccessLevel.PACKAGE)
 public class GeneratorsProvider<T> {
 
+    private final DtoGeneratorInstanceConfig configuration;
     private T dtoInstance;
     private final String[] fieldsFromRoot;
     private final DtoGeneratorBuilder.GeneratorBuildersTree generatorBuildersTree;
     private final GeneratorRemarksProvider generatorRemarksProvider;
-    private final GeneratorsFactory generatorsFactory = GeneratorsFactory.getInstance();
-    private final Map<Class<? extends Annotation>, IGeneratorBuilder<IGenerator<?>>> overriddenBuilders;
-    // TODO copy these maps via the constructor
-    private final Map<String, IGeneratorBuilder<IGenerator<?>>> overriddenBuildersForFields = new HashMap<>();
-    private final Map<String, IGeneratorBuilder<ICollectionGenerator<?>>> overriddenCollectionBuildersForFields = new HashMap<>();
+    private final Map<Class<? extends Annotation>, IGeneratorBuilder> overriddenBuilders;
+    private final Map<String, IGeneratorBuilder> overriddenBuildersForFields;
 
+    GeneratorBuildersHolder userGenBuildersMapping;
+
+    private final AbstractGeneratorBuildersProvider builderSelectChainByAnnotation;
+    private final AbstractGeneratorBuildersProvider builderSelectChainByType;
     @Getter
     private final RulesInfoExtractor rulesInfoExtractor;
 
-    GeneratorsProvider(GeneratorRemarksProvider generatorRemarksProvider,
+    GeneratorsProvider(DtoGeneratorInstanceConfig configuration,
+                       GeneratorRemarksProvider generatorRemarksProvider,
                        FieldGroupFilter fieldGroupFilter,
                        String[] fieldsFromRoot,
                        DtoGeneratorBuilder.GeneratorBuildersTree generatorBuildersTree) {
+        this.configuration = configuration;
+        this.overriddenBuildersForFields = new HashMap<>();
+        this.userGenBuildersMapping = new GeneratorBuildersHolder(new ArrayList<>());
         this.generatorRemarksProvider = generatorRemarksProvider;
         this.fieldsFromRoot = fieldsFromRoot;
         this.overriddenBuilders = new ConcurrentHashMap<>();
         this.rulesInfoExtractor = new RulesInfoExtractor(fieldGroupFilter);
         this.generatorBuildersTree = generatorBuildersTree;
+        this.builderSelectChainByType = initAllKnownTypesChain(overriddenBuildersForFields);
+        this.builderSelectChainByAnnotation = initAnnotationChain(overriddenBuildersForFields);
     }
 
     /**
@@ -60,11 +72,16 @@ public class GeneratorsProvider<T> {
      * @param copyFrom source object
      */
     GeneratorsProvider(GeneratorsProvider<?> copyFrom, String[] fieldsFromRoot) {
+        this.configuration = copyFrom.configuration;
+        this.overriddenBuildersForFields = new HashMap<>();
+        this.userGenBuildersMapping = copyFrom.getUserGenBuildersMapping();
         this.generatorRemarksProvider = copyFrom.getGeneratorRemarksProvider().copy();
         this.fieldsFromRoot = fieldsFromRoot;
         this.overriddenBuilders = copyFrom.getOverriddenBuilders();
         this.rulesInfoExtractor = copyFrom.getRulesInfoExtractor();
         this.generatorBuildersTree = copyFrom.getGeneratorBuildersTree();
+        this.builderSelectChainByType = copyFrom.initAllKnownTypesChain(overriddenBuildersForFields);
+        this.builderSelectChainByAnnotation = copyFrom.initAnnotationChain(overriddenBuildersForFields);
     }
 
     /**
@@ -85,6 +102,76 @@ public class GeneratorsProvider<T> {
         }
     }
 
+    private AbstractGeneratorBuildersProvider initAllKnownTypesChain(
+            Map<String, IGeneratorBuilder> buildersMapping) {
+        GeneratorBuildersProviderByField byField = new GeneratorBuildersProviderByField(
+                configuration,
+                buildersMapping);
+
+        GeneratorBuildersProviderByType byType = new GeneratorBuildersProviderByType(
+                configuration,
+                userGenBuildersMapping);
+
+        byField.addNextProvider(byType);
+
+        return byField;
+    }
+
+    // TODO ремарки - таже проблема с ремарками для внутренних дто
+    private AbstractGeneratorBuildersProvider initAnnotationChain(Map<String, IGeneratorBuilder> buildersMapping) {
+        GeneratorBuildersProviderByField byField = new GeneratorBuildersProviderByField(
+                configuration,
+                buildersMapping);
+
+        GeneratorBuildersProviderByAnnotation byAnnotation = new GeneratorBuildersProviderByAnnotation(
+                configuration,
+                new GeneratorBuildersProviderByType(configuration, userGenBuildersMapping),
+                generatorRemarksProvider,
+                userGenBuildersMapping);
+
+        byField.addNextProvider(byAnnotation);
+
+        return byField;
+    }
+
+    @RequiredArgsConstructor
+    public
+    class ProvidersVisitor {
+        final Field field;
+        final IRuleInfo ruleInfo;
+
+        public void visit(AbstractGeneratorBuildersProvider abstractProvider) {
+            if (abstractProvider.getClass() == GeneratorBuildersProviderByType.class) {
+                visitByType((GeneratorBuildersProviderByType) abstractProvider);
+            } else if (abstractProvider.getClass() == GeneratorBuildersProviderByField.class) {
+                visitByField((GeneratorBuildersProviderByField) abstractProvider);
+            } else if (abstractProvider.getClass() == GeneratorBuildersProviderByAnnotation.class) {
+                visitByAnnotation((GeneratorBuildersProviderByAnnotation) abstractProvider);
+            } else {
+                throw new DtoGeneratorException("Visitor no defined");
+            }
+        }
+
+        void visitByType(GeneratorBuildersProviderByType byType) {
+            byType.setField(field);
+        }
+
+        void visitByField(GeneratorBuildersProviderByField byField) {
+            byField.setField(field);
+        }
+
+        void visitByAnnotation(GeneratorBuildersProviderByAnnotation byAnnotation) {
+            byAnnotation.setField(field);
+            byAnnotation.setMaybeRemark(
+                    generatorRemarksProvider.isBasicRuleRemarkExists(field.getName()) ?
+                            generatorRemarksProvider.getBasicRuleRemark(field.getName()) : null);
+            byAnnotation.setDtoInstance(dtoInstance);
+            byAnnotation.setRuleInfo(ruleInfo);
+            byAnnotation.setGenBuildersTree(getGeneratorBuildersTree());
+            byAnnotation.setFieldPathFromRoot(fieldsFromRoot);
+        }
+    }
+
     /**
      * Returns generator Instance for field value generation
      *
@@ -96,239 +183,50 @@ public class GeneratorsProvider<T> {
      * else generator instance
      */
     Optional<IGenerator<?>> getGenerator(Field field) {
-        String fieldName = field.getName();
+        Optional<IRuleInfo> maybeRulesInfo = getRuleInfo(field);
 
-        if (isGeneratorExplicitlySetForField(fieldName)) {
-            return Optional.of(getGeneratorExplicitlySetForField(fieldName));
+        // field annotated with rules
+        if (maybeRulesInfo.isPresent()) {
+            getBuilderSelectChainByAnnotation().accept(new ProvidersVisitor(field, maybeRulesInfo.get()));
+            return getBuilderSelectChainByAnnotation().getGenerator();
+        } else {
+            getBuilderSelectChainByType().accept(new ProvidersVisitor(field, null));
+            return getBuilderSelectChainByType().getGenerator();
         }
 
-        Optional<IRuleInfo> maybeRulesInfo;
+    }
+
+    private Optional<IRuleInfo> getRuleInfo(Field field) {
         try {
             AnnotationErrorsHandler.ResultDto validationResult =
-                    new AnnotationErrorsHandler(field.getDeclaredAnnotations()).validate();
+                    new AnnotationErrorsHandler(field.getDeclaredAnnotations(), configuration).validate();
             if (!validationResult.getResultString().isEmpty()) {
                 throw new DtoGeneratorException("Field annotated wrong:\n" + validationResult.getResultString());
             }
-            maybeRulesInfo = rulesInfoExtractor.checkAndWrapAnnotations(field, validationResult);
+            return rulesInfoExtractor.checkAndWrapAnnotations(field);
         } catch (Exception e) {
             throw new DtoGeneratorException("Error while extracting rule annotations from field: '" + field + "'", e);
         }
-
-        if (maybeRulesInfo.isPresent()) {
-            IRuleInfo ruleInfo = maybeRulesInfo.get();
-            boolean isCollectionGenerator = ruleInfo.isTypesEqual(RuleType.COLLECTION);
-            IGenerator<?> generator;
-
-            if (isCollectionGenerator) {
-                RuleInfoCollection collectionRuleInfo = (RuleInfoCollection) ruleInfo;
-                IRuleInfo elementRuleInfo = collectionRuleInfo.getItemRule();
-                //TODO need to handle explicitly that collection generator may be overridden only by field name
-                if (isGeneratorOverridden(collectionRuleInfo.getRule())) {
-                    generator = getOverriddenGenerator(collectionRuleInfo.getRule());
-                } else if (isGeneratorOverridden(elementRuleInfo.getRule())) {
-                    IGenerator<?> elementGenerator = getOverriddenGenerator(elementRuleInfo.getRule());
-                    generator = selectCollectionGenerator(field, collectionRuleInfo, elementGenerator);
-                } else {
-                    generator = selectCollectionGenerator(field, collectionRuleInfo);
-                }
-
-            } else {
-                Annotation generationRule = ruleInfo.getRule();
-                generator = isGeneratorOverridden(generationRule) ?
-                        getOverriddenGenerator(generationRule) : selectGenerator(field, ruleInfo);
-            }
-            prepareCustomRemarks(generator, fieldName);
-
-
-            return Optional.of(generator);
-        } else {
-            if (DtoGeneratorConfig.isGenerateAllKnownTypes()) {
-                Optional<IGeneratorBuilder<?>> maybeBuilder =
-                        GeneratorBuildersProvider.getInstance().getBuilder(field.getType());
-                if (maybeBuilder.isPresent()) {
-                    return Optional.of(maybeBuilder.get().build());
-                }
-            }
-            return Optional.empty();
-        }
     }
 
-    IGenerator<?> selectGenerator(Field field, IRuleInfo ruleInfo) {
-        String fieldName = field.getName();
-        Annotation fieldRules = ruleInfo.getRule();
-
-        if (ruleInfo.isTypesEqual(RuleType.BASIC)) {
-            return getBasicTypeGenerator(fieldName, field.getType(), fieldRules);
-        }
-
-        if (ruleInfo.isTypesEqual(RuleType.CUSTOM)) {
-            return getCustomGenerator(fieldRules);
-        }
-
-        if (ruleInfo.isTypesEqual(RuleType.NESTED)) {
-            return getNestedDtoGenerator(field, getFieldsFromRoot());
-        }
-
-        throw new DtoGeneratorException("Unexpected error. Unable to create generator for field '" + field + "' depended on types:" +
-                " '" + ruleInfo + "'");
-    }
-
-    IGenerator<?> selectCollectionGenerator(Field field, RuleInfoCollection ruleInfo) {
-        String fieldName = field.getName();
-        IGenerator<?> elementGenerator = null;
-
-        if (ruleInfo.getItemRule().isTypesEqual(RuleType.BASIC)) {
-            elementGenerator = getBasicTypeGenerator(
-                    fieldName + " " + field.getGenericType().getClass(),
-                    ReflectionUtils.getSingleGenericType(field),
-                    ruleInfo.getItemRule().getRule());
-        }
-
-        if (ruleInfo.getItemRule().isTypesEqual(RuleType.CUSTOM)) {
-            elementGenerator = getCustomGenerator(
-                    ruleInfo.getItemRule().getRule());
-        }
-
-        return selectCollectionGenerator(field, ruleInfo, Objects.requireNonNull(elementGenerator));
-    }
-
-    IGenerator<?> selectCollectionGenerator(Field field, RuleInfoCollection ruleInfo, IGenerator<?> elementGenerator) {
-        String fieldName = field.getName();
-
-        if (ruleInfo.isTypesEqual(RuleType.COLLECTION)) {
-            return getCollectionTypeGenerator(
-                    fieldName, field.getType(),
-                    ruleInfo.getCollectionRule().getRule(),
-                    elementGenerator);
-
-        }
-
-        throw new DtoGeneratorException("Unexpected error. Unable to create generator for collection field '" + field +
-                "' depended on types: '" + ruleInfo + "'");
-    }
-
-
-    void prepareCustomRemarks(IGenerator<?> generator, String fieldName) {
-        if (generator instanceof ICollectionGenerator) {
-            prepareCustomRemarks(((ICollectionGenerator<?>) generator).getItemGenerator(), fieldName);
-        }
-        if (generator instanceof ICustomGeneratorRemarkable) {
-            ICustomGeneratorRemarkable<?> remarkableGenerator = (ICustomGeneratorRemarkable<?>) generator;
-            getGeneratorRemarksProvider().getRemarks(fieldName, remarkableGenerator)
-                    .ifPresent(remarkableGenerator::setRuleRemarks);
-        }
-    }
-
-    void setGeneratorForField(String fieldName, IGeneratorBuilder<IGenerator<?>> genBuilder) throws DtoGeneratorException {
+    void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder genBuilder) throws DtoGeneratorException {
         if (overriddenBuildersForFields.containsKey(fieldName)) {
             throw new DtoGeneratorException("Generator has already been explicitly added for field: '" + fieldName + "'");
         }
         overriddenBuildersForFields.put(fieldName, genBuilder);
     }
 
-    void overrideGenerator(Class<? extends Annotation> rulesClass, @NonNull IGeneratorBuilder<IGenerator<?>> genBuilder) {
-        if (overriddenBuilders.containsKey(rulesClass)) {
-            throw new DtoGeneratorException("Generator has already been explicitly added for Rules: '" + rulesClass + "'");
-        }
-        overriddenBuilders.put(rulesClass, genBuilder);
-    }
-
-    /*
-     * Various generator providers
-     */
-
-    IGenerator<?> getBasicTypeGenerator(String fieldName, Class<?> fieldType, Annotation rules) {
-        return generatorsFactory.getBasicTypeGenerator(
-                fieldName,
-                fieldType,
-                rules,
-                new AtomicReference<>(generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
-                        generatorRemarksProvider.getBasicRuleRemark(fieldName) : null)
-        );
-    }
-
-    IGenerator<?> getCollectionTypeGenerator(String fieldName, Class<?> fieldType, Annotation rules, IGenerator<?> itemGenerator) {
-        return generatorsFactory.getCollectionTypeGenerator(
-                fieldName,
-                fieldType,
-                rules,
-                itemGenerator,
-                new AtomicReference<>(generatorRemarksProvider.isBasicRuleRemarkExists(fieldName) ?
-                        generatorRemarksProvider.getBasicRuleRemark(fieldName) : null));
-    }
-
-    IGenerator<?> getNestedDtoGenerator(Field field, String[] fieldsPath) {
-        String[] pathToNestedDtoField = Arrays.copyOf(fieldsPath, fieldsPath.length + 1);
-        pathToNestedDtoField[fieldsPath.length] = field.getName();
-        DtoGeneratorBuilder<?> dtoGeneratorBuilder = getGeneratorBuildersTree().getBuilder(pathToNestedDtoField);
-        return new NestedDtoGenerator<>(
-                dtoGeneratorBuilder.buildNestedFieldGenerator(pathToNestedDtoField, field.getType())
-        );
-    }
-
-    IGenerator<?> getCustomGenerator(Annotation customGeneratorRules) throws DtoGeneratorException {
-        CustomRule customRules;
+    void overrideGenerator(Class<? extends Annotation> rulesClass, @NonNull IGeneratorBuilder genBuilder) {
         try {
-            customRules = (CustomRule) customGeneratorRules;
-        } catch (ClassCastException e) {
-            throw new DtoGeneratorException("Unexpected error. Unexpected annotation instead of: " + CustomRule.class, e);
-        }
-        Class<?> generatorClass = null;
-        try {
-            generatorClass = customRules.generatorClass();
-            Object generatorInstance = createInstance(generatorClass);
-            if (generatorInstance instanceof ICustomGeneratorArgs) {
-                log.debug("Args {} have been obtained from Annotation: {}", Arrays.asList(customRules.args()), customRules);
-                ((ICustomGeneratorArgs<?>) generatorInstance).setArgs(customRules.args());
-            }
-            if (generatorInstance instanceof ICustomGeneratorDtoDependent) {
-                setDto(generatorInstance);
-            }
-            if (generatorInstance instanceof ICustomGenerator) {
-                return (ICustomGenerator<?>) generatorInstance;
-            } else {
-                throw new DtoGeneratorException("Failed to prepare custom generator. " +
-                        "Custom generator must implements: '" + ICustomGenerator.class + "' or it's heirs.");
-            }
-        } catch (Exception e) {
-            throw new DtoGeneratorException("Error while preparing custom generator from class: " + generatorClass, e);
+            Class<?> generatedType = getDefaultMethodValue(rulesClass, "generatedType", Class.class);
+            getUserGenBuildersMapping().addBuilder(
+                    rulesClass,
+                    generatedType,
+                    genBuilder);
+        } catch (NoSuchMethodException e) {
+            throw new DtoGeneratorException("Rules annotation '" + rulesClass.getName() +
+                    "' does not contain 'generatedType' method with return type 'Class'", e);
         }
 
-    }
-
-    private void setDto(Object generatorInstance) {
-        try {
-            ((ICustomGeneratorDtoDependent) generatorInstance).setDto(dtoInstance);
-        } catch (ClassCastException e) {
-            throw new DtoGeneratorException("ClassCastException while trying to set basic DTO into " +
-                    "DTO dependent custom generator. Perhaps there is wrong argument type is passing into " +
-                    "'setDto' method of generator class. " +
-                    "Generator class: '" + generatorInstance.getClass() + "', " +
-                    "Passing argument type: '" + dtoInstance.getClass() + "'", e);
-        } catch (Exception e) {
-            throw new DtoGeneratorException("Exception was thrown while trying to set DTO into " +
-                    "DTO dependent custom generator: " + generatorInstance.getClass(), e);
-        }
-    }
-
-    /*
-     * Utils
-     */
-
-    private boolean isGeneratorExplicitlySetForField(String fieldName) {
-        return overriddenBuildersForFields.containsKey(fieldName) ||
-                overriddenCollectionBuildersForFields.containsKey(fieldName);
-    }
-
-    private IGenerator<?> getGeneratorExplicitlySetForField(@NonNull String fieldName) {
-        return overriddenBuildersForFields.get(fieldName).build();
-    }
-
-    private boolean isGeneratorOverridden(Annotation rules) {
-        return rules != null && overriddenBuilders.containsKey(rules.annotationType());
-    }
-
-    private IGenerator<?> getOverriddenGenerator(Annotation rules) {
-        return overriddenBuilders.get(rules.annotationType()).build();
     }
 }

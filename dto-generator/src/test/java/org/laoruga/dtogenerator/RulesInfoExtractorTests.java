@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.CharSet;
 import org.laoruga.dtogenerator.constants.Group;
+import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.functional.util.TestUtils;
 
@@ -35,7 +36,7 @@ import static org.laoruga.dtogenerator.constants.Group.GROUP_1;
 class RulesInfoExtractorTests {
 
     static class Dto {
-        @StringRule(minSymbols = 1, maxSymbols = 1, charset = CharSet.NUM)
+        @StringRule(minSymbols = 1, maxSymbols = 1, chars = CharSet.NUM)
         String string;
         @IntegerRule
         int integer;
@@ -100,7 +101,7 @@ class RulesInfoExtractorTests {
                           AnnotationErrorsHandler.ResultDto resultDto,
                           RulesInfoExtractor rulesInfoExtractor) {
         Field field = TestUtils.getField(dtoClass, fieldName);
-        Optional<IRuleInfo> iRuleInfo = rulesInfoExtractor.checkAndWrapAnnotations(field, resultDto);
+        Optional<IRuleInfo> iRuleInfo = rulesInfoExtractor.checkAndWrapAnnotations(field);
 
         assertTrue(iRuleInfo.isPresent());
         assertInstanceOf(RuleInfo.class, iRuleInfo.get());
@@ -147,7 +148,7 @@ class RulesInfoExtractorTests {
                              String group,
                              boolean multipleRules) {
         Field field = TestUtils.getField(dtoClass, fieldName);
-        Optional<IRuleInfo> iRuleInfo = rulesInfoExtractor.checkAndWrapAnnotations(field, resultDto);
+        Optional<IRuleInfo> iRuleInfo = rulesInfoExtractor.checkAndWrapAnnotations(field);
 
         assertTrue(iRuleInfo.isPresent());
         assertInstanceOf(RuleInfoCollection.class, iRuleInfo.get());
@@ -157,7 +158,7 @@ class RulesInfoExtractorTests {
         assertAll(
                 () -> assertThat(ruleInfo.getRule().annotationType(), equalTo(collectionRuleClass)),
                 () -> assertThat(ruleInfo.getCollectionRule().getClass(), equalTo(RuleInfo.class)),
-                () -> assertThat(ruleInfo.getItemRule().getClass(), equalTo(RuleInfo.class)),
+                () -> assertThat(ruleInfo.getElementRule().getClass(), equalTo(RuleInfo.class)),
                 () -> assertThat(ruleInfo.getGroup(), equalTo(group))
         );
 
@@ -170,7 +171,7 @@ class RulesInfoExtractorTests {
                 () -> assertThat(collectionRuleInfo.getGroup(), equalTo(group))
         );
 
-        RuleInfo itemRuleInfo = (RuleInfo) ruleInfo.getItemRule();
+        RuleInfo itemRuleInfo = (RuleInfo) ruleInfo.getElementRule();
 
         assertAll(
                 () -> assertThat(itemRuleInfo.getRule().annotationType(), equalTo(itemRuleClass)),
@@ -178,17 +179,6 @@ class RulesInfoExtractorTests {
                 () -> assertThat(itemRuleInfo.isMultipleRules(), equalTo(multipleRules)),
                 () -> assertThat(itemRuleInfo.getGroup(), equalTo(group))
         );
-    }
-
-    static class DtoNegative1 {
-        @IntegerRule
-        String string;
-    }
-
-    static class DtoNegative2 {
-        @IntegerRule
-        @IntegerRule(group = GROUP_1)
-        Long loong;
     }
 
     static class DtoNegative3 {
@@ -221,8 +211,6 @@ class RulesInfoExtractorTests {
 
     static Stream<Arguments> unappropriatedDataSet() {
         return Stream.of(
-                Arguments.of("string", DtoNegative1.class, "Inappropriate generation rule annotation"),
-                Arguments.of("loong", DtoNegative2.class, "Inappropriate generation rule annotation"),
                 Arguments.of("loong", DtoNegative3.class, "Found '2' @Rule annotations for various types, expected 1 or 0"),
                 Arguments.of("loong", DtoNegative4.class, "Found '2' @Rules annotations for various types, expected @Rules for single type only"),
                 Arguments.of("list", DtoNegative5.class, "Found '2' @CollectionRule annotations for various collection types, expected 1 or 0"),
@@ -236,7 +224,7 @@ class RulesInfoExtractorTests {
     void unappropriatedRule(String fieldName, Class<?> dtoClass, String errMsgPart) {
         DtoGenerator<?> generator = DtoGenerator.builder(dtoClass).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);
-        Exception exception = TestUtils.getErrorsMap(generator).get(fieldName);
+        Throwable exception = TestUtils.getErrorsMap(generator).get(fieldName);
         assertThat(exception.getCause().getMessage(),
                 containsString(errMsgPart));
     }

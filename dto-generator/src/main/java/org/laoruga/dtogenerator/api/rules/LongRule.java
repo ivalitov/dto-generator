@@ -21,7 +21,6 @@ public @interface LongRule {
     long DEFAULT_MIN = 0L;
     long DEFAULT_MAX = 999999999999999999L;
     IRuleRemark DEFAULT_RULE_REMARK = BasicRuleRemark.RANDOM_VALUE;
-    Class<?>[] APPLICABLE_TYPES = {Long.class, Long.TYPE};
 
     long minValue() default DEFAULT_MIN;
 
@@ -30,4 +29,6 @@ public @interface LongRule {
     BasicRuleRemark ruleRemark() default BasicRuleRemark.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
+
+    Class<?> generatedType() default Long.class;
 }
