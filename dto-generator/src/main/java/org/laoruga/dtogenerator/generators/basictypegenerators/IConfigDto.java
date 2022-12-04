@@ -1,5 +1,6 @@
 package org.laoruga.dtogenerator.generators.basictypegenerators;
 
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 
 /**
@@ -7,8 +8,9 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
  * Created on 02.12.2022
  */
 public interface IConfigDto {
-    void merge(IConfigDto staticConfig);
 
+    Class<? extends IGeneratorBuilder> getBuilderClass();
+    void merge(IConfigDto staticConfig);
     void setRuleRemark(IRuleRemark ruleRemark);
     IRuleRemark getRuleRemark();
 

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.IntegerRule;
@@ -86,6 +87,7 @@ public class IntegerGenerator implements IGenerator<Integer> {
     @Getter
     @AllArgsConstructor
     public static class ConfigDto implements IConfigDto {
+
         private Integer maxValue;
         private Integer minValue;
         @Setter
@@ -98,6 +100,11 @@ public class IntegerGenerator implements IGenerator<Integer> {
         }
 
         public ConfigDto() {}
+
+        @Override
+        public Class<? extends IGeneratorBuilder> getBuilderClass() {
+            return IntegerGeneratorBuilder.class;
+        }
 
         public void merge(IConfigDto from) {
             ConfigDto configDto = (ConfigDto) from;

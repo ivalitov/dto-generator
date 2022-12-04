@@ -8,8 +8,8 @@ import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersDefaultConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.generators.DefaultGeneratorBuilders;
 import org.laoruga.dtogenerator.generators.GeneratorBuildersHolder;
-import org.laoruga.dtogenerator.generators.StaticGeneratorBuildersHolder;
 import org.laoruga.dtogenerator.generators.basictypegenerators.EnumGenerator;
 import org.laoruga.dtogenerator.generators.basictypegenerators.IConfigDto;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
@@ -17,6 +17,7 @@ import org.laoruga.dtogenerator.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 /**
  * @author Il'dar Valitov
@@ -25,7 +26,7 @@ import java.util.Optional;
 public class GeneratorBuildersProviderByType extends AbstractGeneratorBuildersProvider {
 
     private final GeneratorBuildersHolder userGeneratorBuilders;
-    private final GeneratorBuildersHolder generalGeneratorBuilders = StaticGeneratorBuildersHolder.getInstance();
+    private final GeneratorBuildersHolder generalGeneratorBuilders = DefaultGeneratorBuilders.getInstance();
     @Setter
     private Field field;
 
@@ -62,7 +63,7 @@ public class GeneratorBuildersProviderByType extends AbstractGeneratorBuildersPr
 
             if (genBuilder instanceof IGeneratorBuilderConfigurable) {
 
-                FunctionTwo<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier;
+                BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier;
 
                 if (genBuilder instanceof EnumGenerator.EnumGeneratorBuilder) {
 
@@ -84,11 +85,15 @@ public class GeneratorBuildersProviderByType extends AbstractGeneratorBuildersPr
                         () -> TypeGeneratorBuildersDefaultConfig.getInstance()
                                 .getConfig(genBuilder.getClass(), getGeneratedType()),
                         () -> (IGeneratorBuilderConfigurable) genBuilder,
-                        generatorSupplier);
+                        generatorSupplier,
+                        getFieldType());
             }
         }
 
         return Optional.ofNullable(generator);
     }
 
+    public Class<?> getFieldType() {
+        return field.getType();
+    }
 }

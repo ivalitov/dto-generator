@@ -8,9 +8,9 @@ import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.generators.DefaultGeneratorBuilders;
 import org.laoruga.dtogenerator.generators.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.generators.RulesInstance;
-import org.laoruga.dtogenerator.generators.StaticGeneratorBuildersHolder;
 import org.laoruga.dtogenerator.generators.basictypegenerators.*;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
@@ -40,7 +40,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
     private final GeneratorBuildersProviderByType generatorBuildersProviderByType;
     private final GeneratorRemarksProvider generatorRemarksProvider;
     private final GeneratorBuildersHolder userGeneratorBuildersHolder;
-    private final GeneratorBuildersHolder defaultlGeneratorBuildersHolder = StaticGeneratorBuildersHolder.getInstance();
+    private final GeneratorBuildersHolder defaultlGeneratorBuildersHolder = DefaultGeneratorBuilders.getInstance();
 
     @Setter
     volatile private Field field;
@@ -181,9 +181,8 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                                         new StringGenerator.ConfigDto(RulesInstance.stringRule) :
                                         new StringGenerator.ConfigDto((StringRule) rules),
                                 () -> genBuilderConfigurable,
-                                (config, builder) -> ((StringGenerator.StringGeneratorBuilder) builder)
-                                        .build(config, true));
-
+                                (config, builder) -> builder.build(config, true),
+                                getFieldType());
                     }
 
                 } else if (DoubleRule.class == rulesClass) {
@@ -200,7 +199,8 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                                             reportPrimitiveCannotBeNull();
                                             return 0D;
                                         } :
-                                        ((DoubleGenerator.DoubleGeneratorBuilder) builder).build(config, true));
+                                        builder.build(config, true),
+                                getFieldType());
                     }
 
                 } else if (IntegerRule.class == rulesClass) {
@@ -217,7 +217,8 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                                             reportPrimitiveCannotBeNull();
                                             return 0;
                                         } :
-                                        ((IntegerGenerator.IntegerGeneratorBuilder) builder).build(config, true));
+                                        builder.build(config, true),
+                                getFieldType());
                     }
 
                 } else if (LongRule.class == rulesClass) {
@@ -234,7 +235,8 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                                             reportPrimitiveCannotBeNull();
                                             return 0;
                                         } :
-                                        ((LongGenerator.LongGeneratorBuilder) builder).build(config, true));
+                                        builder.build(config, true),
+                                getFieldType());
                     }
 
                 } else if (EnumRule.class == rulesClass) {
@@ -245,7 +247,8 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                                         new EnumGenerator.ConfigDto(RulesInstance.enumRule) :
                                         new EnumGenerator.ConfigDto((EnumRule) rules),
                                 () -> genBuilderConfigurable,
-                                enumGeneratorSupplier(generatedTypeOrCollectionElementType)
+                                enumGeneratorSupplier(generatedTypeOrCollectionElementType),
+                                getFieldType()
                         );
                     }
 
@@ -257,7 +260,8 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                                         new LocalDateTimeGenerator.ConfigDto(RulesInstance.localDateTimeRule) :
                                         new LocalDateTimeGenerator.ConfigDto((LocalDateTimeRule) rules),
                                 () -> genBuilderConfigurable,
-                                (config, builder) -> ((LocalDateTimeGenerator.LocalDateTimeGeneratorBuilder) builder).build(config, true));
+                                (config, builder) -> builder.build(config, true),
+                                getFieldType());
                     }
 
                 }
@@ -336,7 +340,8 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
             return getGenerator(
                     () -> configDto,
                     () -> (IGeneratorBuilderConfigurable) collectionGenBuilder,
-                    collectionGeneratorSupplier(elementGenerator));
+                    collectionGeneratorSupplier(elementGenerator),
+                    getFieldType());
         }
 
         log.debug("Unknown collection builder builds as is, without Rules annotation params passing.");

@@ -43,16 +43,17 @@ public class GeneratorBuildersProviderByField extends AbstractGeneratorBuildersP
                 IGeneratorBuilderConfigurable genBuilderConfigurable = (IGeneratorBuilderConfigurable) genBuilder;
 
                 generator = getGenerator(
-                                () -> TypeGeneratorBuildersDefaultConfig.getInstance().getConfig(genBuilderConfigurable.getClass(), getGeneratedType()),
-                                () -> genBuilderConfigurable,
-                                (config, builder) -> {
+                        () -> TypeGeneratorBuildersDefaultConfig.getInstance()
+                                .getConfig(genBuilderConfigurable.getClass(), getFieldType()),
+                        () -> genBuilderConfigurable,
+                        (config, builder) -> {
 
-                                    if (config instanceof EnumGenerator.ConfigDto) {
-                                        ((EnumGenerator.ConfigDto) config).setEnumClass((Class<? extends Enum<?>>) getGeneratedType());
-                                    }
-
-                                    return builder.build(config, true);
-                                });
+                            if (config instanceof EnumGenerator.ConfigDto) {
+                                ((EnumGenerator.ConfigDto) config).setEnumClass((Class<? extends Enum<?>>) getFieldType());
+                            }
+                            return builder.build(config, true);
+                        },
+                        getFieldType());
             } else {
                 log.debug("GenBuilder explicitly set fo field builds as is.");
 
@@ -67,7 +68,7 @@ public class GeneratorBuildersProviderByField extends AbstractGeneratorBuildersP
         return field.getName();
     }
 
-    private Class<?> getGeneratedType() {
+    private Class<?> getFieldType() {
         return field.getType();
     }
 

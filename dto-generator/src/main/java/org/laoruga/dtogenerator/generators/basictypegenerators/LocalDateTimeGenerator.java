@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.LocalDateTimeRule;
@@ -104,6 +105,11 @@ public class LocalDateTimeGenerator implements IGenerator<LocalDateTime> {
         }
 
         public ConfigDto(){}
+
+        @Override
+        public Class<? extends IGeneratorBuilder> getBuilderClass() {
+            return LocalDateTimeGeneratorBuilder.class;
+        }
 
         public void merge(IConfigDto from) {
             ConfigDto configDto = (ConfigDto) from;

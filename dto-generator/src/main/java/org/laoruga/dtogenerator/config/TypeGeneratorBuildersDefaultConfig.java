@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.generators.RulesInstance;
 import org.laoruga.dtogenerator.generators.basictypegenerators.*;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * @author Il'dar Valitov
@@ -27,8 +25,9 @@ public final class TypeGeneratorBuildersDefaultConfig extends TypeGeneratorBuild
         setConfig(DoubleGenerator.DoubleGeneratorBuilder.class, new DoubleGenerator.ConfigDto(RulesInstance.doubleRule));
         setConfig(LocalDateTimeGenerator.LocalDateTimeGeneratorBuilder.class, new LocalDateTimeGenerator.ConfigDto(RulesInstance.localDateTimeRule));
         setConfig(EnumGenerator.EnumGeneratorBuilder.class, new EnumGenerator.ConfigDto(RulesInstance.enumRule));
-        setConfig(CollectionGenerator.CollectionGeneratorBuilder.class, List.class, new CollectionGenerator.ConfigDto(RulesInstance.listRule));
-        setConfig(CollectionGenerator.CollectionGeneratorBuilder.class, Set.class, new CollectionGenerator.ConfigDto(RulesInstance.setRule));
+
+        setCollectionConfig(RulesInstance.listRule.generatedType(), new CollectionGenerator.ConfigDto(RulesInstance.listRule));
+        setCollectionConfig(RulesInstance.setRule.generatedType(), new CollectionGenerator.ConfigDto(RulesInstance.setRule));
     }
 
     @Override
@@ -38,12 +37,10 @@ public final class TypeGeneratorBuildersDefaultConfig extends TypeGeneratorBuild
     }
 
     @Override
-    public IConfigDto getConfig(Class<?> builderClass, Class<?> collectionClass) {
-        if (super.getConfig(builderClass) != null) {
-            return getConfig(builderClass);
-        }
-        return Objects.requireNonNull(super.getConfig(builderClass, collectionClass), "Default config not set for collection builder's class: " +
-                "'" + builderClass + "'");
+    public IConfigDto getConfig(Class<?> builderClass, Class<?> generatedType) {
+        return Objects.requireNonNull(super.getConfig(builderClass, generatedType),
+                "Default config not set for builder's class: " +
+                "'" + builderClass + "' and field type: '" + generatedType + "'");
     }
 
 }

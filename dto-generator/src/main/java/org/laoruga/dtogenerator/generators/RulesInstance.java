@@ -20,16 +20,22 @@ public class RulesInstance {
     @LocalDateTimeRule
     @ListRule
     @SetRule
+    @CustomRule(generatorClass = Object.class)
+    @NestedDtoRule
     private static Object annotations;
 
     public static final StringRule stringRule;
     public static final IntegerRule integerRule;
     public static final LongRule longRule;
     public static final EnumRule enumRule;
-    public static DoubleRule doubleRule;
-    public static LocalDateTimeRule localDateTimeRule;
-    public static SetRule setRule;
-    public static ListRule listRule;
+    public static final DoubleRule doubleRule;
+    public static final LocalDateTimeRule localDateTimeRule;
+    public static final SetRule setRule;
+    public static final ListRule listRule;
+    public static final CustomRule customRule;
+    public static final NestedDtoRule nestedDtoRule;
+
+
 
     static {
         try {
@@ -43,6 +49,8 @@ public class RulesInstance {
             localDateTimeRule = getAnnotationInstance(annotations, LocalDateTimeRule.class);
             setRule = getAnnotationInstance(annotations, SetRule.class);
             listRule = getAnnotationInstance(annotations, ListRule.class);
+            customRule = getAnnotationInstance(annotations, CustomRule.class);
+            nestedDtoRule = getAnnotationInstance(annotations, NestedDtoRule.class);
 
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);

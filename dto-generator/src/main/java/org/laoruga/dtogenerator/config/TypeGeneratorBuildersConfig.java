@@ -3,6 +3,7 @@ package org.laoruga.dtogenerator.config;
 import lombok.Getter;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.generators.basictypegenerators.CollectionGenerator;
 import org.laoruga.dtogenerator.generators.basictypegenerators.IConfigDto;
 
 import java.util.HashMap;
@@ -19,16 +20,22 @@ public class TypeGeneratorBuildersConfig {
     Map<Class<? extends IGeneratorBuilder>, IConfigDto> configMap = new HashMap<>();
     Map<Class<? extends IGeneratorBuilder>, Map<Class<?>, IConfigDto>> doubleKeyConfigMap = new HashMap<>();
 
-    protected void setConfig(Class<? extends IGeneratorBuilder> collectionGenBuilderClass,
-                             Class<?> superTypeClass,
-                             IConfigDto configDto) {
-        doubleKeyConfigMap.putIfAbsent(collectionGenBuilderClass, new HashMap<>());
-        doubleKeyConfigMap.get(collectionGenBuilderClass).put(superTypeClass, configDto);
+    public void setConfig(IConfigDto configDto) {
+        setConfig(configDto.getBuilderClass(), configDto);
     }
 
-    protected void setConfig(Class<? extends IGeneratorBuilder> genBuilderClass,
-                             IConfigDto configDto) {
+    void setConfig(Class<? extends IGeneratorBuilder> genBuilderClass, IConfigDto configDto) {
+        if (genBuilderClass.isAssignableFrom(CollectionGenerator.CollectionGeneratorBuilder.class)) {
+            throw new DtoGeneratorException("For collection builder configuration use 'setCollectionConfig' method.");
+        }
         configMap.put(genBuilderClass, configDto);
+    }
+
+    public void setCollectionConfig(Class<?> superTypeClass,
+                                    IConfigDto configDto) {
+        Class<? extends IGeneratorBuilder> genBuilderClass = configDto.getBuilderClass();
+        doubleKeyConfigMap.putIfAbsent(genBuilderClass, new HashMap<>());
+        doubleKeyConfigMap.get(genBuilderClass).put(superTypeClass, configDto);
     }
 
     public IConfigDto getConfig(Class<?> builderClass) {
@@ -37,6 +44,10 @@ public class TypeGeneratorBuildersConfig {
 
     public IConfigDto getConfig(Class<?> builderClass, Class<?> generatedType) {
         IConfigDto configDto = null;
+
+        if (configMap.containsKey(builderClass)) {
+            configDto = configMap.get(builderClass);
+        }
 
         if (doubleKeyConfigMap.containsKey(builderClass)) {
 

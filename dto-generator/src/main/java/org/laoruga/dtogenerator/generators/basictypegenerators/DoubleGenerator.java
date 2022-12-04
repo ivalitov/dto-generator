@@ -1,10 +1,12 @@
 package org.laoruga.dtogenerator.generators.basictypegenerators;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.math3.util.Precision;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.DoubleRule;
@@ -91,6 +93,8 @@ public class DoubleGenerator implements IGenerator<Double> {
     }
 
     @Getter
+    @Builder
+    @AllArgsConstructor
     public static class ConfigDto implements IConfigDto {
         private Double maxValue;
         private Double minValue;
@@ -105,6 +109,11 @@ public class DoubleGenerator implements IGenerator<Double> {
             this.minValue = rule.minValue();
             this.precision = rule.precision();
             this.ruleRemark = rule.ruleRemark();
+        }
+
+        @Override
+        public Class<? extends IGeneratorBuilder> getBuilderClass() {
+            return DoubleGeneratorBuilder.class;
         }
 
         public void merge(IConfigDto from) {

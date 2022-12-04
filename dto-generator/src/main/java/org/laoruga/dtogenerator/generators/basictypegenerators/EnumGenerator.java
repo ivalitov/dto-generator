@@ -2,6 +2,7 @@ package org.laoruga.dtogenerator.generators.basictypegenerators;
 
 import lombok.*;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.EnumRule;
@@ -125,6 +126,11 @@ public class EnumGenerator implements IGenerator<Enum<?>> {
         }
 
         public ConfigDto() {}
+
+        @Override
+        public Class<? extends IGeneratorBuilder> getBuilderClass() {
+            return EnumGeneratorBuilder.class;
+        }
 
         public void merge(IConfigDto from) {
             ConfigDto configDto = (ConfigDto) from;

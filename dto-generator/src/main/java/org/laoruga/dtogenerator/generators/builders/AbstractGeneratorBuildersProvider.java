@@ -12,6 +12,7 @@ import org.laoruga.dtogenerator.generators.basictypegenerators.EnumGenerator;
 import org.laoruga.dtogenerator.generators.basictypegenerators.IConfigDto;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 /**
@@ -74,11 +75,14 @@ public abstract class AbstractGeneratorBuildersProvider {
 
     protected IGenerator<?> getGenerator(Supplier<IConfigDto> configDtoSupplier,
                                          Supplier<IGeneratorBuilderConfigurable> genBuildSupplier,
-                                         FunctionTwo<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier) {
+                                         BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier,
+                                         Class<?> fieldType) {
         IGeneratorBuilderConfigurable genBuilder = genBuildSupplier.get();
 
-        IConfigDto instanceConfig = getConfiguration().getGenBuildersConfig().getConfig(genBuilder.getClass());
-        IConfigDto staticConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig().getConfig(genBuilder.getClass());
+        IConfigDto instanceConfig = getConfiguration().getGenBuildersConfig()
+                .getConfig(genBuilder.getClass(), fieldType);
+        IConfigDto staticConfig  = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig()
+                .getConfig(genBuilder.getClass(), fieldType);
         IConfigDto config = configDtoSupplier.get();
 
         if (staticConfig != null) {
@@ -96,7 +100,7 @@ public abstract class AbstractGeneratorBuildersProvider {
         return generatorSupplier.apply(config, genBuilder);
     }
 
-    protected FunctionTwo<
+    protected BiFunction<
             IConfigDto,
             IGeneratorBuilderConfigurable,
             IGenerator<?>> enumGeneratorSupplier(Class<?> generatedType) {
@@ -114,7 +118,7 @@ public abstract class AbstractGeneratorBuildersProvider {
         };
     }
 
-    protected FunctionTwo<
+    protected BiFunction<
             IConfigDto,
             IGeneratorBuilderConfigurable,
             IGenerator<?>> collectionGeneratorSupplier(IGenerator<?> elementGenerator) {
@@ -124,17 +128,5 @@ public abstract class AbstractGeneratorBuildersProvider {
             return builder.build(config, true);
 
         };
-    }
-
-    public interface FunctionTwo<T, V, R> {
-
-        /**
-         * Applies this function to the given argument.
-         *
-         * @param t the function first argument
-         * @param v the function sconf argument
-         * @return the function result
-         */
-        R apply(T t, V v);
     }
 }

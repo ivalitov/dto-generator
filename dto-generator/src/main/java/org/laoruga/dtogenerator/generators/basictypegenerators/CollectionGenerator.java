@@ -1,11 +1,13 @@
 package org.laoruga.dtogenerator.generators.basictypegenerators;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.ListRule;
@@ -134,6 +136,8 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
     }
 
     @Getter
+    @Builder
+    @AllArgsConstructor
     public static class ConfigDto implements IConfigDto {
         private Integer minSize;
         private Integer maxSize;
@@ -175,6 +179,11 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
             if (from.getCollectionInstance() != null) this.collectionInstance = from.getCollectionInstance();
             if (from.getElementGenerator() != null) this.elementGenerator = from.getElementGenerator();
             if (from.getRuleRemark() != null) this.ruleRemark = from.getRuleRemark();
+        }
+
+        @Override
+        public Class<? extends IGeneratorBuilder> getBuilderClass() {
+            return CollectionGeneratorBuilder.class;
         }
 
         @Override

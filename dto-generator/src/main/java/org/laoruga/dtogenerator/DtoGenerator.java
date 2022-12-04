@@ -107,7 +107,11 @@ public class DtoGenerator<T> {
         if (getFieldGeneratorMap().isEmpty()) {
             log.debug("Generators not found");
         } else {
-            log.debug(getFieldGeneratorMap().size() + " generators was created for fields: " + getFieldGeneratorMap().keySet());
+            final AtomicInteger idx = new AtomicInteger(0);
+            log.debug(getFieldGeneratorMap().size() + " generators was created for fields: \n" +
+                    getFieldGeneratorMap().keySet().stream()
+                            .map(i -> idx.incrementAndGet() + ". " + i)
+                            .collect(Collectors.joining("\n")));
         }
     }
 }
