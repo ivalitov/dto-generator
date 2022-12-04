@@ -17,12 +17,10 @@ import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersProviderByT
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 import static org.laoruga.dtogenerator.util.ReflectionUtils.getDefaultMethodValue;
 
 /**
@@ -167,8 +165,14 @@ public class GeneratorsProvider<T> {
                             generatorRemarksProvider.getBasicRuleRemark(field.getName()) : null);
             byAnnotation.setDtoInstance(dtoInstance);
             byAnnotation.setRuleInfo(ruleInfo);
-            byAnnotation.setGenBuildersTree(getGeneratorBuildersTree());
-            byAnnotation.setFieldPathFromRoot(fieldsFromRoot);
+            byAnnotation.setNestedDtoGeneratorSupplier(() -> {
+                        String[] pathToNestedDtoField = Arrays.copyOf(fieldsFromRoot, fieldsFromRoot.length + 1);
+                        pathToNestedDtoField[fieldsFromRoot.length] = field.getName();
+                        DtoGeneratorBuilder<?> nestedDtoGeneratorBuilder = generatorBuildersTree.getBuilder(pathToNestedDtoField);
+                        nestedDtoGeneratorBuilder.getGeneratorsProvider().setDtoInstance(createInstance(field.getType()));
+                        return nestedDtoGeneratorBuilder.build();
+                    }
+            );
         }
     }
 

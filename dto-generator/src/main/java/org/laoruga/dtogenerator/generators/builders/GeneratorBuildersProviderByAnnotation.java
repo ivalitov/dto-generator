@@ -17,6 +17,7 @@ import org.laoruga.dtogenerator.util.ReflectionUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static org.laoruga.dtogenerator.constants.BasicRuleRemark.NULL_VALUE;
 import static org.laoruga.dtogenerator.util.ReflectionUtils.createCollectionInstance;
@@ -27,6 +28,22 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createCollectionInst
  */
 @Slf4j
 public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuildersProvider {
+
+    private final GeneratorBuildersProviderByType generatorBuildersProviderByType;
+    private final GeneratorRemarksProvider generatorRemarksProvider;
+    private final GeneratorBuildersHolder userGeneratorBuildersHolder;
+    private final GeneratorBuildersHolder defaultGeneratorBuildersHolder = DefaultGeneratorBuilders.getInstance();
+
+    @Setter
+    volatile private Field field;
+    @Setter
+    volatile private Object dtoInstance;
+    @Setter
+    volatile private IRuleInfo ruleInfo;
+    @Setter
+    volatile private Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier;
+    volatile private Class<?> generatedTypeOrCollectionElementType;
+
     public GeneratorBuildersProviderByAnnotation(DtoGeneratorInstanceConfig configuration,
                                                  GeneratorBuildersProviderByType generatorBuildersProviderByType,
                                                  GeneratorRemarksProvider generatorRemarksProvider,
@@ -36,23 +53,6 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
         this.generatorRemarksProvider = generatorRemarksProvider;
         this.userGeneratorBuildersHolder = userGeneratorBuildersHolder;
     }
-
-    private final GeneratorBuildersProviderByType generatorBuildersProviderByType;
-    private final GeneratorRemarksProvider generatorRemarksProvider;
-    private final GeneratorBuildersHolder userGeneratorBuildersHolder;
-    private final GeneratorBuildersHolder defaultlGeneratorBuildersHolder = DefaultGeneratorBuilders.getInstance();
-
-    @Setter
-    volatile private Field field;
-    @Setter
-    volatile private Object dtoInstance;
-    @Setter
-    volatile private IRuleInfo ruleInfo;
-    @Setter
-    volatile private DtoGeneratorBuilder.GeneratorBuildersTree genBuildersTree;
-    @Setter
-    volatile private String[] fieldPathFromRoot;
-    volatile private Class<?> generatedTypeOrCollectionElementType;
 
     public Optional<IGenerator<?>> selectOrCreateGenerator() {
 
@@ -150,7 +150,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
     }
 
     private IGeneratorBuilder getDefaultGenBuilder(Annotation rules, Class<?> generatedType) {
-        return defaultlGeneratorBuildersHolder.getBuilder(rules, generatedType)
+        return defaultGeneratorBuildersHolder.getBuilder(rules, generatedType)
                 .orElseThrow(() -> new DtoGeneratorException("General generator builder not found. Rules: '" + rules + "'"
                         + ", Genrated type: '" + generatedType + "'"));
     }
@@ -359,9 +359,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
     private IGenerator<?> getNestedDtoGenerator(NestedDtoGenerator.NestedDtoGeneratorBuilder builder) {
         return builder
-                .setGeneratorBuildersTree(genBuildersTree)
-                .setField(field)
-                .setFieldsPath(fieldPathFromRoot)
+                .setNestedDtoGeneratorSupplier(nestedDtoGeneratorSupplier)
                 .build();
     }
 

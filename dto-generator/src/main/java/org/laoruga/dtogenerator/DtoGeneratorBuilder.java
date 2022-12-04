@@ -1,9 +1,6 @@
 package org.laoruga.dtogenerator;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.math3.util.Pair;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWrapper;
@@ -13,8 +10,6 @@ import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
-
-import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 
 /**
  * 1. ок - Basic remark applicable to any field marked with simple rules
@@ -39,6 +34,7 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 public class DtoGeneratorBuilder<T> {
 
     private final DtoGeneratorInstanceConfig configuration;
+    @Getter(AccessLevel.PROTECTED)
     private final GeneratorsProvider<T> generatorsProvider;
     private final GeneratorBuildersTree generatorBuildersTree;
     private final FieldGroupFilter fieldGroupFilter;
@@ -176,13 +172,6 @@ public class DtoGeneratorBuilder<T> {
      */
     public DtoGenerator<T> build() {
         return new DtoGenerator<>(generatorsProvider, this);
-    }
-
-    //TODO move it from this
-    public DtoGenerator<?> buildNestedFieldGenerator(String[] pathToNestedDtoField, Class<?> generatedType) {
-        DtoGeneratorBuilder<?> nestedDtoGenBuilder = getBuilderFromTreeOrThis(pathToNestedDtoField);
-        nestedDtoGenBuilder.generatorsProvider.setDtoInstance(createInstance(generatedType));
-        return nestedDtoGenBuilder.build();
     }
 
     private DtoGeneratorBuilder<?> getBuilderFromTreeOrThis(String[] pathToField) {
