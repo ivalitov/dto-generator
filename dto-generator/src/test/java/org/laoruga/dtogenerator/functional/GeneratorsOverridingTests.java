@@ -10,6 +10,7 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
 import org.laoruga.dtogenerator.functional.data.dtoclient.ClientType;
 import org.laoruga.dtogenerator.functional.util.TestUtils;
@@ -269,8 +270,8 @@ class GeneratorsOverridingTests {
     }
 
     @Test
-    @DisplayName("Overridden configs of known type generators")
-    void overriddenConfig() {
+    @DisplayName("Overridden instance configs of known type generators")
+    void overriddenInstanceConfig() {
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
         TypeGeneratorBuildersConfig gensConfig = builder.getUserConfig().getGenBuildersConfig();
 
@@ -335,6 +336,55 @@ class GeneratorsOverridingTests {
 
         log.info(TestUtils.toJson(dto));
 
+        assertOverriddenConfig(dto);
+    }
+
+    @Test
+    @DisplayName("Overridden static config of known type generators")
+    void overriddenStaticConfig() {
+        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
+        TypeGeneratorBuildersConfig gensConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig();
+
+        gensConfig.getStringConfig().setMinLength(1);
+        gensConfig.getStringConfig().setMaxLength(100);
+        gensConfig.getStringConfig().setRuleRemark(MIN_VALUE);
+        gensConfig.getStringConfig().setChars("x");
+
+        gensConfig.getIntegerConfig().setMinValue(-100);
+        gensConfig.getIntegerConfig().setMaxValue(1);
+        gensConfig.getIntegerConfig().setRuleRemark(MAX_VALUE);
+
+        gensConfig.getDoubleConfig().setMinValue(2D);
+        gensConfig.getDoubleConfig().setMaxValue(100D);
+        gensConfig.getDoubleConfig().setRuleRemark(MIN_VALUE);
+
+        gensConfig.getLongConfig().setMinValue(-100L);
+        gensConfig.getLongConfig().setMaxValue(3L);
+        gensConfig.getLongConfig().setRuleRemark(MAX_VALUE);
+
+        gensConfig.getLocalDateTimeConfig().setLeftShiftDays(-1);
+        gensConfig.getLocalDateTimeConfig().setRightShiftDays(100);
+        gensConfig.getLocalDateTimeConfig().setRuleRemark(MIN_VALUE);
+
+        gensConfig.getEnumConfig().setRuleRemark(MIN_VALUE);
+
+        gensConfig.getListConfig().setMinSize(2);
+        gensConfig.getListConfig().setMaxSize(100);
+        gensConfig.getListConfig().setCollectionInstance(LinkedList::new);
+        gensConfig.getListConfig().setRuleRemark(MIN_VALUE);
+
+        gensConfig.getSetConfig().setMinSize(0);
+        gensConfig.getSetConfig().setMaxSize(1);
+        gensConfig.getSetConfig().setRuleRemark(MAX_VALUE);
+
+        Dto dto = builder.build().generateDto();
+
+        log.info(TestUtils.toJson(dto));
+
+        assertOverriddenConfig(dto);
+    }
+
+    public void assertOverriddenConfig(Dto dto) {
         assertAll(
                 () -> assertThat(dto.getString(), equalTo("x")),
                 () -> assertThat(dto.getInteger(), equalTo(1)),
@@ -365,7 +415,6 @@ class GeneratorsOverridingTests {
 
                 () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue())
         );
-
     }
 
     static class NumberGenerator implements ICustomGeneratorArgs<Integer> {

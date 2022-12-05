@@ -112,12 +112,11 @@ public class EnumGenerator implements IGenerator<Enum<?>> {
 
     @Builder
     @Getter
+    @Setter
     @AllArgsConstructor
     public static class ConfigDto implements IConfigDto{
         private String[] possibleEnumNames;
-        @Setter
         private Class<? extends Enum> enumClass;
-        @Setter
         private IRuleRemark ruleRemark;
 
         public ConfigDto(EnumRule enumRule) {

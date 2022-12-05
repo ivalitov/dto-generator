@@ -91,6 +91,7 @@ public class LocalDateTimeGenerator implements IGenerator<LocalDateTime> {
 
     @Builder
     @Getter
+    @Setter
     @AllArgsConstructor
     public static class ConfigDto implements IConfigDto {
         private Integer leftShiftDays;

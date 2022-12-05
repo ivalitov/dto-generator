@@ -85,12 +85,12 @@ public class IntegerGenerator implements IGenerator<Integer> {
 
     @Builder
     @Getter
+    @Setter
     @AllArgsConstructor
     public static class ConfigDto implements IConfigDto {
 
         private Integer maxValue;
         private Integer minValue;
-        @Setter
         private IRuleRemark ruleRemark;
 
         public ConfigDto(IntegerRule rule) {

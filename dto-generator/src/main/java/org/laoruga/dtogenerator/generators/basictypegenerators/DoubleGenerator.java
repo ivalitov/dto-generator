@@ -93,13 +93,13 @@ public class DoubleGenerator implements IGenerator<Double> {
     }
 
     @Getter
+    @Setter
     @Builder
     @AllArgsConstructor
     public static class ConfigDto implements IConfigDto {
         private Double maxValue;
         private Double minValue;
         private Integer precision;
-        @Setter
         private IRuleRemark ruleRemark;
 
         public ConfigDto() {}

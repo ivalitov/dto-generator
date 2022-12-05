@@ -3,11 +3,12 @@ package org.laoruga.dtogenerator.config;
 import lombok.Getter;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generators.basictypegenerators.CollectionGenerator;
-import org.laoruga.dtogenerator.generators.basictypegenerators.IConfigDto;
+import org.laoruga.dtogenerator.generators.basictypegenerators.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Il'dar Valitov
@@ -65,4 +66,77 @@ public class TypeGeneratorBuildersConfig {
         }
         return configDto;
     }
+
+    public StringGenerator.ConfigDto getStringConfig() {
+        IConfigDto config = getConfig(StringGenerator.StringGeneratorBuilder.class);
+        if (config == null) {
+            config = new StringGenerator.ConfigDto();
+            setConfig(config);
+        }
+        return (StringGenerator.ConfigDto) config;
+    }
+
+    public IntegerGenerator.ConfigDto getIntegerConfig() {
+        IConfigDto config = getConfig(IntegerGenerator.IntegerGeneratorBuilder.class);
+        if (config == null) {
+            config = new IntegerGenerator.ConfigDto();
+            setConfig(config);
+        }
+        return (IntegerGenerator.ConfigDto) config;
+    }
+
+    public LongGenerator.ConfigDto getLongConfig() {
+        IConfigDto config = getConfig(LongGenerator.LongGeneratorBuilder.class);
+        if (config == null) {
+            config = new LongGenerator.ConfigDto();
+            setConfig(config);
+        }
+        return (LongGenerator.ConfigDto) getConfig(LongGenerator.LongGeneratorBuilder.class);
+    }
+
+    public DoubleGenerator.ConfigDto getDoubleConfig() {
+        IConfigDto config = getConfig(DoubleGenerator.DoubleGeneratorBuilder.class);
+        if (config == null) {
+            config = new DoubleGenerator.ConfigDto();
+            setConfig(config);
+        }
+        return (DoubleGenerator.ConfigDto) config;
+    }
+
+    public LocalDateTimeGenerator.ConfigDto getLocalDateTimeConfig() {
+        IConfigDto config = getConfig(LocalDateTimeGenerator.LocalDateTimeGeneratorBuilder.class);
+        if (config == null) {
+            config = new LocalDateTimeGenerator.ConfigDto();
+            setConfig(config);
+        }
+        return (LocalDateTimeGenerator.ConfigDto) config;
+    }
+
+    public EnumGenerator.ConfigDto getEnumConfig() {
+        IConfigDto config = getConfig(EnumGenerator.EnumGeneratorBuilder.class);
+        if (config == null) {
+            config = new EnumGenerator.ConfigDto();
+            setConfig(config);
+        }
+        return (EnumGenerator.ConfigDto) getConfig(EnumGenerator.EnumGeneratorBuilder.class);
+    }
+
+    public CollectionGenerator.ConfigDto getListConfig() {
+        IConfigDto config = getConfig(CollectionGenerator.CollectionGeneratorBuilder.class, List.class);
+        if (config == null) {
+            config = new CollectionGenerator.ConfigDto();
+            setCollectionConfig(List.class, config);
+        }
+        return (CollectionGenerator.ConfigDto) config;
+    }
+
+    public CollectionGenerator.ConfigDto getSetConfig() {
+        IConfigDto config = getConfig(CollectionGenerator.CollectionGeneratorBuilder.class, Set.class);
+        if (config == null) {
+            config = new CollectionGenerator.ConfigDto();
+            setCollectionConfig(Set.class, config);
+        }
+        return (CollectionGenerator.ConfigDto) config;
+    }
+
 }

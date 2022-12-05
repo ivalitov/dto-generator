@@ -85,12 +85,12 @@ public class LongGenerator implements IGenerator<Long> {
     }
 
     @Builder
+    @Setter
     @Getter
     @AllArgsConstructor
     public static class ConfigDto implements IConfigDto{
         private Long maxValue;
         private Long minValue;
-        @Setter
         private IRuleRemark ruleRemark;
 
         public ConfigDto(LongRule rule) {

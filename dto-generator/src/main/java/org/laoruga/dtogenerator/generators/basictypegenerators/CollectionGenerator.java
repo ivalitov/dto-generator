@@ -136,6 +136,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
     }
 
     @Getter
+    @Setter
     @Builder
     @AllArgsConstructor
     public static class ConfigDto implements IConfigDto {
@@ -143,7 +144,6 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
         private Integer maxSize;
         private Supplier<Collection<?>> collectionInstance;
         private IGenerator<Object> elementGenerator;
-        @Setter
         private IRuleRemark ruleRemark;
 
         public ConfigDto() {

@@ -139,6 +139,7 @@ public class StringGenerator implements IGenerator<String> {
 
     @Builder
     @Getter
+    @Setter
     @AllArgsConstructor
     public static class ConfigDto implements IConfigDto {
 
@@ -146,8 +147,6 @@ public class StringGenerator implements IGenerator<String> {
         private Integer minLength;
         private String[] words;
         private String chars;
-
-        @Setter
         private IRuleRemark ruleRemark;
         private String regexp;
 
