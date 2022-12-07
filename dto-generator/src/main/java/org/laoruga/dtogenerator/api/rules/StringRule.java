@@ -20,11 +20,10 @@ public @interface StringRule {
 
     String DEFAULT_REGEXP = "";
 
-    int minSymbols() default 0;
+    int minLength() default 0;
 
-    int maxSymbols() default 1000;
+    int maxLength() default 1000;
 
-    // TODO realize
     String[] words() default {};
 
     String chars() default CharSet.DEFAULT_CHARSET;

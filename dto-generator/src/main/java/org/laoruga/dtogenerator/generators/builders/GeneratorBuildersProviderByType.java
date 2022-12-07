@@ -1,6 +1,7 @@
 package org.laoruga.dtogenerator.generators.builders;
 
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
@@ -23,6 +24,7 @@ import java.util.function.BiFunction;
  * @author Il'dar Valitov
  * Created on 24.11.2022
  */
+@Slf4j
 public class GeneratorBuildersProviderByType extends AbstractGeneratorBuildersProvider {
 
     private final GeneratorBuildersHolder userGeneratorBuilders;
@@ -30,7 +32,8 @@ public class GeneratorBuildersProviderByType extends AbstractGeneratorBuildersPr
     @Setter
     private Field field;
 
-    public GeneratorBuildersProviderByType(DtoGeneratorInstanceConfig configuration, GeneratorBuildersHolder userGeneratorBuilders) {
+    public GeneratorBuildersProviderByType(DtoGeneratorInstanceConfig configuration,
+                                           GeneratorBuildersHolder userGeneratorBuilders) {
         super(configuration);
         this.userGeneratorBuilders = userGeneratorBuilders;
     }
@@ -50,11 +53,9 @@ public class GeneratorBuildersProviderByType extends AbstractGeneratorBuildersPr
 
     Optional<IGenerator<?>> selectOrCreateGenerator(Class<?> generatedType) {
         Optional<IGeneratorBuilder> maybeBuilder = userGeneratorBuilders.getBuilder(generatedType);
-        if (maybeBuilder.isPresent()) {
-            return Optional.of(maybeBuilder.get().build());
+        if (!maybeBuilder.isPresent()) {
+            maybeBuilder = generalGeneratorBuilders.getBuilder(generatedType);
         }
-
-        maybeBuilder = generalGeneratorBuilders.getBuilder(generatedType);
 
         IGenerator<?> generator = null;
 
@@ -81,12 +82,15 @@ public class GeneratorBuildersProviderByType extends AbstractGeneratorBuildersPr
                     generatorSupplier = (config, builder) -> builder.build(config, true);
                 }
 
+                //TODO нужна копия конфига иначе но будет меняться
                 generator = getGenerator(
                         () -> TypeGeneratorBuildersDefaultConfig.getInstance()
                                 .getConfig(genBuilder.getClass(), getGeneratedType()),
                         () -> (IGeneratorBuilderConfigurable) genBuilder,
                         generatorSupplier,
                         getFieldType());
+            } else {
+                log.debug("Unknown generator builder found by field type, trying to build 'as is' without configuring.");
             }
         }
 

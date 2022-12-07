@@ -36,7 +36,7 @@ import static org.laoruga.dtogenerator.constants.Group.GROUP_1;
 class RulesInfoExtractorTests {
 
     static class Dto {
-        @StringRule(minSymbols = 1, maxSymbols = 1, chars = CharSet.NUM)
+        @StringRule(minLength = 1, maxLength = 1, chars = CharSet.NUM)
         String string;
         @IntegerRule
         int integer;

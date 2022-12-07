@@ -169,7 +169,7 @@ class RulesGroupingTests {
     @NoArgsConstructor
     static class DtoAllRules {
 
-        @StringRule(group = GROUP_1, minSymbols = 1, maxSymbols = 1, chars = NUM)
+        @StringRule(group = GROUP_1, minLength = 1, maxLength = 1, chars = NUM)
         @StringRule(chars = ENG)
         private String string;
 

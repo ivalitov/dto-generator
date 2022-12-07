@@ -14,6 +14,8 @@ import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
+import java.util.Objects;
+
 /**
  * @author Il'dar Valitov
  * Created on 19.05.2022
@@ -79,7 +81,7 @@ public class StringGenerator implements IGenerator<String> {
 
     public static final class StringGeneratorBuilder implements IGeneratorBuilderConfigurable {
 
-        private ConfigDto configDto;
+        private final ConfigDto configDto;
 
         private StringGeneratorBuilder() {
             this.configDto = new ConfigDto();
@@ -130,7 +132,7 @@ public class StringGenerator implements IGenerator<String> {
                     stringConfigDto.minLength,
                     stringConfigDto.chars.toCharArray(),
                     stringConfigDto.words,
-                    stringConfigDto.ruleRemark,
+                    Objects.requireNonNull(stringConfigDto.ruleRemark, "Rule remark not set."),
                     stringConfigDto.regexp
             );
         }
@@ -151,8 +153,8 @@ public class StringGenerator implements IGenerator<String> {
         private String regexp;
 
         public ConfigDto(StringRule stringRule) {
-            this.maxLength = stringRule.maxSymbols();
-            this.minLength = stringRule.minSymbols();
+            this.maxLength = stringRule.maxLength();
+            this.minLength = stringRule.minLength();
             this.words = stringRule.words();
             this.chars = stringRule.chars();
             this.ruleRemark = stringRule.ruleRemark();

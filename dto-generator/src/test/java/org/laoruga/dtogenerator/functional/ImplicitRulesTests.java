@@ -63,8 +63,8 @@ public class ImplicitRulesTests {
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getString().length(), both(
-                        greaterThanOrEqualTo(RulesInstance.stringRule.minSymbols()))
-                        .and(lessThanOrEqualTo(RulesInstance.stringRule.maxSymbols()))),
+                        greaterThanOrEqualTo(RulesInstance.stringRule.minLength()))
+                        .and(lessThanOrEqualTo(RulesInstance.stringRule.maxLength()))),
                 () -> assertThat(dto.getInteger(), both(
                         greaterThanOrEqualTo(RulesInstance.integerRule.minValue()))
                         .and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue()))),

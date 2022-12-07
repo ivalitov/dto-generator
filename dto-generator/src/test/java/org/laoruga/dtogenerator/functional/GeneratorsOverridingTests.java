@@ -3,13 +3,17 @@ package org.laoruga.dtogenerator.functional;
 import io.qameta.allure.Epic;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.config.DtoGeneratorConfig;
+import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
 import org.laoruga.dtogenerator.functional.data.dtoclient.ClientType;
@@ -18,10 +22,12 @@ import org.laoruga.dtogenerator.generators.GeneratorBuilders;
 import org.laoruga.dtogenerator.generators.basictypegenerators.*;
 
 import java.beans.Transient;
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -75,6 +81,9 @@ class GeneratorsOverridingTests {
         @NestedDtoRule
         InnerDto innerDto;
 
+        @CustomRule(generatorClass = CustomIntegerGenerator.class, args = "888")
+        Integer customInteger;
+
         Map<String, Integer> stringIntegerMap;
 
         public String getLocalDateTime() {
@@ -123,6 +132,9 @@ class GeneratorsOverridingTests {
 
         Map<String, Integer> stringIntegerMap;
 
+        @CustomRule(generatorClass = CustomIntegerGenerator.class, args = "999")
+        Integer customInteger;
+
         public String getLocalDateTime() {
             return localDateTime.toString();
         }
@@ -146,10 +158,10 @@ class GeneratorsOverridingTests {
                 .setGeneratorBuilder(DoubleRule.class, GeneratorBuilders.doubleBuilder().minValue(3D).maxValue(3D))
                 .setGeneratorBuilder(LocalDateTimeRule.class, GeneratorBuilders.localDateTimeBuilder().leftShiftDays(0).rightShiftDays(0))
                 .setGeneratorBuilder(EnumRule.class, GeneratorBuilders.enumBuilder().possibleEnumNames("PERSON"))
-                .setCollectionGeneratorBuilder(ListRule.class, GeneratorBuilders.listBuilder()
+                .setGeneratorBuilder(ListRule.class, GeneratorBuilders.listBuilder()
                         .collectionInstance(LinkedList::new)
                         .minSize(1).maxSize(1))
-                .setCollectionGeneratorBuilder(SetRule.class, GeneratorBuilders.setBuilder()
+                .setGeneratorBuilder(SetRule.class, GeneratorBuilders.setBuilder()
                         .collectionInstance(HashSet::new)
                         .minSize(1).maxSize(1));
 
@@ -170,7 +182,9 @@ class GeneratorsOverridingTests {
                 () -> assertThat(dto.getLinkedListOfEnum(), equalTo(new LinkedList<>(Arrays.asList(ClientType.PERSON)))),
 
                 () -> assertThat(dto.getInnerDto(), notNullValue()),
-                () -> assertThat(dto.getStringIntegerMap(), nullValue())
+                () -> assertThat(dto.getStringIntegerMap(), nullValue()),
+
+                () -> assertThat(dto.getCustomInteger(), equalTo(888))
         );
 
         assertAll(
@@ -185,7 +199,9 @@ class GeneratorsOverridingTests {
                 () -> assertThat(dto.getInnerDto().getSetOfInteger(), equalTo(new HashSet<>(Arrays.asList(1)))),
                 () -> assertThat(dto.getInnerDto().getLinkedListOfEnum(), equalTo(new LinkedList<>(Arrays.asList(ClientType.PERSON)))),
 
-                () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue())
+                () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue()),
+
+                () -> assertThat(dto.getInnerDto().getCustomInteger(), equalTo(999))
         );
     }
 
@@ -200,15 +216,15 @@ class GeneratorsOverridingTests {
                 .setGeneratorBuilder("aDouble", GeneratorBuilders.doubleBuilder().minValue(3D).maxValue(3D))
                 .setGeneratorBuilder("localDateTime", GeneratorBuilders.localDateTimeBuilder().leftShiftDays(0).rightShiftDays(0))
                 .setGeneratorBuilder("clientType", GeneratorBuilders.enumBuilder().possibleEnumNames("PERSON"))
-                .setCollectionGeneratorBuilder("listOfString", GeneratorBuilders.listBuilder()
+                .setGeneratorBuilder("listOfString", GeneratorBuilders.listBuilder()
                         .collectionInstance(LinkedList::new)
                         .elementGenerator(() -> "yyy")
                         .minSize(1).maxSize(1))
-                .setCollectionGeneratorBuilder("setOfLong", GeneratorBuilders.setBuilder()
+                .setGeneratorBuilder("setOfLong", GeneratorBuilders.setBuilder()
                         .elementGenerator(() -> 2L)
                         .collectionInstance(HashSet::new)
                         .minSize(1).maxSize(1))
-                .setCollectionGeneratorBuilder("linkedListOfEnum", GeneratorBuilders.setBuilder()
+                .setGeneratorBuilder("linkedListOfEnum", GeneratorBuilders.setBuilder()
                         .elementGenerator(() -> ClientType.LEGAL_PERSON)
                         .collectionInstance(LinkedList::new)
                         .minSize(1).maxSize(1))
@@ -219,15 +235,15 @@ class GeneratorsOverridingTests {
                 .setGeneratorBuilder("innerDto.aDouble", GeneratorBuilders.doubleBuilder().minValue(5D).maxValue(5D))
                 .setGeneratorBuilder("innerDto.localDateTime", GeneratorBuilders.localDateTimeBuilder().leftShiftDays(1).rightShiftDays(-1))
                 .setGeneratorBuilder("innerDto.clientType", GeneratorBuilders.enumBuilder().possibleEnumNames("ORG"))
-                .setCollectionGeneratorBuilder("innerDto.listOfDouble", GeneratorBuilders.listBuilder()
+                .setGeneratorBuilder("innerDto.listOfDouble", GeneratorBuilders.listBuilder()
                         .collectionInstance(CopyOnWriteArrayList::new)
                         .elementGenerator(() -> 99.99D)
                         .minSize(1).maxSize(1))
-                .setCollectionGeneratorBuilder("innerDto.setOfInteger", GeneratorBuilders.setBuilder()
+                .setGeneratorBuilder("innerDto.setOfInteger", GeneratorBuilders.setBuilder()
                         .elementGenerator(() -> 12345)
                         .collectionInstance(LinkedHashSet::new)
                         .minSize(1).maxSize(1))
-                .setCollectionGeneratorBuilder("innerDto.linkedListOfEnum", GeneratorBuilders.setBuilder()
+                .setGeneratorBuilder("innerDto.linkedListOfEnum", GeneratorBuilders.setBuilder()
                         .elementGenerator(() -> ClientType.ORG)
                         .collectionInstance(LinkedList::new)
                         .minSize(1).maxSize(1));
@@ -249,7 +265,9 @@ class GeneratorsOverridingTests {
                 () -> assertThat(dto.getLinkedListOfEnum(), equalTo(new LinkedList<>(Arrays.asList(ClientType.LEGAL_PERSON)))),
 
                 () -> assertThat(dto.getInnerDto(), notNullValue()),
-                () -> assertThat(dto.getStringIntegerMap(), nullValue())
+                () -> assertThat(dto.getStringIntegerMap(), nullValue()),
+
+                () -> assertThat(dto.getCustomInteger(), equalTo(888))
         );
 
         assertAll(
@@ -264,7 +282,9 @@ class GeneratorsOverridingTests {
                 () -> assertThat(dto.getInnerDto().getSetOfInteger(), equalTo(new LinkedHashSet<>(Arrays.asList(12345)))),
                 () -> assertThat(dto.getInnerDto().getLinkedListOfEnum(), equalTo(new LinkedList<>(Arrays.asList(ClientType.ORG)))),
 
-                () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue())
+                () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue()),
+
+                () -> assertThat(dto.getInnerDto().getCustomInteger(), equalTo(999))
         );
 
     }
@@ -398,7 +418,10 @@ class GeneratorsOverridingTests {
                 () -> assertThat(dto.getLinkedListOfEnum(), equalTo(new LinkedList<>(Arrays.asList(ClientType.ORG, ClientType.ORG)))),
 
                 () -> assertThat(dto.getInnerDto(), notNullValue()),
-                () -> assertThat(dto.getStringIntegerMap(), nullValue())
+                () -> assertThat(dto.getStringIntegerMap(), nullValue()),
+
+                () -> assertThat(dto.getCustomInteger(), equalTo(888))
+
         );
 
         assertAll(
@@ -413,15 +436,229 @@ class GeneratorsOverridingTests {
                 () -> assertThat(dto.getInnerDto().getSetOfInteger(), equalTo(new HashSet<>(Arrays.asList(1)))),
                 () -> assertThat(dto.getInnerDto().getLinkedListOfEnum(), equalTo(new LinkedList<>(Arrays.asList(ClientType.ORG, ClientType.ORG)))),
 
-                () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue())
+                () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue()),
+
+                () -> assertThat(dto.getInnerDto().getCustomInteger(), equalTo(999))
         );
     }
 
-    static class NumberGenerator implements ICustomGeneratorArgs<Integer> {
+    @Test
+    @DisplayName("Overridden builders by annotations. Not known type generators")
+    void overriddenInstanceAndStaticConfig() {
+
+        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class)
+                .setGeneratorBuilder(StringRule.class, () -> () -> "string")
+                .setGeneratorBuilder(IntegerRule.class, () -> () -> 1)
+                .setGeneratorBuilder(LongRule.class, () -> () -> 2L)
+                .setGeneratorBuilder(DoubleRule.class, () -> () -> 3D)
+                .setGeneratorBuilder(LocalDateTimeRule.class, () -> LocalDateTime::now)
+                .setGeneratorBuilder(EnumRule.class, () -> () -> ClientType.ORG)
+                .setGeneratorBuilder(ListRule.class, () -> LinkedList::new)
+                .setGeneratorBuilder(SetRule.class, () -> HashSet::new);
+
+        Dto dto = builder.build().generateDto();
+
+        log.info(TestUtils.toJson(dto));
+
+        assertAll(
+                () -> assertThat(dto.getString(), equalTo("string")),
+                () -> assertThat(dto.getInteger(), equalTo(1)),
+                () -> assertThat(dto.getALong(), equalTo(2L)),
+                () -> assertThat(dto.getADouble(), equalTo(3D)),
+                () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now())),
+                () -> assertThat(dto.getClientType(), equalTo(ClientType.ORG)),
+
+                () -> assertThat(dto.getListOfString(), empty()),
+                () -> assertThat(dto.getSetOfLong(), empty()),
+                () -> assertThat(dto.getLinkedListOfEnum(), empty()),
+
+                () -> assertThat(dto.getInnerDto(), notNullValue()),
+                () -> assertThat(dto.getStringIntegerMap(), nullValue()),
+
+                () -> assertThat(dto.getCustomInteger(), equalTo(888))
+        );
+
+        assertAll(
+                () -> assertThat(dto.getInnerDto().getString(), equalTo("string")),
+                () -> assertThat(dto.getInnerDto().getInteger(), equalTo(1)),
+                () -> assertThat(dto.getInnerDto().getALong(), equalTo(2L)),
+                () -> assertThat(dto.getInnerDto().getADouble(), equalTo(3D)),
+                () -> assertThat(dto.getInnerDto().getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now())),
+                () -> assertThat(dto.getInnerDto().getClientType(), equalTo(ClientType.ORG)),
+
+                () -> assertThat(dto.getInnerDto().getListOfDouble(), empty()),
+                () -> assertThat(dto.getInnerDto().getSetOfInteger(), empty()),
+                () -> assertThat(dto.getInnerDto().getLinkedListOfEnum(), empty()),
+
+                () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue()),
+
+                () -> assertThat(dto.getInnerDto().getCustomInteger(), equalTo(999))
+        );
+    }
+
+    @Getter
+    @NoArgsConstructor
+    static class DtoDifferent {
+
+        @StringRule
+        String stringWithEmptyRule;
+
+        @StringRule(minLength = 3, maxLength = 3, ruleRemark = MIN_VALUE)
+        String stringWithFullRule;
+
+        String stringWithoutRule;
+
+        @IntegerRule(minValue = 2)
+        Integer integerWithRule;
+
+        @IntegerRule
+        Integer integerWithEmptyRule;
+
+        @ListRule
+        @StringRule
+        List<String> listOfStringWithEmptyRule;
+
+        @SetRule(minSize = 1, maxSize = 20)
+        @StringRule
+        Set<String> setOfStringWithEmptyRule;
+    }
+
+    // TODO This case needs full coverage
+    @Test
+    @DisplayName("Overridden builders and configs combinations")
+    void overriddenBuildersAndConfigsCombination() {
+        DtoGeneratorStaticConfig.getInstance().setGenerateAllKnownTypes(true);
+        DtoGeneratorBuilder<DtoDifferent> builder = DtoGenerator.builder(DtoDifferent.class);
+
+        TypeGeneratorBuildersConfig staticConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig();
+        TypeGeneratorBuildersConfig userConfig = builder.getUserConfig().getGenBuildersConfig();
+
+        builder.setGeneratorBuilder(StringRule.class, GeneratorBuilders.stringBuilder()
+                .chars("o")
+                .minLength(1)
+                .maxLength(1)
+        );
+        userConfig.getStringConfig().setMinLength(2);
+        staticConfig.getStringConfig().setMaxLength(2);
+
+        builder.setGeneratorBuilder("integerWithRule", GeneratorBuilders.integerBuilder()
+                .maxValue(2)
+                .ruleRemark(MAX_VALUE));
+
+        userConfig.getSetConfig().setMaxSize(1);
+        userConfig.getListConfig().setMaxSize(1);
+
+        staticConfig.getIntegerConfig().setMaxValue(0);
+
+        DtoDifferent dto = builder.build().generateDto();
+
+        log.info(TestUtils.toJson(dto));
+
+        /*
+         * static config for String max = 2
+         * static config for Integer max = 0
+         *
+         * instance config for String min = 2
+         * instance config for Set max = 1
+         * instance config for List max = 1
+         */
+
+        assertAll(
+                () -> assertThat(dto.getStringWithEmptyRule(), equalTo("o")),
+                () -> assertThat(dto.getStringWithFullRule(), equalTo("o")),
+                () -> assertThat(dto.getStringWithoutRule(), equalTo("o")),
+
+                () -> assertThat(dto.getIntegerWithRule(), equalTo(2)),
+                () -> assertThat(dto.getIntegerWithEmptyRule(), equalTo(0)),
+
+                () -> assertThat(dto.getListOfStringWithEmptyRule(), equalTo(Arrays.asList("o"))),
+                () -> assertThat(dto.getSetOfStringWithEmptyRule(), equalTo(new HashSet<>(Arrays.asList("o"))))
+        );
+
+        DtoGeneratorBuilder<DtoDifferent> builder2 = DtoGenerator.builder(DtoDifferent.class);
+
+        DtoGeneratorInstanceConfig userConfig2 = builder2.getUserConfig();
+        userConfig2.getGenBuildersConfig().getIntegerConfig().setMinValue(5);
+        userConfig2.getGenBuildersConfig().getIntegerConfig().setMaxValue(5);
+        userConfig2.getGenBuildersConfig().getStringConfig().setChars("i");
+        userConfig2.getGenBuildersConfig().getSetConfig().setMaxSize(1);
+        userConfig2.getGenBuildersConfig().getSetConfig().setMinSize(1);
+        builder2.setGeneratorBuilder(ListRule.class, GeneratorBuilders.listBuilder().maxSize(1).minSize(1));
+
+        DtoDifferent dto2 = builder2.build().generateDto();
+
+        log.info(TestUtils.toJson(dto2));
+
+        /*
+         * static config did not change
+         * static config for String max = 2
+         * static config for Integer max = 0
+         *
+         * instance config for Integer min = max = 5
+         * instance config for String chars = 'i'
+         * instance config for Set min = max = 1
+         *
+         * builder of List with config min = max = 1
+         */
+
+        assertAll(
+                // static max = 2; default min = 0; default remark = RANDOM
+                () -> assertThat(dto2.getStringWithEmptyRule().length(),
+                        both(greaterThanOrEqualTo(0))
+                                .and(lessThanOrEqualTo(2))),
+
+                // annotated min = 3; annotated max = 3; annotated remark = MIN
+                () -> assertThat(dto2.getStringWithFullRule().length(), equalTo(3)),
+
+                // default min = 0; static max = 2; default remark = RANDOM
+                () -> assertThat(dto2.getStringWithoutRule(),
+                        either(equalTo(""))
+                                .or(equalTo("i"))
+                                .or(equalTo("ii"))),
+
+                // instance min = 5; instance max = 5;
+                () -> assertThat(dto2.getIntegerWithRule(), equalTo(5)),
+                () -> assertThat(dto2.getIntegerWithEmptyRule(), equalTo(5)),
+
+                // String: static max = 2; default min = 0; default remark = RANDOM
+                // List  : generator builder config min = max = 1
+                () -> assertThat(dto2.getListOfStringWithEmptyRule().getClass(), equalTo(ArrayList.class)),
+                () -> assertThat(dto2.getListOfStringWithEmptyRule().toString(),
+                        either(equalTo(Arrays.asList("").toString()))
+                                .or(equalTo(Arrays.asList("i").toString()))
+                                .or(equalTo(Arrays.asList("ii").toString()))),
+
+                // String: static max = 2; default min = 0; default remark = RANDOM
+                // Set   : instance config min = max = 1
+                () -> assertThat(dto2.getSetOfStringWithEmptyRule().getClass(), equalTo(HashSet.class)),
+                () -> assertThat(dto2.getSetOfStringWithEmptyRule().toString(),
+                        either(equalTo(Arrays.asList("").toString()))
+                                .or(equalTo(Arrays.asList("i").toString()))
+                                .or(equalTo(Arrays.asList("ii").toString())))
+
+        );
+
+
+    }
+
+    @AfterEach
+    @SneakyThrows
+    void restoreConfig() {
+        DtoGeneratorConfig config = DtoGeneratorStaticConfig.getInstance();
+        config.setGenerateAllKnownTypes(false);
+        Field configField = config.getClass().getSuperclass().getDeclaredField("genBuildersConfig");
+        configField.setAccessible(true);
+        AtomicReference<TypeGeneratorBuildersConfig> buildersConfig =
+                (AtomicReference<TypeGeneratorBuildersConfig>) configField.get(config);
+        buildersConfig.set(new TypeGeneratorBuildersConfig());
+    }
+
+
+    static class CustomIntegerGenerator implements ICustomGeneratorArgs<Integer> {
         int generated;
 
         @Override
-        public NumberGenerator setArgs(String... args) {
+        public CustomIntegerGenerator setArgs(String... args) {
             generated = Integer.parseInt(args[0]);
             return this;
         }

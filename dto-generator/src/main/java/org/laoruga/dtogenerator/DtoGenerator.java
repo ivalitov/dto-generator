@@ -3,7 +3,6 @@ package org.laoruga.dtogenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
@@ -14,7 +13,6 @@ import org.laoruga.dtogenerator.generatorsexecutor.ExecutorOfGenerator;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +35,7 @@ public class DtoGenerator<T> {
     private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
     @Getter(AccessLevel.PACKAGE)
     private final DtoGeneratorBuilder<T> builderInstance;
-    private final Map<Field, Exception> errors = new HashMap<>();
+    private final ErrorsMapper errorsMapper = new ErrorsMapper();
 
     protected DtoGenerator(GeneratorsProvider<T> generatorsProvider,
                            DtoGeneratorBuilder<T> dtoGeneratorBuilder) {
@@ -88,27 +86,19 @@ public class DtoGenerator<T> {
             try {
                 generator = getGeneratorsProvider().getGenerator(field);
             } catch (Exception e) {
-                errors.put(field, e);
+                errorsMapper.put(field, e);
             }
             generator.ifPresent(iGenerator -> getFieldGeneratorMap().put(field, iGenerator));
         }
-        if (!errors.isEmpty()) {
-            final AtomicInteger counter = new AtomicInteger(0);
-            String formattedErrors = errors.entrySet().stream()
-                    .map(fieldExceptionEntry ->
-                            "- [" + counter.incrementAndGet() + "] Field: '" + fieldExceptionEntry.getKey().toString() + "'\n" +
-                                    "- [" + counter.get() + "] Exception:\n" +
-                                    ExceptionUtils.getStackTrace(fieldExceptionEntry.getValue())
-                    )
-                    .collect(Collectors.joining("\n"));
-            log.error("{} error(s) while generators preparation. See problems below: \n" + formattedErrors, errors.size());
+        if (!errorsMapper.isEmpty()) {
+            log.error("{} error(s) while generators preparation. See problems below: \n" + errorsMapper, errorsMapper.size());
             throw new DtoGeneratorException("Error while generators preparation (see log above)");
         }
         if (getFieldGeneratorMap().isEmpty()) {
             log.debug("Generators not found");
         } else {
             final AtomicInteger idx = new AtomicInteger(0);
-            log.debug(getFieldGeneratorMap().size() + " generators was created for fields: \n" +
+            log.debug(getFieldGeneratorMap().size() + " generators created for fields: \n" +
                     getFieldGeneratorMap().keySet().stream()
                             .map(i -> idx.incrementAndGet() + ". " + i)
                             .collect(Collectors.joining("\n")));

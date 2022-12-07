@@ -10,7 +10,6 @@ import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generators.DefaultGeneratorBuilders;
 import org.laoruga.dtogenerator.generators.GeneratorBuildersHolder;
-import org.laoruga.dtogenerator.generators.RulesInstance;
 import org.laoruga.dtogenerator.generators.basictypegenerators.*;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
@@ -99,8 +98,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                 elementGenerator = buildGenerator(
                         elementRuleInfo.getRule(),
                         elementGenBuilder,
-                        false,
-                        isUserBuilder);
+                        false);
 
             } else {
 
@@ -140,8 +138,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
             generator = buildGenerator(
                     ruleInfo.getRule(),
                     genBuilder,
-                    generatedTypeOrCollectionElementType.isPrimitive(),
-                    isUserBuilder);
+                    generatedTypeOrCollectionElementType.isPrimitive());
         }
 
         prepareCustomRemarks(generator, getFieldName());
@@ -161,113 +158,95 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
     private IGenerator<?> buildGenerator(Annotation rules,
                                          IGeneratorBuilder generatorBuilder,
-                                         boolean isPrimitive,
-                                         boolean userBuilder) {
+                                         boolean isPrimitive) {
 
         Class<? extends Annotation> rulesClass = rules.annotationType();
 
 
         try {
-            if (generatorBuilder instanceof IGeneratorBuilderConfigurable) {
 
-                IGeneratorBuilderConfigurable genBuilderConfigurable = (IGeneratorBuilderConfigurable) generatorBuilder;
 
-                if (StringRule.class == rulesClass) {
+            if (StringRule.class == rulesClass) {
 
-                    if (genBuilderConfigurable instanceof StringGenerator.StringGeneratorBuilder) {
+                if (generatorBuilder instanceof StringGenerator.StringGeneratorBuilder) {
 
-                        return getGenerator(
-                                () -> userBuilder ?
-                                        new StringGenerator.ConfigDto(RulesInstance.stringRule) :
-                                        new StringGenerator.ConfigDto((StringRule) rules),
-                                () -> genBuilderConfigurable,
-                                (config, builder) -> builder.build(config, true),
-                                getFieldType());
-                    }
-
-                } else if (DoubleRule.class == rulesClass) {
-
-                    if (genBuilderConfigurable instanceof DoubleGenerator.DoubleGeneratorBuilder) {
-
-                        return getGenerator(
-                                () -> userBuilder ?
-                                        new DoubleGenerator.ConfigDto(RulesInstance.doubleRule) :
-                                        new DoubleGenerator.ConfigDto((DoubleRule) rules),
-                                () -> genBuilderConfigurable,
-                                (config, builder) -> (config.getRuleRemark() == NULL_VALUE && isPrimitive) ?
-                                        () -> {
-                                            reportPrimitiveCannotBeNull();
-                                            return 0D;
-                                        } :
-                                        builder.build(config, true),
-                                getFieldType());
-                    }
-
-                } else if (IntegerRule.class == rulesClass) {
-
-                    if (genBuilderConfigurable instanceof IntegerGenerator.IntegerGeneratorBuilder) {
-
-                        return getGenerator(
-                                () -> userBuilder ?
-                                        new IntegerGenerator.ConfigDto(RulesInstance.integerRule) :
-                                        new IntegerGenerator.ConfigDto((IntegerRule) rules),
-                                () -> genBuilderConfigurable,
-                                (config, builder) -> (config.getRuleRemark() == NULL_VALUE && isPrimitive) ?
-                                        () -> {
-                                            reportPrimitiveCannotBeNull();
-                                            return 0;
-                                        } :
-                                        builder.build(config, true),
-                                getFieldType());
-                    }
-
-                } else if (LongRule.class == rulesClass) {
-
-                    if (genBuilderConfigurable instanceof LongGenerator.LongGeneratorBuilder) {
-
-                        return getGenerator(
-                                () -> userBuilder ?
-                                        new LongGenerator.ConfigDto(RulesInstance.longRule) :
-                                        new LongGenerator.ConfigDto((LongRule) rules),
-                                () -> genBuilderConfigurable,
-                                (config, builder) -> (config.getRuleRemark() == NULL_VALUE && isPrimitive) ?
-                                        () -> {
-                                            reportPrimitiveCannotBeNull();
-                                            return 0;
-                                        } :
-                                        builder.build(config, true),
-                                getFieldType());
-                    }
-
-                } else if (EnumRule.class == rulesClass) {
-
-                    if (genBuilderConfigurable instanceof EnumGenerator.EnumGeneratorBuilder) {
-                        return getGenerator(
-                                () -> userBuilder ?
-                                        new EnumGenerator.ConfigDto(RulesInstance.enumRule) :
-                                        new EnumGenerator.ConfigDto((EnumRule) rules),
-                                () -> genBuilderConfigurable,
-                                enumGeneratorSupplier(generatedTypeOrCollectionElementType),
-                                getFieldType()
-                        );
-                    }
-
-                } else if (LocalDateTimeRule.class == rulesClass) {
-
-                    if (genBuilderConfigurable instanceof LocalDateTimeGenerator.LocalDateTimeGeneratorBuilder) {
-                        return getGenerator(
-                                () -> userBuilder ?
-                                        new LocalDateTimeGenerator.ConfigDto(RulesInstance.localDateTimeRule) :
-                                        new LocalDateTimeGenerator.ConfigDto((LocalDateTimeRule) rules),
-                                () -> genBuilderConfigurable,
-                                (config, builder) -> builder.build(config, true),
-                                getFieldType());
-                    }
-
+                    return getGenerator(
+                            () -> new StringGenerator.ConfigDto((StringRule) rules),
+                            () -> (IGeneratorBuilderConfigurable) generatorBuilder,
+                            (config, builder) -> builder.build(config, true),
+                            getFieldType());
                 }
-            }
 
-            if (CustomRule.class == rulesClass) {
+            } else if (DoubleRule.class == rulesClass) {
+
+                if (generatorBuilder instanceof DoubleGenerator.DoubleGeneratorBuilder) {
+
+                    return getGenerator(
+                            () -> new DoubleGenerator.ConfigDto((DoubleRule) rules),
+                            () -> (IGeneratorBuilderConfigurable) generatorBuilder,
+                            (config, builder) -> (config.getRuleRemark() == NULL_VALUE && isPrimitive) ?
+                                    () -> {
+                                        reportPrimitiveCannotBeNull();
+                                        return 0D;
+                                    } :
+                                    builder.build(config, true),
+                            getFieldType());
+                }
+
+            } else if (IntegerRule.class == rulesClass) {
+
+                if (generatorBuilder instanceof IntegerGenerator.IntegerGeneratorBuilder) {
+
+                    return getGenerator(
+                            () -> new IntegerGenerator.ConfigDto((IntegerRule) rules),
+                            () -> (IGeneratorBuilderConfigurable) generatorBuilder,
+                            (config, builder) -> (config.getRuleRemark() == NULL_VALUE && isPrimitive) ?
+                                    () -> {
+                                        reportPrimitiveCannotBeNull();
+                                        return 0;
+                                    } :
+                                    builder.build(config, true),
+                            getFieldType());
+                }
+
+            } else if (LongRule.class == rulesClass) {
+
+                if (generatorBuilder instanceof LongGenerator.LongGeneratorBuilder) {
+
+                    return getGenerator(
+                            () -> new LongGenerator.ConfigDto((LongRule) rules),
+                            () -> (IGeneratorBuilderConfigurable) generatorBuilder,
+                            (config, builder) -> (config.getRuleRemark() == NULL_VALUE && isPrimitive) ?
+                                    () -> {
+                                        reportPrimitiveCannotBeNull();
+                                        return 0;
+                                    } :
+                                    builder.build(config, true),
+                            getFieldType());
+                }
+
+            } else if (EnumRule.class == rulesClass) {
+
+                if (generatorBuilder instanceof EnumGenerator.EnumGeneratorBuilder) {
+                    return getGenerator(
+                            () -> new EnumGenerator.ConfigDto((EnumRule) rules),
+                            () -> (IGeneratorBuilderConfigurable) generatorBuilder,
+                            enumGeneratorSupplier(generatedTypeOrCollectionElementType),
+                            getFieldType()
+                    );
+                }
+
+            } else if (LocalDateTimeRule.class == rulesClass) {
+
+                if (generatorBuilder instanceof LocalDateTimeGenerator.LocalDateTimeGeneratorBuilder) {
+                    return getGenerator(
+                            () -> new LocalDateTimeGenerator.ConfigDto((LocalDateTimeRule) rules),
+                            () -> (IGeneratorBuilderConfigurable) generatorBuilder,
+                            (config, builder) -> builder.build(config, true),
+                            getFieldType());
+                }
+
+            } else if (CustomRule.class == rulesClass) {
 
                 if (generatorBuilder instanceof CustomGenerator.CustomGeneratorBuilder) {
                     return getCustomGenerator(
@@ -286,7 +265,6 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                 throw new DtoGeneratorException("Unknown rules annotation '" + rulesClass + "'");
             }
 
-
         } catch (Exception e) {
             if (e.getClass() == ClassCastException.class) {
                 log.debug("Probably unknown builder, trying to build generator as is.");
@@ -295,7 +273,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
             throw e;
         }
 
-        log.debug("Unknown generator builder. It builds as is, without passing params .");
+        log.debug("Unknown generator builder, trying to build 'as is' without configuring.");
         return generatorBuilder.build();
     }
 
@@ -311,25 +289,13 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
             if (ListRule.class == rulesClass) {
 
-                configDto = (isUserCollectionBuilder ?
-
-                        new CollectionGenerator.ConfigDto(RulesInstance.listRule)
-                                .setCollectionInstance(
-                                        () -> createCollectionInstance((RulesInstance.listRule).listClass())) :
-
-                        new CollectionGenerator.ConfigDto((ListRule) collectionRule))
+                configDto = new CollectionGenerator.ConfigDto((ListRule) collectionRule)
                         .setCollectionInstance(
                                 () -> createCollectionInstance(((ListRule) collectionRule).listClass()));
 
             } else if (SetRule.class == rulesClass) {
 
-                configDto = isUserCollectionBuilder ?
-
-                        new CollectionGenerator.ConfigDto(RulesInstance.setRule)
-                                .setCollectionInstance(
-                                        () -> createCollectionInstance((RulesInstance.setRule).setClass())) :
-
-                        new CollectionGenerator.ConfigDto((SetRule) collectionRule)
+                configDto = new CollectionGenerator.ConfigDto((SetRule) collectionRule)
                                 .setCollectionInstance(
                                         () -> createCollectionInstance(((SetRule) collectionRule).setClass()));
 

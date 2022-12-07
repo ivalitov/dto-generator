@@ -40,7 +40,7 @@ public class GeneratorsProvider<T> {
     private final Map<Class<? extends Annotation>, IGeneratorBuilder> overriddenBuilders;
     private final Map<String, IGeneratorBuilder> overriddenBuildersForFields;
 
-    GeneratorBuildersHolder userGenBuildersMapping;
+    private final GeneratorBuildersHolder userGenBuildersMapping;
 
     private final AbstractGeneratorBuildersProvider builderSelectChainByAnnotation;
     private final AbstractGeneratorBuildersProvider builderSelectChainByType;

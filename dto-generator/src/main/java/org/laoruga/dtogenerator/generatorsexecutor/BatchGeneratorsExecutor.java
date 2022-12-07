@@ -1,13 +1,15 @@
 package org.laoruga.dtogenerator.generatorsexecutor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.laoruga.dtogenerator.ErrorsMapper;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * @author Il'dar Valitov
@@ -18,9 +20,8 @@ public class BatchGeneratorsExecutor {
 
     private final Map<Field, IGenerator<?>> fieldGeneratorMap;
     private final AbstractExecutor executorsChain;
-    private final int maxAttempts;
-
-    private final Map<Field, Exception> errors = new HashMap<>();
+    private  int maxAttempts;
+    private final ErrorsMapper errorsMapper = new ErrorsMapper();
 
     public BatchGeneratorsExecutor(AbstractExecutor executorsChain,
                                    Map<Field, IGenerator<?>> fieldGeneratorMap,
@@ -31,6 +32,7 @@ public class BatchGeneratorsExecutor {
     }
 
     public void execute() {
+        maxAttempts = 5;
 
         boolean areAllCompleted = fieldGeneratorMap.isEmpty();
 
@@ -38,24 +40,27 @@ public class BatchGeneratorsExecutor {
 
         while (!areAllCompleted && maxAttempts > attempt) {
             attempt++;
-            areAllCompleted = executeEachRemaining();
+            areAllCompleted = executeEachRemaining(attempt);
         }
 
         if (!checkIfAllGeneratorsExecuted()) {
-            throw new DtoGeneratorException("Error while generators execution (see log above)");
+            log.error("{} error(s) while generators execution. See problems below: \n" + errorsMapper, errorsMapper.size());
+            throw new DtoGeneratorException("Error while generators execution");
         }
     }
 
-    private boolean executeEachRemaining() {
+    private boolean executeEachRemaining(int attempt) {
         Iterator<Map.Entry<Field, IGenerator<?>>> iterator = fieldGeneratorMap.entrySet().iterator();
-        while (iterator.hasNext()) {
+        while (iterator.hasNext() && maxAttempts > attempt) {
             Map.Entry<Field, IGenerator<?>> nextGenerator = iterator.next();
+            Field field = nextGenerator.getKey();
 
             boolean completed;
             try {
-                completed = executorsChain.execute(nextGenerator.getKey(), nextGenerator.getValue());
+                completed = executorsChain.execute(field, nextGenerator.getValue());
             } catch (Exception e) {
-                errors.put(nextGenerator.getKey(), e);
+                attempt++;
+                errorsMapper.put(field, e);
                 completed = false;
             }
             if (completed) {
@@ -68,11 +73,15 @@ public class BatchGeneratorsExecutor {
     private boolean checkIfAllGeneratorsExecuted() {
         boolean successful = fieldGeneratorMap.isEmpty();
         if (!successful) {
-            log.error("Unexpected state. There {} unused generator(s) left. Fields vs Generators: " +
-                    fieldGeneratorMap, fieldGeneratorMap.size());
+            AtomicInteger counter = new AtomicInteger(0);
+            String leftGenerators = fieldGeneratorMap.entrySet().stream()
+                    .map((i) -> counter.incrementAndGet() + ". Field: '" + i.getKey() + "', generator: '" + i.getValue() + "'")
+                    .collect(Collectors.joining("\n"));
+            log.error("Unexpected state. There {} unused generator(s) left:\n" +
+                    leftGenerators, fieldGeneratorMap.size());
         }
-        if (!errors.isEmpty()) {
-            log.warn("{} error(s) while generators execution. Fields vs Generators: " + errors, errors.size());
+        if (!errorsMapper.isEmpty()) {
+            log.warn("{} error(s) while generators execution:\n" + errorsMapper, errorsMapper.size());
         }
         return successful;
     }

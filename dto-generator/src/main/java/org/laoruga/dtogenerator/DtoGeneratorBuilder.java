@@ -76,26 +76,12 @@ public class DtoGeneratorBuilder<T> {
     }
 
 
-    public DtoGeneratorBuilder<T> setCollectionGeneratorBuilder(@NonNull Class<? extends Annotation> rulesAnnotationClass,
-                                                                @NonNull IGeneratorBuilder generatorBuilder) throws DtoGeneratorException {
-        generatorsProvider.overrideGenerator(rulesAnnotationClass, generatorBuilder);
-        return this;
-    }
-
     /**
      * @param fieldName        name of field to generate value
      * @param generatorBuilder builder of generator of any type
      */
     public DtoGeneratorBuilder<T> setGeneratorBuilder(@NonNull String fieldName,
                                                       @NonNull IGeneratorBuilder generatorBuilder) throws DtoGeneratorException {
-        Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
-        DtoGeneratorBuilder<?> dtoGeneratorBuilder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
-        dtoGeneratorBuilder.generatorsProvider.setGeneratorBuilderForField(fieldAndPath.getFirst(), generatorBuilder);
-        return this;
-    }
-
-    public DtoGeneratorBuilder<T> setCollectionGeneratorBuilder(@NonNull String fieldName,
-                                                                @NonNull IGeneratorBuilder generatorBuilder) throws DtoGeneratorException {
         Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
         DtoGeneratorBuilder<?> dtoGeneratorBuilder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
         dtoGeneratorBuilder.generatorsProvider.setGeneratorBuilderForField(fieldAndPath.getFirst(), generatorBuilder);
@@ -124,8 +110,8 @@ public class DtoGeneratorBuilder<T> {
      * Custom Rule Remarks
      */
 
-    public DtoGeneratorBuilder<T> addRuleRemark(@NonNull String fieldName,
-                                                @NonNull CustomRuleRemarkWrapper... ruleRemark) {
+    public DtoGeneratorBuilder<T> setRuleRemarksCustom(@NonNull String fieldName,
+                                                       @NonNull CustomRuleRemarkWrapper... ruleRemark) {
         Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
         DtoGeneratorBuilder<?> fieldAndBuilder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
         fieldAndBuilder.generatorsProvider.getGeneratorRemarksProvider().addCustomRuleRemarkForField(
@@ -133,7 +119,7 @@ public class DtoGeneratorBuilder<T> {
         return this;
     }
 
-    public DtoGeneratorBuilder<T> addRuleRemark(@NonNull CustomRuleRemarkWrapper... ruleRemarks) {
+    public DtoGeneratorBuilder<T> setRuleRemarksCustom(@NonNull CustomRuleRemarkWrapper... ruleRemarks) {
         this.generatorsProvider.getGeneratorRemarksProvider().addRuleRemarkForAllFields(ruleRemarks);
         return this;
     }

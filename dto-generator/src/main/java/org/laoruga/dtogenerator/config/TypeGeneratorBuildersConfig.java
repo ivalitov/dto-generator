@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * @author Il'dar Valitov
@@ -18,54 +19,67 @@ import java.util.Set;
 @Getter
 public class TypeGeneratorBuildersConfig {
 
-    Map<Class<? extends IGeneratorBuilder>, IConfigDto> configMap = new HashMap<>();
-    Map<Class<? extends IGeneratorBuilder>, Map<Class<?>, IConfigDto>> doubleKeyConfigMap = new HashMap<>();
+    Map<Class<? extends IGeneratorBuilder>, Supplier<IConfigDto>> configMap = new HashMap<>();
+    Map<Class<? extends IGeneratorBuilder>, Map<Class<?>, Supplier<IConfigDto>>> doubleKeyConfigMap = new HashMap<>();
 
     public void setConfig(IConfigDto configDto) {
-        setConfig(configDto.getBuilderClass(), configDto);
+        setConfig(configDto.getBuilderClass(), () -> configDto);
     }
 
-    void setConfig(Class<? extends IGeneratorBuilder> genBuilderClass, IConfigDto configDto) {
+    void setConfig(Class<? extends IGeneratorBuilder> genBuilderClass, Supplier<IConfigDto> configDtoSupplier) {
         if (genBuilderClass.isAssignableFrom(CollectionGenerator.CollectionGeneratorBuilder.class)) {
             throw new DtoGeneratorException("For collection builder configuration use 'setCollectionConfig' method.");
         }
-        configMap.put(genBuilderClass, configDto);
+        configMap.put(genBuilderClass, configDtoSupplier);
     }
 
     public void setCollectionConfig(Class<?> superTypeClass,
                                     IConfigDto configDto) {
-        Class<? extends IGeneratorBuilder> genBuilderClass = configDto.getBuilderClass();
+        setCollectionConfig(superTypeClass, () -> configDto);
+    }
+
+    void setCollectionConfig(Class<?> superTypeClass,
+                             Supplier<IConfigDto> configDtoSupplier) {
+        Class<? extends IGeneratorBuilder> genBuilderClass = configDtoSupplier.get().getBuilderClass();
         doubleKeyConfigMap.putIfAbsent(genBuilderClass, new HashMap<>());
-        doubleKeyConfigMap.get(genBuilderClass).put(superTypeClass, configDto);
+        doubleKeyConfigMap.get(genBuilderClass).put(superTypeClass, configDtoSupplier);
     }
 
     public IConfigDto getConfig(Class<?> builderClass) {
-        return configMap.get(builderClass);
+        IConfigDto configDto= null;
+        if (configMap.containsKey(builderClass)) {
+            configDto = configMap.get(builderClass).get();
+        }
+        return configDto;
     }
 
     public IConfigDto getConfig(Class<?> builderClass, Class<?> generatedType) {
         IConfigDto configDto = null;
 
         if (configMap.containsKey(builderClass)) {
-            configDto = configMap.get(builderClass);
+            configDto = configMap.get(builderClass).get();
         }
 
         if (doubleKeyConfigMap.containsKey(builderClass)) {
 
-            Map<Class<?>, IConfigDto> classIConfigDtoMap = doubleKeyConfigMap.get(builderClass);
+            Map<Class<?>, Supplier<IConfigDto>> classIConfigDtoMap = doubleKeyConfigMap.get(builderClass);
             for (Class<?> generatedSuperType : classIConfigDtoMap.keySet()) {
                 if (generatedSuperType.isAssignableFrom(generatedType)) {
                     if (configDto != null) {
                         throw new DtoGeneratorException("Ambiguous generator's builder config. " +
                                 " Found more than one config for generated type: '" + generatedType + "'");
                     }
-                    configDto = classIConfigDtoMap.get(generatedSuperType);
+                    configDto = classIConfigDtoMap.get(generatedSuperType).get();
                 }
             }
 
         }
         return configDto;
     }
+
+    /*
+     * Lazy getters
+     */
 
     public StringGenerator.ConfigDto getStringConfig() {
         IConfigDto config = getConfig(StringGenerator.StringGeneratorBuilder.class);
