@@ -38,10 +38,6 @@ public class GeneratorBuildersProviderByType extends AbstractGeneratorBuildersPr
         this.userGeneratorBuilders = userGeneratorBuilders;
     }
 
-    private Class<?> getGeneratedType() {
-        return field.getType();
-    }
-
     @Override
     public Optional<IGenerator<?>> selectOrCreateGenerator() {
         if (DtoGeneratorStaticConfig.getInstance().getGenerateAllKnownTypes()) {
@@ -82,13 +78,12 @@ public class GeneratorBuildersProviderByType extends AbstractGeneratorBuildersPr
                     generatorSupplier = (config, builder) -> builder.build(config, true);
                 }
 
-                //TODO нужна копия конфига иначе но будет меняться
                 generator = getGenerator(
                         () -> TypeGeneratorBuildersDefaultConfig.getInstance()
                                 .getConfig(genBuilder.getClass(), getGeneratedType()),
                         () -> (IGeneratorBuilderConfigurable) genBuilder,
                         generatorSupplier,
-                        getFieldType());
+                        getGeneratedType());
             } else {
                 log.debug("Unknown generator builder found by field type, trying to build 'as is' without configuring.");
             }
@@ -97,7 +92,7 @@ public class GeneratorBuildersProviderByType extends AbstractGeneratorBuildersPr
         return Optional.ofNullable(generator);
     }
 
-    public Class<?> getFieldType() {
+    private Class<?> getGeneratedType() {
         return field.getType();
     }
 }

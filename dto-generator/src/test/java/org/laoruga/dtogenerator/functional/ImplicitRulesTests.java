@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.functional.data.dtoclient.ClientType;
 import org.laoruga.dtogenerator.functional.util.TestUtils;
@@ -16,6 +17,7 @@ import org.laoruga.dtogenerator.generators.RulesInstance;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -42,6 +44,27 @@ public class ImplicitRulesTests {
         LocalDateTime localDateTime;
         ClientType clientType;
         List<String> listOfString;
+        Set<Long> setOfLong;
+        @NestedDtoRule
+        InnerDto innerDto;
+
+        public String getLocalDateTime() {
+            return localDateTime.toString();
+        }
+    }
+
+    @NoArgsConstructor
+    @Getter
+    static class InnerDto {
+
+        String string;
+        Integer integer;
+        Long aLong;
+        Double aDouble;
+        LocalDateTime localDateTime;
+        ClientType clientType;
+        List<String> listOfString;
+        Set<Long> setOfLong;
 
         public String getLocalDateTime() {
             return localDateTime.toString();
@@ -56,6 +79,12 @@ public class ImplicitRulesTests {
     @Test
     @DisplayName("Generation with implicit rules")
     void GenerationWithImplicitRules() {
+
+        DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig().getListConfig().setMinSize(1);
+        DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig().getListConfig().setMaxSize(1);
+        DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig().getSetConfig().setMinSize(1);
+        DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig().getSetConfig().setMaxSize(1);
+
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
 
         log.info(TestUtils.toJson(dto));
@@ -75,8 +104,9 @@ public class ImplicitRulesTests {
                         greaterThanOrEqualTo(RulesInstance.doubleRule.minValue()))
                         .and(lessThanOrEqualTo(RulesInstance.doubleRule.maxValue()))),
                 () -> assertThat(dto.getLocalDateTime(), notNullValue()),
-                () -> assertThat(dto.getClientType(), notNullValue())
-
+                () -> assertThat(dto.getClientType(), notNullValue()),
+                () -> assertThat(dto.getListOfString().size(), equalTo(1)),
+                () -> assertThat(dto.getSetOfLong().size(), equalTo(1))
         );
     }
 
