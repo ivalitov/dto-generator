@@ -117,6 +117,8 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                 elementGenerator = maybeGenerator.get();
             }
 
+            prepareCustomRemarks(elementGenerator, getFieldName());
+
             generator = buildCollectionGenerator(
                     collectionRuleInfo.getRule(),
                     collectionGenBuilder,
