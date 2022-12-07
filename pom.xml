@@ -32,9 +32,9 @@
     </properties>
 
     <scm>
-        <connection>scm:git:git@bitbucket.org:ivalitov/dto-generator.git</connection>
-        <developerConnection>scm:git:git@bitbucket.org:ivalitov/dto-generator.git</developerConnection>
-        <url>https://bitbucket.org/ivalitov/dto-generator</url>
+        <connection>scm:git:git@github.com:ivalitov/dto-generator.git</connection>
+        <developerConnection>scm:git:git@github.com:ivalitov/dto-generator.git</developerConnection>
+        <url>https://github.com/ivalitov/dto-generator</url>
         <tag>@{project.version}</tag>
     </scm>
 
@@ -190,6 +190,22 @@
                     <tagNameFormat>@{project.version}</tagNameFormat>
                     <remoteTagging>true</remoteTagging>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <source>8</source>
                 </configuration>
             </plugin>
             <plugin>
