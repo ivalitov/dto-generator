@@ -5,7 +5,7 @@
     <groupId>org.laoruga</groupId>
     <artifactId>dto-generator-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.0</version>
+    <version>1.3.1-SNAPSHOT</version>
 
     <modules>
         <module>dto-generator</module>
@@ -35,7 +35,7 @@
         <connection>scm:git:git@bitbucket.org:ivalitov/dto-generator.git</connection>
         <developerConnection>scm:git:git@bitbucket.org:ivalitov/dto-generator.git</developerConnection>
         <url>https://bitbucket.org/ivalitov/dto-generator</url>
-        <tag>1.3.0</tag>
+        <tag>@{project.version}</tag>
     </scm>
 
     <dependencies>
