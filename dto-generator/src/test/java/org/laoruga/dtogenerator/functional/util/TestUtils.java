@@ -4,6 +4,9 @@ import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.ErrorsMapper;
+import org.laoruga.dtogenerator.config.DtoGeneratorConfig;
+import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
+import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -43,5 +46,17 @@ public class TestUtils {
     @SneakyThrows
     public static String toJson(Object object) {
         return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(object);
+    }
+
+    @SneakyThrows
+    @SuppressWarnings("unchecked")
+    public static void resetStaticConfig() {
+        DtoGeneratorConfig config = DtoGeneratorStaticConfig.getInstance();
+        config.setGenerateAllKnownTypes(false);
+        Field configField = config.getClass().getSuperclass().getDeclaredField("genBuildersConfig");
+        configField.setAccessible(true);
+        AtomicReference<TypeGeneratorBuildersConfig> buildersConfig =
+                (AtomicReference<TypeGeneratorBuildersConfig>) configField.get(config);
+        buildersConfig.set(new TypeGeneratorBuildersConfig());
     }
 }

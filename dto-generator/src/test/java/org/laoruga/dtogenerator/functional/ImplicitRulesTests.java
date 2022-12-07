@@ -4,8 +4,8 @@ import io.qameta.allure.Epic;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
@@ -23,6 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.laoruga.dtogenerator.functional.util.TestUtils.resetStaticConfig;
 
 /**
  * @author Il'dar Valitov
@@ -71,8 +72,8 @@ public class ImplicitRulesTests {
         }
     }
 
-    @BeforeAll
-    static void before() {
+    @BeforeEach
+    void before() {
         DtoGeneratorStaticConfig.getInstance().setGenerateAllKnownTypes(true);
     }
 
@@ -108,10 +109,30 @@ public class ImplicitRulesTests {
                 () -> assertThat(dto.getListOfString().size(), equalTo(1)),
                 () -> assertThat(dto.getSetOfLong().size(), equalTo(1))
         );
+
+        assertAll(
+                () -> assertThat(dto.getInnerDto().getString().length(), both(
+                        greaterThanOrEqualTo(RulesInstance.stringRule.minLength()))
+                        .and(lessThanOrEqualTo(RulesInstance.stringRule.maxLength()))),
+                () -> assertThat(dto.getInnerDto().getInteger(), both(
+                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue()))
+                        .and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue()))),
+                () -> assertThat(dto.getInnerDto().getALong(), both(
+                        greaterThanOrEqualTo(RulesInstance.longRule.minValue()))
+                        .and(lessThanOrEqualTo(RulesInstance.longRule.maxValue()))),
+                () -> assertThat(dto.getInnerDto().getADouble(), both(
+                        greaterThanOrEqualTo(RulesInstance.doubleRule.minValue()))
+                        .and(lessThanOrEqualTo(RulesInstance.doubleRule.maxValue()))),
+                () -> assertThat(dto.getInnerDto().getLocalDateTime(), notNullValue()),
+                () -> assertThat(dto.getInnerDto().getClientType(), notNullValue()),
+                () -> assertThat(dto.getInnerDto().getListOfString().size(), equalTo(1)),
+                () -> assertThat(dto.getInnerDto().getSetOfLong().size(), equalTo(1))
+        );
     }
 
-    @AfterAll
-    static void after() {
+    @AfterEach
+    void after() {
         DtoGeneratorStaticConfig.getInstance().setGenerateAllKnownTypes(false);
+        resetStaticConfig();
     }
 }

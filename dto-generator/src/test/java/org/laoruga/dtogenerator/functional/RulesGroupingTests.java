@@ -31,7 +31,7 @@ import static org.laoruga.dtogenerator.constants.Group.*;
  * @author Il'dar Valitov
  * Created on 02.06.2022
  */
-@DisplayName("String Rules Tests")
+@DisplayName("Rule Grouping Tests")
 @Epic("RULES_GROUPING")
 class RulesGroupingTests {
 

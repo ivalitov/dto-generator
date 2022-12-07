@@ -12,7 +12,6 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.*;
-import org.laoruga.dtogenerator.config.DtoGeneratorConfig;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
@@ -22,18 +21,17 @@ import org.laoruga.dtogenerator.generators.GeneratorBuilders;
 import org.laoruga.dtogenerator.generators.basictypegenerators.*;
 
 import java.beans.Transient;
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.laoruga.dtogenerator.constants.BasicRuleRemark.MAX_VALUE;
 import static org.laoruga.dtogenerator.constants.BasicRuleRemark.MIN_VALUE;
+import static org.laoruga.dtogenerator.functional.util.TestUtils.resetStaticConfig;
 
 /**
  * @author Il'dar Valitov
@@ -45,7 +43,7 @@ import static org.laoruga.dtogenerator.constants.BasicRuleRemark.MIN_VALUE;
 @DisplayName("Overriding of generators")
 @Epic("GENERATORS_OVERRIDING")
 @Slf4j
-class GeneratorsOverridingTests {
+class OverridingOfGeneratorsTests {
 
     @Getter
     @NoArgsConstructor
@@ -647,13 +645,7 @@ class GeneratorsOverridingTests {
     @AfterEach
     @SneakyThrows
     void restoreConfig() {
-        DtoGeneratorConfig config = DtoGeneratorStaticConfig.getInstance();
-        config.setGenerateAllKnownTypes(false);
-        Field configField = config.getClass().getSuperclass().getDeclaredField("genBuildersConfig");
-        configField.setAccessible(true);
-        AtomicReference<TypeGeneratorBuildersConfig> buildersConfig =
-                (AtomicReference<TypeGeneratorBuildersConfig>) configField.get(config);
-        buildersConfig.set(new TypeGeneratorBuildersConfig());
+        resetStaticConfig();
     }
 
 
