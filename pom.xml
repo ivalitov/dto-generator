@@ -191,6 +191,7 @@
                     <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
                     <tagNameFormat>@{project.version}</tagNameFormat>
                     <remoteTagging>true</remoteTagging>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
             <plugin>
