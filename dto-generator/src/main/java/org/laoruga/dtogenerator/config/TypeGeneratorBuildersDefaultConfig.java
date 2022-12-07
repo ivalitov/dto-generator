@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.generators.RulesInstance;
-import org.laoruga.dtogenerator.generators.basictypegenerators.*;
+import org.laoruga.dtogenerator.rules.RulesInstance;
+import org.laoruga.dtogenerator.typegenerators.*;
 
 import java.util.Objects;
 

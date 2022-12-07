@@ -12,7 +12,7 @@ import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
 import org.laoruga.dtogenerator.functional.data.dtoclient.*;
-import org.laoruga.dtogenerator.generators.RulesInstance;
+import org.laoruga.dtogenerator.rules.RulesInstance;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;

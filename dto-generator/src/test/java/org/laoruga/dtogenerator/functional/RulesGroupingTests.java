@@ -10,7 +10,7 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.generators.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.Group;
-import org.laoruga.dtogenerator.generators.RulesInstance;
+import org.laoruga.dtogenerator.rules.RulesInstance;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

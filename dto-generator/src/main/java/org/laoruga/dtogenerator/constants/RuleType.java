@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.constants;
 
 import java.lang.annotation.Annotation;
 
-import static org.laoruga.dtogenerator.RulesInfoHelper.*;
+import static org.laoruga.dtogenerator.rules.RulesInfoHelper.*;
 
 /**
  * @author Il'dar Valitov

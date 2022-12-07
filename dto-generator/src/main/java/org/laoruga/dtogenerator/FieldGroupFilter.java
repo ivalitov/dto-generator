@@ -10,7 +10,7 @@ import java.util.Set;
  * @author Il'dar Valitov
  * Created on 18.06.2022
  */
-class FieldGroupFilter {
+public class FieldGroupFilter {
 
     private boolean isNew = true;
 
@@ -32,7 +32,7 @@ class FieldGroupFilter {
         include.addAll(Arrays.asList(groups));
     }
 
-    boolean isContainsIncludeGroup(String group) {
+    public boolean isContainsIncludeGroup(String group) {
         return include.contains(group);
     }
 

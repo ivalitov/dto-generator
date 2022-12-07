@@ -6,10 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generatorsexecutor.BatchGeneratorsExecutor;
-import org.laoruga.dtogenerator.generatorsexecutor.ExecutorOfCollectionGenerator;
-import org.laoruga.dtogenerator.generatorsexecutor.ExecutorOfDtoDependentGenerator;
-import org.laoruga.dtogenerator.generatorsexecutor.ExecutorOfGenerator;
+import org.laoruga.dtogenerator.typegenerators.executors.BatchGeneratorsExecutor;
+import org.laoruga.dtogenerator.typegenerators.executors.ExecutorOfCollectionGenerator;
+import org.laoruga.dtogenerator.typegenerators.executors.ExecutorOfDtoDependentGenerator;
+import org.laoruga.dtogenerator.typegenerators.executors.ExecutorOfGenerator;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -30,18 +30,18 @@ public class DtoGenerator<T> {
     private final T dtoInstance;
 
     @Getter(AccessLevel.PACKAGE)
-    private final GeneratorsProvider<T> generatorsProvider;
+    private final TypeGeneratorsProvider<T> typeGeneratorsProvider;
     @Getter(AccessLevel.PACKAGE)
     private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
     @Getter(AccessLevel.PACKAGE)
     private final DtoGeneratorBuilder<T> builderInstance;
-    private final ErrorsMapper errorsMapper = new ErrorsMapper();
+    private final ErrorsHolder errorsHolder = new ErrorsHolder();
 
-    protected DtoGenerator(GeneratorsProvider<T> generatorsProvider,
+    protected DtoGenerator(TypeGeneratorsProvider<T> typeGeneratorsProvider,
                            DtoGeneratorBuilder<T> dtoGeneratorBuilder) {
-        this.generatorsProvider = generatorsProvider;
+        this.typeGeneratorsProvider = typeGeneratorsProvider;
         this.builderInstance = dtoGeneratorBuilder;
-        this.dtoInstance = generatorsProvider.getDtoInstance();
+        this.dtoInstance = typeGeneratorsProvider.getDtoInstance();
     }
 
     public static <T> DtoGeneratorBuilder<T> builder(Class<T> dtoClass) {
@@ -84,14 +84,14 @@ public class DtoGenerator<T> {
         for (Field field : dtoClass.getDeclaredFields()) {
             Optional<IGenerator<?>> generator = Optional.empty();
             try {
-                generator = getGeneratorsProvider().getGenerator(field);
+                generator = getTypeGeneratorsProvider().getGenerator(field);
             } catch (Exception e) {
-                errorsMapper.put(field, e);
+                errorsHolder.put(field, e);
             }
             generator.ifPresent(iGenerator -> getFieldGeneratorMap().put(field, iGenerator));
         }
-        if (!errorsMapper.isEmpty()) {
-            log.error("{} error(s) while generators preparation. See problems below: \n" + errorsMapper, errorsMapper.size());
+        if (!errorsHolder.isEmpty()) {
+            log.error("{} error(s) while generators preparation. See problems below: \n" + errorsHolder, errorsHolder.size());
             throw new DtoGeneratorException("Error while generators preparation (see log above)");
         }
         if (getFieldGeneratorMap().isEmpty()) {

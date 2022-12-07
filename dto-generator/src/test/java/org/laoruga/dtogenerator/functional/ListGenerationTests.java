@@ -14,7 +14,7 @@ import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.functional.data.dtoclient.ClientDto;
 import org.laoruga.dtogenerator.functional.util.TestUtils;
-import org.laoruga.dtogenerator.generators.RulesInstance;
+import org.laoruga.dtogenerator.rules.RulesInstance;
 
 import java.util.*;
 import java.util.function.Consumer;

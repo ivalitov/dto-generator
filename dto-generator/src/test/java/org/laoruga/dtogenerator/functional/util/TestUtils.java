@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.functional.util;
 import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.ErrorsMapper;
+import org.laoruga.dtogenerator.ErrorsHolder;
 import org.laoruga.dtogenerator.config.DtoGeneratorConfig;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
@@ -23,12 +23,12 @@ public class TestUtils {
 
         AtomicReference<Map<Field, Exception>> errors;
         try {
-            Field mapperField = dtoGenerator.getClass().getDeclaredField("errorsMapper");
+            Field mapperField = dtoGenerator.getClass().getDeclaredField("errorsHolder");
             mapperField.setAccessible(true);
-            ErrorsMapper errorsMapper = (ErrorsMapper) mapperField.get(dtoGenerator);
-            Field errorsField = errorsMapper.getClass().getDeclaredField("errors");
+            ErrorsHolder errorsHolder = (ErrorsHolder) mapperField.get(dtoGenerator);
+            Field errorsField = errorsHolder.getClass().getDeclaredField("errors");
             errorsField.setAccessible(true);
-            errors = (AtomicReference<Map<Field, Exception>>) errorsField.get(errorsMapper);
+            errors = (AtomicReference<Map<Field, Exception>>) errorsField.get(errorsHolder);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

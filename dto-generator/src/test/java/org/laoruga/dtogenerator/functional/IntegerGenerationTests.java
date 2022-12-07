@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.constants.BasicRuleRemark;
-import org.laoruga.dtogenerator.generators.RulesInstance;
+import org.laoruga.dtogenerator.rules.RulesInstance;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
