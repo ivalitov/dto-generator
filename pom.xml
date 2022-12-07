@@ -7,7 +7,7 @@
     <groupId>org.laoruga</groupId>
     <artifactId>dto-generator-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.1-ALPHA</version>
+    <version>0.3.0-SNAPSHOT</version>
 
     <modules>
         <module>dto-generator</module>
@@ -32,6 +32,13 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
+
+    <scm>
+        <connection>scm:git:git@bitbucket.org:ivalitov/dto-generator.git</connection>
+        <developerConnection>scm:git:git@bitbucket.org:ivalitov/dto-generator.git</developerConnection>
+        <url>https://bitbucket.org/ivalitov/dto-generator</url>
+        <tag>@{project.version}</tag>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -150,6 +157,42 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>3.0.0-M7</version>
+                <configuration>
+                    <goal>pre-integration-test</goal>
+                    <preparationGoals>package</preparationGoals>
+                    <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
+                    <tagNameFormat>@{project.version}</tagNameFormat>
+                    <remoteTagging>true</remoteTagging>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
