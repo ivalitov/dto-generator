@@ -10,7 +10,7 @@ import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.laoruga.dtogenerator.constants.BasicRuleRemark.*;
+import static org.laoruga.dtogenerator.constants.RuleRemark.*;
 
 /**
  * @author Il'dar Valitov

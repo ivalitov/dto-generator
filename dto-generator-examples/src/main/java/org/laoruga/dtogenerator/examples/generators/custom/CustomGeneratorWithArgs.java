@@ -1,6 +1,6 @@
 package org.laoruga.dtogenerator.examples.generators.custom;
 
-import org.laoruga.dtogenerator.api.generators.ICustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
 import lombok.AllArgsConstructor;
 import org.apache.commons.text.RandomStringGenerator;
 

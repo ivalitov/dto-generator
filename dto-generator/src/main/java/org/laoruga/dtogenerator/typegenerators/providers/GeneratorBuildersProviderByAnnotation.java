@@ -5,7 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.TypeGeneratorRemarksProvider;
 import org.laoruga.dtogenerator.TypeGeneratorsProvider;
-import org.laoruga.dtogenerator.api.generators.*;
+import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
+import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.constants.RuleType;
@@ -22,7 +26,7 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.laoruga.dtogenerator.constants.BasicRuleRemark.NULL_VALUE;
+import static org.laoruga.dtogenerator.constants.RuleRemark.NULL_VALUE;
 import static org.laoruga.dtogenerator.util.ReflectionUtils.createCollectionInstance;
 
 /**

@@ -1,10 +1,10 @@
 package org.laoruga.dtogenerator;
 
 import lombok.NonNull;
-import org.laoruga.dtogenerator.api.generators.ICustomGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWrapper;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.constants.BasicRuleRemark;
+import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.util.*;
@@ -43,7 +43,7 @@ public class TypeGeneratorRemarksProvider {
     }
 
     void setBasicRuleRemarkForField(@NonNull String filedName,
-                                    @NonNull BasicRuleRemark ruleRemark) {
+                                    @NonNull RuleRemark ruleRemark) {
         if (basicRuleRemarksMapByField.containsKey(filedName)) {
             throw new DtoGeneratorException("Try to overwrite remark from: '" + getBasicRuleRemark(filedName) + "'" +
                     " to: '" + ruleRemark + "' for field '" + filedName + "'.");
@@ -51,7 +51,7 @@ public class TypeGeneratorRemarksProvider {
         basicRuleRemarksMapByField.put(filedName, ruleRemark);
     }
 
-    public void setBasicRuleRemarkForFields(BasicRuleRemark basicRuleRemark) {
+    public void setBasicRuleRemarkForFields(RuleRemark basicRuleRemark) {
         if (basicRuleRemarkForFields.get() != null && basicRuleRemarkForFields.get() != basicRuleRemark) {
             throw new DtoGeneratorException("Try to overwrite remark for all fields from: '"
                     + basicRuleRemarkForFields.get() + "' to: '" + basicRuleRemark + "'.");

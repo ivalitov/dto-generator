@@ -3,7 +3,11 @@ package org.laoruga.dtogenerator.typegenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.*;
+import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 

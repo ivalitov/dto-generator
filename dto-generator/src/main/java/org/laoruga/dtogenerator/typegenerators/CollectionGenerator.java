@@ -13,7 +13,7 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.ListRule;
 import org.laoruga.dtogenerator.api.rules.SetRule;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
-import org.laoruga.dtogenerator.constants.BasicRuleRemark;
+import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
@@ -43,7 +43,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
     public Collection<Object> generate() {
         int maxAttempts = DtoGeneratorStaticConfig.getInstance().getMaxCollectionGenerationCycles();
         int size;
-        switch ((BasicRuleRemark) ruleRemark) {
+        switch ((RuleRemark) ruleRemark) {
             case MIN_VALUE:
                 size = minSize;
                 break;

@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.api.generators;
+package org.laoruga.dtogenerator.api.generators.custom;
 
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWrapper;
 

@@ -1,8 +1,8 @@
 package org.laoruga.dtogenerator.functional.data.customgenerator;
 
 import org.laoruga.dtogenerator.api.generators.AbstractCustomGeneratorRemarkable;
-import org.laoruga.dtogenerator.api.generators.ICustomGeneratorArgs;
-import org.laoruga.dtogenerator.api.generators.ICustomGeneratorDtoDependent;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWrapper;
 import org.laoruga.dtogenerator.functional.data.dtoclient.*;
 import org.laoruga.dtogenerator.util.RandomUtils;

@@ -1,8 +1,8 @@
 package org.laoruga.dtogenerator.api.rules;
 
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
-import org.laoruga.dtogenerator.constants.BasicRuleRemark;
 import org.laoruga.dtogenerator.constants.Group;
+import org.laoruga.dtogenerator.constants.RuleRemark;
 
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -22,7 +22,7 @@ public @interface LocalDateTimeRule {
 
     int rightShiftDays() default 365 * 5;
 
-    BasicRuleRemark ruleRemark() default BasicRuleRemark.RANDOM_VALUE;
+    RuleRemark ruleRemark() default RuleRemark.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 

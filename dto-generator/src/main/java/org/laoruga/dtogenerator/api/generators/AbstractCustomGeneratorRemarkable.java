@@ -2,6 +2,7 @@ package org.laoruga.dtogenerator.api.generators;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWrapper;
 import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
 

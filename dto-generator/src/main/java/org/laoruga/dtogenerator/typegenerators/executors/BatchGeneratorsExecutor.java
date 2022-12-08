@@ -32,7 +32,6 @@ public class BatchGeneratorsExecutor {
     }
 
     public void execute() {
-        maxAttempts = 5;
 
         boolean areAllCompleted = fieldGeneratorMap.isEmpty();
 

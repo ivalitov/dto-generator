@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.api.remarks;
 
 import lombok.NonNull;
 import lombok.Value;
-import org.laoruga.dtogenerator.api.generators.ICustomGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 
 import java.util.Arrays;
 import java.util.Collections;

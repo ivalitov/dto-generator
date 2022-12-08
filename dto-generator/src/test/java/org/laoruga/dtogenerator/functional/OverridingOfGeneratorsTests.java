@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.api.generators.ICustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
@@ -29,8 +29,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.laoruga.dtogenerator.constants.BasicRuleRemark.MAX_VALUE;
-import static org.laoruga.dtogenerator.constants.BasicRuleRemark.MIN_VALUE;
+import static org.laoruga.dtogenerator.constants.RuleRemark.MAX_VALUE;
+import static org.laoruga.dtogenerator.constants.RuleRemark.MIN_VALUE;
 import static org.laoruga.dtogenerator.functional.util.TestUtils.resetStaticConfig;
 
 /**

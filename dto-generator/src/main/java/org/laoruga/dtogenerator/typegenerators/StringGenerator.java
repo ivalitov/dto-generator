@@ -11,7 +11,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import org.laoruga.dtogenerator.constants.BasicRuleRemark;
+import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Objects;
@@ -35,13 +35,13 @@ public class StringGenerator implements IGenerator<String> {
     @Override
     public String generate() {
         int length;
-        if (ruleRemark == BasicRuleRemark.MIN_VALUE) {
+        if (ruleRemark == RuleRemark.MIN_VALUE) {
             length = minLength;
-        } else if (ruleRemark == BasicRuleRemark.MAX_VALUE) {
+        } else if (ruleRemark == RuleRemark.MAX_VALUE) {
             length = maxLength;
-        } else if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
+        } else if (ruleRemark == RuleRemark.RANDOM_VALUE) {
             length = RandomUtils.nextInt(minLength, maxLength);
-        } else if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
+        } else if (ruleRemark == RuleRemark.NULL_VALUE) {
             return null;
         } else {
             throw new IllegalStateException("Unexpected value " + ruleRemark);

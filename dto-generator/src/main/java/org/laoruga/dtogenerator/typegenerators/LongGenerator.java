@@ -9,7 +9,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.LongRule;
-import org.laoruga.dtogenerator.constants.BasicRuleRemark;
+import org.laoruga.dtogenerator.constants.RuleRemark;
 
 /**
  * @author Il'dar Valitov
@@ -25,16 +25,16 @@ public class LongGenerator implements IGenerator<Long> {
 
     @Override
     public Long generate() {
-        if (ruleRemark == BasicRuleRemark.MIN_VALUE) {
+        if (ruleRemark == RuleRemark.MIN_VALUE) {
             return minValue;
         }
-        if (ruleRemark == BasicRuleRemark.MAX_VALUE) {
+        if (ruleRemark == RuleRemark.MAX_VALUE) {
             return maxValue;
         }
-        if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
+        if (ruleRemark == RuleRemark.RANDOM_VALUE) {
             return minValue + (long) (Math.random() * (maxValue - minValue));
         }
-        if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
+        if (ruleRemark == RuleRemark.NULL_VALUE) {
             return null;
         }
         throw new IllegalStateException("Unexpected value " + ruleRemark);

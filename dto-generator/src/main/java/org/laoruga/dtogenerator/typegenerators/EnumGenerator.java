@@ -6,7 +6,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.EnumRule;
-import org.laoruga.dtogenerator.constants.BasicRuleRemark;
+import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
@@ -32,14 +32,14 @@ public class EnumGenerator implements IGenerator<Enum<?>> {
                 .sorted(Comparator.comparing(String::length))
                 .toArray(String[]::new);
         String enumInstanceName;
-        if (ruleRemark == BasicRuleRemark.MIN_VALUE) {
+        if (ruleRemark == RuleRemark.MIN_VALUE) {
             enumInstanceName = sortedEnumNames[0];
-        } else if (ruleRemark == BasicRuleRemark.MAX_VALUE) {
+        } else if (ruleRemark == RuleRemark.MAX_VALUE) {
             enumInstanceName = sortedEnumNames[sortedEnumNames.length - 1];
-        } else if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
+        } else if (ruleRemark == RuleRemark.RANDOM_VALUE) {
             int count = sortedEnumNames.length;
             enumInstanceName = sortedEnumNames[RandomUtils.getRandom().nextInt(count)];
-        } else if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
+        } else if (ruleRemark == RuleRemark.NULL_VALUE) {
             return null;
         } else {
             throw new IllegalStateException("Unexpected value " + ruleRemark);

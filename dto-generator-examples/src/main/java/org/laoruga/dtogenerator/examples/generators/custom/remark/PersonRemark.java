@@ -1,6 +1,6 @@
 package org.laoruga.dtogenerator.examples.generators.custom.remark;
 
-import org.laoruga.dtogenerator.api.generators.ICustomGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
 import org.laoruga.dtogenerator.examples.generators.custom.CustomGeneratorRemarkable;
 

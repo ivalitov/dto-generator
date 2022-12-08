@@ -9,7 +9,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.LocalDateTimeRule;
-import org.laoruga.dtogenerator.constants.BasicRuleRemark;
+import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.time.LocalDateTime;
@@ -29,18 +29,18 @@ public class LocalDateTimeGenerator implements IGenerator<LocalDateTime> {
     @Override
     public LocalDateTime generate() {
         LocalDateTime now = LocalDateTime.now();
-        if (ruleRemark == BasicRuleRemark.MIN_VALUE) {
+        if (ruleRemark == RuleRemark.MIN_VALUE) {
             return now.minusDays(leftShiftDays);
         }
-        if (ruleRemark == BasicRuleRemark.MAX_VALUE) {
+        if (ruleRemark == RuleRemark.MAX_VALUE) {
             return now.plusDays(rightShiftDays);
         }
-        if (ruleRemark == BasicRuleRemark.RANDOM_VALUE) {
+        if (ruleRemark == RuleRemark.RANDOM_VALUE) {
             int randomInt = RandomUtils.getRandom().nextInt(leftShiftDays + rightShiftDays + 1);
             LocalDateTime minDate = now.minusDays(leftShiftDays);
             return minDate.plusDays(randomInt);
         }
-        if (ruleRemark == BasicRuleRemark.NULL_VALUE) {
+        if (ruleRemark == RuleRemark.NULL_VALUE) {
             return null;
         }
         throw new IllegalStateException("Unexpected value " + ruleRemark);

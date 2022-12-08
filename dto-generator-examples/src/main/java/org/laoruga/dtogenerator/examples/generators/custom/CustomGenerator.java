@@ -1,6 +1,6 @@
 package org.laoruga.dtogenerator.examples.generators.custom;
 
-import org.laoruga.dtogenerator.api.generators.ICustomGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Arrays;

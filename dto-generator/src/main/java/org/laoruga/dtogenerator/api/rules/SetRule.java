@@ -2,8 +2,8 @@ package org.laoruga.dtogenerator.api.rules;
 
 import org.laoruga.dtogenerator.api.BoundType;
 import org.laoruga.dtogenerator.api.rules.meta.RuleForCollection;
-import org.laoruga.dtogenerator.constants.BasicRuleRemark;
 import org.laoruga.dtogenerator.constants.Group;
+import org.laoruga.dtogenerator.constants.RuleRemark;
 
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -22,13 +22,13 @@ public @interface SetRule {
 
     Class<? extends Set> setClass() default HashSet.class;
 
-    @BoundType(BasicRuleRemark.MAX_VALUE)
+    @BoundType(RuleRemark.MAX_VALUE)
     int maxSize() default 10;
 
-    @BoundType(BasicRuleRemark.MIN_VALUE)
+    @BoundType(RuleRemark.MIN_VALUE)
     int minSize() default 1;
 
-    BasicRuleRemark ruleRemark() default BasicRuleRemark.RANDOM_VALUE;
+    RuleRemark ruleRemark() default RuleRemark.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 

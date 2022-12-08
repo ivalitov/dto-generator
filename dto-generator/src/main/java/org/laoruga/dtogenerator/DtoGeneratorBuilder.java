@@ -7,7 +7,7 @@ import org.apache.commons.math3.util.Pair;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWrapper;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
-import org.laoruga.dtogenerator.constants.BasicRuleRemark;
+import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
@@ -95,7 +95,7 @@ public class DtoGeneratorBuilder<T> {
      */
 
     public DtoGeneratorBuilder<T> setRuleRemark(@NonNull String fieldName,
-                                                @NonNull BasicRuleRemark ruleRemark) throws DtoGeneratorException {
+                                                @NonNull RuleRemark ruleRemark) throws DtoGeneratorException {
         Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
         DtoGeneratorBuilder<?> fieldAndBuilder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
         fieldAndBuilder.typeGeneratorsProvider.getTypeGeneratorRemarksProvider().setBasicRuleRemarkForField(
@@ -103,7 +103,7 @@ public class DtoGeneratorBuilder<T> {
         return this;
     }
 
-    public DtoGeneratorBuilder<T> setRuleRemark(@NonNull BasicRuleRemark basicRuleRemark) throws DtoGeneratorException {
+    public DtoGeneratorBuilder<T> setRuleRemark(@NonNull RuleRemark basicRuleRemark) throws DtoGeneratorException {
         this.typeGeneratorsProvider.getTypeGeneratorRemarksProvider().setBasicRuleRemarkForFields(basicRuleRemark);
         return this;
     }

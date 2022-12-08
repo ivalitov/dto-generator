@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.api.generators;
+package org.laoruga.dtogenerator.api.generators.custom;
 
 /**
  * @author Il'dar Valitov

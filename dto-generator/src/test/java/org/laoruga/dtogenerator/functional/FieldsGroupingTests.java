@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.generators.ICustomGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;

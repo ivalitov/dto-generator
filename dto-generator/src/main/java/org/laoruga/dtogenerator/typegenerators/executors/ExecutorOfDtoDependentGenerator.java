@@ -1,8 +1,8 @@
 package org.laoruga.dtogenerator.typegenerators.executors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.ICustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.typegenerators.CustomGenerator;
 
