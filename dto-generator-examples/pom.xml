@@ -15,7 +15,7 @@
         <dependency>
             <groupId>org.laoruga</groupId>
             <artifactId>dto-generator</artifactId>
-            <version>0.1-ALPHA</version>
+            <version>${project.version}</version>
         </dependency>
 
     </dependencies>
