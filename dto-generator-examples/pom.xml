@@ -8,6 +8,8 @@
         <version>0.3.4-alpha-SNAPSHOT</version>
     </parent>
 
+    <packaging>jar</packaging>
+
     <artifactId>dto-generator-examples</artifactId>
 
     <dependencies>
