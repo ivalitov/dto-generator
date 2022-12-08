@@ -9,7 +9,6 @@
     </parent>
 
     <artifactId>dto-generator-examples</artifactId>
-    <version>0.1-ALPHA</version>
 
     <dependencies>
 
