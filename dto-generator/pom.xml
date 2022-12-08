@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.laoruga</groupId>
         <artifactId>dto-generator-parent</artifactId>
-        <version>0.3.3-alpha-SNAPSHOT</version>
+        <version>0.3.3-alpha</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
