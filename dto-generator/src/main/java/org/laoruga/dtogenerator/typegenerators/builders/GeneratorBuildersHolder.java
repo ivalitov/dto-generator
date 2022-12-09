@@ -32,8 +32,7 @@ public final class GeneratorBuildersHolder {
 
             if (buildersGeneratedType == generatedType) {
                 if (matchedBuilder != null) {
-                    throw new DtoGeneratorException("More than one matched generators found for generated type: " +
-                            "'" + generatedType + "'");
+                    throw new DtoGeneratorException("More than one matched generators found for generated type: " + "'" + generatedType + "'");
                 }
                 matchedBuilder = info.getBuilderSupplier().get();
             }
@@ -50,22 +49,25 @@ public final class GeneratorBuildersHolder {
 
         for (GenBuilderInfo info : getBuilderInfoList()) {
 
-                if (info.getGeneratedType() == Enum.class) {
-                    if (anyEnumBuilder != null) {
-                        throw new DtoGeneratorException("More than one matched generators found for generated type: " + "'" + generatedType + "'");
-                    }
-                    anyEnumBuilder = info.getBuilderSupplier().get();
-                } else if (info.getGeneratedType() == generatedType) {
-                    if (strictEnumBuilder != null) {
-                        throw new DtoGeneratorException("More than one matched generators found for generated type: " + "'" + generatedType + "'");
-                    }
-                    strictEnumBuilder = info.getBuilderSupplier().get();
+            if (info.getGeneratedType() == Enum.class) {
+                if (anyEnumBuilder != null) {
+                    throwError(generatedType);
                 }
+                anyEnumBuilder = info.getBuilderSupplier().get();
+            } else if (info.getGeneratedType() == generatedType) {
+                if (strictEnumBuilder != null) {
+                    throwError(generatedType);
+                }
+                strictEnumBuilder = info.getBuilderSupplier().get();
+            }
 
         }
         return Optional.ofNullable(anyEnumBuilder != null ? anyEnumBuilder : strictEnumBuilder);
     }
 
+    private static void throwError(Class<?> generatedType) {
+        throw new DtoGeneratorException("More than one matched generators found for generated type: " + "'" + generatedType + "'");
+    }
 
     public Optional<IGeneratorBuilder> getBuilder(Annotation rulesAnnotation, Class<?> generatedType) {
         GenBuilderInfo matchedBuilder = null;
