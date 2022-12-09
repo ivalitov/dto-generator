@@ -1,6 +1,5 @@
 [![SonarCloud](https://github.com/ivalitov/dto-generator/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/ivalitov/dto-generator/actions/workflows/build.yml)
 
-
 ***
 
 # DTO Generator
