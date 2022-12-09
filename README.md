@@ -1,5 +1,7 @@
-[![SonarCloud](https://github.com/ivalitov/dto-generator/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/ivalitov/dto-generator/actions/workflows/build.yml)
-
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ivalitov_dto-generator&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ivalitov_dto-generator)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ivalitov_dto-generator&metric=coverage)](https://sonarcloud.io/summary/new_code?id=ivalitov_dto-generator)
+[![badge-jdk](https://img.shields.io/badge/jdk-8-green.svg)](https://www.oracle.com/java/technologies/javase-downloads.html)
+[![License badge](https://img.shields.io/badge/license-Apache2-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 ***
 
 # DTO Generator
