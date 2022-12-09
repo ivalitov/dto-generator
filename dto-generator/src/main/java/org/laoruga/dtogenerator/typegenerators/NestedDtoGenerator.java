@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 public class NestedDtoGenerator implements IGenerator<Object> {
 
-    private final DtoGenerator<?> nestedDtoGenerator;
+    private final DtoGenerator<?> dtoGenerator;
 
     public static NestedDtoGenerator.NestedDtoGeneratorBuilder builder() {
         return new NestedDtoGenerator.NestedDtoGeneratorBuilder();
@@ -23,7 +23,7 @@ public class NestedDtoGenerator implements IGenerator<Object> {
 
     @Override
     public Object generate() {
-        return nestedDtoGenerator.generateDto();
+        return dtoGenerator.generateDto();
     }
 
     @Slf4j

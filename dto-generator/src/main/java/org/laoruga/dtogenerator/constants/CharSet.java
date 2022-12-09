@@ -1,6 +1,8 @@
 package org.laoruga.dtogenerator.constants;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Il'dar Valitov
@@ -8,7 +10,8 @@ import lombok.Getter;
  */
 
 @Getter
-public class CharSet {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class CharSet {
 
     public static final String NUM = "1234567890";
     public static final String ENG = "qwertzuiopasdfghjklyxcvbn";

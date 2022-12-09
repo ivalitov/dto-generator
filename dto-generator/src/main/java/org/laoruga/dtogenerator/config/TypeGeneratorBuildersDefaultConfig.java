@@ -14,13 +14,12 @@ import java.util.Objects;
  * Created on 13.11.2022
  */
 @Slf4j
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TypeGeneratorBuildersDefaultConfig extends TypeGeneratorBuildersConfig {
 
     @Getter
     private static final TypeGeneratorBuildersDefaultConfig instance = new TypeGeneratorBuildersDefaultConfig();
 
-    {
+    private TypeGeneratorBuildersDefaultConfig() {
         setConfig(StringGenerator.StringGeneratorBuilder.class, () -> new StringGenerator.ConfigDto(RulesInstance.stringRule));
         setConfig(IntegerGenerator.IntegerGeneratorBuilder.class, () -> new IntegerGenerator.ConfigDto(RulesInstance.integerRule));
         setConfig(LongGenerator.LongGeneratorBuilder.class, () -> new LongGenerator.ConfigDto(RulesInstance.longRule));
@@ -42,7 +41,7 @@ public final class TypeGeneratorBuildersDefaultConfig extends TypeGeneratorBuild
     public IConfigDto getConfig(Class<?> builderClass, Class<?> generatedType) {
         return Objects.requireNonNull(super.getConfig(builderClass, generatedType),
                 "Default config not set for builder's class: " +
-                "'" + builderClass + "' and field type: '" + generatedType + "'");
+                        "'" + builderClass + "' and field type: '" + generatedType + "'");
     }
 
     @Override
@@ -57,7 +56,7 @@ public final class TypeGeneratorBuildersDefaultConfig extends TypeGeneratorBuild
         logWarning();
     }
 
-    private static void logWarning(){
+    private static void logWarning() {
         log.warn("Default type generator's config have changed, this may conclude to unexpected behaviour.");
     }
 

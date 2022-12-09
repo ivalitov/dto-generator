@@ -1,6 +1,9 @@
 package org.laoruga.dtogenerator.rules;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -10,7 +13,8 @@ import java.util.Objects;
  * @author Il'dar Valitov
  * Created on 30.11.2022
  */
-public class RulesInstance {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RulesInstance {
 
     @StringRule
     @IntegerRule
@@ -35,8 +39,6 @@ public class RulesInstance {
     public static final CustomRule customRule;
     public static final NestedDtoRule nestedDtoRule;
 
-
-
     static {
         try {
             Field annotations = RulesInstance.class.getDeclaredField("annotations");
@@ -53,7 +55,7 @@ public class RulesInstance {
             nestedDtoRule = getAnnotationInstance(annotations, NestedDtoRule.class);
 
         } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
+            throw new DtoGeneratorException(e);
         }
     }
 

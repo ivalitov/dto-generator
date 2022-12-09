@@ -43,15 +43,14 @@ public abstract class AbstractGeneratorBuildersProvider {
 
     abstract Optional<IGenerator<?>> selectOrCreateGenerator();
 
-
     public Optional<IGenerator<?>> getGenerator() {
         Optional<IGenerator<?>> maybeGenerator = selectOrCreateGenerator();
         if (maybeGenerator.isPresent()) {
             return maybeGenerator;
         } else {
-            Optional<AbstractGeneratorBuildersProvider> nextProvider = getNextProvider();
-            if (nextProvider.isPresent()) {
-                return nextProvider.get().getGenerator();
+            Optional<AbstractGeneratorBuildersProvider> provider = getNextProvider();
+            if (provider.isPresent()) {
+                return provider.get().getGenerator();
             } else {
                 return Optional.empty();
             }

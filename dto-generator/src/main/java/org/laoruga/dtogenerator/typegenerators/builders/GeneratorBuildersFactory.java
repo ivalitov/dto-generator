@@ -1,12 +1,15 @@
 package org.laoruga.dtogenerator.typegenerators.builders;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.typegenerators.*;
 
 /**
  * @author Il'dar Valitov
  * Created on 24.11.2022
  */
-public class GeneratorBuildersFactory {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class GeneratorBuildersFactory {
     public static StringGenerator.StringGeneratorBuilder stringBuilder() {
         return StringGenerator.builder();
     }

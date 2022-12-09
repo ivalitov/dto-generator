@@ -63,13 +63,13 @@ public class TypeGeneratorBuildersConfig {
         if (doubleKeyConfigMap.containsKey(builderClass)) {
 
             Map<Class<?>, Supplier<IConfigDto>> classIConfigDtoMap = doubleKeyConfigMap.get(builderClass);
-            for (Class<?> generatedSuperType : classIConfigDtoMap.keySet()) {
-                if (generatedSuperType.isAssignableFrom(generatedType)) {
+            for (Map.Entry<Class<?>, Supplier<IConfigDto>> generatedSuperType : classIConfigDtoMap.entrySet()) {
+                if (generatedSuperType.getKey().isAssignableFrom(generatedType)) {
                     if (configDto != null) {
                         throw new DtoGeneratorException("Ambiguous generator's builder config. " +
                                 " Found more than one config for generated type: '" + generatedType + "'");
                     }
-                    configDto = classIConfigDtoMap.get(generatedSuperType).get();
+                    configDto = generatedSuperType.getValue().get();
                 }
             }
 

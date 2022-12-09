@@ -1,5 +1,7 @@
 package org.laoruga.dtogenerator.typegenerators.builders;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.rules.RulesInstance;
 
@@ -12,7 +14,8 @@ import static org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuilders
  * @author Il'dar Valitov
  * Created on 24.11.2022
  */
-public class GeneratorBuildersHolderGeneral {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class GeneratorBuildersHolderGeneral {
 
     private static GeneratorBuildersHolder instance;
 

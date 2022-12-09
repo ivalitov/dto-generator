@@ -17,6 +17,7 @@ import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.rules.IRuleInfo;
 import org.laoruga.dtogenerator.rules.RuleInfoCollection;
 import org.laoruga.dtogenerator.typegenerators.*;
+import org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuildersFactory;
 import org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuildersHolderGeneral;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
@@ -24,8 +25,10 @@ import org.laoruga.dtogenerator.util.ReflectionUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
+import static org.laoruga.dtogenerator.constants.RuleRemark.MIN_VALUE;
 import static org.laoruga.dtogenerator.constants.RuleRemark.NULL_VALUE;
 import static org.laoruga.dtogenerator.util.ReflectionUtils.createCollectionInstance;
 
@@ -174,13 +177,17 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
         try {
 
-            if (StringRule.class == rulesClass && generatorBuilder instanceof StringGenerator.StringGeneratorBuilder) {
+
+            if (StringRule.class == rulesClass) {
+
+                if (generatorBuilder instanceof StringGenerator.StringGeneratorBuilder) {
 
                     return getGenerator(
                             () -> new StringGenerator.ConfigDto((StringRule) rules),
                             () -> (IGeneratorBuilderConfigurable) generatorBuilder,
                             (config, builder) -> builder.build(config, true),
                             getFieldType());
+                }
 
             } else if (DoubleRule.class == rulesClass) {
 
@@ -189,12 +196,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                     return getGenerator(
                             () -> new DoubleGenerator.ConfigDto((DoubleRule) rules),
                             () -> (IGeneratorBuilderConfigurable) generatorBuilder,
-                            (config, builder) -> (config.getRuleRemark() == NULL_VALUE && isPrimitive) ?
-                                    () -> {
-                                        reportPrimitiveCannotBeNull();
-                                        return 0D;
-                                    } :
-                                    builder.build(config, true),
+                            doubleGeneratorSupplier(isPrimitive),
                             getFieldType());
                 }
 
@@ -205,12 +207,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                     return getGenerator(
                             () -> new IntegerGenerator.ConfigDto((IntegerRule) rules),
                             () -> (IGeneratorBuilderConfigurable) generatorBuilder,
-                            (config, builder) -> (config.getRuleRemark() == NULL_VALUE && isPrimitive) ?
-                                    () -> {
-                                        reportPrimitiveCannotBeNull();
-                                        return 0;
-                                    } :
-                                    builder.build(config, true),
+                            integerGeneratorSupplier(isPrimitive),
                             getFieldType());
                 }
 
@@ -221,12 +218,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                     return getGenerator(
                             () -> new LongGenerator.ConfigDto((LongRule) rules),
                             () -> (IGeneratorBuilderConfigurable) generatorBuilder,
-                            (config, builder) -> (config.getRuleRemark() == NULL_VALUE && isPrimitive) ?
-                                    () -> {
-                                        reportPrimitiveCannotBeNull();
-                                        return 0;
-                                    } :
-                                    builder.build(config, true),
+                            longGeneratorSupplier(isPrimitive),
                             getFieldType());
                 }
 
@@ -300,8 +292,8 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
             } else if (SetRule.class == rulesClass) {
 
                 configDto = new CollectionGenerator.ConfigDto((SetRule) collectionRule)
-                                .setCollectionInstance(
-                                        () -> createCollectionInstance(((SetRule) collectionRule).setClass()));
+                        .setCollectionInstance(
+                                () -> createCollectionInstance(((SetRule) collectionRule).setClass()));
 
             } else {
                 throw new DtoGeneratorException("Unknown rules annotation class '" + rulesClass + "'");
@@ -333,6 +325,45 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                 .build();
     }
 
+    BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> integerGeneratorSupplier(boolean isPrimitive) {
+        return (config, builder) -> {
+            if (config.getRuleRemark() == NULL_VALUE && isPrimitive) {
+                reportPrimitiveCannotBeNull();
+                return GeneratorBuildersFactory.integerBuilder()
+                        .minValue(0)
+                        .maxValue(0)
+                        .ruleRemark(MIN_VALUE).build();
+            }
+            return builder.build(config, true);
+        };
+    }
+
+    BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> longGeneratorSupplier(boolean isPrimitive) {
+        return (config, builder) -> {
+            if (config.getRuleRemark() == NULL_VALUE && isPrimitive) {
+                reportPrimitiveCannotBeNull();
+                return GeneratorBuildersFactory.longBuilder()
+                        .minValue(0L)
+                        .maxValue(0L)
+                        .ruleRemark(MIN_VALUE).build();
+            }
+            return builder.build(config, true);
+        };
+    }
+
+    BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> doubleGeneratorSupplier(boolean isPrimitive) {
+        return (config, builder) -> {
+            if (config.getRuleRemark() == NULL_VALUE && isPrimitive) {
+                reportPrimitiveCannotBeNull();
+                return GeneratorBuildersFactory.doubleBuilder()
+                        .minValue(0D)
+                        .maxValue(0D)
+                        .ruleRemark(MIN_VALUE).build();
+            }
+            return builder.build(config, true);
+        };
+    }
+
     private void prepareCustomRemarks(IGenerator<?> generator, String fieldName) {
         if (generator instanceof CustomGenerator) {
             IGenerator<?> usersGeneratorInstance = ((CustomGenerator) generator).getUsersGeneratorInstance();
@@ -361,7 +392,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
      */
 
     private void reportPrimitiveCannotBeNull() {
-        log.debug("Primitive field " + getFieldName() + " can't be null, it will be assigned to '0'");
+        log.warn("Primitive field " + getFieldName() + " can't be null, it will be assigned to '0'");
     }
 
     @Override
