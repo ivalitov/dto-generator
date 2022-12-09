@@ -653,9 +653,8 @@ class OverridingOfGeneratorsTests {
         int generated;
 
         @Override
-        public CustomIntegerGenerator setArgs(String... args) {
+        public void setArgs(String... args) {
             generated = Integer.parseInt(args[0]);
-            return this;
         }
 
         @Override

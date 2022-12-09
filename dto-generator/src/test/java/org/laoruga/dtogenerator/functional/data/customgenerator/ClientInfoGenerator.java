@@ -26,9 +26,8 @@ public class ClientInfoGenerator extends AbstractCustomGeneratorRemarkable<Clien
     private String[] generatorArgs;
 
     @Override
-    public ClientInfoGenerator setArgs(String[] args) {
+    public void setArgs(String[] args) {
         this.generatorArgs = args;
-        return this;
     }
 
     @Override

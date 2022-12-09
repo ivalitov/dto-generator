@@ -438,9 +438,75 @@ Will result something like:
 ```
 
 You may design your custom generator for any type you want. To do this, you need to implement one or more
-`ICustomGenerator*` interfaces
+`ICustomGenerator*` interfaces:
 
-Example of usage you may see in the project with examples: [Dto Generator Examples project](dto-generator-examples/README.md)
+- `ICustomGenerator`             
+- `ICustomGeneratorArgs`         
+- `ICustomGeneratorDtoDependent` 
+- `ICustomGeneratorRemarkable`   
+
+Example of custom generator with args:
+
+```java
+import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.rules.CustomRule;
+import java.util.Map;
+
+public class Example8 {
+
+    /**
+     * Dto to generate
+     */
+    static class Dto8 {
+        
+        @CustomRule(generatorClass = DocumentGenerator.class, args = "PASSPORT")
+        private Document document;
+    }
+
+    /**
+     * Type that we want to generate via custom generator
+     */
+    static class Document {
+        Map<String, String> attributes;
+    }
+
+    /**
+     * Custom generator which requires of passing of arguments
+     */
+    static class DocumentGenerator implements ICustomGeneratorArgs<Document> {
+
+        private String docType;
+
+        @Override
+        public void setArgs(String... args) {
+            this.docType = args[0];
+        }
+
+        @Override
+        public Document generate() {
+            Document document = new Document();
+            switch (docType) {
+                case "PASSPORT":
+                    document.attributes = generatePassportAttributes();
+                case "DRIVER_LICENSE":
+                    document.attributes = generateDriverLicenseAttributes();
+            }
+            return document;
+        }
+
+        public Map<String, String> generatePassportAttributes() {
+            // generation logic
+        }
+
+        public Map<String, String> generateDriverLicenseAttributes() {
+            // generation logic
+        }
+    }
+}
+```
+
+More info and more examples of usage you may see in the project with examples: [Dto Generator Examples project](dto-generator-examples/README.md)
 
 <a name="more_examples"></a>
 

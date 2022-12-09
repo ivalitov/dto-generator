@@ -18,9 +18,8 @@ public class CustomGeneratorWithArgs implements ICustomGeneratorArgs<List<String
     Args args;
 
     @Override
-    public ICustomGeneratorArgs<List<String>> setArgs(String... args) {
+    public void setArgs(String... args) {
         this.args = convert(args);
-        return this;
     }
 
     @Override
