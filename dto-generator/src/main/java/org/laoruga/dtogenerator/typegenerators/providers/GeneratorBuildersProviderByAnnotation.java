@@ -126,8 +126,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
             generator = buildCollectionGenerator(
                     collectionRuleInfo.getRule(),
                     collectionGenBuilder,
-                    elementGenerator,
-                    isUserCollectionBuilder
+                    elementGenerator
             );
 
         } else {
@@ -175,17 +174,13 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
         try {
 
-
-            if (StringRule.class == rulesClass) {
-
-                if (generatorBuilder instanceof StringGenerator.StringGeneratorBuilder) {
+            if (StringRule.class == rulesClass && generatorBuilder instanceof StringGenerator.StringGeneratorBuilder) {
 
                     return getGenerator(
                             () -> new StringGenerator.ConfigDto((StringRule) rules),
                             () -> (IGeneratorBuilderConfigurable) generatorBuilder,
                             (config, builder) -> builder.build(config, true),
                             getFieldType());
-                }
 
             } else if (DoubleRule.class == rulesClass) {
 
@@ -289,8 +284,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
     private IGenerator<?> buildCollectionGenerator(Annotation collectionRule,
                                                    IGeneratorBuilder collectionGenBuilder,
-                                                   IGenerator<?> elementGenerator,
-                                                   boolean isUserCollectionBuilder) {
+                                                   IGenerator<?> elementGenerator) {
         Class<? extends Annotation> rulesClass = collectionRule.annotationType();
 
         if (collectionGenBuilder instanceof CollectionGenerator.CollectionGeneratorBuilder) {
