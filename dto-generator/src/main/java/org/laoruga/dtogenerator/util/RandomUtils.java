@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.RandomStringGenerator;
+import org.laoruga.dtogenerator.constants.CharSet;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -19,6 +20,9 @@ import java.util.concurrent.ThreadLocalRandom;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RandomUtils {
+
+    private static final RandomStringGenerator DEFAULT_STRING_GENERATOR =
+            new RandomStringGenerator.Builder().selectFrom(CharSet.DEFAULT_CHARSET.toCharArray()).build();
 
     @Getter
     private static final Random random = new Random();
@@ -96,7 +100,7 @@ public final class RandomUtils {
     }
 
     public static String nextString(int length) {
-        return new RandomStringGenerator.Builder().selectFrom().build().generate(length);
+        return DEFAULT_STRING_GENERATOR.generate(length);
     }
 
 }

@@ -15,6 +15,7 @@ public class CharSet {
     public static final String ENG_CAP = "QWERTZUIOPASDFGHJKLYXCVBNM";
     public static final String RUS = "абввгдеёжзиклмнопрстуфхцчшщэъьюя";
     public static final String RUS_CAP = "АБВВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЭЪЬЮЯ";
-    public static final String DEFAULT_CHARSET = NUM + ENG + ENG_CAP;
+    public static final String SPECIAL_SYMBOLS_XML_SAFE = "~\"`'.,!?@#№$%^-+=*(){}[]/|\\_:; ";
+    public static final String DEFAULT_CHARSET = NUM + ENG + ENG_CAP + SPECIAL_SYMBOLS_XML_SAFE;
 
 }
