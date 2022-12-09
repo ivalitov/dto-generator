@@ -34,6 +34,18 @@ If you want to create your own generator of specific type, next annotation is us
 
 ## Usage
 
+1. [Annotation Based Configuration](#annotation_based_config)
+2. [Grouping of Rules](#rules_grouping)
+3. [Known Type's Generation](#known_types_generation)
+4. [Configuration management](#config_management)
+5. [Rule's Remarks](#rules_remarks)
+6. [User's Builders](#users_builder)
+7. [Nested DTO](#nested_dto)
+8. [Custom Rules](#custom_rule)
+9. [More Examples](#more_examples)
+
+<a name="annotation_based_config"></a>
+
 ### 1. Annotation Based Configuration
 
 For example, if we're using next rules:
@@ -88,7 +100,55 @@ As the result we'll have an object containing random data, based on parameters o
 }
 ```
 
-### 2. Known Type Generation
+
+<a name="rules_grouping"></a>
+
+### 2. Grouping of Rules
+
+You may put multiple **@Rule** annotations on the one field and mark them with different groups.
+Then you need to select which group you prefer to use for DTO generation.
+
+For example, next config:
+
+```java
+import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.api.rules.*;
+
+public class Example7 {
+
+    public static class Dto7 {
+
+        @StringRule(words = {"Alice", "Maria"}, group = "GIRL")
+        @StringRule(words = {"Peter", "Clint"}, group = "BOY")
+        private String name;
+
+        @IntegerRule(minValue = 18, maxValue = 30, group = "YOUNG")
+        @IntegerRule(minValue = 31, maxValue = 60, group = "MATURE")
+        private Integer age;
+
+    }
+
+    public static void main(String[] args) {
+        Dto7 dto = DtoGenerator.builder(Dto7.class)
+                .includeGroups("MATURE", "BOY")
+                .build()
+                .generateDto();
+    }
+}
+```
+
+will produce, for instance:
+
+```json
+{
+  "name": "Clint",
+  "age": 45
+}
+```
+
+<a name="known_types_generation"></a>
+
+### 3. Known Type's Generation
 
 Configuration parameter **generateAllKnownTypes** allows to generate values of fields of known types, without the need
 to put *@Rules* annotation no them.
@@ -130,7 +190,9 @@ rules:
 }
 ```
 
-### 3. Configuration management
+<a name="config_management"></a>
+
+### 4. Configuration management
 
 There are 4 configuration levels, each next level of config overrides previous ones:
 
@@ -183,7 +245,9 @@ The result sting will be next:
 }
 ```
 
-### 4. Rule's Remarks
+<a name="rules_remarks"></a>
+
+### 5. Rule's Remarks
 
 Rule's remarks - refinements for known type generators, to generate boundary values.
 It is possible to assign remark either to the entire DTO or only to certain fields.
@@ -246,7 +310,7 @@ The result dto will look like:
 
 <a name="users_builder"></a>
 
-### 5. User's Builders of Known Types
+### 6. User's Builders of Known Types
 
 You may override generators of known types:
 
@@ -312,7 +376,7 @@ The result dto may look like:
 
 <a name="nested_dto"></a>
 
-### 6. Nested DTO
+### 7. Nested DTO
 
 If you want to override or remark fields within nested DTO, use path to DTO separated by dots.
 
@@ -367,68 +431,18 @@ Will result something like:
 
 <a name="custom_rule"></a>
 
-### 7. Custom Rules
+### 8. Custom Rules
 
 ```diff
 - This is an experimental feature, it will be significantly changed in future releases
 ```
 
-You may design your custom generator for any type you want. To do this, you need to implement one or more interfaces:
+You may design your custom generator for any type you want. To do this, you need to implement one or more
+`ICustomGenerator*` interfaces
 
-| Interface                      | Feature                                                                                                                                        |
-|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
-| `ICustomGenerator`             | base annotation, allows to create non configurable type generators                                                                             |
-| `ICustomGeneratorArgs`         | allows to pass array of arguments to type generator                                                                                            |
-| `ICustomGeneratorDtoDependent` | provides a reference to the DTO instance to the generator<br/>(to check if the DTO fields required for generation have already been filled in) |
-| `ICustomGeneratorRemarkable  ` | allows to pass objects to a custom type generator as remarks                                                                                   |
-
-Example of usage you may see in the project with
-examples: [see below](#more_examples)
-
-### 8. Grouping of Rules
-
-You may put multiple **@Rule** annotations on the one field and mark them with different groups.
-Then you need to select which group you prefer to use for DTO generation.
-
-For example, next config:
-
-```java
-import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.*;
-
-public class Example7 {
-
-    public static class Dto7 {
-
-        @StringRule(words = {"Alice", "Maria"}, group = "GIRL")
-        @StringRule(words = {"Peter", "Clint"}, group = "BOY")
-        private String name;
-
-        @IntegerRule(minValue = 18, maxValue = 30, group = "YOUNG")
-        @IntegerRule(minValue = 31, maxValue = 60, group = "MATURE")
-        private Integer age;
-
-    }
-
-    public static void main(String[] args) {
-        Dto7 dto = DtoGenerator.builder(Dto7.class)
-                .includeGroups("MATURE", "BOY")
-                .build()
-                .generateDto();
-    }
-}
-```
-
-will produce, for instance:
-
-```json
-{
-  "name": "Clint",
-  "age": 45
-}
-```
+Example of usage you may see in the project with examples: [Dto Generator Examples project](dto-generator-examples/README.md)
 
 <a name="more_examples"></a>
 
 ### 9. More Examples
-More examples you can find in the project: https://github.com/ivalitov/dto-generator/tree/master/dto-generator-examples
+More examples you can find in the: [Dto Generator Examples project](dto-generator-examples/README.md)
