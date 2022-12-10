@@ -19,6 +19,7 @@
 
     <properties>
         <argLinePlaceholder />
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
@@ -31,12 +32,15 @@
         <allure.version>2.17.2</allure.version>
         <allure.junit5.version>2.16.1</allure.junit5.version>
         <allure.junit5.assert.version>${allure.version}</allure.junit5.assert.version>
-        <plugin.allure.ver>2.10.0</plugin.allure.ver>
         <hamcrest.verstion>2.2</hamcrest.verstion>
-        <jacoco.version>0.8.7</jacoco.version>
+
+        <!-- analysis -->
 
         <sonar.organization>laoruga</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <jacoco.version>0.8.7</jacoco.version>
+
+        <!-- plugins -->
 
         <plugin.nexus.staging.ver>1.6.13</plugin.nexus.staging.ver>
         <plugin.maven.gpg.ver>3.0.1</plugin.maven.gpg.ver>
@@ -46,13 +50,14 @@
         <plugin.maven.release.ver>3.0.0-M7</plugin.maven.release.ver>
         <plugin.maven.assembly.ver>3.0.0</plugin.maven.assembly.ver>
         <plugin.maven.javadoc.ver>3.4.1</plugin.maven.javadoc.ver>
+        <plugin.allure.ver>2.10.0</plugin.allure.ver>
     </properties>
 
     <scm>
         <connection>scm:git:git@github.com:ivalitov/dto-generator.git</connection>
         <developerConnection>scm:git:git@github.com:ivalitov/dto-generator.git</developerConnection>
         <url>https://github.com/ivalitov/dto-generator</url>
-        <tag>1.3.1</tag>
+        <tag>0.3.5-alpha</tag>
     </scm>
 
     <dependencies>
