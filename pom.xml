@@ -4,7 +4,7 @@
 
     <groupId>org.laoruga</groupId>
     <artifactId>dto-generator-parent</artifactId>
-    <version>0.3.5-alpha</version>
+    <version>0.3.6-alpha-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
