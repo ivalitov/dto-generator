@@ -8,6 +8,10 @@
 
     <packaging>pom</packaging>
 
+    <name>DTO Generator</name>
+    <description>DTO Generator makes it easy to create POJOs containing random data generated according to given rules</description>
+    <url>https://github.com/ivalitov/dto-generator</url>
+
     <modules>
         <module>dto-generator</module>
         <module>dto-generator-examples</module>
@@ -27,12 +31,21 @@
         <allure.version>2.17.2</allure.version>
         <allure.junit5.version>2.16.1</allure.junit5.version>
         <allure.junit5.assert.version>${allure.version}</allure.junit5.assert.version>
-        <allure.maven.version>2.10.0</allure.maven.version>
+        <plugin.allure.ver>2.10.0</plugin.allure.ver>
         <hamcrest.verstion>2.2</hamcrest.verstion>
         <jacoco.version>0.8.7</jacoco.version>
 
         <sonar.organization>laoruga</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
+        <plugin.nexus.staging.ver>1.6.13</plugin.nexus.staging.ver>
+        <plugin.maven.gpg.ver>3.0.1</plugin.maven.gpg.ver>
+        <plugin.maven.source.ver>3.2.1</plugin.maven.source.ver>
+        <plugin.maven.compiler.ver>3.8.1</plugin.maven.compiler.ver>
+        <plugin.maven.surefire.ver>2.22.2</plugin.maven.surefire.ver>
+        <plugin.maven.release.ver>3.0.0-M7</plugin.maven.release.ver>
+        <plugin.maven.assembly.ver>3.0.0</plugin.maven.assembly.ver>
+        <plugin.maven.javadoc.ver>3.4.1</plugin.maven.javadoc.ver>
     </properties>
 
     <scm>
@@ -43,6 +56,7 @@
     </scm>
 
     <dependencies>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-reload4j</artifactId>
@@ -73,6 +87,8 @@
             <version>1.18.22</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Testing -->
 
         <!-- Junit Platform -->
 
@@ -155,14 +171,75 @@
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <build>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.sonatype.plugins</groupId>
+                    <artifactId>nexus-staging-maven-plugin</artifactId>
+                    <version>${plugin.nexus.staging.ver}</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <serverId>ossrh</serverId>
+                        <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                        <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>${plugin.maven.gpg.ver}</version>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <gpgArguments>
+                            <gpgArgument>--pinentry-mode</gpgArgument>
+                            <gpgArgument>loopback</gpgArgument>
+                        </gpgArguments>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>${plugin.maven.assembly.ver}</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -184,10 +261,11 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>3.0.0-M7</version>
+                <version>${plugin.maven.release.ver}</version>
                 <configuration>
                     <goal>pre-integration-test</goal>
                     <preparationGoals>package</preparationGoals>
@@ -197,10 +275,11 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>${plugin.maven.javadoc.ver}</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -213,10 +292,11 @@
                     <source>8</source>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.1</version>
+                <version>${plugin.maven.source.ver}</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -226,15 +306,17 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>${plugin.maven.compiler.ver}</version>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>${plugin.maven.surefire.ver}</version>
                 <configuration>
                     <argLine>
                         ${argLinePlaceholder}
@@ -263,12 +345,43 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
             <plugin>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
-                <version>${allure.maven.version}</version>
+                <version>${plugin.allure.ver}</version>
             </plugin>
+
         </plugins>
+
     </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <name>SNAPSHOTS</name>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <name>RELEASES</name>
+            <url>https://s01.oss.sonatype.org/content/repositories/releases</url>
+        </repository>
+    </distributionManagement>
+
+    <developers>
+        <developer>
+            <id>laoruga</id>
+            <name>Ildar Valitov</name>
+            <url>https://www.ivalitov.org</url>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://github.com/ivalitov/dto-generator/blob/master/LICENSE</url>
+        </license>
+    </licenses>
 
 </project>
