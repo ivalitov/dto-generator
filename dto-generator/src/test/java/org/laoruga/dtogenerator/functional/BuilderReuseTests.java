@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Builder reuse")
 @Epic("BUILDER_REUSE")
 @Slf4j
-public class BuilderReuseTests {
+class BuilderReuseTests {
 
     @Test
     @DisplayName("Generating of two DTO instances")

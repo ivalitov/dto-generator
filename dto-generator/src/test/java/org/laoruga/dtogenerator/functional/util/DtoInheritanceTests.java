@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName("DTO Inheritance")
 @Epic("DTO_INHERITANCE")
 @Slf4j
-public class DtoInheritanceTests {
+class DtoInheritanceTests {
 
     @Getter
     static abstract class DtoAbstract {
