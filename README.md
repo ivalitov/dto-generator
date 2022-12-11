@@ -1,3 +1,4 @@
+[![Maven Central](https://img.shields.io/maven-central/v/org.laoruga/dto-generator.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.laoruga%22%20AND%20a:%22dto-generator%22)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ivalitov_dto-generator&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ivalitov_dto-generator)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ivalitov_dto-generator&metric=coverage)](https://sonarcloud.io/summary/new_code?id=ivalitov_dto-generator)
 [![badge-jdk](https://img.shields.io/badge/jdk-8-green.svg)](https://www.oracle.com/java/technologies/javase-downloads.html)

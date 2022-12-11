@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.laoruga</groupId>
@@ -9,7 +10,8 @@
     <packaging>pom</packaging>
 
     <name>DTO Generator</name>
-    <description>DTO Generator makes it easy to create POJOs containing random data generated according to given rules</description>
+    <description>DTO Generator makes it easy to create POJOs containing random data generated according to given rules
+    </description>
     <url>https://github.com/ivalitov/dto-generator</url>
 
     <modules>
@@ -18,7 +20,7 @@
     </modules>
 
     <properties>
-        <argLinePlaceholder />
+        <argLinePlaceholder/>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
@@ -42,15 +44,15 @@
 
         <!-- plugins -->
 
-        <plugin.nexus.staging.ver>1.6.13</plugin.nexus.staging.ver>
-        <plugin.maven.gpg.ver>3.0.1</plugin.maven.gpg.ver>
-        <plugin.maven.source.ver>3.2.1</plugin.maven.source.ver>
-        <plugin.maven.compiler.ver>3.8.1</plugin.maven.compiler.ver>
-        <plugin.maven.surefire.ver>2.22.2</plugin.maven.surefire.ver>
-        <plugin.maven.release.ver>3.0.0-M7</plugin.maven.release.ver>
-        <plugin.maven.assembly.ver>3.0.0</plugin.maven.assembly.ver>
-        <plugin.maven.javadoc.ver>3.4.1</plugin.maven.javadoc.ver>
-        <plugin.allure.ver>2.10.0</plugin.allure.ver>
+        <plugin.nexus.staging.version>1.6.13</plugin.nexus.staging.version>
+        <plugin.maven.gpg.version>3.0.1</plugin.maven.gpg.version>
+        <plugin.maven.source.version>3.2.1</plugin.maven.source.version>
+        <plugin.maven.compiler.version>3.8.1</plugin.maven.compiler.version>
+        <plugin.maven.surefire.version>2.22.2</plugin.maven.surefire.version>
+        <plugin.maven.release.version>3.0.0-M7</plugin.maven.release.version>
+        <plugin.maven.jar-plugin.version>3.3.0</plugin.maven.jar-plugin.version>
+        <plugin.maven.javadoc.version>3.4.1</plugin.maven.javadoc.version>
+        <plugin.allure.version>2.10.0</plugin.allure.version>
     </properties>
 
     <scm>
@@ -209,7 +211,7 @@
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>${plugin.nexus.staging.ver}</version>
+                    <version>${plugin.nexus.staging.version}</version>
                     <extensions>true</extensions>
                     <configuration>
                         <serverId>ossrh</serverId>
@@ -220,7 +222,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>${plugin.maven.gpg.ver}</version>
+                    <version>${plugin.maven.gpg.version}</version>
                     <executions>
                         <execution>
                             <id>sign-artifacts</id>
@@ -241,36 +243,17 @@
         </pluginManagement>
 
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>${plugin.maven.assembly.ver}</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${plugin.maven.jar-plugin.version}</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>${plugin.maven.release.ver}</version>
+                <version>${plugin.maven.release.version}</version>
                 <configuration>
                     <goal>pre-integration-test</goal>
                     <preparationGoals>package</preparationGoals>
@@ -284,7 +267,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${plugin.maven.javadoc.ver}</version>
+                <version>${plugin.maven.javadoc.version}</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -301,7 +284,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>${plugin.maven.source.ver}</version>
+                <version>${plugin.maven.source.version}</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -315,13 +298,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${plugin.maven.compiler.ver}</version>
+                <version>${plugin.maven.compiler.version}</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${plugin.maven.surefire.ver}</version>
+                <version>${plugin.maven.surefire.version}</version>
                 <configuration>
                     <argLine>
                         ${argLinePlaceholder}
@@ -354,7 +337,7 @@
             <plugin>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
-                <version>${plugin.allure.ver}</version>
+                <version>${plugin.allure.version}</version>
             </plugin>
 
         </plugins>
@@ -377,7 +360,7 @@
     <developers>
         <developer>
             <id>laoruga</id>
-            <name>Ildar Valitov</name>
+            <name>Il'dar Valitov</name>
             <url>https://www.ivalitov.org</url>
         </developer>
     </developers>
