@@ -4,11 +4,12 @@ import org.laoruga.dtogenerator.api.generators.AbstractCustomGeneratorRemarkable
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWrapper;
-import org.laoruga.dtogenerator.functional.data.dtoclient.*;
+import org.laoruga.dtogenerator.functional.data.dto.dtoclient.*;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static org.laoruga.dtogenerator.functional.data.customgenerator.ClientRemark.CLIENT_TYPE;
 import static org.laoruga.dtogenerator.functional.data.customgenerator.ClientRemark.DOCUMENT;
@@ -22,7 +23,7 @@ public class ClientInfoGenerator extends AbstractCustomGeneratorRemarkable<Clien
         ICustomGeneratorArgs<ClientInfoDto>,
         ICustomGeneratorDtoDependent<ClientInfoDto, ClientDto> {
 
-    ClientDto generatedDto;
+    Supplier<ClientDto> generatedDto;
     private String[] generatorArgs;
 
     @Override
@@ -82,17 +83,17 @@ public class ClientInfoGenerator extends AbstractCustomGeneratorRemarkable<Clien
                 throw new IllegalStateException("Unexpected value: " + clientType);
         }
         clientInfo.setClientType(clientType);
-        clientInfo.setId(generatedDto.getStringRequiredForClient());
+        clientInfo.setId(generatedDto.get().getStringRequiredForClient());
         return clientInfo;
     }
 
     @Override
-    public void setDto(ClientDto generatedDto) {
+    public void setDtoSupplier(Supplier<ClientDto> generatedDto) {
         this.generatedDto = generatedDto;
     }
 
     @Override
     public boolean isDtoReady() {
-        return generatedDto.getStringRequiredForClient() != null;
+        return generatedDto.get().getStringRequiredForClient() != null;
     }
 }

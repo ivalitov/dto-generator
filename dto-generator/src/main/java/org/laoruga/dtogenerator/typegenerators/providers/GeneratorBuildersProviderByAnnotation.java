@@ -47,7 +47,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
     @Setter
     volatile private Field field;
     @Setter
-    volatile private Object dtoInstance;
+    volatile private Supplier<?> dtoInstanceSupplier;
     @Setter
     volatile private IRuleInfo ruleInfo;
     @Setter
@@ -315,7 +315,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                                              CustomRule rule) {
         return builder
                 .setCustomGeneratorRules(rule)
-                .setDtoInstance(dtoInstance)
+                .setDtoInstanceSupplier(dtoInstanceSupplier)
                 .build();
     }
 

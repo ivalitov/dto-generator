@@ -97,7 +97,7 @@ public class StringGenerator implements IGenerator<String> {
             return this;
         }
 
-        public StringGeneratorBuilder words(String[] words) {
+        public StringGeneratorBuilder words(String... words) {
             this.configDto.words = words;
             return this;
         }

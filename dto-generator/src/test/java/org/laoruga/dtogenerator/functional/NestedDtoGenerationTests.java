@@ -3,6 +3,7 @@ package org.laoruga.dtogenerator.functional;
 import io.qameta.allure.Epic;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,7 @@ import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.functional.data.dtoclient.*;
+import org.laoruga.dtogenerator.functional.data.dto.dtoclient.*;
 import org.laoruga.dtogenerator.rules.RulesInstance;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -28,6 +29,7 @@ import static org.laoruga.dtogenerator.functional.IntegerGenerationTests.simpleI
 
 @DisplayName("Nested dto Generators Tests")
 @Epic("NESTED_DTO")
+@Slf4j
 class NestedDtoGenerationTests {
 
     @Getter

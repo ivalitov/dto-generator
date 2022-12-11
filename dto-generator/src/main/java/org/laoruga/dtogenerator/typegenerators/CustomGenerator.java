@@ -13,6 +13,7 @@ import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.function.Supplier;
 
 import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 
@@ -38,11 +39,11 @@ public class CustomGenerator implements IGenerator<Object> {
     @Slf4j
     public static class CustomGeneratorBuilder implements IGeneratorBuilder {
 
-        private Object dtoInstance;
+        private Supplier<?> dtoInstanceSupplier;
         private Annotation customGeneratorRules;
 
-        public CustomGeneratorBuilder setDtoInstance(Object dtoInstance) {
-            this.dtoInstance = dtoInstance;
+        public CustomGeneratorBuilder setDtoInstanceSupplier(Supplier<?> dtoInstanceSupplier) {
+            this.dtoInstanceSupplier = dtoInstanceSupplier;
             return this;
         }
 
@@ -88,13 +89,13 @@ public class CustomGenerator implements IGenerator<Object> {
 
         private void setDto(Object generatorInstance) {
             try {
-                ((ICustomGeneratorDtoDependent) generatorInstance).setDto(dtoInstance);
+                ((ICustomGeneratorDtoDependent) generatorInstance).setDtoSupplier(dtoInstanceSupplier);
             } catch (ClassCastException e) {
                 throw new DtoGeneratorException("ClassCastException while trying to set basic DTO into " +
                         "DTO dependent custom generator. Perhaps there is wrong argument type is passing into " +
                         "'setDto' method of generator class. " +
                         "Generator class: '" + generatorInstance.getClass() + "', " +
-                        "Passing argument type: '" + dtoInstance.getClass() + "'", e);
+                        "Passing argument type: '" + dtoInstanceSupplier.getClass() + "'", e);
             } catch (Exception e) {
                 throw new DtoGeneratorException("Exception was thrown while trying to set DTO into " +
                         "DTO dependent custom generator: " + generatorInstance.getClass(), e);

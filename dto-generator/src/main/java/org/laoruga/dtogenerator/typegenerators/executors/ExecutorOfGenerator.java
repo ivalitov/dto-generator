@@ -5,6 +5,7 @@ import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.reflect.Field;
+import java.util.function.Supplier;
 
 /**
  * @author Il'dar Valitov
@@ -13,11 +14,11 @@ import java.lang.reflect.Field;
 @Slf4j
 public class ExecutorOfGenerator extends AbstractExecutor {
 
-    private final Object dtoInstance;
+    private final Supplier<?> dtoInstanceSupplier;
 
-    public <T> ExecutorOfGenerator(T dtoInstance) {
+    public <T> ExecutorOfGenerator(Supplier<?> dtoInstanceSupplier) {
         super(null);
-        this.dtoInstance = dtoInstance;
+        this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
     // TODO consolidate errors
@@ -31,7 +32,7 @@ public class ExecutorOfGenerator extends AbstractExecutor {
         }
             try {
             field.setAccessible(true);
-            field.set(dtoInstance, result);
+            field.set(dtoInstanceSupplier.get(), result);
         } catch (Exception e) {
             throw new DtoGeneratorException("Error while setting generated value of type: '" +
                     (result != null ? result.getClass() : null) + "' to the field: " +

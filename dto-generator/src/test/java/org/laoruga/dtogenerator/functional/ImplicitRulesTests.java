@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
-import org.laoruga.dtogenerator.functional.data.dtoclient.ClientType;
+import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
 import org.laoruga.dtogenerator.functional.util.TestUtils;
 import org.laoruga.dtogenerator.rules.RulesInstance;
 

@@ -10,13 +10,13 @@ import org.laoruga.dtogenerator.typegenerators.executors.BatchGeneratorsExecutor
 import org.laoruga.dtogenerator.typegenerators.executors.ExecutorOfCollectionGenerator;
 import org.laoruga.dtogenerator.typegenerators.executors.ExecutorOfDtoDependentGenerator;
 import org.laoruga.dtogenerator.typegenerators.executors.ExecutorOfGenerator;
-import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -27,8 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DtoGenerator<T> {
 
-    private final T dtoInstance;
-
+    private final Supplier<T> dtoInstanceSupplier;
     @Getter(AccessLevel.PACKAGE)
     private final TypeGeneratorsProvider<T> typeGeneratorsProvider;
     @Getter(AccessLevel.PACKAGE)
@@ -41,11 +40,11 @@ public class DtoGenerator<T> {
                            DtoGeneratorBuilder<T> dtoGeneratorBuilder) {
         this.typeGeneratorsProvider = typeGeneratorsProvider;
         this.builderInstance = dtoGeneratorBuilder;
-        this.dtoInstance = typeGeneratorsProvider.getDtoInstance();
+        this.dtoInstanceSupplier = typeGeneratorsProvider.getDtoInstanceSupplier();
     }
 
     public static <T> DtoGeneratorBuilder<T> builder(Class<T> dtoClass) {
-        return new DtoGeneratorBuilder<>(ReflectionUtils.createInstance(dtoClass));
+        return new DtoGeneratorBuilder<>(dtoClass);
     }
 
     public static <T> DtoGeneratorBuilder<T> builder(T dtoInstance) {
@@ -53,9 +52,12 @@ public class DtoGenerator<T> {
     }
 
     public T generateDto() {
-        prepareGeneratorsRecursively(dtoInstance.getClass());
+        if (dtoInstanceSupplier instanceof DtoInstanceSupplier) {
+            ((DtoInstanceSupplier<T>) dtoInstanceSupplier).updateInstance();
+        }
+        prepareGeneratorsRecursively(dtoInstanceSupplier.get().getClass());
         applyGenerators();
-        return dtoInstance;
+        return dtoInstanceSupplier.get();
     }
 
     private void prepareGeneratorsRecursively(Class<?> dtoClass) {
@@ -72,7 +74,7 @@ public class DtoGenerator<T> {
         ExecutorOfDtoDependentGenerator executorsChain =
                 new ExecutorOfDtoDependentGenerator(
                         new ExecutorOfCollectionGenerator(
-                                new ExecutorOfGenerator(dtoInstance)));
+                                new ExecutorOfGenerator(dtoInstanceSupplier)));
 
         BatchGeneratorsExecutor batchGeneratorsExecutor = new BatchGeneratorsExecutor(
                 executorsChain, getFieldGeneratorMap(), maxAttempts);
@@ -88,7 +90,7 @@ public class DtoGenerator<T> {
             } catch (Exception e) {
                 errorsHolder.put(field, e);
             }
-            generator.ifPresent(iGenerator -> getFieldGeneratorMap().put(field, iGenerator));
+            generator.ifPresent(typeGeneratorInstance -> getFieldGeneratorMap().put(field, typeGeneratorInstance));
         }
         if (!errorsHolder.isEmpty()) {
             log.error("{} error(s) while generators preparation. See problems below: \n" + errorsHolder, errorsHolder.size());
