@@ -49,7 +49,8 @@ If you want to create your own generator of specific type, next annotation is us
 6. [User's Builders](#users_builder)
 7. [Nested DTO](#nested_dto)
 8. [Custom Rules](#custom_rule)
-9. [More Examples](#more_examples)
+9. [Requirements for POJO classes](#pojo_requirements)
+10. [More Examples](#more_examples)
 
 <a name="annotation_based_config"></a>
 
@@ -80,17 +81,20 @@ public class Dto {
 ```
 
 To generate an object with random dada inside, just create a **DtoGeneratorBuilder** instance and call **generateDto()**
-method:
+one of two methods:
 
 ```java
 import org.laoruga.dtogenerator.DtoGenerator;
 
 public class Foo {
     void bar() {
-        // You can pass class of dto
-        Dto dtoInstance = DtoGenerator.builder(Dto.class).build().generateDto();
+        // 1. You can pass class of DTO
+        DtoGenerator<Dto> dtoGenerator = DtoGenerator.builder(Dto.class).build();
+        // and every call of generateDto method will provide new instance with random data
+        Dto dtoInstance = dtoGenerator.generateDto();
 
-        // or instance
+        // 2. Or you can pass instance of DTO to be filled with random data
+        // In this case, every call of generateDto method will generate new data in the same DTO
         Dto dto = DtoGenerator.builder(new Dto()).build().generateDto();
     }
 }
@@ -515,7 +519,19 @@ public class Example8 {
 
 More info and more examples of usage you may see in the project with examples: [Dto Generator Examples project](dto-generator-examples/README.md)
 
+<a name="pojo_requirements"></a>
+
+### 9. Requirements for DTO classes
+
+Requirements:
+1. DTO class must have declared no-args constructor with any visibility
+2. DTO class shouldn't be a NOT-static nested class
+
+Supported:
+1. DTO classes may extend abstract or concrete classes via inheritance
+2. DTO class may be static nested class
+
 <a name="more_examples"></a>
 
-### 9. More Examples
+### 10. More Examples
 More examples you can find in the: [Dto Generator Examples project](dto-generator-examples/README.md)
