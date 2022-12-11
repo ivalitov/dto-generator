@@ -4,7 +4,7 @@
 
     <groupId>org.laoruga</groupId>
     <artifactId>dto-generator-parent</artifactId>
-    <version>0.4.1-alpha</version>
+    <version>0.4.2-alpha-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -58,7 +58,7 @@
         <connection>scm:git:git@github.com:ivalitov/dto-generator.git</connection>
         <developerConnection>scm:git:git@github.com:ivalitov/dto-generator.git</developerConnection>
         <url>https://github.com/ivalitov/dto-generator</url>
-        <tag>0.4.1-alpha</tag>
+        <tag>0.3.5-alpha</tag>
     </scm>
 
     <dependencies>
