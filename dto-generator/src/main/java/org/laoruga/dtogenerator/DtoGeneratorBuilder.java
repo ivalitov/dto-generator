@@ -12,24 +12,9 @@ import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.function.Supplier;
 
 /**
- * 1. ок - Basic remark applicable to any field marked with simple rules
- * 2. ок - Basic remark for field with name
- * <p>
- * 3. ок - Custom remark for custom generator applicable to any field marked with that custom generator
- * 4. [not finished] Custom remark field with name
- * <p>
- * 5. [not finished] - Concrete generator for specific field (basic or custom, override or new - whatever)
- * 6. Change simple generator for any field
- * 6.1 - default builder
- * 6.2 - custom simple field generator
- * <p>
- * 7. [won't fix] Change custom generator for any field
- * 8. [same as set or override basic generator] Change custom generator for specific field
- * <p>
- * 9. how to apply this to nested pojo field ???
- *
  * @author Il'dar Valitov
  * Created on 16.04.2022
  */
@@ -41,7 +26,15 @@ public class DtoGeneratorBuilder<T> {
     private final DtoGeneratorBuildersTree dtoGeneratorBuildersTree;
     private final FieldGroupFilter fieldGroupFilter;
 
+    DtoGeneratorBuilder(Class<T> dtoClass) {
+        this(new DtoInstanceSupplier<>(dtoClass));
+    }
+
     DtoGeneratorBuilder(T dtoInstance) {
+        this(() -> dtoInstance);
+    }
+
+    private DtoGeneratorBuilder(Supplier<T> dtoInstanceSupplier) {
         this.configuration = new DtoGeneratorInstanceConfig();
         this.fieldGroupFilter = new FieldGroupFilter();
         this.dtoGeneratorBuildersTree = new DtoGeneratorBuildersTree(this);
@@ -51,13 +44,14 @@ public class DtoGeneratorBuilder<T> {
                 fieldGroupFilter,
                 new String[]{DtoGeneratorBuildersTree.ROOT},
                 dtoGeneratorBuildersTree);
-        this.typeGeneratorsProvider.setDtoInstance(dtoInstance);
+        this.typeGeneratorsProvider.setDtoInstanceSupplier(dtoInstanceSupplier);
     }
+
 
     /**
      * Constructor to copy builder for creating Builder for nested DTOs generating.
      *
-     * @param toCopy         from
+     * @param toCopy          from
      * @param pathFromRootDto - path to nested DTO field
      */
     DtoGeneratorBuilder(DtoGeneratorBuilder<T> toCopy, String[] pathFromRootDto) {

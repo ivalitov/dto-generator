@@ -19,8 +19,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
-import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 import static org.laoruga.dtogenerator.util.ReflectionUtils.getDefaultMethodValue;
 
 /**
@@ -33,7 +33,7 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.getDefaultMethodValu
 public class TypeGeneratorsProvider<T> {
 
     private final DtoGeneratorInstanceConfig configuration;
-    private T dtoInstance;
+    private Supplier<T> dtoInstanceSupplier;
     private final String[] pathFromRootDto;
     private final DtoGeneratorBuildersTree dtoGeneratorBuildersTree;
     private final TypeGeneratorRemarksProvider typeGeneratorRemarksProvider;
@@ -83,18 +83,15 @@ public class TypeGeneratorsProvider<T> {
     }
 
     /**
-     * Setter for field delayed field initialisation.
+     * Setter for delayed field initialisation.
      * When nested DTO generation params are filling in {@link DtoGeneratorBuilder},
      * we don't know type of nested field yet.
      *
      * @param dtoInstance dto instance to build
      */
-    void setDtoInstance(Object dtoInstance) {
-        if (this.dtoInstance != null) {
-            throw new DtoGeneratorException("Dto instance has already been set: '" + this.dtoInstance.getClass() + "'");
-        }
+    void setDtoInstanceSupplier(Supplier<?> dtoInstance) {
         try {
-            this.dtoInstance = (T) dtoInstance;
+            this.dtoInstanceSupplier = (Supplier<T>) dtoInstance;
         } catch (ClassCastException e) {
             throw new DtoGeneratorException("Unexpected error", e);
         }
@@ -163,13 +160,15 @@ public class TypeGeneratorsProvider<T> {
             byAnnotation.setMaybeRemark(
                     typeGeneratorRemarksProvider.isBasicRuleRemarkExists(field.getName()) ?
                             typeGeneratorRemarksProvider.getBasicRuleRemark(field.getName()) : null);
-            byAnnotation.setDtoInstance(dtoInstance);
+            byAnnotation.setDtoInstanceSupplier(dtoInstanceSupplier);
             byAnnotation.setRuleInfo(ruleInfo);
             byAnnotation.setNestedDtoGeneratorSupplier(() -> {
                         String[] pathToNestedDtoField = Arrays.copyOf(pathFromRootDto, pathFromRootDto.length + 1);
                         pathToNestedDtoField[pathFromRootDto.length] = field.getName();
-                        DtoGeneratorBuilder<?> nestedDtoGeneratorBuilder = dtoGeneratorBuildersTree.getBuilder(pathToNestedDtoField);
-                        nestedDtoGeneratorBuilder.getTypeGeneratorsProvider().setDtoInstance(createInstance(field.getType()));
+                        DtoGeneratorBuilder<?> nestedDtoGeneratorBuilder =
+                                dtoGeneratorBuildersTree.getBuilder(pathToNestedDtoField);
+                        nestedDtoGeneratorBuilder.getTypeGeneratorsProvider().setDtoInstanceSupplier(
+                                new DtoInstanceSupplier<>(field.getType()));
                         return nestedDtoGeneratorBuilder.build();
                     }
             );

@@ -10,17 +10,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
-import org.laoruga.dtogenerator.functional.data.dtoclient.ClientType;
+import org.laoruga.dtogenerator.functional.data.dto.DtoAllKnownTypes;
+import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
 import org.laoruga.dtogenerator.functional.util.TestUtils;
 import org.laoruga.dtogenerator.typegenerators.*;
 import org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuildersFactory;
 
-import java.beans.Transient;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -45,114 +44,12 @@ import static org.laoruga.dtogenerator.functional.util.TestUtils.resetStaticConf
 @Slf4j
 class OverridingOfGeneratorsTests {
 
-    @Getter
-    @NoArgsConstructor
-    static class Dto {
-
-        @StringRule
-        String string;
-
-        @IntegerRule
-        Integer integer;
-
-        @LongRule
-        Long aLong;
-
-        @DoubleRule
-        Double aDouble;
-
-        @LocalDateTimeRule
-        LocalDateTime localDateTime;
-
-        @EnumRule
-        ClientType clientType;
-
-        @ListRule
-        @StringRule
-        List<String> listOfString;
-
-        @SetRule
-        @LongRule
-        Set<Long> setOfLong;
-
-        @ListRule
-        @EnumRule
-        LinkedList<ClientType> linkedListOfEnum;
-
-        @NestedDtoRule
-        InnerDto innerDto;
-
-        @CustomRule(generatorClass = CustomIntegerGenerator.class, args = "888")
-        Integer customInteger;
-
-        Map<String, Integer> stringIntegerMap;
-
-        public String getLocalDateTime() {
-            return localDateTime.toString();
-        }
-
-        @Transient
-        public LocalDateTime getLocalDateTimeAsIs() {
-            return localDateTime;
-        }
-    }
-
-    @Getter
-    @NoArgsConstructor
-    static class InnerDto {
-
-        @StringRule
-        String string;
-
-        @IntegerRule
-        Integer integer;
-
-        @LongRule
-        Long aLong;
-
-        @DoubleRule
-        Double aDouble;
-
-        @LocalDateTimeRule
-        LocalDateTime localDateTime;
-
-        @EnumRule
-        ClientType clientType;
-
-        @ListRule
-        @DoubleRule
-        List<Double> listOfDouble;
-
-        @SetRule
-        @IntegerRule
-        Set<Integer> setOfInteger;
-
-        @ListRule
-        @EnumRule
-        LinkedList<ClientType> linkedListOfEnum;
-
-        Map<String, Integer> stringIntegerMap;
-
-        @CustomRule(generatorClass = CustomIntegerGenerator.class, args = "999")
-        Integer customInteger;
-
-        public String getLocalDateTime() {
-            return localDateTime.toString();
-        }
-
-        @Transient
-        public LocalDateTime getLocalDateTimeAsIs() {
-            return localDateTime;
-        }
-
-    }
-
     @Test
     @DisplayName("Overridden builders by annotations. General known type generators")
     void
     basicGeneratorOverridden() {
 
-        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class)
+        DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class)
                 .setGeneratorBuilder(StringRule.class, GeneratorBuildersFactory.stringBuilder().minLength(5).maxLength(5).chars("x"))
                 .setGeneratorBuilder(IntegerRule.class, GeneratorBuildersFactory.integerBuilder().minValue(1).maxValue(1))
                 .setGeneratorBuilder(LongRule.class, GeneratorBuildersFactory.longBuilder().minValue(2L).maxValue(2L))
@@ -166,7 +63,7 @@ class OverridingOfGeneratorsTests {
                         .collectionInstance(HashSet::new)
                         .minSize(1).maxSize(1));
 
-        Dto dto = builder.build().generateDto();
+        DtoAllKnownTypes dto = builder.build().generateDto();
 
         log.info(TestUtils.toJson(dto));
 
@@ -210,7 +107,7 @@ class OverridingOfGeneratorsTests {
     @DisplayName("Overridden builders by field name. General known type generators")
     void fieldGeneratorOverridden() {
 
-        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class)
+        DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class)
                 .setGeneratorBuilder("string", GeneratorBuildersFactory.stringBuilder().minLength(5).maxLength(5).chars("x"))
                 .setGeneratorBuilder("integer", GeneratorBuildersFactory.integerBuilder().minValue(1).maxValue(1))
                 .setGeneratorBuilder("aLong", GeneratorBuildersFactory.longBuilder().minValue(2L).maxValue(2L))
@@ -249,7 +146,7 @@ class OverridingOfGeneratorsTests {
                         .collectionInstance(LinkedList::new)
                         .minSize(1).maxSize(1));
 
-        Dto dto = builder.build().generateDto();
+        DtoAllKnownTypes dto = builder.build().generateDto();
 
         log.info(TestUtils.toJson(dto));
 
@@ -293,7 +190,7 @@ class OverridingOfGeneratorsTests {
     @Test
     @DisplayName("Overridden instance configs of known type generators")
     void overriddenInstanceConfig() {
-        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
+        DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
         TypeGeneratorBuildersConfig gensConfig = builder.getUserConfig().getGenBuildersConfig();
 
         gensConfig.setConfig(
@@ -353,7 +250,7 @@ class OverridingOfGeneratorsTests {
                         .ruleRemark(MAX_VALUE)
                         .build());
 
-        Dto dto = builder.build().generateDto();
+        DtoAllKnownTypes dto = builder.build().generateDto();
 
         log.info(TestUtils.toJson(dto));
 
@@ -363,7 +260,7 @@ class OverridingOfGeneratorsTests {
     @Test
     @DisplayName("Overridden static config of known type generators")
     void overriddenStaticConfig() {
-        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
+        DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
         TypeGeneratorBuildersConfig gensConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig();
 
         gensConfig.getStringConfig().setMinLength(1);
@@ -398,14 +295,14 @@ class OverridingOfGeneratorsTests {
         gensConfig.getSetConfig().setMaxSize(1);
         gensConfig.getSetConfig().setRuleRemark(MAX_VALUE);
 
-        Dto dto = builder.build().generateDto();
+        DtoAllKnownTypes dto = builder.build().generateDto();
 
         log.info(TestUtils.toJson(dto));
 
         assertOverriddenConfig(dto);
     }
 
-    public void assertOverriddenConfig(Dto dto) {
+    public void assertOverriddenConfig(DtoAllKnownTypes dto) {
         assertAll(
                 () -> assertThat(dto.getString(), equalTo("x")),
                 () -> assertThat(dto.getInteger(), equalTo(1)),
@@ -447,7 +344,7 @@ class OverridingOfGeneratorsTests {
     @DisplayName("Overridden builders by annotations. Not known type generators")
     void overriddenInstanceAndStaticConfig() {
 
-        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class)
+        DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class)
                 .setGeneratorBuilder(StringRule.class, () -> () -> "string")
                 .setGeneratorBuilder(IntegerRule.class, () -> () -> 1)
                 .setGeneratorBuilder(LongRule.class, () -> () -> 2L)
@@ -457,7 +354,7 @@ class OverridingOfGeneratorsTests {
                 .setGeneratorBuilder(ListRule.class, () -> LinkedList::new)
                 .setGeneratorBuilder(SetRule.class, () -> HashSet::new);
 
-        Dto dto = builder.build().generateDto();
+        DtoAllKnownTypes dto = builder.build().generateDto();
 
         log.info(TestUtils.toJson(dto));
 
@@ -648,19 +545,5 @@ class OverridingOfGeneratorsTests {
         resetStaticConfig();
     }
 
-
-    static class CustomIntegerGenerator implements ICustomGeneratorArgs<Integer> {
-        int generated;
-
-        @Override
-        public void setArgs(String... args) {
-            generated = Integer.parseInt(args[0]);
-        }
-
-        @Override
-        public Integer generate() {
-            return generated;
-        }
-    }
 
 }

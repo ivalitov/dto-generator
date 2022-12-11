@@ -1,8 +1,6 @@
 package org.laoruga.dtogenerator.config;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.rules.RulesInstance;
 import org.laoruga.dtogenerator.typegenerators.*;

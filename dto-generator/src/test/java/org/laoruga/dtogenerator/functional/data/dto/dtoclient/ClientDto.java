@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.functional.data.dtoclient;
+package org.laoruga.dtogenerator.functional.data.dto.dtoclient;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

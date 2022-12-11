@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.functional.data.dtoclient.*;
+import org.laoruga.dtogenerator.functional.data.dto.dtoclient.*;
 
 import java.util.stream.Stream;
 

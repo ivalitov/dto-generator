@@ -140,6 +140,13 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.exparity</groupId>
+            <artifactId>hamcrest-date</artifactId>
+            <version>2.0.8</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <profiles>
@@ -360,7 +367,7 @@
     <developers>
         <developer>
             <id>laoruga</id>
-            <name>Il'dar Valitov</name>
+            <name>Ildar Valitov</name>
             <url>https://www.ivalitov.org</url>
         </developer>
     </developers>
