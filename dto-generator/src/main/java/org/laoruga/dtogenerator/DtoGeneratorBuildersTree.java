@@ -4,10 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Tree of generator builders when nested DTOs exist.
@@ -23,23 +20,28 @@ public class DtoGeneratorBuildersTree {
         this.tree = new Node(ROOT, rootBuilder);
     }
 
-    public DtoGeneratorBuilder<?> getBuilder(String[] fields) {
-        Node prev = tree;
-        Node next = null;
-        for (String field : fields) {
-            if (!ROOT.equals(field)) {
-                Optional<Node> maybeNode = prev.getChildren().stream()
-                        .filter(node -> field.equals(node.getFieldName()))
-                        .findFirst();
-                if (maybeNode.isPresent()) {
-                    next = maybeNode.get();
-                } else {
-                    next = new Node(field, new DtoGeneratorBuilder<>(tree.getBuilder(), fields));
-                    prev.getChildren().add(next);
-                }
+    public DtoGeneratorBuilder<?> getBuilderLazy(String[] fields) {
+        if (fields.length < 2) {
+            throw new IllegalArgumentException(
+                    "Field path must contain at least 1 element, but was: " + Arrays.asList(fields));
+        }
+        return getBuilderLazy(fields, 1, tree);
+    }
+
+    public DtoGeneratorBuilder<?> getBuilderLazy(String[] fields, int idx, Node node) {
+        if (fields.length == idx) {
+            return node.getBuilder();
+        }
+
+        for (Node child : node.getChildren()) {
+            if (Objects.equals(child.getFieldName(), fields[idx])) {
+                return getBuilderLazy(fields, idx + 1, child);
             }
         }
-        return Objects.requireNonNull(next, "Unexpected error").getBuilder();
+
+        Node newNode = new Node(fields[idx], new DtoGeneratorBuilder<>(tree.getBuilder(), fields));
+        node.getChildren().add(newNode);
+        return newNode.getBuilder();
     }
 
     @Getter

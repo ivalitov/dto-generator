@@ -11,8 +11,9 @@ import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
 import java.util.function.Supplier;
+
+import static org.laoruga.dtogenerator.DtoGeneratorBuildersTree.ROOT;
 
 /**
  * @author Il'dar Valitov
@@ -42,7 +43,7 @@ public class DtoGeneratorBuilder<T> {
                 configuration,
                 new TypeGeneratorRemarksProvider(),
                 fieldGroupFilter,
-                new String[]{DtoGeneratorBuildersTree.ROOT},
+                new String[]{ROOT},
                 dtoGeneratorBuildersTree);
         this.typeGeneratorsProvider.setDtoInstanceSupplier(dtoInstanceSupplier);
     }
@@ -158,7 +159,7 @@ public class DtoGeneratorBuilder<T> {
 
     private DtoGeneratorBuilder<?> getBuilderFromTreeOrThis(String[] pathToField) {
         if (pathToField != null) {
-            return dtoGeneratorBuildersTree.getBuilder(pathToField);
+            return dtoGeneratorBuildersTree.getBuilderLazy(pathToField);
         } else {
             return this;
         }
@@ -168,7 +169,10 @@ public class DtoGeneratorBuilder<T> {
         if (fieldsFromRoot.contains(".")) {
             String[] pathToField = fieldsFromRoot.split("\\.");
             String fieldName = pathToField[pathToField.length - 1];
-            pathToField = Arrays.copyOf(pathToField, pathToField.length - 1);
+            for (int i = pathToField.length - 2; i >= 0; i--) {
+                pathToField[i + 1] = pathToField[i];
+            }
+            pathToField[0] = ROOT;
             return Pair.create(fieldName, pathToField);
         } else {
             return Pair.create(fieldsFromRoot, null);

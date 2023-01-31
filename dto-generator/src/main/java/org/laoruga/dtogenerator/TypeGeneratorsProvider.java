@@ -166,7 +166,7 @@ public class TypeGeneratorsProvider<T> {
                         String[] pathToNestedDtoField = Arrays.copyOf(pathFromRootDto, pathFromRootDto.length + 1);
                         pathToNestedDtoField[pathFromRootDto.length] = field.getName();
                         DtoGeneratorBuilder<?> nestedDtoGeneratorBuilder =
-                                dtoGeneratorBuildersTree.getBuilder(pathToNestedDtoField);
+                                dtoGeneratorBuildersTree.getBuilderLazy(pathToNestedDtoField);
                         nestedDtoGeneratorBuilder.getTypeGeneratorsProvider().setDtoInstanceSupplier(
                                 new DtoInstanceSupplier<>(field.getType()));
                         return nestedDtoGeneratorBuilder.build();
