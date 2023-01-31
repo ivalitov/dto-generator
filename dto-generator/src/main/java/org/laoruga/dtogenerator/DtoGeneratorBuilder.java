@@ -35,7 +35,7 @@ public class DtoGeneratorBuilder<T> {
         this(() -> dtoInstance);
     }
 
-    private DtoGeneratorBuilder(Supplier<? super Object> dtoInstanceSupplier) {
+    private DtoGeneratorBuilder(Supplier<Object> dtoInstanceSupplier) {
         this.configuration = new DtoGeneratorInstanceConfig();
         this.fieldGroupFilter = new FieldGroupFilter();
         this.dtoGeneratorBuildersTree = new DtoGeneratorBuildersTree(this);

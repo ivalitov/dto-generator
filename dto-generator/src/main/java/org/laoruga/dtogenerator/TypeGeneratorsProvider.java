@@ -89,7 +89,7 @@ public class TypeGeneratorsProvider {
      *
      * @param dtoInstance dto instance to build
      */
-    void setDtoInstanceSupplier(Supplier<? super Object> dtoInstance) {
+    void setDtoInstanceSupplier(Supplier<Object> dtoInstance) {
         try {
             this.dtoInstanceSupplier = dtoInstance;
         } catch (ClassCastException e) {
