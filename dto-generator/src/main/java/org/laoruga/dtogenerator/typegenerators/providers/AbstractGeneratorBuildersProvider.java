@@ -57,7 +57,7 @@ public abstract class AbstractGeneratorBuildersProvider {
         }
     }
 
-    public void accept(TypeGeneratorsProvider<?>.ProvidersVisitor visitor) {
+    public void accept(TypeGeneratorsProvider.ProvidersVisitor visitor) {
         visitor.visit(this);
         if (getNextProvider().isPresent()) {
             getNextProvider().get().accept(visitor);

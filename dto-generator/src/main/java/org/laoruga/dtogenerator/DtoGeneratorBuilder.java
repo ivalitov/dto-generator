@@ -23,23 +23,23 @@ public class DtoGeneratorBuilder<T> {
 
     private final DtoGeneratorInstanceConfig configuration;
     @Getter(AccessLevel.PROTECTED)
-    private final TypeGeneratorsProvider<T> typeGeneratorsProvider;
+    private final TypeGeneratorsProvider typeGeneratorsProvider;
     private final DtoGeneratorBuildersTree dtoGeneratorBuildersTree;
     private final FieldGroupFilter fieldGroupFilter;
 
     DtoGeneratorBuilder(Class<T> dtoClass) {
-        this(new DtoInstanceSupplier<>(dtoClass));
+        this(new DtoInstanceSupplier(dtoClass));
     }
 
     DtoGeneratorBuilder(T dtoInstance) {
         this(() -> dtoInstance);
     }
 
-    private DtoGeneratorBuilder(Supplier<T> dtoInstanceSupplier) {
+    private DtoGeneratorBuilder(Supplier<? super Object> dtoInstanceSupplier) {
         this.configuration = new DtoGeneratorInstanceConfig();
         this.fieldGroupFilter = new FieldGroupFilter();
         this.dtoGeneratorBuildersTree = new DtoGeneratorBuildersTree(this);
-        this.typeGeneratorsProvider = new TypeGeneratorsProvider<>(
+        this.typeGeneratorsProvider = new TypeGeneratorsProvider(
                 configuration,
                 new TypeGeneratorRemarksProvider(),
                 fieldGroupFilter,
@@ -57,7 +57,7 @@ public class DtoGeneratorBuilder<T> {
      */
     DtoGeneratorBuilder(DtoGeneratorBuilder<T> toCopy, String[] pathFromRootDto) {
         this.configuration = toCopy.configuration;
-        this.typeGeneratorsProvider = new TypeGeneratorsProvider<>(toCopy.typeGeneratorsProvider, pathFromRootDto);
+        this.typeGeneratorsProvider = new TypeGeneratorsProvider(toCopy.typeGeneratorsProvider, pathFromRootDto);
         this.dtoGeneratorBuildersTree = toCopy.dtoGeneratorBuildersTree;
         this.fieldGroupFilter = toCopy.fieldGroupFilter;
     }

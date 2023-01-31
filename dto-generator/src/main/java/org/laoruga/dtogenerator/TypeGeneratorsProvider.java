@@ -30,10 +30,10 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.getDefaultMethodValu
 
 @Slf4j
 @Getter(AccessLevel.PACKAGE)
-public class TypeGeneratorsProvider<T> {
+public class TypeGeneratorsProvider {
 
     private final DtoGeneratorInstanceConfig configuration;
-    private Supplier<T> dtoInstanceSupplier;
+    private Supplier<Object> dtoInstanceSupplier;
     private final String[] pathFromRootDto;
     private final DtoGeneratorBuildersTree dtoGeneratorBuildersTree;
     private final TypeGeneratorRemarksProvider typeGeneratorRemarksProvider;
@@ -69,7 +69,7 @@ public class TypeGeneratorsProvider<T> {
      *
      * @param copyFrom source object
      */
-    TypeGeneratorsProvider(TypeGeneratorsProvider<?> copyFrom, String[] pathFromRootDto) {
+    TypeGeneratorsProvider(TypeGeneratorsProvider copyFrom, String[] pathFromRootDto) {
         this.configuration = copyFrom.configuration;
         this.overriddenBuildersForFields = new HashMap<>();
         this.userGenBuildersMapping = copyFrom.getUserGenBuildersMapping();
@@ -89,9 +89,9 @@ public class TypeGeneratorsProvider<T> {
      *
      * @param dtoInstance dto instance to build
      */
-    void setDtoInstanceSupplier(Supplier<?> dtoInstance) {
+    void setDtoInstanceSupplier(Supplier<? super Object> dtoInstance) {
         try {
-            this.dtoInstanceSupplier = (Supplier<T>) dtoInstance;
+            this.dtoInstanceSupplier = dtoInstance;
         } catch (ClassCastException e) {
             throw new DtoGeneratorException("Unexpected error", e);
         }
@@ -168,7 +168,7 @@ public class TypeGeneratorsProvider<T> {
                         DtoGeneratorBuilder<?> nestedDtoGeneratorBuilder =
                                 dtoGeneratorBuildersTree.getBuilderLazy(pathToNestedDtoField);
                         nestedDtoGeneratorBuilder.getTypeGeneratorsProvider().setDtoInstanceSupplier(
-                                new DtoInstanceSupplier<>(field.getType()));
+                                new DtoInstanceSupplier(field.getType()));
                         return nestedDtoGeneratorBuilder.build();
                     }
             );

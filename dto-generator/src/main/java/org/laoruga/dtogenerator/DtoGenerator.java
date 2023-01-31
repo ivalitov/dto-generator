@@ -27,16 +27,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DtoGenerator<T> {
 
-    private final Supplier<T> dtoInstanceSupplier;
+    private final Supplier<Object> dtoInstanceSupplier;
     @Getter(AccessLevel.PACKAGE)
-    private final TypeGeneratorsProvider<T> typeGeneratorsProvider;
+    private final TypeGeneratorsProvider typeGeneratorsProvider;
     @Getter(AccessLevel.PACKAGE)
     private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
     @Getter(AccessLevel.PACKAGE)
     private final DtoGeneratorBuilder<T> builderInstance;
     private final ErrorsHolder errorsHolder = new ErrorsHolder();
 
-    protected DtoGenerator(TypeGeneratorsProvider<T> typeGeneratorsProvider,
+    protected DtoGenerator(TypeGeneratorsProvider typeGeneratorsProvider,
                            DtoGeneratorBuilder<T> dtoGeneratorBuilder) {
         this.typeGeneratorsProvider = typeGeneratorsProvider;
         this.builderInstance = dtoGeneratorBuilder;
@@ -53,11 +53,11 @@ public class DtoGenerator<T> {
 
     public T generateDto() {
         if (dtoInstanceSupplier instanceof DtoInstanceSupplier) {
-            ((DtoInstanceSupplier<T>) dtoInstanceSupplier).updateInstance();
+            ((DtoInstanceSupplier) dtoInstanceSupplier).updateInstance();
         }
         prepareGeneratorsRecursively(dtoInstanceSupplier.get().getClass());
         applyGenerators();
-        return dtoInstanceSupplier.get();
+        return (T) dtoInstanceSupplier.get();
     }
 
     private void prepareGeneratorsRecursively(Class<?> dtoClass) {

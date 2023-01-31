@@ -396,7 +396,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
     }
 
     @Override
-    public void accept(TypeGeneratorsProvider<?>.ProvidersVisitor visitor) {
+    public void accept(TypeGeneratorsProvider.ProvidersVisitor visitor) {
         super.accept(visitor);
         generatorBuildersProviderByType.accept(visitor);
     }

@@ -9,17 +9,17 @@ import java.util.function.Supplier;
  * @author Il'dar Valitov
  * Created on 11.12.2022
  */
-public class DtoInstanceSupplier<T> implements Supplier<T> {
+public class DtoInstanceSupplier implements Supplier<Object> {
 
-    private T dtoInstance;
-    private final Class<T> dtoClass;
+    private Object dtoInstance;
+    private final Class<?> dtoClass;
 
-    public DtoInstanceSupplier(Class<T> dtoClass) {
+    public DtoInstanceSupplier(Class<?> dtoClass) {
         this.dtoClass = dtoClass;
     }
 
     @Override
-    public T get() {
+    public Object get() {
         return Objects.requireNonNull(dtoInstance, "DTO instance is null");
     }
 
