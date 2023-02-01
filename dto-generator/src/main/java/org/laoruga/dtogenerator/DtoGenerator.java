@@ -73,8 +73,8 @@ public class DtoGenerator<T> {
         int maxAttempts = DtoGeneratorStaticConfig.getInstance().getMaxDependentGenerationCycles();
 
         ExecutorOfDtoDependentGenerator executorsChain =
-                new ExecutorOfDtoDependentGenerator(
-                        new ExecutorOfCollectionGenerator(
+                new ExecutorOfDtoDependentGenerator(dtoInstanceSupplier,
+                        new ExecutorOfCollectionGenerator(dtoInstanceSupplier,
                                 new ExecutorOfGenerator(dtoInstanceSupplier)));
 
         BatchGeneratorsExecutor batchGeneratorsExecutor = new BatchGeneratorsExecutor(

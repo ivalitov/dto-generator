@@ -16,8 +16,13 @@ public class ExecutorOfGenerator extends AbstractExecutor {
 
     private final Supplier<?> dtoInstanceSupplier;
 
-    public <T> ExecutorOfGenerator(Supplier<?> dtoInstanceSupplier) {
-        super(null);
+    public ExecutorOfGenerator(Supplier<?> dtoInstanceSupplier) {
+        this.dtoInstanceSupplier = dtoInstanceSupplier;
+    }
+
+    public ExecutorOfGenerator(Supplier<?> dtoInstanceSupplier,
+                                   AbstractExecutor nextExecutor) {
+        super(nextExecutor);
         this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 

@@ -4,6 +4,7 @@ import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 
 import java.lang.reflect.Field;
+import java.util.function.Supplier;
 
 /**
  * @author Il'dar Valitov
@@ -11,17 +12,24 @@ import java.lang.reflect.Field;
  */
 
 public class ExecutorOfCollectionGenerator extends ExecutorOfDtoDependentGenerator {
-    public ExecutorOfCollectionGenerator(AbstractExecutor nextGenerators) {
-        super(nextGenerators);
+    public ExecutorOfCollectionGenerator(Supplier<?> dtoInstanceSupplier,
+                                         AbstractExecutor nextGenerator) {
+        super(dtoInstanceSupplier, nextGenerator);
     }
 
     @Override
     public boolean execute(Field field, IGenerator<?> generator) {
         if (generator instanceof ICollectionGenerator) {
+
             IGenerator<?> innerGenerator = ((ICollectionGenerator<?>) generator).getElementGenerator();
-            if (!isDtoReadyForFieldGeneration(innerGenerator)) {
+
+            if (isItDtoDependentGenerator(innerGenerator)) {
+                if (isDtoReadyForFieldGeneration(innerGenerator)) {
+                    return super.execute(field, generator);
+                }
                 return false;
             }
+            return super.execute(field, generator);
         }
         return executeNext(field, generator);
     }
