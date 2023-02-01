@@ -9,7 +9,15 @@
 
 ## Description
 
-DTO Generator makes it easy to create POJOs containing random data generated according to given rules.
+DTO Generator is a Java library that makes it easy to get Java objects filled with random data generated according to given rules (configuration).
+
+There are various ways to provide configuration:
+- directly on the DTO fields via annotations ;
+- by configuring DtoGenerator instance;
+- by updating common default configuration;
+- do not set anything relying on default configuration;
+- use all the above approaches together.
+
 This can be useful for test automation, when high variability of data is required.
 
 ## Documentation
@@ -18,8 +26,7 @@ Description of all features, examples, configurations is still in progress.
 
 ## Generation API
 
-So-called "@Rules" annotations is used to mark the fields of DTO that need to be generated.
-These annotations are also source of the configuration for generation.
+So-called "@Rules" annotations are used to provide configuration on the field:
 
 - *@StringRule*
 - *@IntegerRule*
@@ -30,8 +37,7 @@ These annotations are also source of the configuration for generation.
 - *@ListRule*
 - *@SetRule*
 
-If a DTO class contains a nested DTO as one of the fields, the following annotation is used to tell the generator to
-process the field [see more below](#nested_dto):
+If a DTO class contains within its fields another DTOs, which fields must to be generated as well, the following annotation is used to tell the generator about it [see more below](#nested_dto):
 
 - *@NestedDtoRule*
 
@@ -80,8 +86,7 @@ public class Dto {
 }
 ```
 
-To generate an object with random dada inside, just create a **DtoGeneratorBuilder** instance and call **generateDto()**
-one of two methods:
+In order to generate an object filled with random data, just create a **DtoGeneratorBuilder** instance and call  **generateDto()** method:
 
 ```java
 import org.laoruga.dtogenerator.DtoGenerator;
@@ -89,8 +94,8 @@ import org.laoruga.dtogenerator.DtoGenerator;
 public class Foo {
     void bar() {
         // 1. You can pass class of DTO
-        DtoGenerator<Dto> dtoGenerator = DtoGenerator.builder(Dto.class).build();
         // and every call of generateDto method will provide new instance with random data
+        DtoGenerator<Dto> dtoGenerator = DtoGenerator.builder(Dto.class).build();
         Dto dtoInstance = dtoGenerator.generateDto();
 
         // 2. Or you can pass instance of DTO to be filled with random data
@@ -100,7 +105,7 @@ public class Foo {
 }
 ```
 
-As the result we'll have an object containing random data, based on parameters of generation rules:
+As the result we'll have an object containing random data, generated based on generation rules:
 
 ```json
 {
@@ -116,8 +121,8 @@ As the result we'll have an object containing random data, based on parameters o
 
 ### 2. Grouping of Rules
 
-You may put multiple **@Rule** annotations on the one field and mark them with different groups.
-Then you need to select which group you prefer to use for DTO generation.
+You may put multiple **@Rule** annotations on the one field, then you should mark them with different groups.
+Then you have to select which group you prefer to use for DTO generation.
 
 For example, next config:
 
@@ -161,11 +166,11 @@ will produce, for instance:
 
 ### 3. Known Type's Generation
 
-Configuration parameter **generateAllKnownTypes** allows to generate values of fields of known types, without the need
-to put *@Rules* annotation no them.
-Known type are those types for which *@Rules* annotations exists.
+Configuration parameter **generateAllKnownTypes** allows to generate field values of known types, without the need
+to put *@Rules* annotation on them.
+Known types are those types for which *@Rules* annotations exists.
 
-There are several ways to configuring of generation, one of them is use of static configuration:
+There are several ways to configuring of generation, one of them is using of static configuration:
 
 ```java
 DtoGeneratorStaticConfig.getInstance().setGenerateAllKnownTypes(true);
@@ -184,8 +189,7 @@ public class Dto2 {
 }
 ```
 
-As the result we'll have an object containing random data, based on default or overridden parameters of generation
-rules:
+As the result we'll have an object containing random data, based on default or overridden generation rules parameters:
 
 ```json
 {
@@ -205,7 +209,7 @@ rules:
 
 ### 4. Configuration management
 
-There are 4 configuration levels, each next level of config overrides previous ones:
+There are 4 configuration levels, each next configuration level overrides previous ones:
 
 1. Annotation config -
     1. parameters provided from **@Rules** annotation of the DTO field
@@ -248,7 +252,7 @@ public class Example3 {
 }
 ```
 
-The result sting will be next:
+The result string will be next:
 
 ```json
 {
@@ -325,7 +329,7 @@ The result dto will look like:
 
 You may override generators of known types:
 
-1. Override generator linked with **@Rules** annotation by default (will apply to all fields within DTO)
+1. Override generator linked with **@Rules** annotation by default (will apply to every field of appropriate type within DTO)
 2. Override generator of certain field
 
 For overriding you can use:
@@ -389,7 +393,7 @@ The result dto may look like:
 
 ### 7. Nested DTO
 
-If you want to override or remark fields within nested DTO, use path to DTO separated by dots.
+In order to override or remark fields within nested DTO, use path to DTO separated by dots.
 
 For example:
 
