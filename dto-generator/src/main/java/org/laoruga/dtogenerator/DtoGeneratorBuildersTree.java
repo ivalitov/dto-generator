@@ -1,55 +1,46 @@
 package org.laoruga.dtogenerator;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-
-import java.util.*;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Tree of generator builders when nested DTOs exist.
  */
-@RequiredArgsConstructor
 public class DtoGeneratorBuildersTree {
 
     public static final String ROOT = "%ROOT%";
 
-    private final Node tree;
+    private final DtoGeneratorBuilderTreeNode tree;
 
-    public DtoGeneratorBuildersTree(DtoGeneratorBuilder<?> rootBuilder) {
-        this.tree = new Node(ROOT, rootBuilder);
+    public DtoGeneratorBuildersTree(DtoGeneratorBuilderTreeNode rootNode) {
+        this.tree = rootNode;
     }
 
-    public DtoGeneratorBuilder<?> getBuilderLazy(String[] fields) {
-        if (fields.length < 2) {
+    public DtoGeneratorBuilderTreeNode getBuilderLazy(String[] fields) {
+        if (fields.length < 1) {
             throw new IllegalArgumentException(
                     "Field path must contain at least 1 element, but was: " + Arrays.asList(fields));
         }
-        return getBuilderLazy(fields, 1, tree);
+        return getBuilderLazy(fields, 0, tree);
     }
 
-    public DtoGeneratorBuilder<?> getBuilderLazy(String[] fields, int idx, Node node) {
-        if (fields.length == idx) {
-            return node.getBuilder();
+    private DtoGeneratorBuilderTreeNode getBuilderLazy(String[] fields, int idx, DtoGeneratorBuilderTreeNode node) {
+
+        if (fields.length - 1 == idx) {
+            return node;
         }
 
-        for (Node child : node.getChildren()) {
+        idx = idx + 1;
+
+        for (DtoGeneratorBuilderTreeNode child : node.getChildren()) {
             if (Objects.equals(child.getFieldName(), fields[idx])) {
-                return getBuilderLazy(fields, idx + 1, child);
+                return getBuilderLazy(fields, idx, child);
             }
         }
 
-        Node newNode = new Node(fields[idx], new DtoGeneratorBuilder<>(tree.getBuilder(), fields));
+        DtoGeneratorBuilderTreeNode newNode = DtoGeneratorBuilderTreeNode.createNode(tree, fields[idx], fields);
         node.getChildren().add(newNode);
-        return newNode.getBuilder();
+        return newNode;
     }
 
-    @Getter
-    @Setter
-    @RequiredArgsConstructor
-    static class Node {
-        private final String fieldName;
-        private final DtoGeneratorBuilder<?> builder;
-        private List<Node> children = new LinkedList<>();
-    }
 }

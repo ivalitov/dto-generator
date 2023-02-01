@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWrapper;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
@@ -14,6 +14,7 @@ import java.lang.annotation.Annotation;
 import java.util.function.Supplier;
 
 import static org.laoruga.dtogenerator.DtoGeneratorBuildersTree.ROOT;
+import static org.laoruga.dtogenerator.util.StringUtils.splitPath;
 
 /**
  * @author Il'dar Valitov
@@ -21,10 +22,13 @@ import static org.laoruga.dtogenerator.DtoGeneratorBuildersTree.ROOT;
  */
 public class DtoGeneratorBuilder<T> {
 
+    @Getter(AccessLevel.PROTECTED)
     private final DtoGeneratorInstanceConfig configuration;
     @Getter(AccessLevel.PROTECTED)
     private final TypeGeneratorsProvider typeGeneratorsProvider;
+    @Getter(AccessLevel.PROTECTED)
     private final DtoGeneratorBuildersTree dtoGeneratorBuildersTree;
+    @Getter(AccessLevel.PROTECTED)
     private final FieldGroupFilter fieldGroupFilter;
 
     DtoGeneratorBuilder(Class<T> dtoClass) {
@@ -38,28 +42,29 @@ public class DtoGeneratorBuilder<T> {
     private DtoGeneratorBuilder(Supplier<Object> dtoInstanceSupplier) {
         this.configuration = new DtoGeneratorInstanceConfig();
         this.fieldGroupFilter = new FieldGroupFilter();
-        this.dtoGeneratorBuildersTree = new DtoGeneratorBuildersTree(this);
         this.typeGeneratorsProvider = new TypeGeneratorsProvider(
                 configuration,
                 new TypeGeneratorRemarksProvider(),
                 fieldGroupFilter,
                 new String[]{ROOT},
-                dtoGeneratorBuildersTree);
+                this::getDtoGeneratorBuildersTree);
         this.typeGeneratorsProvider.setDtoInstanceSupplier(dtoInstanceSupplier);
+        this.dtoGeneratorBuildersTree = new DtoGeneratorBuildersTree(
+                DtoGeneratorBuilderTreeNode.createRootNode(this)
+        );
     }
 
-
     /**
-     * Constructor to copy builder for creating Builder for nested DTOs generating.
-     *
-     * @param toCopy          from
-     * @param pathFromRootDto - path to nested DTO field
+     * Constructor to copy builder for nested DTO generation.
      */
-    DtoGeneratorBuilder(DtoGeneratorBuilder<T> toCopy, String[] pathFromRootDto) {
-        this.configuration = toCopy.configuration;
-        this.typeGeneratorsProvider = new TypeGeneratorsProvider(toCopy.typeGeneratorsProvider, pathFromRootDto);
-        this.dtoGeneratorBuildersTree = toCopy.dtoGeneratorBuildersTree;
-        this.fieldGroupFilter = toCopy.fieldGroupFilter;
+    protected DtoGeneratorBuilder(DtoGeneratorInstanceConfig configuration,
+                                  TypeGeneratorsProvider typeGeneratorsProvider,
+                                  DtoGeneratorBuildersTree dtoGeneratorBuildersTree,
+                                  FieldGroupFilter fieldGroupFilter) {
+        this.configuration = configuration;
+        this.typeGeneratorsProvider = typeGeneratorsProvider;
+        this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
+        this.fieldGroupFilter = fieldGroupFilter;
     }
 
     /**
@@ -79,9 +84,10 @@ public class DtoGeneratorBuilder<T> {
      */
     public DtoGeneratorBuilder<T> setGeneratorBuilder(@NonNull String fieldName,
                                                       @NonNull IGeneratorBuilder generatorBuilder) throws DtoGeneratorException {
-        Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
-        DtoGeneratorBuilder<?> dtoGeneratorBuilder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
-        dtoGeneratorBuilder.typeGeneratorsProvider.setGeneratorBuilderForField(fieldAndPath.getFirst(), generatorBuilder);
+        Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
+        getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
+                .getTypeGeneratorsProvider()
+                .setGeneratorBuilderForField(fieldNameAndPath.getLeft(), generatorBuilder);
         return this;
     }
 
@@ -91,10 +97,11 @@ public class DtoGeneratorBuilder<T> {
 
     public DtoGeneratorBuilder<T> setRuleRemark(@NonNull String fieldName,
                                                 @NonNull RuleRemark ruleRemark) throws DtoGeneratorException {
-        Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
-        DtoGeneratorBuilder<?> fieldAndBuilder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
-        fieldAndBuilder.typeGeneratorsProvider.getTypeGeneratorRemarksProvider().setBasicRuleRemarkForField(
-                fieldAndPath.getFirst(), ruleRemark);
+        Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
+        getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
+                .getTypeGeneratorsProvider()
+                .getTypeGeneratorRemarksProvider()
+                .setBasicRuleRemarkForField(fieldNameAndPath.getLeft(), ruleRemark);
         return this;
     }
 
@@ -109,10 +116,11 @@ public class DtoGeneratorBuilder<T> {
 
     public DtoGeneratorBuilder<T> setRuleRemarksCustom(@NonNull String fieldName,
                                                        @NonNull CustomRuleRemarkWrapper... ruleRemark) {
-        Pair<String, String[]> fieldAndPath = splitPathToField(fieldName);
-        DtoGeneratorBuilder<?> fieldAndBuilder = getBuilderFromTreeOrThis(fieldAndPath.getSecond());
-        fieldAndBuilder.typeGeneratorsProvider.getTypeGeneratorRemarksProvider().addCustomRuleRemarkForField(
-                fieldAndPath.getFirst(), ruleRemark);
+        Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
+        getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
+                .getTypeGeneratorsProvider()
+                .getTypeGeneratorRemarksProvider()
+                .addCustomRuleRemarkForField(fieldNameAndPath.getLeft(), ruleRemark);
         return this;
     }
 
@@ -155,28 +163,6 @@ public class DtoGeneratorBuilder<T> {
      */
     public DtoGenerator<T> build() {
         return new DtoGenerator<>(typeGeneratorsProvider, this);
-    }
-
-    private DtoGeneratorBuilder<?> getBuilderFromTreeOrThis(String[] pathToField) {
-        if (pathToField != null) {
-            return dtoGeneratorBuildersTree.getBuilderLazy(pathToField);
-        } else {
-            return this;
-        }
-    }
-
-    private Pair<String, String[]> splitPathToField(String fieldsFromRoot) {
-        if (fieldsFromRoot.contains(".")) {
-            String[] pathToField = fieldsFromRoot.split("\\.");
-            String fieldName = pathToField[pathToField.length - 1];
-            for (int i = pathToField.length - 2; i >= 0; i--) {
-                pathToField[i + 1] = pathToField[i];
-            }
-            pathToField[0] = ROOT;
-            return Pair.create(fieldName, pathToField);
-        } else {
-            return Pair.create(fieldsFromRoot, null);
-        }
     }
 
 }

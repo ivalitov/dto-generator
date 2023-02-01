@@ -35,7 +35,7 @@ public class TypeGeneratorsProvider {
     private final DtoGeneratorInstanceConfig configuration;
     private Supplier<Object> dtoInstanceSupplier;
     private final String[] pathFromRootDto;
-    private final DtoGeneratorBuildersTree dtoGeneratorBuildersTree;
+    private final Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree;
     private final TypeGeneratorRemarksProvider typeGeneratorRemarksProvider;
     private final Map<Class<? extends Annotation>, IGeneratorBuilder> overriddenBuilders;
     private final Map<String, IGeneratorBuilder> overriddenBuildersForFields;
@@ -51,7 +51,7 @@ public class TypeGeneratorsProvider {
                            TypeGeneratorRemarksProvider typeGeneratorRemarksProvider,
                            FieldGroupFilter fieldGroupFilter,
                            String[] pathFromRootDto,
-                           DtoGeneratorBuildersTree dtoGeneratorBuildersTree) {
+                           Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree) {
         this.configuration = configuration;
         this.overriddenBuildersForFields = new HashMap<>();
         this.userGenBuildersMapping = new GeneratorBuildersHolder(new ArrayList<>());
@@ -70,7 +70,7 @@ public class TypeGeneratorsProvider {
      * @param copyFrom source object
      */
     TypeGeneratorsProvider(TypeGeneratorsProvider copyFrom, String[] pathFromRootDto) {
-        this.configuration = copyFrom.configuration;
+        this.configuration = copyFrom.getConfiguration();
         this.overriddenBuildersForFields = new HashMap<>();
         this.userGenBuildersMapping = copyFrom.getUserGenBuildersMapping();
         this.typeGeneratorRemarksProvider = copyFrom.getTypeGeneratorRemarksProvider().copy();
@@ -165,8 +165,8 @@ public class TypeGeneratorsProvider {
             byAnnotation.setNestedDtoGeneratorSupplier(() -> {
                         String[] pathToNestedDtoField = Arrays.copyOf(pathFromRootDto, pathFromRootDto.length + 1);
                         pathToNestedDtoField[pathFromRootDto.length] = field.getName();
-                        DtoGeneratorBuilder<?> nestedDtoGeneratorBuilder =
-                                dtoGeneratorBuildersTree.getBuilderLazy(pathToNestedDtoField);
+                        DtoGeneratorBuilderTreeNode nestedDtoGeneratorBuilder =
+                                dtoGeneratorBuildersTree.get().getBuilderLazy(pathToNestedDtoField);
                         nestedDtoGeneratorBuilder.getTypeGeneratorsProvider().setDtoInstanceSupplier(
                                 new DtoInstanceSupplier(field.getType()));
                         return nestedDtoGeneratorBuilder.build();
