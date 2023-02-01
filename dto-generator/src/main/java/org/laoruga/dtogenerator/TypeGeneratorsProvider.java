@@ -54,7 +54,7 @@ public class TypeGeneratorsProvider {
                            Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree) {
         this.configuration = configuration;
         this.overriddenBuildersForFields = new HashMap<>();
-        this.userGenBuildersMapping = new GeneratorBuildersHolder(new ArrayList<>());
+        this.userGenBuildersMapping = new GeneratorBuildersHolder();
         this.typeGeneratorRemarksProvider = typeGeneratorRemarksProvider;
         this.pathFromRootDto = pathFromRootDto;
         this.overriddenBuilders = new ConcurrentHashMap<>();

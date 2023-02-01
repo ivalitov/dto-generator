@@ -5,10 +5,7 @@ import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.rules.RulesInstance;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuildersHolder.GenBuilderInfo.createInstance;
+import static org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuilderInfo.createInstance;
 
 /**
  * @author Il'dar Valitov
@@ -27,26 +24,68 @@ public final class GeneratorBuildersHolderGeneral {
     }
 
     private static GeneratorBuildersHolder init() {
-        List<GeneratorBuildersHolder.GenBuilderInfo> basicBuilderInfoList = Arrays.asList(
+        GeneratorBuildersHolder generatorBuildersHolder = new GeneratorBuildersHolder();
 
-                // general
-                createInstance(StringRule.class, RulesInstance.stringRule.generatedType(), GeneratorBuildersFactory::stringBuilder),
-                createInstance(IntegerRule.class, RulesInstance.integerRule.generatedType(), Integer.TYPE, GeneratorBuildersFactory::integerBuilder),
-                createInstance(DoubleRule.class, RulesInstance.doubleRule.generatedType(), Double.TYPE, GeneratorBuildersFactory::doubleBuilder),
-                createInstance(LongRule.class, RulesInstance.longRule.generatedType(), Long.TYPE, GeneratorBuildersFactory::longBuilder),
-                createInstance(EnumRule.class, RulesInstance.enumRule.generatedType(), GeneratorBuildersFactory::enumBuilder),
-                createInstance(LocalDateTimeRule.class, RulesInstance.localDateTimeRule.generatedType(), GeneratorBuildersFactory::localDateTimeBuilder),
+        // general
+        generatorBuildersHolder.addBuilder(
+                createInstance(
+                        StringRule.class,
+                        RulesInstance.stringRule.generatedType(),
+                        GeneratorBuildersFactory::stringBuilder));
+        generatorBuildersHolder.addBuilder(
+                createInstance(
+                        IntegerRule.class,
+                        RulesInstance.integerRule.generatedType(),
+                        Integer.TYPE,
+                        GeneratorBuildersFactory::integerBuilder));
+        generatorBuildersHolder.addBuilder(
+                createInstance(
+                        DoubleRule.class,
+                        RulesInstance.doubleRule.generatedType(),
+                        Double.TYPE,
+                        GeneratorBuildersFactory::doubleBuilder));
+        generatorBuildersHolder.addBuilder(
+                createInstance(
+                        LongRule.class,
+                        RulesInstance.longRule.generatedType(),
+                        Long.TYPE,
+                        GeneratorBuildersFactory::longBuilder));
+        generatorBuildersHolder.addBuilder(
+                createInstance(
+                        EnumRule.class,
+                        RulesInstance.enumRule.generatedType(),
+                        GeneratorBuildersFactory::enumBuilder));
+        generatorBuildersHolder.addBuilder(
+                createInstance(
+                        LocalDateTimeRule.class,
+                        RulesInstance.localDateTimeRule.generatedType(),
+                        GeneratorBuildersFactory::localDateTimeBuilder));
 
-                // collection
-                createInstance(SetRule.class, RulesInstance.setRule.generatedType(), GeneratorBuildersFactory::setBuilder),
-                createInstance(ListRule.class, RulesInstance.listRule.generatedType(), GeneratorBuildersFactory::listBuilder),
+        // collection
+        generatorBuildersHolder.addBuilder(
+                createInstance(
+                        SetRule.class,
+                        RulesInstance.setRule.generatedType(),
+                        GeneratorBuildersFactory::setBuilder));
+        generatorBuildersHolder.addBuilder(
+                createInstance(
+                        ListRule.class,
+                        RulesInstance.listRule.generatedType(),
+                        GeneratorBuildersFactory::listBuilder));
 
-                // extended
-                createInstance(CustomRule.class, RulesInstance.customRule.generatedType(), GeneratorBuildersFactory::customBuilder),
-                createInstance(NestedDtoRule.class, RulesInstance.nestedDtoRule.generatedType(), GeneratorBuildersFactory::nestedDtoBuilder)
+        // extended
+        generatorBuildersHolder.addBuilder(
+                createInstance(
+                        CustomRule.class,
+                        RulesInstance.customRule.generatedType(),
+                        GeneratorBuildersFactory::customBuilder));
+        generatorBuildersHolder.addBuilder(
+                createInstance(
+                        NestedDtoRule.class,
+                        RulesInstance.nestedDtoRule.generatedType(),
+                        GeneratorBuildersFactory::nestedDtoBuilder));
 
-        );
-        return new GeneratorBuildersHolder(basicBuilderInfoList);
+        return generatorBuildersHolder;
     }
 
 }
