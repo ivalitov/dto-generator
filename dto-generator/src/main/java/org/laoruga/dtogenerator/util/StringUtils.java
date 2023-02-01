@@ -15,7 +15,7 @@ public class StringUtils {
      * @param fieldsFromRoot - string may contain field name or fields sequence separated by dots.
      *                       For example: 'person.age'
      * @return left - field name; right - path to field started with '%ROOT%'.
-     * For example: <'age' , ['%ROOT%', 'person'>;
+     * For example: Left - 'age'; Right - ['%ROOT%', 'person']
      */
     public static Pair<String, String[]> splitPath(String fieldsFromRoot) {
         String fieldName;

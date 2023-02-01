@@ -57,8 +57,10 @@ public final class ReflectionUtils {
 
     /**
      * @param dtoClass class to instantiate, must have no-args constructor
+     * @param <T>      - type to create
      * @return instance of class
      */
+    @SuppressWarnings("unchecked")
     public static <T> T createInstance(Class<T> dtoClass) {
         try {
             Constructor<?>[] declaredConstructors = dtoClass.getDeclaredConstructors();
@@ -83,6 +85,10 @@ public final class ReflectionUtils {
     /**
      * 1. Filed type should be assignable from required collectionClass
      * 2. CollectionClass should not be an interface or abstract
+     *
+     * @param collectionClass - class of collection
+     * @param <T>             - collection element type
+     * @return - new collection instance
      */
     public static <T> T createCollectionInstance(Class<T> collectionClass) {
         if (collectionClass.isInterface() || Modifier.isAbstract(collectionClass.getModifiers())) {
@@ -110,6 +116,7 @@ public final class ReflectionUtils {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T getDefaultMethodValue(Class<? extends Annotation> annotationClass,
                                               String methodName,
                                               Class<T> valueType) throws NoSuchMethodException {

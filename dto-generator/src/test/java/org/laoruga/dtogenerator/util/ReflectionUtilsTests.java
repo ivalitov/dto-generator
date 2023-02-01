@@ -53,5 +53,4 @@ class ReflectionUtilsTests {
                 () -> ReflectionUtils.assertTypeCompatibility(Set.class, ArrayList.class));
     }
 
-
 }

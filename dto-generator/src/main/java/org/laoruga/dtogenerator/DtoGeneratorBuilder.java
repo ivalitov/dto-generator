@@ -54,8 +54,14 @@ public class DtoGeneratorBuilder<T> {
         );
     }
 
+
     /**
      * Constructor to copy builder for nested DTO generation.
+     *
+     * @param configuration            - configuration instance
+     * @param typeGeneratorsProvider   - generators provider for field values
+     * @param dtoGeneratorBuildersTree - generator builders tree
+     * @param fieldGroupFilter         - groups for filtering fields
      */
     protected DtoGeneratorBuilder(DtoGeneratorInstanceConfig configuration,
                                   TypeGeneratorsProvider typeGeneratorsProvider,
@@ -67,12 +73,14 @@ public class DtoGeneratorBuilder<T> {
         this.fieldGroupFilter = fieldGroupFilter;
     }
 
+
     /**
      * @param rulesAnnotationClass - not collection only
      * @param generatorBuilder     - builder of not collection type
+     * @return - this
      */
     public DtoGeneratorBuilder<T> setGeneratorBuilder(@NonNull Class<? extends Annotation> rulesAnnotationClass,
-                                                      @NonNull IGeneratorBuilder generatorBuilder) throws DtoGeneratorException {
+                                                      @NonNull IGeneratorBuilder generatorBuilder) {
         typeGeneratorsProvider.overrideGenerator(rulesAnnotationClass, generatorBuilder);
         return this;
     }
@@ -81,9 +89,10 @@ public class DtoGeneratorBuilder<T> {
     /**
      * @param fieldName        name of field to generate value
      * @param generatorBuilder builder of generator of any type
+     * @return - this
      */
     public DtoGeneratorBuilder<T> setGeneratorBuilder(@NonNull String fieldName,
-                                                      @NonNull IGeneratorBuilder generatorBuilder) throws DtoGeneratorException {
+                                                      @NonNull IGeneratorBuilder generatorBuilder) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
                 .getTypeGeneratorsProvider()
@@ -142,6 +151,7 @@ public class DtoGeneratorBuilder<T> {
      * else - only passed groups are used (In this case, if you need to use DEFAULT group, you need to pass it too).
      *
      * @param groups - groups by which @Rule will be filtered
+     * @return - this
      */
     public DtoGeneratorBuilder<T> includeGroups(String... groups) {
         if (groups != null && groups.length != 0) {

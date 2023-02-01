@@ -61,6 +61,7 @@ public final class RandomUtils {
 
     /**
      * @param collection - collection to take a random element
+     * @param <T> collection element type
      * @return - random element from collection
      */
     public static <T> T getRandomItem(Collection<T> collection) {
@@ -77,6 +78,7 @@ public final class RandomUtils {
 
     /**
      * @param items - array to take a random element
+     * @param <T> array element type
      * @return - random element from array
      */
     public static <T> T getRandomItem(T... items) {
