@@ -51,6 +51,7 @@ public class DtoGenerator<T> {
         return new DtoGeneratorBuilder<>(dtoInstance);
     }
 
+    @SuppressWarnings("unchecked")
     public T generateDto() {
         if (dtoInstanceSupplier instanceof DtoInstanceSupplier) {
             ((DtoInstanceSupplier) dtoInstanceSupplier).updateInstance();
