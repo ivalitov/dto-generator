@@ -9,7 +9,7 @@
 
 ## Description
 
-DTO Generator is a Java library that makes it easy to get Java objects filled with random data generated according to given rules (configuration).
+DTO Generator is a Java library that makes it easy to get Java objects filled with random data generated according to given rules.
 
 There are various ways to provide configuration:
 - directly on the DTO fields via annotations ;
