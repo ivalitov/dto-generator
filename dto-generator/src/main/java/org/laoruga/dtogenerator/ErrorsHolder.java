@@ -1,6 +1,5 @@
 package org.laoruga.dtogenerator;
 
-import lombok.Getter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.lang.reflect.Field;
@@ -15,11 +14,17 @@ import java.util.stream.Collectors;
  */
 public class ErrorsHolder {
 
-    @Getter(lazy = true)
-    private final Map<Field, Exception> errors = new LinkedHashMap<>();
+    private Map<Field, Exception> errors;
+
+    private Map<Field, Exception> getErrors() {
+        if (errors == null) {
+            errors = new LinkedHashMap<>();
+        }
+        return errors;
+    }
 
     public boolean isEmpty() {
-        return getErrors().isEmpty();
+        return errors == null || getErrors().isEmpty();
     }
 
     public void put(Field field, Exception e) {
@@ -28,6 +33,9 @@ public class ErrorsHolder {
 
     @Override
     public String toString() {
+        if (isEmpty()) {
+            return "";
+        }
         final AtomicInteger counter = new AtomicInteger(0);
         return getErrors().entrySet().stream()
                 .map(fieldExceptionEntry ->
@@ -38,7 +46,7 @@ public class ErrorsHolder {
                 .collect(Collectors.joining("\n"));
     }
 
-    public int size() {
-        return getErrors().size();
+    public int getErrorsNumber() {
+        return errors == null ? 0 : getErrors().size();
     }
 }

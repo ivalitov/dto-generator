@@ -21,18 +21,18 @@ public class TestUtils {
 
     public static Map<String, Exception> getErrorsMap(DtoGenerator dtoGenerator) {
 
-        AtomicReference<Map<Field, Exception>> errors;
+        Map<Field, Exception> errors;
         try {
             Field mapperField = dtoGenerator.getClass().getDeclaredField("errorsHolder");
             mapperField.setAccessible(true);
             ErrorsHolder errorsHolder = (ErrorsHolder) mapperField.get(dtoGenerator);
             Field errorsField = errorsHolder.getClass().getDeclaredField("errors");
             errorsField.setAccessible(true);
-            errors = (AtomicReference<Map<Field, Exception>>) errorsField.get(errorsHolder);
+            errors = (Map<Field, Exception>) errorsField.get(errorsHolder);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return errors.get().entrySet().stream().collect(Collectors.toMap(
+        return errors.entrySet().stream().collect(Collectors.toMap(
                 (e) -> e.getKey().getName(),
                 Map.Entry::getValue
         ));

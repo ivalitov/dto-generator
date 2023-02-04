@@ -43,7 +43,7 @@ public class BatchGeneratorsExecutor {
         }
 
         if (!checkIfAllGeneratorsExecuted()) {
-            log.error("{} error(s) while generators execution. See problems below: \n" + errorsHolder, errorsHolder.size());
+            log.error("{} error(s) while generators execution. See problems below: \n" + errorsHolder, errorsHolder.getErrorsNumber());
             throw new DtoGeneratorException("Error while generators execution");
         }
     }
@@ -80,7 +80,7 @@ public class BatchGeneratorsExecutor {
                     leftGenerators, fieldGeneratorMap.size());
         }
         if (!errorsHolder.isEmpty()) {
-            log.warn("{} error(s) while generators execution:\n" + errorsHolder, errorsHolder.size());
+            log.warn("{} error(s) while generators execution:\n" + errorsHolder, errorsHolder.getErrorsNumber());
         }
         return successful;
     }
