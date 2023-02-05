@@ -12,7 +12,6 @@ import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
  */
 
 public interface ICustomRuleRemark {
-
     /**
      * Call this method for passing 'remark' to {@link DtoGeneratorBuilder}
      *
@@ -24,7 +23,11 @@ public interface ICustomRuleRemark {
             throw new DtoGeneratorException("Remark '" + this + "' expected '" + requiredArgsNumber() +
                     "' args. Passed '" + args.length + " args'");
         }
-        return new CustomRuleRemarkWithArgs(this, getGeneratorClass(), args);
+        return new CustomRuleRemarkWithArgs(this, args);
+    }
+
+    default String[] getArgs() {
+        return new String[0];
     }
 
     /**
@@ -39,4 +42,8 @@ public interface ICustomRuleRemark {
      * @return class of custom generator for which is intended this 'remark'
      */
     Class<? extends ICustomGenerator<?>> getGeneratorClass();
+
+    default ICustomRuleRemark getRemarkInstance() {
+        return this;
+    }
 }

@@ -1,8 +1,8 @@
 package org.laoruga.dtogenerator.api.generators.custom;
 
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWithArgs;
+import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Il'dar Valitov
@@ -11,6 +11,5 @@ import java.util.List;
 
 public interface ICustomGeneratorRemarkable<T> extends ICustomGenerator<T> {
 
-    void setRuleRemarks(List<CustomRuleRemarkWithArgs> iRuleRemarks);
-
+    void setRuleRemarks(Map<ICustomRuleRemark, ICustomRuleRemark> ruleRemarks);
 }

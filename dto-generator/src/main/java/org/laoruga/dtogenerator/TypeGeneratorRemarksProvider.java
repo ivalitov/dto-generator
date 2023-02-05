@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator;
 
 import lombok.NonNull;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWithArgs;
+import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
@@ -19,8 +19,8 @@ public class TypeGeneratorRemarksProvider {
 
     private final Map<String, IRuleRemark> basicRuleRemarksMapByField;
     private final AtomicReference<IRuleRemark> basicRuleRemarkForAnyField;
-    private final Map<String, List<CustomRuleRemarkWithArgs>> customRuleRemarksMapByField;
-    private final Map<Class<? extends ICustomGenerator<?>>, List<CustomRuleRemarkWithArgs>> customRuleRemarksMapByGenerator;
+    private final Map<String, Set<ICustomRuleRemark>> customRuleRemarksMapByField;
+    private final Map<Class<? extends ICustomGenerator<?>>, Set<ICustomRuleRemark>> customRuleRemarksMapByGenerator;
 
     public TypeGeneratorRemarksProvider() {
         this(new AtomicReference<>(), new HashMap<>());
@@ -37,7 +37,7 @@ public class TypeGeneratorRemarksProvider {
 
     private TypeGeneratorRemarksProvider(
             AtomicReference<IRuleRemark> basicRuleRemarkForAnyField,
-            Map<Class<? extends ICustomGenerator<?>>, List<CustomRuleRemarkWithArgs>> customRuleRemarksMapByGenerator) {
+            Map<Class<? extends ICustomGenerator<?>>, Set<ICustomRuleRemark>> customRuleRemarksMapByGenerator) {
         this.basicRuleRemarksMapByField = new HashMap<>();
         this.customRuleRemarksMapByField = new HashMap<>();
         this.basicRuleRemarkForAnyField = basicRuleRemarkForAnyField;
@@ -88,46 +88,49 @@ public class TypeGeneratorRemarksProvider {
         return customRuleRemarksMapByField.containsKey(fieldName);
     }
 
-    List<CustomRuleRemarkWithArgs> getCustomRuleRemarks(ICustomGenerator<?> customGenerator) {
+    Set<ICustomRuleRemark> getCustomRuleRemarks(ICustomGenerator<?> customGenerator) {
         return customRuleRemarksMapByGenerator.get(customGenerator.getClass());
     }
 
-    List<CustomRuleRemarkWithArgs> getCustomRuleRemarks(String fieldName) {
+    Set<ICustomRuleRemark> getCustomRuleRemarks(String fieldName) {
         return customRuleRemarksMapByField.get(fieldName);
     }
 
-    public Optional<List<CustomRuleRemarkWithArgs>> getCustomRuleRemarks(String fieldName, ICustomGenerator<?> remarkableGenerator) {
-        List<CustomRuleRemarkWithArgs> mappedByField = isCustomRuleRemarkExists(fieldName) ?
-                getCustomRuleRemarks(fieldName) : new ArrayList<>();
-        List<CustomRuleRemarkWithArgs> mappedByGenerator = isCustomRuleRemarkExists(remarkableGenerator) ?
-                getCustomRuleRemarks(remarkableGenerator) : new ArrayList<>();
-        if (mappedByGenerator.isEmpty() && mappedByField.isEmpty()) {
+    public Optional<Map<ICustomRuleRemark, ICustomRuleRemark>> getCustomRuleRemarks(String fieldName, ICustomGenerator<?> remarkableGenerator) {
+        Set<ICustomRuleRemark> mappedByField =
+                isCustomRuleRemarkExists(fieldName) ? getCustomRuleRemarks(fieldName) : null;
+
+        Set<ICustomRuleRemark> mappedByGenerator =
+                isCustomRuleRemarkExists(remarkableGenerator) ? getCustomRuleRemarks(remarkableGenerator) : null;
+
+        if (mappedByField == null && mappedByGenerator == null) {
             return Optional.empty();
         }
-        if (!mappedByField.isEmpty() && !mappedByGenerator.isEmpty()) {
-            Iterator<CustomRuleRemarkWithArgs> iterator = mappedByGenerator.iterator();
-            while (iterator.hasNext()) {
-                CustomRuleRemarkWithArgs remarkMappedByGenerator = iterator.next();
-                Optional<CustomRuleRemarkWithArgs> sameRemark = mappedByField.stream()
-                        .filter(i -> i.getCustomRuleRemark().equals(remarkMappedByGenerator.getCustomRuleRemark()))
-                        .findAny();
-                if (sameRemark.isPresent()) {
-                    iterator.remove();
-                }
-            }
+
+        Map<ICustomRuleRemark, ICustomRuleRemark> remarksMap = new HashMap<>();
+        if (mappedByGenerator != null) {
+            addToMap(remarksMap, mappedByGenerator);
         }
-        mappedByField.addAll(mappedByGenerator);
-        return Optional.of(mappedByField);
+        if (mappedByField != null) {
+            addToMap(remarksMap, mappedByField);
+        }
+        return Optional.ofNullable(remarksMap);
+    }
+
+    private void addToMap(Map<ICustomRuleRemark, ICustomRuleRemark> remarksMap, Set<ICustomRuleRemark> remarksSet) {
+        for (ICustomRuleRemark remark : remarksSet) {
+            remarksMap.put(remark.getRemarkInstance(), remark);
+        }
     }
 
     void addCustomRuleRemarkForField(@NonNull String filedName,
-                                     @NonNull CustomRuleRemarkWithArgs ruleRemark) {
-        customRuleRemarksMapByField.putIfAbsent(filedName, new LinkedList<>());
+                                     @NonNull ICustomRuleRemark ruleRemark) {
+        customRuleRemarksMapByField.putIfAbsent(filedName, new HashSet<>());
         customRuleRemarksMapByField.get(filedName).add(ruleRemark);
     }
 
-    void addRuleRemarkForAllFields(@NonNull CustomRuleRemarkWithArgs ruleRemarks) {
-        this.customRuleRemarksMapByGenerator.putIfAbsent(ruleRemarks.getGeneratorClass(), new LinkedList<>());
+    void addRuleRemarkForAllFields(@NonNull ICustomRuleRemark ruleRemarks) {
+        this.customRuleRemarksMapByGenerator.putIfAbsent(ruleRemarks.getGeneratorClass(), new HashSet<>());
         this.customRuleRemarksMapByGenerator.get(ruleRemarks.getGeneratorClass()).add(ruleRemarks);
     }
 }

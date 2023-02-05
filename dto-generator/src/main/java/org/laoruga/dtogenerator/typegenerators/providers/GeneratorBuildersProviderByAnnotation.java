@@ -24,6 +24,7 @@ import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -372,8 +373,10 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
             }
             if (usersGeneratorInstance instanceof ICustomGeneratorRemarkable) {
                 ICustomGeneratorRemarkable<?> remarkableGenerator = (ICustomGeneratorRemarkable<?>) usersGeneratorInstance;
-                typeGeneratorRemarksProvider.getCustomRuleRemarks(fieldName, remarkableGenerator)
-                        .ifPresent(remarkableGenerator::setRuleRemarks);
+                remarkableGenerator.setRuleRemarks(
+                        typeGeneratorRemarksProvider
+                                .getCustomRuleRemarks(fieldName, remarkableGenerator)
+                                .orElse(new HashMap<>()));
             }
         }
 
