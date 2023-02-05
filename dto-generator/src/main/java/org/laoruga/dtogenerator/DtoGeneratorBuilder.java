@@ -115,7 +115,9 @@ public class DtoGeneratorBuilder<T> {
     }
 
     public DtoGeneratorBuilder<T> setRuleRemark(@NonNull RuleRemark basicRuleRemark) throws DtoGeneratorException {
-        this.typeGeneratorsProvider.getTypeGeneratorRemarksProvider().setBasicRuleRemarkForFields(basicRuleRemark);
+        this.getTypeGeneratorsProvider()
+                .getTypeGeneratorRemarksProvider()
+                .setBasicRuleRemarkForAnyField(basicRuleRemark);
         return this;
     }
 
@@ -124,7 +126,7 @@ public class DtoGeneratorBuilder<T> {
      */
 
     public DtoGeneratorBuilder<T> setRuleRemarksCustom(@NonNull String fieldName,
-                                                       @NonNull CustomRuleRemarkWrapper... ruleRemark) {
+                                                       @NonNull CustomRuleRemarkWrapper ruleRemark) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
                 .getTypeGeneratorsProvider()

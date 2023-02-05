@@ -372,7 +372,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
             }
             if (usersGeneratorInstance instanceof ICustomGeneratorRemarkable) {
                 ICustomGeneratorRemarkable<?> remarkableGenerator = (ICustomGeneratorRemarkable<?>) usersGeneratorInstance;
-                typeGeneratorRemarksProvider.getRemarks(fieldName, remarkableGenerator)
+                typeGeneratorRemarksProvider.getCustomRuleRemarks(fieldName, remarkableGenerator)
                         .ifPresent(remarkableGenerator::setRuleRemarks);
             }
         }
