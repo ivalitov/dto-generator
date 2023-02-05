@@ -2,8 +2,9 @@ package org.laoruga.dtogenerator.functional.data.customgenerator;
 
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorDtoDependent;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkableArgs;
 import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemarkArgs;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.*;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
@@ -20,11 +21,11 @@ import static org.laoruga.dtogenerator.functional.data.customgenerator.ClientRem
  */
 
 public class ClientInfoGenerator implements
-        ICustomGeneratorRemarkable<ClientInfoDto>,
+        ICustomGeneratorRemarkableArgs<ClientInfoDto>,
         ICustomGeneratorArgs<ClientInfoDto>,
         ICustomGeneratorDtoDependent<ClientInfoDto, ClientDto> {
 
-    Map<ICustomRuleRemark, ICustomRuleRemark> ruleRemarks;
+    Map<ICustomRuleRemark, ICustomRuleRemarkArgs> ruleRemarks;
     Supplier<ClientDto> generatedDto;
     private String[] generatorArgs;
 
@@ -102,7 +103,7 @@ public class ClientInfoGenerator implements
     }
 
     @Override
-    public void setRuleRemarks(Map<ICustomRuleRemark, ICustomRuleRemark> ruleRemarks) {
+    public void setRuleRemarks(Map<ICustomRuleRemark, ICustomRuleRemarkArgs> ruleRemarks) {
         this.ruleRemarks = ruleRemarks;
     }
 }

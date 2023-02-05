@@ -1,14 +1,14 @@
 package org.laoruga.dtogenerator.functional.data.customgenerator;
 
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
-import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemarkArgs;
 
 /**
  * @author Il'dar Valitov
  * Created on 04.05.2022
  */
 
-public enum ClientRemark implements ICustomRuleRemark {
+public enum ClientRemark implements ICustomRuleRemarkArgs {
     CLIENT_TYPE(1),
     DOCUMENT(1);
 

@@ -10,6 +10,7 @@ import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkableArgs;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.constants.RuleType;
@@ -372,14 +373,22 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                 prepareCustomRemarks(((ICollectionGenerator<?>) usersGeneratorInstance)
                         .getElementGenerator(), fieldName);
 
-            }
-            if (usersGeneratorInstance instanceof ICustomGeneratorRemarkable) {
+            } else if (usersGeneratorInstance instanceof ICustomGeneratorRemarkableArgs) {
 
-                ICustomGeneratorRemarkable<?> remarkableGenerator = (ICustomGeneratorRemarkable<?>) usersGeneratorInstance;
+                ICustomGeneratorRemarkableArgs<?> remarkableGenerator =
+                        (ICustomGeneratorRemarkableArgs<?>) usersGeneratorInstance;
+                remarkableGenerator.setRuleRemarks(
+                        typeGeneratorRemarksProvider.getCustomRuleRemarksArgs(fieldName, remarkableGenerator));
+
+            } else if (usersGeneratorInstance instanceof ICustomGeneratorRemarkable) {
+
+                ICustomGeneratorRemarkable<?> remarkableGenerator =
+                        (ICustomGeneratorRemarkable<?>) usersGeneratorInstance;
                 remarkableGenerator.setRuleRemarks(
                         typeGeneratorRemarksProvider.getCustomRuleRemarks(fieldName, remarkableGenerator));
 
             }
+
         }
 
     }

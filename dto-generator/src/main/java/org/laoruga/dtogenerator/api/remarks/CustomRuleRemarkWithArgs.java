@@ -11,9 +11,9 @@ import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 
 @AllArgsConstructor
 @Getter
-public class CustomRuleRemarkWithArgs implements ICustomRuleRemark {
+public class CustomRuleRemarkWithArgs implements ICustomRuleRemarkArgs {
 
-    private ICustomRuleRemark customRuleRemark;
+    private ICustomRuleRemarkArgs customRuleRemark;
     private String[] args;
 
     @Override
@@ -32,7 +32,7 @@ public class CustomRuleRemarkWithArgs implements ICustomRuleRemark {
     }
 
     @Override
-    public ICustomRuleRemark getRemarkInstance() {
+    public ICustomRuleRemarkArgs getRemarkInstance() {
         return customRuleRemark;
     }
 

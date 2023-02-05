@@ -6,6 +6,7 @@ import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemarkArgs;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
@@ -135,7 +136,7 @@ public class DtoGeneratorBuilder<T> {
         return this;
     }
 
-    public DtoGeneratorBuilder<T> addRuleRemarksCustom(@NonNull ICustomRuleRemark ruleRemarks) {
+    public DtoGeneratorBuilder<T> addRuleRemarksCustom(@NonNull ICustomRuleRemarkArgs ruleRemarks) {
         this.typeGeneratorsProvider.getTypeGeneratorRemarksProvider().addRuleRemarkForAllFields(ruleRemarks);
         return this;
     }
