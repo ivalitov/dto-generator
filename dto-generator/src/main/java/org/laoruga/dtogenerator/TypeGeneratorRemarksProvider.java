@@ -22,6 +22,8 @@ public class TypeGeneratorRemarksProvider {
     private final Map<String, Set<ICustomRuleRemark>> customRuleRemarksMapByField;
     private final Map<Class<? extends ICustomGenerator<?>>, Set<ICustomRuleRemark>> customRuleRemarksMapByGenerator;
 
+    private static final Map<ICustomRuleRemark, ICustomRuleRemark> EMPTY_MAP = Collections.unmodifiableMap(new HashMap<>());
+
     public TypeGeneratorRemarksProvider() {
         this(new AtomicReference<>(), new HashMap<>());
     }
@@ -96,7 +98,7 @@ public class TypeGeneratorRemarksProvider {
         return customRuleRemarksMapByField.get(fieldName);
     }
 
-    public Optional<Map<ICustomRuleRemark, ICustomRuleRemark>> getCustomRuleRemarks(String fieldName, ICustomGenerator<?> remarkableGenerator) {
+    public Map<ICustomRuleRemark, ICustomRuleRemark> getCustomRuleRemarks(String fieldName, ICustomGenerator<?> remarkableGenerator) {
         Set<ICustomRuleRemark> mappedByField =
                 isCustomRuleRemarkExists(fieldName) ? getCustomRuleRemarks(fieldName) : null;
 
@@ -104,17 +106,18 @@ public class TypeGeneratorRemarksProvider {
                 isCustomRuleRemarkExists(remarkableGenerator) ? getCustomRuleRemarks(remarkableGenerator) : null;
 
         if (mappedByField == null && mappedByGenerator == null) {
-            return Optional.empty();
+            return EMPTY_MAP;
         }
 
         Map<ICustomRuleRemark, ICustomRuleRemark> remarksMap = new HashMap<>();
+
         if (mappedByGenerator != null) {
             addToMap(remarksMap, mappedByGenerator);
         }
         if (mappedByField != null) {
             addToMap(remarksMap, mappedByField);
         }
-        return Optional.ofNullable(remarksMap);
+        return remarksMap;
     }
 
     private void addToMap(Map<ICustomRuleRemark, ICustomRuleRemark> remarksMap, Set<ICustomRuleRemark> remarksSet) {
