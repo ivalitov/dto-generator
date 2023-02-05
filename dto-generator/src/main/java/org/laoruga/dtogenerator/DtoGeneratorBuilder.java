@@ -125,7 +125,7 @@ public class DtoGeneratorBuilder<T> {
      * Custom Rule Remarks
      */
 
-    public DtoGeneratorBuilder<T> setRuleRemarksCustom(@NonNull String fieldName,
+    public DtoGeneratorBuilder<T> addRuleRemarksCustom(@NonNull String fieldName,
                                                        @NonNull CustomRuleRemarkWithArgs ruleRemark) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
@@ -135,7 +135,7 @@ public class DtoGeneratorBuilder<T> {
         return this;
     }
 
-    public DtoGeneratorBuilder<T> setRuleRemarksCustom(@NonNull CustomRuleRemarkWithArgs ruleRemarks) {
+    public DtoGeneratorBuilder<T> addRuleRemarksCustom(@NonNull CustomRuleRemarkWithArgs ruleRemarks) {
         this.typeGeneratorsProvider.getTypeGeneratorRemarksProvider().addRuleRemarkForAllFields(ruleRemarks);
         return this;
     }
