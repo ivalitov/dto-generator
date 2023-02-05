@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.examples.generators.custom;
 
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.generators.AbstractCustomGeneratorRemarkable;
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWrapper;
+import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWithArgs;
 import org.laoruga.dtogenerator.examples.generators.custom.remark.PersonRemark;
 import org.laoruga.dtogenerator.util.RandomUtils;
 import org.laoruga.dtogenerator.examples.dto.Gender;
@@ -21,10 +21,10 @@ public class CustomGeneratorRemarkable extends AbstractCustomGeneratorRemarkable
     public Person generate() {
         Person person = DtoGenerator.builder(Person.class).build().generateDto();
 
-        Optional<CustomRuleRemarkWrapper> maybeAgeRemark = getWrappedRemark(PersonRemark.AGE_RANGE);
-        Optional<CustomRuleRemarkWrapper> maybeWeightRemark = getWrappedRemark(PersonRemark.WEIGHT_RANGE);
-        Optional<CustomRuleRemarkWrapper> maybeGrowthRemark = getWrappedRemark(PersonRemark.GROWTH_RANGE);
-        Optional<CustomRuleRemarkWrapper> maybeGenderRemark = getWrappedRemark(PersonRemark.GENDER);
+        Optional<CustomRuleRemarkWithArgs> maybeAgeRemark = getWrappedRemark(PersonRemark.AGE_RANGE);
+        Optional<CustomRuleRemarkWithArgs> maybeWeightRemark = getWrappedRemark(PersonRemark.WEIGHT_RANGE);
+        Optional<CustomRuleRemarkWithArgs> maybeGrowthRemark = getWrappedRemark(PersonRemark.GROWTH_RANGE);
+        Optional<CustomRuleRemarkWithArgs> maybeGenderRemark = getWrappedRemark(PersonRemark.GENDER);
 
         maybeAgeRemark.ifPresent(ruleRemarkWrapper -> person.setAge(randomInRange(ruleRemarkWrapper)));
         maybeWeightRemark.ifPresent(ruleRemarkWrapper -> person.setWeight(randomInRange(ruleRemarkWrapper)));
@@ -34,7 +34,7 @@ public class CustomGeneratorRemarkable extends AbstractCustomGeneratorRemarkable
         return person;
     }
 
-    private static int randomInRange(CustomRuleRemarkWrapper ruleRemarkWrapper) {
+    private static int randomInRange(CustomRuleRemarkWithArgs ruleRemarkWrapper) {
         String[] range = ruleRemarkWrapper.getArgs();
         return RandomUtils.nextInt(range[0], range[1]);
     }

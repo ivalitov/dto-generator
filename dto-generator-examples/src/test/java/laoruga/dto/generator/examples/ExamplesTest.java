@@ -50,10 +50,10 @@ class ExamplesTest {
     void customGeneratorRemarkable() {
         Office office = DtoGenerator.builder(Office.class)
                 .setRuleRemarksCustom(
-                        PersonRemark.WEIGHT_RANGE.wrap("50", "70"),
-                        PersonRemark.GROWTH_RANGE.wrap("130", "150"),
-                        PersonRemark.AGE_RANGE.wrap("18", "30"),
-                        PersonRemark.GENDER.wrap("FEMALE"))
+                        PersonRemark.WEIGHT_RANGE.setArgs("50", "70"),
+                        PersonRemark.GROWTH_RANGE.setArgs("130", "150"),
+                        PersonRemark.AGE_RANGE.setArgs("18", "30"),
+                        PersonRemark.GENDER.setArgs("FEMALE"))
                 .build()
                 .generateDto();
 

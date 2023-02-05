@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.functional.data.customgenerator;
 import org.laoruga.dtogenerator.api.generators.AbstractCustomGeneratorRemarkable;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorDtoDependent;
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWrapper;
+import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWithArgs;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.*;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
@@ -38,13 +38,13 @@ public class ClientInfoGenerator extends AbstractCustomGeneratorRemarkable<Clien
 
         String prefix = generatorArgs.length == 0 ? "" : RandomUtils.getRandomItem(generatorArgs);
 
-        Optional<CustomRuleRemarkWrapper> maybeClientTypeRemark = getWrappedRemark(CLIENT_TYPE);
+        Optional<CustomRuleRemarkWithArgs> maybeClientTypeRemark = getWrappedRemark(CLIENT_TYPE);
         clientType = maybeClientTypeRemark
                 .map(customRuleRemarkWrapper -> ClientType.valueOf(
                         String.valueOf(customRuleRemarkWrapper.getArgs()[0]).toUpperCase()))
                 .orElseGet(() -> RandomUtils.getRandomItem(ClientType.values()));
 
-        Optional<CustomRuleRemarkWrapper> maybeDocTypeRemark = getWrappedRemark(DOCUMENT);
+        Optional<CustomRuleRemarkWithArgs> maybeDocTypeRemark = getWrappedRemark(DOCUMENT);
         docType = maybeDocTypeRemark
                 .map(customRuleRemarkWrapper -> DocType.valueOf(
                         String.valueOf(customRuleRemarkWrapper.getArgs()[0]).toUpperCase()))

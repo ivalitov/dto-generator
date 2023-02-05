@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.api.generators;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWrapper;
+import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkWithArgs;
 import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
 
 import java.util.List;
@@ -16,19 +16,19 @@ import java.util.Optional;
 @Getter(AccessLevel.PROTECTED)
 public abstract class AbstractCustomGeneratorRemarkable<T> implements ICustomGeneratorRemarkable<T> {
 
-    private List<CustomRuleRemarkWrapper> ruleRemarkWrapperList;
+    private List<CustomRuleRemarkWithArgs> ruleRemarkWrapperList;
 
     @Override
-    public final void setRuleRemarks(List<CustomRuleRemarkWrapper> ruleRemarkWrapperList) {
+    public final void setRuleRemarks(List<CustomRuleRemarkWithArgs> ruleRemarkWrapperList) {
         this.ruleRemarkWrapperList = ruleRemarkWrapperList;
     }
 
-    protected Optional<CustomRuleRemarkWrapper> getWrappedRemark(ICustomRuleRemark remark) {
+    protected Optional<CustomRuleRemarkWithArgs> getWrappedRemark(ICustomRuleRemark remark) {
         if (getRuleRemarkWrapperList() == null) {
             return Optional.empty();
         }
-        for (CustomRuleRemarkWrapper ruleRemark : getRuleRemarkWrapperList()) {
-            if (ruleRemark.getWrappedRuleRemark().equals(remark)) {
+        for (CustomRuleRemarkWithArgs ruleRemark : getRuleRemarkWrapperList()) {
+            if (ruleRemark.getCustomRuleRemark().equals(remark)) {
                 return Optional.of(ruleRemark);
             }
         }
