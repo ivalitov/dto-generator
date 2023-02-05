@@ -34,7 +34,7 @@ public class DtoGenerator<T> {
     private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
     @Getter(AccessLevel.PACKAGE)
     private final DtoGeneratorBuilder<T> builderInstance;
-    private final ErrorsHolder errorsHolder = new ErrorsHolder();
+    final ErrorsHolder  errorsHolder = new ErrorsHolder();
 
     protected DtoGenerator(TypeGeneratorsProvider typeGeneratorsProvider,
                            DtoGeneratorBuilder<T> dtoGeneratorBuilder) {

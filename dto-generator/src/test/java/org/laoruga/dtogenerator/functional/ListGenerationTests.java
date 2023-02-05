@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.api.rules.ListRule;
 import org.laoruga.dtogenerator.api.rules.SetRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientDto;
-import org.laoruga.dtogenerator.functional.util.TestUtils;
 import org.laoruga.dtogenerator.rules.RulesInstance;
 
 import java.util.*;
@@ -156,7 +156,7 @@ class ListGenerationTests {
         DtoGenerator<DtoWithWildcardList> generator = DtoGenerator.builder(DtoWithWildcardList.class).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);
 
-        Map<String, Exception> errorsMap = TestUtils.getErrorsMap(generator);
+        Map<String, Exception> errorsMap = UtilsRoot.getErrorsMap(generator);
 
         assertEquals(1, errorsMap.size());
         assertTrue(errorsMap.containsKey("wildCardList"));
@@ -171,7 +171,7 @@ class ListGenerationTests {
         DtoGenerator<DtoWithRawList> generator = DtoGenerator.builder(DtoWithRawList.class).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);
 
-        Map<String, Exception> errorsMap = TestUtils.getErrorsMap(generator);
+        Map<String, Exception> errorsMap = UtilsRoot.getErrorsMap(generator);
 
         assertEquals(1, errorsMap.size());
         assertTrue(errorsMap.containsKey("rawList"));
@@ -186,7 +186,7 @@ class ListGenerationTests {
         DtoGenerator<DtoWithListOfCollections> generator = DtoGenerator.builder(DtoWithListOfCollections.class).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);
 
-        Map<String, Exception> errorsMap = TestUtils.getErrorsMap(generator);
+        Map<String, Exception> errorsMap = UtilsRoot.getErrorsMap(generator);
 
         assertEquals(2, errorsMap.size());
         assertTrue(errorsMap.containsKey("listOfSet"));

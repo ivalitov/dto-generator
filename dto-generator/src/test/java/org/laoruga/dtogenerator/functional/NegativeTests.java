@@ -6,9 +6,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.functional.util.TestUtils;
 
 import java.util.stream.Stream;
 
@@ -48,7 +48,7 @@ public class NegativeTests {
     void wrongRule(String fieldName, Class<?> dtoClass, String errMsgPart) {
         DtoGenerator<?> generator = DtoGenerator.builder(dtoClass).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);
-        Throwable exception = TestUtils.getErrorsMap(generator).get(fieldName);
+        Throwable exception = UtilsRoot.getErrorsMap(generator).get(fieldName);
         assertThat(exception.getMessage(),
                 containsString(errMsgPart));
     }

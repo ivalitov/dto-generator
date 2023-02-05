@@ -16,7 +16,7 @@ public class ErrorsHolder {
 
     private Map<Field, Exception> errors;
 
-    private Map<Field, Exception> getErrors() {
+    Map<Field, Exception> getErrors() {
         if (errors == null) {
             errors = new LinkedHashMap<>();
         }

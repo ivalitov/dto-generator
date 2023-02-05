@@ -9,10 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
-import org.laoruga.dtogenerator.functional.util.TestUtils;
 import org.laoruga.dtogenerator.rules.RulesInstance;
 
 import java.time.LocalDateTime;
@@ -23,7 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.laoruga.dtogenerator.functional.util.TestUtils.resetStaticConfig;
+import static org.laoruga.dtogenerator.UtilsRoot.resetStaticConfig;
 
 /**
  * @author Il'dar Valitov
@@ -88,7 +88,7 @@ public class ImplicitRulesTests {
 
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
 
-        log.info(TestUtils.toJson(dto));
+        log.info(UtilsRoot.toJson(dto));
 
         assertNotNull(dto);
         assertAll(

@@ -13,7 +13,6 @@ import org.laoruga.dtogenerator.constants.CharSet;
 import org.laoruga.dtogenerator.constants.Group;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.functional.util.TestUtils;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -89,7 +88,7 @@ class RulesInfoExtractorTests {
                           String group,
                           boolean multiple,
                           RulesInfoExtractor rulesInfoExtractor) {
-        Field field = TestUtils.getField(dtoClass, fieldName);
+        Field field = UtilsRoot.getField(dtoClass, fieldName);
         Optional<IRuleInfo> iRuleInfo = rulesInfoExtractor.checkAndWrapAnnotations(field);
 
         assertTrue(iRuleInfo.isPresent());
@@ -132,7 +131,7 @@ class RulesInfoExtractorTests {
                              RulesInfoExtractor rulesInfoExtractor,
                              String group,
                              boolean multipleRules) {
-        Field field = TestUtils.getField(dtoClass, fieldName);
+        Field field = UtilsRoot.getField(dtoClass, fieldName);
         Optional<IRuleInfo> iRuleInfo = rulesInfoExtractor.checkAndWrapAnnotations(field);
 
         assertTrue(iRuleInfo.isPresent());
@@ -209,7 +208,7 @@ class RulesInfoExtractorTests {
     void unappropriatedRule(String fieldName, Class<?> dtoClass, String errMsgPart) {
         DtoGenerator<?> generator = DtoGenerator.builder(dtoClass).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);
-        Throwable exception = TestUtils.getErrorsMap(generator).get(fieldName);
+        Throwable exception = UtilsRoot.getErrorsMap(generator).get(fieldName);
         assertThat(exception.getCause().getMessage(),
                 containsString(errMsgPart));
     }

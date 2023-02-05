@@ -10,13 +10,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
+import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
 import org.laoruga.dtogenerator.functional.data.dto.DtoAllKnownTypes;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
-import org.laoruga.dtogenerator.functional.util.TestUtils;
 import org.laoruga.dtogenerator.typegenerators.*;
 import org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuildersFactory;
 
@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.laoruga.dtogenerator.constants.RuleRemark.MAX_VALUE;
 import static org.laoruga.dtogenerator.constants.RuleRemark.MIN_VALUE;
-import static org.laoruga.dtogenerator.functional.util.TestUtils.resetStaticConfig;
+import static org.laoruga.dtogenerator.UtilsRoot.resetStaticConfig;
 
 /**
  * @author Il'dar Valitov
@@ -65,7 +65,7 @@ class OverridingOfGeneratorsTests {
 
         DtoAllKnownTypes dto = builder.build().generateDto();
 
-        log.info(TestUtils.toJson(dto));
+        log.info(UtilsRoot.toJson(dto));
 
         assertAll(
                 () -> assertThat(dto.getString(), equalTo("xxxxx")),
@@ -148,7 +148,7 @@ class OverridingOfGeneratorsTests {
 
         DtoAllKnownTypes dto = builder.build().generateDto();
 
-        log.info(TestUtils.toJson(dto));
+        log.info(UtilsRoot.toJson(dto));
 
         assertAll(
                 () -> assertThat(dto.getString(), equalTo("xxxxx")),
@@ -252,7 +252,7 @@ class OverridingOfGeneratorsTests {
 
         DtoAllKnownTypes dto = builder.build().generateDto();
 
-        log.info(TestUtils.toJson(dto));
+        log.info(UtilsRoot.toJson(dto));
 
         assertOverriddenConfig(dto);
     }
@@ -297,7 +297,7 @@ class OverridingOfGeneratorsTests {
 
         DtoAllKnownTypes dto = builder.build().generateDto();
 
-        log.info(TestUtils.toJson(dto));
+        log.info(UtilsRoot.toJson(dto));
 
         assertOverriddenConfig(dto);
     }
@@ -356,7 +356,7 @@ class OverridingOfGeneratorsTests {
 
         DtoAllKnownTypes dto = builder.build().generateDto();
 
-        log.info(TestUtils.toJson(dto));
+        log.info(UtilsRoot.toJson(dto));
 
         assertAll(
                 () -> assertThat(dto.getString(), equalTo("string")),
@@ -450,7 +450,7 @@ class OverridingOfGeneratorsTests {
 
         DtoDifferent dto = builder.build().generateDto();
 
-        log.info(TestUtils.toJson(dto));
+        log.info(UtilsRoot.toJson(dto));
 
         /*
          * static config for String max = 2
@@ -485,7 +485,7 @@ class OverridingOfGeneratorsTests {
 
         DtoDifferent dto2 = builder2.build().generateDto();
 
-        log.info(TestUtils.toJson(dto2));
+        log.info(UtilsRoot.toJson(dto2));
 
         /*
          * static config did not change

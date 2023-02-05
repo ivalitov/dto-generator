@@ -7,12 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import org.laoruga.dtogenerator.functional.util.TestUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -110,7 +110,7 @@ class FieldsGroupingTests {
                 .includeGroups(REQUIRED)
                 .build().generateDto();
 
-        log.info(TestUtils.toJson(dto));
+        log.info(UtilsRoot.toJson(dto));
 
         assertNotNull(dto);
         assertAll(
