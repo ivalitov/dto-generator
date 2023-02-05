@@ -18,18 +18,28 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class TypeGeneratorRemarksProvider {
 
-    private final Map<String, IRuleRemark> basicRuleRemarksMapByField = new HashMap<>();
+    private final Map<String, IRuleRemark> basicRuleRemarksMapByField;
     private final AtomicReference<IRuleRemark> basicRuleRemarkForFields;
-    private final Map<String, List<CustomRuleRemarkWrapper>> customRuleRemarksMapByField = new HashMap<>();
+    private final Map<String, List<CustomRuleRemarkWrapper>> customRuleRemarksMapByField;
     private final Map<Class<? extends ICustomGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksMap;
 
     public TypeGeneratorRemarksProvider() {
-        this(new AtomicReference<>(), new ConcurrentHashMap<>());
+        this(new AtomicReference<>(), new HashMap<>());
+    }
+
+    /**
+     * Copy Constructor
+     * @param toCopy - source
+     */
+    TypeGeneratorRemarksProvider(TypeGeneratorRemarksProvider toCopy) {
+        this(toCopy.basicRuleRemarkForFields, toCopy.customRuleRemarksMap);
     }
 
     private TypeGeneratorRemarksProvider(
             AtomicReference<IRuleRemark> basicRuleRemarkForFields,
             Map<Class<? extends ICustomGenerator<?>>, List<CustomRuleRemarkWrapper>> customRuleRemarksMap) {
+        this.basicRuleRemarksMapByField = new HashMap<>();
+        this.customRuleRemarksMapByField = new HashMap<>();
         this.basicRuleRemarkForFields = basicRuleRemarkForFields;
         this.customRuleRemarksMap = customRuleRemarksMap;
     }
@@ -123,9 +133,5 @@ public class TypeGeneratorRemarksProvider {
             this.customRuleRemarksMap.putIfAbsent(remark.getGeneratorClass(), new LinkedList<>());
             this.customRuleRemarksMap.get(remark.getGeneratorClass()).add(remark);
         }
-    }
-
-    TypeGeneratorRemarksProvider copy() {
-        return new TypeGeneratorRemarksProvider(basicRuleRemarkForFields, customRuleRemarksMap);
     }
 }

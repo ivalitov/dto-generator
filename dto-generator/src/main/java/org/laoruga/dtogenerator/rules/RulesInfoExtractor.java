@@ -12,8 +12,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.laoruga.dtogenerator.rules.RulesInfoHelper.*;
 
@@ -128,11 +129,11 @@ public class RulesInfoExtractor {
 
     private Optional<Pair<String, Annotation>> selectRuleByGroup(Annotation rules) {
         try {
-            LinkedList<Object> uniqueGroups = new LinkedList<>();
+            Set<Object> uniqueGroups = new HashSet<>();
             Object ruleAnnotationsArray = rules.getClass().getMethod("value").invoke(rules);
-            int length = Array.getLength(ruleAnnotationsArray);
+
             Optional<Pair<String, Annotation>> matched = Optional.empty();
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < Array.getLength(ruleAnnotationsArray); i++) {
                 Annotation rule = (Annotation) Array.get(ruleAnnotationsArray, i);
                 String checkedGroup = getGroupNameFromRuleAnnotation(rule);
                 if (uniqueGroups.contains(rule)) {

@@ -7,7 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.FieldGroupFilter;
+import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.CharSet;
 import org.laoruga.dtogenerator.constants.Group;
@@ -68,19 +68,15 @@ class RulesInfoExtractorTests {
         String stringMultipleRules;
     }
 
-    static RulesInfoExtractor getExtractorInstance(String... groups) {
-        return new RulesInfoExtractor(new FieldGroupFilter(groups));
-    }
-
 
     static Stream<Arguments> generalRulesDataSet() {
         return Stream.of(
-                Arguments.of(Dto.class, "string", StringRule.class, Group.DEFAULT, false, getExtractorInstance()),
-                Arguments.of(Dto.class, "integer", IntegerRule.class, Group.DEFAULT, false, getExtractorInstance()),
-                Arguments.of(Dto.class, "decimal", DoubleRule.class, Group.DEFAULT, false, getExtractorInstance()),
-                Arguments.of(Dto.class, "loong", LongRule.class, Group.DEFAULT, false, getExtractorInstance()),
-                Arguments.of(Dto.class, "localDateTime", LocalDateTimeRule.class, Group.DEFAULT, false, getExtractorInstance()),
-                Arguments.of(Dto.class, "stringMultipleRules", StringRule.class, Group.GROUP_3, true, getExtractorInstance(Group.GROUP_3))
+                Arguments.of(Dto.class, "string", StringRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
+                Arguments.of(Dto.class, "integer", IntegerRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
+                Arguments.of(Dto.class, "decimal", DoubleRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
+                Arguments.of(Dto.class, "loong", LongRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
+                Arguments.of(Dto.class, "localDateTime", LocalDateTimeRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
+                Arguments.of(Dto.class, "stringMultipleRules", StringRule.class, Group.GROUP_3, true, UtilsRoot.getExtractorInstance(Group.GROUP_3))
         );
     }
 
@@ -112,15 +108,15 @@ class RulesInfoExtractorTests {
     static Stream<Arguments> collectionRulesDataSet() {
         return Stream.of(
                 Arguments.of(Dto.class, "listOfDates", ListRule.class, LocalDateTimeRule.class,
-                        getExtractorInstance(),
+                        UtilsRoot.getExtractorInstance(),
                         Group.DEFAULT,
                         false),
                 Arguments.of(Dto.class, "setOfInts", SetRule.class, IntegerRule.class,
-                        getExtractorInstance(),
+                        UtilsRoot.getExtractorInstance(),
                         Group.DEFAULT,
                         false),
                 Arguments.of(Dto.class, "listOfStringMultipleRules", ListRule.class, StringRule.class,
-                        getExtractorInstance(GROUP_1),
+                        UtilsRoot.getExtractorInstance(GROUP_1),
                         GROUP_1,
                         true)
         );

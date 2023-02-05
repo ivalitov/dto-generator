@@ -73,7 +73,7 @@ public class TypeGeneratorsProvider {
         this.configuration = copyFrom.getConfiguration();
         this.overriddenBuildersForFields = new HashMap<>();
         this.userGenBuildersMapping = copyFrom.getUserGenBuildersMapping();
-        this.typeGeneratorRemarksProvider = copyFrom.getTypeGeneratorRemarksProvider().copy();
+        this.typeGeneratorRemarksProvider = new TypeGeneratorRemarksProvider(copyFrom.getTypeGeneratorRemarksProvider());
         this.pathFromRootDto = pathFromRootDto;
         this.overriddenBuilders = copyFrom.getOverriddenBuilders();
         this.rulesInfoExtractor = copyFrom.getRulesInfoExtractor();
