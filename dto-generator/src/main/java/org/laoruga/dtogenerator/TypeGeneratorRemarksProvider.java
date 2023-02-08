@@ -160,8 +160,8 @@ public class TypeGeneratorRemarksProvider {
     private void addToMap(Map<ICustomRuleRemark, ICustomRuleRemarkArgs> remarksMap, Set<ICustomRuleRemark> remarksSet) {
         for (ICustomRuleRemark remark : remarksSet) {
             if (!(remark instanceof ICustomRuleRemarkArgs)) {
-                final ICustomRuleRemark wrappedRemark = remark;
-                remark = new ICustomRuleRemarkArgs() {
+                final ICustomRuleRemark remarkFinal = remark;
+                final ICustomRuleRemarkArgs wrappedRemark = new ICustomRuleRemarkArgs() {
                     @Override
                     public int requiredArgsNumber() {
                         return 0;
@@ -169,12 +169,14 @@ public class TypeGeneratorRemarksProvider {
 
                     @Override
                     public Class<? extends ICustomGenerator<?>> getGeneratorClass() {
-                        return wrappedRemark.getGeneratorClass();
+                        return remarkFinal.getGeneratorClass();
                     }
                 };
-                remarksMap.put(remark, (ICustomRuleRemarkArgs) remark);
+                remarksMap.put(remarkFinal, wrappedRemark);
             } else {
-                remarksMap.put(((ICustomRuleRemarkArgs) remark).getRemarkInstance(), ((ICustomRuleRemarkArgs) remark));
+                remarksMap.put(
+                        ((ICustomRuleRemarkArgs) remark).getRemarkInstance(),
+                        ((ICustomRuleRemarkArgs) remark));
             }
         }
     }

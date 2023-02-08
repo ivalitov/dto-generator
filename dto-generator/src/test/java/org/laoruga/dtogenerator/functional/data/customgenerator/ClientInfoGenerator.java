@@ -36,6 +36,11 @@ public class ClientInfoGenerator implements
 
     @Override
     public ClientInfoDto generate() {
+
+        if (ruleRemarks.containsKey(RemarkNonArgs.NULL_VALUE)) {
+            return null;
+        }
+
         ClientType clientType;
         DocType docType;
 

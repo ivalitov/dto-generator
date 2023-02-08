@@ -1,6 +1,8 @@
 package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Feature;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,8 +10,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
+import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
+import org.laoruga.dtogenerator.api.rules.CustomRule;
+import org.laoruga.dtogenerator.functional.data.customgenerator.RemarkNonArgs;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.*;
 
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -117,6 +124,74 @@ class CustomDtoGenerationTests {
                     () -> assertThat(personInfoWithPrefix.getSecondName(), startsWith(ClientDto.PREFIX))
             );
         }
+    }
+
+    @Test
+    @Feature("CUSTOM_RULES")
+    @DisplayName("Custom Type Generator Remarkable With Args (remark without args))")
+    void customTypeGeneratorRemarkableWithArgsAndRemarkWithoutArgs() {
+        ClientDto dto = DtoGenerator.builder(ClientDto.class)
+                .addRuleRemarksCustom("clientInfoWithPrefix", RemarkNonArgs.NULL_VALUE)
+                .build().generateDto();
+        assertNotNull(dto);
+        baseAssertions(dto);
+
+        assertAll(
+                () -> assertNull(dto.getClientInfoWithPrefix()),
+                () -> assertNotNull(dto.getClientInfo())
+        );
+
+        assertAll(
+                () -> assertNotNull(dto.getClientInfo().getClientType()),
+                () -> assertNotNull(dto.getClientInfo().getId())
+        );
+    }
+
+    @Getter
+    @NoArgsConstructor
+    static class Dto {
+        String someString;
+        @CustomRule(generatorClass = FooGenerator.class)
+        Foo foo;
+    }
+
+    static class Foo {
+    }
+
+    static class FooGenerator implements ICustomGeneratorRemarkable<Foo> {
+
+        Set<ICustomRuleRemark> ruleRemarks;
+
+        @Override
+        public Foo generate() {
+            if (ruleRemarks.contains(RemarkNonArgs.NULL_VALUE)) {
+                return null;
+            }
+            return new Foo();
+        }
+
+        @Override
+        public void setRuleRemarks(Set<ICustomRuleRemark> ruleRemarks) {
+            this.ruleRemarks = ruleRemarks;
+        }
+    }
+
+    @Test
+    @Feature("CUSTOM_RULES")
+    @DisplayName("Custom Type Generator Remarkable Without Args (remark without args))")
+    void customTypeGeneratorWithoutArgsAndRemarkWithoutArgs() {
+        Dto dto = DtoGenerator.builder(Dto.class)
+                .addRuleRemarksCustom("foo", RemarkNonArgs.NULL_VALUE)
+                .build().generateDto();
+
+        assertNotNull(dto);
+        assertNull(dto.getFoo());
+
+        Dto dto2 = DtoGenerator.builder(Dto.class)
+                .build().generateDto();
+
+        assertNotNull(dto);
+        assertNotNull(dto2.getFoo());
     }
 
 }
