@@ -49,10 +49,10 @@ class ExamplesTest {
     @Test
     void customGeneratorRemarkable() {
         Office office = DtoGenerator.builder(Office.class)
-                .addRuleRemarksCustom(PersonRemark.WEIGHT_RANGE.setArgs("50", "70"))
-                .addRuleRemarksCustom(PersonRemark.GROWTH_RANGE.setArgs("130", "150"))
-                .addRuleRemarksCustom(PersonRemark.AGE_RANGE.setArgs("18", "30"))
-                .addRuleRemarksCustom(PersonRemark.GENDER.setArgs("FEMALE"))
+                .addRuleRemark(PersonRemark.WEIGHT_RANGE.setArgs("50", "70"))
+                .addRuleRemark(PersonRemark.GROWTH_RANGE.setArgs("130", "150"))
+                .addRuleRemark(PersonRemark.AGE_RANGE.setArgs("18", "30"))
+                .addRuleRemark(PersonRemark.GENDER.setArgs("FEMALE"))
                 .build()
                 .generateDto();
 

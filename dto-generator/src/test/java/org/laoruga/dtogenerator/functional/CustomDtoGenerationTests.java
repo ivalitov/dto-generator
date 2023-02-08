@@ -72,9 +72,9 @@ class CustomDtoGenerationTests {
     @MethodSource("customDtoGenerationWithRemarksTestData")
     void customDtoGenerationWithRemarks(ClientType clientType, DocType docType) {
         DtoGeneratorBuilder<ClientDto> builder = DtoGenerator.builder(ClientDto.class);
-        builder.addRuleRemarksCustom("clientInfo", CLIENT_TYPE.setArgs(clientType.name()));
+        builder.addRuleRemark("clientInfo", CLIENT_TYPE.setArgs(clientType.name()));
         if (docType != null) {
-            builder.addRuleRemarksCustom(DOCUMENT.setArgs(docType.name()));
+            builder.addRuleRemark(DOCUMENT.setArgs(docType.name()));
         }
         ClientDto dto = builder.build().generateDto();
 
@@ -95,9 +95,9 @@ class CustomDtoGenerationTests {
     @MethodSource("customDtoGenerationWithRemarksTestData")
     void customDtoGenerationWithDefaultArgs(ClientType clientType, DocType docType) {
         DtoGeneratorBuilder<ClientDto> builder = DtoGenerator.builder(ClientDto.class);
-        builder.addRuleRemarksCustom(CLIENT_TYPE.setArgs(clientType.name()));
+        builder.addRuleRemark(CLIENT_TYPE.setArgs(clientType.name()));
         if (docType != null) {
-            builder.addRuleRemarksCustom(DOCUMENT.setArgs(docType.name()));
+            builder.addRuleRemark(DOCUMENT.setArgs(docType.name()));
         }
         ClientDto dto = builder.build().generateDto();
 
@@ -132,7 +132,7 @@ class CustomDtoGenerationTests {
     @DisplayName("Custom Type Generator Remarkable With Args (remark without args))")
     void customTypeGeneratorRemarkableWithArgsAndRemarkWithoutArgs() {
         ClientDto dto = DtoGenerator.builder(ClientDto.class)
-                .addRuleRemarksCustom("clientInfoWithPrefix", RemarkNonArgs.NULL_VALUE)
+                .addRuleRemark("clientInfoWithPrefix", RemarkNonArgs.NULL_VALUE)
                 .build().generateDto();
         assertNotNull(dto);
         baseAssertions(dto);
@@ -186,7 +186,7 @@ class CustomDtoGenerationTests {
     @DisplayName("Custom Type Generator Remarkable Without Args (remark without args))")
     void customTypeGeneratorWithoutArgsAndRemarkWithoutArgs() {
         Dto dto = DtoGenerator.builder(Dto.class)
-                .addRuleRemarksCustom("foo", RemarkNonArgs.NULL_VALUE)
+                .addRuleRemark("foo", RemarkNonArgs.NULL_VALUE)
                 .build().generateDto();
 
         assertNotNull(dto);
@@ -215,7 +215,7 @@ class CustomDtoGenerationTests {
         // field not specified
 
         Dto dto1 = DtoGenerator.builder(Dto.class)
-                .addRuleRemarksCustom(RemarkUniversal.NULL_VALUE)
+                .addRuleRemark(RemarkUniversal.NULL_VALUE)
                 .build().generateDto();
 
         assertNotNull(dto1);
@@ -227,7 +227,7 @@ class CustomDtoGenerationTests {
         // field specified
 
         Dto dto2 = DtoGenerator.builder(Dto.class)
-                .addRuleRemarksCustom("foo", RemarkUniversal.NULL_VALUE)
+                .addRuleRemark("foo", RemarkUniversal.NULL_VALUE)
                 .build().generateDto();
 
         assertNotNull(dto2);
@@ -246,7 +246,7 @@ class CustomDtoGenerationTests {
         // field not specified
 
         ClientDto dto = DtoGenerator.builder(ClientDto.class)
-                .addRuleRemarksCustom(RemarkUniversal.NULL_VALUE)
+                .addRuleRemark(RemarkUniversal.NULL_VALUE)
                 .build().generateDto();
         assertNotNull(dto);
 
@@ -258,7 +258,7 @@ class CustomDtoGenerationTests {
         // field specified
 
         ClientDto dto2 = DtoGenerator.builder(ClientDto.class)
-                .addRuleRemarksCustom("clientInfo", RemarkUniversal.NULL_VALUE)
+                .addRuleRemark("clientInfo", RemarkUniversal.NULL_VALUE)
                 .build().generateDto();
         assertNotNull(dto2);
 

@@ -10,11 +10,11 @@ import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
  * Created on 28.04.2022
  */
 
-public interface ICustomRuleRemark {
+public interface ICustomRuleRemark extends IRuleRemark {
 
     /**
      * Overriding this method specifies the class of custom generator these remarks are intended for.
-     * When method overridden, remarks added via {@link DtoGeneratorBuilder#addRuleRemarksCustom(ICustomRuleRemark)}
+     * When method overridden, remarks added via {@link DtoGeneratorBuilder#addRuleRemark(ICustomRuleRemark)}
      * getting into only generator specified by this method, otherwise - to each custom generator class.
      *
      * @return - class of custom generator for which is intended this 'remark'

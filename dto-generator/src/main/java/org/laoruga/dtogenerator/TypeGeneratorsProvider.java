@@ -36,7 +36,7 @@ public class TypeGeneratorsProvider {
     private Supplier<Object> dtoInstanceSupplier;
     private final String[] pathFromRootDto;
     private final Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree;
-    private final TypeGeneratorRemarksProvider typeGeneratorRemarksProvider;
+    private final RemarksHolder remarksHolder;
     private final Map<Class<? extends Annotation>, IGeneratorBuilder> overriddenBuilders;
     private final Map<String, IGeneratorBuilder> overriddenBuildersForFields;
 
@@ -48,14 +48,14 @@ public class TypeGeneratorsProvider {
     private final RulesInfoExtractor rulesInfoExtractor;
 
     TypeGeneratorsProvider(DtoGeneratorInstanceConfig configuration,
-                           TypeGeneratorRemarksProvider typeGeneratorRemarksProvider,
+                           RemarksHolder typeGeneratorRemarksProvider,
                            FieldGroupFilter fieldGroupFilter,
                            String[] pathFromRootDto,
                            Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree) {
         this.configuration = configuration;
         this.overriddenBuildersForFields = new HashMap<>();
         this.userGenBuildersMapping = new GeneratorBuildersHolder();
-        this.typeGeneratorRemarksProvider = typeGeneratorRemarksProvider;
+        this.remarksHolder = typeGeneratorRemarksProvider;
         this.pathFromRootDto = pathFromRootDto;
         this.overriddenBuilders = new ConcurrentHashMap<>();
         this.rulesInfoExtractor = new RulesInfoExtractor(fieldGroupFilter);
@@ -73,7 +73,7 @@ public class TypeGeneratorsProvider {
         this.configuration = copyFrom.getConfiguration();
         this.overriddenBuildersForFields = new HashMap<>();
         this.userGenBuildersMapping = copyFrom.getUserGenBuildersMapping();
-        this.typeGeneratorRemarksProvider = new TypeGeneratorRemarksProvider(copyFrom.getTypeGeneratorRemarksProvider());
+        this.remarksHolder = new RemarksHolder(copyFrom.getRemarksHolder());
         this.pathFromRootDto = pathFromRootDto;
         this.overriddenBuilders = copyFrom.getOverriddenBuilders();
         this.rulesInfoExtractor = copyFrom.getRulesInfoExtractor();
@@ -121,7 +121,7 @@ public class TypeGeneratorsProvider {
         GeneratorBuildersProviderByAnnotation byAnnotation = new GeneratorBuildersProviderByAnnotation(
                 configuration,
                 new GeneratorBuildersProviderByType(configuration, userGenBuildersMapping),
-                typeGeneratorRemarksProvider,
+                remarksHolder,
                 userGenBuildersMapping);
 
         byField.addNextProvider(byAnnotation);
@@ -158,8 +158,8 @@ public class TypeGeneratorsProvider {
         void visitByAnnotation(GeneratorBuildersProviderByAnnotation byAnnotation) {
             byAnnotation.setField(field);
             byAnnotation.setMaybeRemark(
-                    typeGeneratorRemarksProvider.isBasicRuleRemarkExists(field.getName()) ?
-                            typeGeneratorRemarksProvider.getBasicRuleRemark(field.getName()) : null);
+                    remarksHolder.getBasicRemarks().isBasicRuleRemarkExists(field.getName()) ?
+                            remarksHolder.getBasicRemarks().getBasicRuleRemark(field.getName()) : null);
             byAnnotation.setDtoInstanceSupplier(dtoInstanceSupplier);
             byAnnotation.setRuleInfo(ruleInfo);
             byAnnotation.setNestedDtoGeneratorSupplier(() -> {

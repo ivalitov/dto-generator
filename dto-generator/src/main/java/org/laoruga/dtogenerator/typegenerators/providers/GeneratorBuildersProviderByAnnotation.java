@@ -1,9 +1,11 @@
 package org.laoruga.dtogenerator.typegenerators.providers;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.TypeGeneratorRemarksProvider;
+import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.TypeGeneratorsProvider;
 import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
@@ -38,10 +40,11 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createCollectionInst
  * Created on 24.11.2022
  */
 @Slf4j
+@Getter(AccessLevel.PRIVATE)
 public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuildersProvider {
 
     private final GeneratorBuildersProviderByType generatorBuildersProviderByType;
-    private final TypeGeneratorRemarksProvider typeGeneratorRemarksProvider;
+    private final RemarksHolder remarksHolder;
     private final GeneratorBuildersHolder userGeneratorBuildersHolder;
     private final GeneratorBuildersHolder defaultGeneratorBuildersHolder = GeneratorBuildersHolderGeneral.getInstance();
 
@@ -57,11 +60,11 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
     public GeneratorBuildersProviderByAnnotation(DtoGeneratorInstanceConfig configuration,
                                                  GeneratorBuildersProviderByType generatorBuildersProviderByType,
-                                                 TypeGeneratorRemarksProvider typeGeneratorRemarksProvider,
+                                                 RemarksHolder remarksHolder,
                                                  GeneratorBuildersHolder userGeneratorBuildersHolder) {
         super(configuration);
         this.generatorBuildersProviderByType = generatorBuildersProviderByType;
-        this.typeGeneratorRemarksProvider = typeGeneratorRemarksProvider;
+        this.remarksHolder = remarksHolder;
         this.userGeneratorBuildersHolder = userGeneratorBuildersHolder;
     }
 
@@ -376,12 +379,16 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
             } else if (usersGeneratorInstance instanceof ICustomGeneratorRemarkableArgs) {
 
                 ((ICustomGeneratorRemarkableArgs<?>) usersGeneratorInstance).setRuleRemarks(
-                        typeGeneratorRemarksProvider.getCustomRuleRemarksArgs(fieldName, usersGeneratorInstance.getClass()));
+                        getRemarksHolder()
+                                .getCustomRemarks()
+                                .getRemarksWithArgs(fieldName, usersGeneratorInstance.getClass()));
 
             } else if (usersGeneratorInstance instanceof ICustomGeneratorRemarkable) {
 
                 ((ICustomGeneratorRemarkable<?>) usersGeneratorInstance).setRuleRemarks(
-                        typeGeneratorRemarksProvider.getCustomRuleRemarks(fieldName, usersGeneratorInstance.getClass()));
+                        getRemarksHolder()
+                                .getCustomRemarks()
+                                .getRemarks(fieldName, usersGeneratorInstance.getClass()));
 
             }
         }

@@ -44,7 +44,7 @@ public class DtoGeneratorBuilder<T> {
         this.fieldGroupFilter = new FieldGroupFilter();
         this.typeGeneratorsProvider = new TypeGeneratorsProvider(
                 configuration,
-                new TypeGeneratorRemarksProvider(),
+                new RemarksHolder(),
                 fieldGroupFilter,
                 new String[]{ROOT},
                 this::getDtoGeneratorBuildersTree);
@@ -109,14 +109,16 @@ public class DtoGeneratorBuilder<T> {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
                 .getTypeGeneratorsProvider()
-                .getTypeGeneratorRemarksProvider()
+                .getRemarksHolder()
+                .getBasicRemarks()
                 .setBasicRuleRemarkForField(fieldNameAndPath.getLeft(), ruleRemark);
         return this;
     }
 
     public DtoGeneratorBuilder<T> setRuleRemark(@NonNull RuleRemark basicRuleRemark) throws DtoGeneratorException {
-        this.getTypeGeneratorsProvider()
-                .getTypeGeneratorRemarksProvider()
+        getTypeGeneratorsProvider()
+                .getRemarksHolder()
+                .getBasicRemarks()
                 .setBasicRuleRemarkForAnyField(basicRuleRemark);
         return this;
     }
@@ -125,18 +127,22 @@ public class DtoGeneratorBuilder<T> {
      * Custom Rule Remarks
      */
 
-    public DtoGeneratorBuilder<T> addRuleRemarksCustom(@NonNull String fieldName,
-                                                       @NonNull ICustomRuleRemark ruleRemark) {
+    public DtoGeneratorBuilder<T> addRuleRemark(@NonNull String fieldName,
+                                                @NonNull ICustomRuleRemark ruleRemark) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
                 .getTypeGeneratorsProvider()
-                .getTypeGeneratorRemarksProvider()
-                .addCustomRuleRemarkForField(fieldNameAndPath.getLeft(), ruleRemark);
+                .getRemarksHolder()
+                .getCustomRemarks()
+                .addRemark(fieldNameAndPath.getLeft(), ruleRemark);
         return this;
     }
 
-    public DtoGeneratorBuilder<T> addRuleRemarksCustom(@NonNull ICustomRuleRemark ruleRemarks) {
-        this.typeGeneratorsProvider.getTypeGeneratorRemarksProvider().addRuleRemarkForAllFields(ruleRemarks);
+    public DtoGeneratorBuilder<T> addRuleRemark(@NonNull ICustomRuleRemark ruleRemarks) {
+        typeGeneratorsProvider
+                .getRemarksHolder()
+                .getCustomRemarks()
+                .addRemarkForAnyField(ruleRemarks);
         return this;
     }
 
@@ -157,7 +163,7 @@ public class DtoGeneratorBuilder<T> {
      */
     public DtoGeneratorBuilder<T> includeGroups(String... groups) {
         if (groups != null && groups.length != 0) {
-            this.typeGeneratorsProvider.getRulesInfoExtractor().getFieldsGroupFilter().includeGroups(groups);
+            typeGeneratorsProvider.getRulesInfoExtractor().getFieldsGroupFilter().includeGroups(groups);
         }
         return this;
     }
