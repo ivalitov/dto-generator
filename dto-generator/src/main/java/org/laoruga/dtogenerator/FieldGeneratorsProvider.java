@@ -9,11 +9,11 @@ import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.rules.IRuleInfo;
 import org.laoruga.dtogenerator.rules.RulesInfoExtractor;
 import org.laoruga.dtogenerator.rules.RulesInfoHelper;
-import org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuildersHolder;
-import org.laoruga.dtogenerator.typegenerators.providers.AbstractGeneratorBuildersProvider;
-import org.laoruga.dtogenerator.typegenerators.providers.GeneratorBuildersProviderByAnnotation;
-import org.laoruga.dtogenerator.typegenerators.providers.GeneratorBuildersProviderByField;
-import org.laoruga.dtogenerator.typegenerators.providers.GeneratorBuildersProviderByType;
+import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersHolder;
+import org.laoruga.dtogenerator.generators.providers.AbstractGeneratorBuildersProvider;
+import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProviderByAnnotation;
+import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProviderByField;
+import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProviderByType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -30,11 +30,11 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.getDefaultMethodValu
 
 @Slf4j
 @Getter(AccessLevel.PACKAGE)
-public class TypeGeneratorsProvider {
+public class FieldGeneratorsProvider {
 
     private final DtoGeneratorInstanceConfig configuration;
     private Supplier<Object> dtoInstanceSupplier;
-    private final String[] pathFromRootDto;
+    private final String[] pathFromDtoRoot;
     private final Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree;
     private final RemarksHolder remarksHolder;
     private final Map<Class<? extends Annotation>, IGeneratorBuilder> overriddenBuilders;
@@ -47,16 +47,16 @@ public class TypeGeneratorsProvider {
     @Getter
     private final RulesInfoExtractor rulesInfoExtractor;
 
-    TypeGeneratorsProvider(DtoGeneratorInstanceConfig configuration,
-                           RemarksHolder typeGeneratorRemarksProvider,
-                           FieldGroupFilter fieldGroupFilter,
-                           String[] pathFromRootDto,
-                           Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree) {
+    FieldGeneratorsProvider(DtoGeneratorInstanceConfig configuration,
+                            RemarksHolder typeGeneratorRemarksProvider,
+                            FieldGroupFilter fieldGroupFilter,
+                            String[] pathFromDtoRoot,
+                            Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree) {
         this.configuration = configuration;
         this.overriddenBuildersForFields = new HashMap<>();
         this.userGenBuildersMapping = new GeneratorBuildersHolder();
         this.remarksHolder = typeGeneratorRemarksProvider;
-        this.pathFromRootDto = pathFromRootDto;
+        this.pathFromDtoRoot = pathFromDtoRoot;
         this.overriddenBuilders = new ConcurrentHashMap<>();
         this.rulesInfoExtractor = new RulesInfoExtractor(fieldGroupFilter);
         this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
@@ -69,12 +69,12 @@ public class TypeGeneratorsProvider {
      *
      * @param copyFrom source object
      */
-    TypeGeneratorsProvider(TypeGeneratorsProvider copyFrom, String[] pathFromRootDto) {
+    FieldGeneratorsProvider(FieldGeneratorsProvider copyFrom, String[] pathFromDtoRoot) {
         this.configuration = copyFrom.getConfiguration();
         this.overriddenBuildersForFields = new HashMap<>();
         this.userGenBuildersMapping = copyFrom.getUserGenBuildersMapping();
         this.remarksHolder = new RemarksHolder(copyFrom.getRemarksHolder());
-        this.pathFromRootDto = pathFromRootDto;
+        this.pathFromDtoRoot = pathFromDtoRoot;
         this.overriddenBuilders = copyFrom.getOverriddenBuilders();
         this.rulesInfoExtractor = copyFrom.getRulesInfoExtractor();
         this.dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
@@ -112,7 +112,7 @@ public class TypeGeneratorsProvider {
         return byField;
     }
 
-    // TODO ремарки - таже проблема с ремарками для внутренних дто
+    // TODO test remarks with inner DTO
     private AbstractGeneratorBuildersProvider initAnnotationChain(Map<String, IGeneratorBuilder> buildersMapping) {
         GeneratorBuildersProviderByField byField = new GeneratorBuildersProviderByField(
                 configuration,
@@ -163,11 +163,11 @@ public class TypeGeneratorsProvider {
             byAnnotation.setDtoInstanceSupplier(dtoInstanceSupplier);
             byAnnotation.setRuleInfo(ruleInfo);
             byAnnotation.setNestedDtoGeneratorSupplier(() -> {
-                        String[] pathToNestedDtoField = Arrays.copyOf(pathFromRootDto, pathFromRootDto.length + 1);
-                        pathToNestedDtoField[pathFromRootDto.length] = field.getName();
+                        String[] pathToNestedDtoField = Arrays.copyOf(pathFromDtoRoot, pathFromDtoRoot.length + 1);
+                        pathToNestedDtoField[pathFromDtoRoot.length] = field.getName();
                         DtoGeneratorBuilderTreeNode nestedDtoGeneratorBuilder =
                                 dtoGeneratorBuildersTree.get().getBuilderLazy(pathToNestedDtoField);
-                        nestedDtoGeneratorBuilder.getTypeGeneratorsProvider().setDtoInstanceSupplier(
+                        nestedDtoGeneratorBuilder.getFieldGeneratorsProvider().setDtoInstanceSupplier(
                                 new DtoInstanceSupplier(field.getType()));
                         return nestedDtoGeneratorBuilder.build();
                     }

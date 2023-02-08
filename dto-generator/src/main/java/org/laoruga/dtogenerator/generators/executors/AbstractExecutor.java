@@ -1,8 +1,7 @@
-package org.laoruga.dtogenerator.typegenerators.executors;
+package org.laoruga.dtogenerator.generators.executors;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 
 import java.lang.reflect.Field;

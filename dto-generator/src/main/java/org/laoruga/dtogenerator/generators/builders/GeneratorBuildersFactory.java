@@ -1,8 +1,8 @@
-package org.laoruga.dtogenerator.typegenerators.builders;
+package org.laoruga.dtogenerator.generators.builders;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.laoruga.dtogenerator.typegenerators.*;
+import org.laoruga.dtogenerator.generators.*;
 
 /**
  * @author Il'dar Valitov

@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.typegenerators.providers;
+package org.laoruga.dtogenerator.generators.providers;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.RemarksHolder;
-import org.laoruga.dtogenerator.TypeGeneratorsProvider;
+import org.laoruga.dtogenerator.FieldGeneratorsProvider;
 import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
@@ -19,10 +19,10 @@ import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.rules.IRuleInfo;
 import org.laoruga.dtogenerator.rules.RuleInfoCollection;
-import org.laoruga.dtogenerator.typegenerators.*;
-import org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuildersFactory;
-import org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuildersHolder;
-import org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuildersHolderGeneral;
+import org.laoruga.dtogenerator.generators.*;
+import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersFactory;
+import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersHolder;
+import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersHolderGeneral;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
@@ -412,7 +412,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
     }
 
     @Override
-    public void accept(TypeGeneratorsProvider.ProvidersVisitor visitor) {
+    public void accept(FieldGeneratorsProvider.ProvidersVisitor visitor) {
         super.accept(visitor);
         generatorBuildersProviderByType.accept(visitor);
     }

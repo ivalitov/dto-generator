@@ -20,7 +20,7 @@ public class DtoGeneratorBuilderTreeNode extends DtoGeneratorBuilder<Object> {
 
     private DtoGeneratorBuilderTreeNode(DtoGeneratorBuilder<?> toCopy, String fieldName) {
         super(toCopy.getConfiguration(),
-                toCopy.getTypeGeneratorsProvider(),
+                toCopy.getFieldGeneratorsProvider(),
                 toCopy.getDtoGeneratorBuildersTree(),
                 toCopy.getFieldGroupFilter());
         this.fieldName = fieldName;
@@ -28,7 +28,7 @@ public class DtoGeneratorBuilderTreeNode extends DtoGeneratorBuilder<Object> {
 
     public DtoGeneratorBuilderTreeNode(DtoGeneratorBuilder<?> toCopy, String fieldName, String[] pathFromRootDto) {
         super(toCopy.getConfiguration(),
-                new TypeGeneratorsProvider(toCopy.getTypeGeneratorsProvider(), pathFromRootDto),
+                new FieldGeneratorsProvider(toCopy.getFieldGeneratorsProvider(), pathFromRootDto),
                 toCopy.getDtoGeneratorBuildersTree(),
                 toCopy.getFieldGroupFilter());
         this.fieldName = fieldName;

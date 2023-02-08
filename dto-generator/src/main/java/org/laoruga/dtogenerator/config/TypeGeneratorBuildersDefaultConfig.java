@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.config;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.rules.RulesInstance;
-import org.laoruga.dtogenerator.typegenerators.*;
+import org.laoruga.dtogenerator.generators.*;
 
 import java.util.Objects;
 

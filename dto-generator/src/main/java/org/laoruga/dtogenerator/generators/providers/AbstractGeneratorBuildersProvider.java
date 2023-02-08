@@ -1,15 +1,15 @@
-package org.laoruga.dtogenerator.typegenerators.providers;
+package org.laoruga.dtogenerator.generators.providers;
 
-import org.laoruga.dtogenerator.TypeGeneratorsProvider;
+import org.laoruga.dtogenerator.FieldGeneratorsProvider;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.typegenerators.CollectionGenerator;
-import org.laoruga.dtogenerator.typegenerators.EnumGenerator;
-import org.laoruga.dtogenerator.typegenerators.IConfigDto;
+import org.laoruga.dtogenerator.generators.CollectionGenerator;
+import org.laoruga.dtogenerator.generators.EnumGenerator;
+import org.laoruga.dtogenerator.generators.IConfigDto;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -57,7 +57,7 @@ public abstract class AbstractGeneratorBuildersProvider {
         }
     }
 
-    public void accept(TypeGeneratorsProvider.ProvidersVisitor visitor) {
+    public void accept(FieldGeneratorsProvider.ProvidersVisitor visitor) {
         visitor.visit(this);
         if (getNextProvider().isPresent()) {
             getNextProvider().get().accept(visitor);

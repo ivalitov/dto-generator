@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.typegenerators;
+package org.laoruga.dtogenerator.generators;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,9 +8,8 @@ import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.api.rules.IntegerRule;
+import org.laoruga.dtogenerator.api.rules.LongRule;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.util.RandomUtils;
 
 /**
  * @author Il'dar Valitov
@@ -18,14 +17,14 @@ import org.laoruga.dtogenerator.util.RandomUtils;
  */
 
 @AllArgsConstructor
-public class IntegerGenerator implements IGenerator<Integer> {
+public class LongGenerator implements IGenerator<Long> {
 
-    private final int maxValue;
-    private final int minValue;
+    private final long maxValue;
+    private final long minValue;
     private final IRuleRemark ruleRemark;
 
     @Override
-    public Integer generate() {
+    public Long generate() {
         if (ruleRemark == RuleRemark.MIN_VALUE) {
             return minValue;
         }
@@ -33,7 +32,7 @@ public class IntegerGenerator implements IGenerator<Integer> {
             return maxValue;
         }
         if (ruleRemark == RuleRemark.RANDOM_VALUE) {
-            return RandomUtils.nextInt(minValue, maxValue);
+            return minValue + (long) (Math.random() * (maxValue - minValue));
         }
         if (ruleRemark == RuleRemark.NULL_VALUE) {
             return null;
@@ -41,69 +40,70 @@ public class IntegerGenerator implements IGenerator<Integer> {
         throw new IllegalStateException("Unexpected value " + ruleRemark);
     }
 
-    public static IntegerGeneratorBuilder builder() {
-        return new IntegerGeneratorBuilder();
+    public static LongGeneratorBuilder builder() {
+        return new LongGeneratorBuilder();
     }
 
-    public static final class IntegerGeneratorBuilder implements IGeneratorBuilderConfigurable {
+    public static final class LongGeneratorBuilder implements IGeneratorBuilderConfigurable {
+
         private final ConfigDto configDto;
 
-        private IntegerGeneratorBuilder() {
+        private LongGeneratorBuilder() {
             this.configDto = new ConfigDto();
         }
 
-        public IntegerGeneratorBuilder maxValue(int maxValue) {
+        public LongGeneratorBuilder maxValue(long maxValue) {
             configDto.maxValue = maxValue;
             return this;
         }
 
-        public IntegerGeneratorBuilder minValue(int minValue) {
+        public LongGeneratorBuilder minValue(long minValue) {
             configDto.minValue = minValue;
             return this;
         }
 
-        public IntegerGeneratorBuilder ruleRemark(IRuleRemark ruleRemark) {
+        public LongGeneratorBuilder ruleRemark(IRuleRemark ruleRemark) {
             configDto.ruleRemark = ruleRemark;
             return this;
         }
 
-        public IntegerGenerator build() {
+        public LongGenerator build() {
             return build(configDto, false);
         }
 
-        public IntegerGenerator build(IConfigDto configDto, boolean merge) {
+
+        public LongGenerator build(IConfigDto configDto, boolean merge) {
             if (merge) {
                 configDto.merge(this.configDto);
             }
-            ConfigDto integerConfigDto = (ConfigDto) configDto;
-            return new IntegerGenerator(
-                    integerConfigDto.maxValue,
-                    integerConfigDto.minValue,
-                    integerConfigDto.ruleRemark);
+            ConfigDto longConfigDto = (ConfigDto) configDto;
+            return new LongGenerator(
+                    longConfigDto.maxValue,
+                    longConfigDto.minValue,
+                    longConfigDto.ruleRemark);
         }
     }
 
     @Builder
-    @Getter
     @Setter
+    @Getter
     @AllArgsConstructor
-    public static class ConfigDto implements IConfigDto {
-
-        private Integer maxValue;
-        private Integer minValue;
+    public static class ConfigDto implements IConfigDto{
+        private Long maxValue;
+        private Long minValue;
         private IRuleRemark ruleRemark;
 
-        public ConfigDto(IntegerRule rule) {
+        public ConfigDto(LongRule rule) {
             this.maxValue = rule.maxValue();
             this.minValue = rule.minValue();
             this.ruleRemark = rule.ruleRemark();
         }
 
-        public ConfigDto() {}
+        public ConfigDto() { }
 
         @Override
         public Class<? extends IGeneratorBuilder> getBuilderClass() {
-            return IntegerGeneratorBuilder.class;
+            return LongGeneratorBuilder.class;
         }
 
         public void merge(IConfigDto from) {

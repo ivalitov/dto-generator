@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.typegenerators;
+package org.laoruga.dtogenerator.generators;
 
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;

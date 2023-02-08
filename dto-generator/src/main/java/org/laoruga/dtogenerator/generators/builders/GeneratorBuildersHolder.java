@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.typegenerators.builders;
+package org.laoruga.dtogenerator.generators.builders;
 
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;

@@ -17,8 +17,8 @@ import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
 import org.laoruga.dtogenerator.functional.data.dto.DtoAllKnownTypes;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
-import org.laoruga.dtogenerator.typegenerators.*;
-import org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuildersFactory;
+import org.laoruga.dtogenerator.generators.*;
+import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

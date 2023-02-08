@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.typegenerators.builders;
+package org.laoruga.dtogenerator.generators.builders;
 
 import lombok.Getter;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;

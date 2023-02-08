@@ -1,11 +1,11 @@
-package org.laoruga.dtogenerator.typegenerators.builders;
+package org.laoruga.dtogenerator.generators.builders;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.rules.RulesInstance;
 
-import static org.laoruga.dtogenerator.typegenerators.builders.GeneratorBuilderInfo.createInstance;
+import static org.laoruga.dtogenerator.generators.builders.GeneratorBuilderInfo.createInstance;
 
 /**
  * @author Il'dar Valitov

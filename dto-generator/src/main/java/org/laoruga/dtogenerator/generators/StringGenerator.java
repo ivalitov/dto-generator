@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.typegenerators;
+package org.laoruga.dtogenerator.generators;
 
 import com.mifmif.common.regex.Generex;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.typegenerators.providers;
+package org.laoruga.dtogenerator.generators.providers;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +7,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersDefaultConfig;
-import org.laoruga.dtogenerator.typegenerators.EnumGenerator;
+import org.laoruga.dtogenerator.generators.EnumGenerator;
 
 import java.lang.reflect.Field;
 import java.util.Map;

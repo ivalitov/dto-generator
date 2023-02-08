@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.config;
 import lombok.Getter;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.typegenerators.*;
+import org.laoruga.dtogenerator.generators.*;
 
 import java.util.HashMap;
 import java.util.List;

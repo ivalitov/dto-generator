@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.typegenerators.executors;
+package org.laoruga.dtogenerator.generators.executors;
 
 import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;

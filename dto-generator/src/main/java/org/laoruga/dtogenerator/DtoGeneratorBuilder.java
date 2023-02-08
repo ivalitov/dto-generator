@@ -25,7 +25,7 @@ public class DtoGeneratorBuilder<T> {
     @Getter(AccessLevel.PROTECTED)
     private final DtoGeneratorInstanceConfig configuration;
     @Getter(AccessLevel.PROTECTED)
-    private final TypeGeneratorsProvider typeGeneratorsProvider;
+    private final FieldGeneratorsProvider fieldGeneratorsProvider;
     @Getter(AccessLevel.PROTECTED)
     private final DtoGeneratorBuildersTree dtoGeneratorBuildersTree;
     @Getter(AccessLevel.PROTECTED)
@@ -42,13 +42,13 @@ public class DtoGeneratorBuilder<T> {
     private DtoGeneratorBuilder(Supplier<Object> dtoInstanceSupplier) {
         this.configuration = new DtoGeneratorInstanceConfig();
         this.fieldGroupFilter = new FieldGroupFilter();
-        this.typeGeneratorsProvider = new TypeGeneratorsProvider(
+        this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
                 configuration,
                 new RemarksHolder(),
                 fieldGroupFilter,
                 new String[]{ROOT},
                 this::getDtoGeneratorBuildersTree);
-        this.typeGeneratorsProvider.setDtoInstanceSupplier(dtoInstanceSupplier);
+        this.fieldGeneratorsProvider.setDtoInstanceSupplier(dtoInstanceSupplier);
         this.dtoGeneratorBuildersTree = new DtoGeneratorBuildersTree(
                 DtoGeneratorBuilderTreeNode.createRootNode(this)
         );
@@ -59,16 +59,16 @@ public class DtoGeneratorBuilder<T> {
      * Constructor to copy builder for nested DTO generation.
      *
      * @param configuration            - configuration instance
-     * @param typeGeneratorsProvider   - generators provider for field values
+     * @param fieldGeneratorsProvider   - generators provider for field values
      * @param dtoGeneratorBuildersTree - generator builders tree
      * @param fieldGroupFilter         - groups for filtering fields
      */
     protected DtoGeneratorBuilder(DtoGeneratorInstanceConfig configuration,
-                                  TypeGeneratorsProvider typeGeneratorsProvider,
+                                  FieldGeneratorsProvider fieldGeneratorsProvider,
                                   DtoGeneratorBuildersTree dtoGeneratorBuildersTree,
                                   FieldGroupFilter fieldGroupFilter) {
         this.configuration = configuration;
-        this.typeGeneratorsProvider = typeGeneratorsProvider;
+        this.fieldGeneratorsProvider = fieldGeneratorsProvider;
         this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
         this.fieldGroupFilter = fieldGroupFilter;
     }
@@ -81,7 +81,7 @@ public class DtoGeneratorBuilder<T> {
      */
     public DtoGeneratorBuilder<T> setGeneratorBuilder(@NonNull Class<? extends Annotation> rulesAnnotationClass,
                                                       @NonNull IGeneratorBuilder generatorBuilder) {
-        typeGeneratorsProvider.overrideGenerator(rulesAnnotationClass, generatorBuilder);
+        fieldGeneratorsProvider.overrideGenerator(rulesAnnotationClass, generatorBuilder);
         return this;
     }
 
@@ -95,7 +95,7 @@ public class DtoGeneratorBuilder<T> {
                                                       @NonNull IGeneratorBuilder generatorBuilder) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
-                .getTypeGeneratorsProvider()
+                .getFieldGeneratorsProvider()
                 .setGeneratorBuilderForField(fieldNameAndPath.getLeft(), generatorBuilder);
         return this;
     }
@@ -108,7 +108,7 @@ public class DtoGeneratorBuilder<T> {
                                                 @NonNull RuleRemark ruleRemark) throws DtoGeneratorException {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
-                .getTypeGeneratorsProvider()
+                .getFieldGeneratorsProvider()
                 .getRemarksHolder()
                 .getBasicRemarks()
                 .setBasicRuleRemarkForField(fieldNameAndPath.getLeft(), ruleRemark);
@@ -116,7 +116,7 @@ public class DtoGeneratorBuilder<T> {
     }
 
     public DtoGeneratorBuilder<T> setRuleRemark(@NonNull RuleRemark basicRuleRemark) throws DtoGeneratorException {
-        getTypeGeneratorsProvider()
+        getFieldGeneratorsProvider()
                 .getRemarksHolder()
                 .getBasicRemarks()
                 .setBasicRuleRemarkForAnyField(basicRuleRemark);
@@ -131,7 +131,7 @@ public class DtoGeneratorBuilder<T> {
                                                 @NonNull ICustomRuleRemark ruleRemark) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
-                .getTypeGeneratorsProvider()
+                .getFieldGeneratorsProvider()
                 .getRemarksHolder()
                 .getCustomRemarks()
                 .addRemark(fieldNameAndPath.getLeft(), ruleRemark);
@@ -139,7 +139,7 @@ public class DtoGeneratorBuilder<T> {
     }
 
     public DtoGeneratorBuilder<T> addRuleRemark(@NonNull ICustomRuleRemark ruleRemarks) {
-        typeGeneratorsProvider
+        fieldGeneratorsProvider
                 .getRemarksHolder()
                 .getCustomRemarks()
                 .addRemarkForAnyField(ruleRemarks);
@@ -163,7 +163,7 @@ public class DtoGeneratorBuilder<T> {
      */
     public DtoGeneratorBuilder<T> includeGroups(String... groups) {
         if (groups != null && groups.length != 0) {
-            typeGeneratorsProvider.getRulesInfoExtractor().getFieldsGroupFilter().includeGroups(groups);
+            fieldGeneratorsProvider.getRulesInfoExtractor().getFieldsGroupFilter().includeGroups(groups);
         }
         return this;
     }
@@ -180,7 +180,7 @@ public class DtoGeneratorBuilder<T> {
      * @return dto builder instance
      */
     public DtoGenerator<T> build() {
-        return new DtoGenerator<>(typeGeneratorsProvider, this);
+        return new DtoGenerator<>(fieldGeneratorsProvider, this);
     }
 
 }
