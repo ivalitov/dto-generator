@@ -1,5 +1,6 @@
 package org.laoruga.dtogenerator.api.remarks;
 
+import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 
 /**
@@ -12,8 +13,14 @@ import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 public interface ICustomRuleRemark {
 
     /**
-     * @return class of custom generator for which is intended this 'remark'
+     * Overriding this method specifies the class of custom generator these remarks are intended for.
+     * When method overridden, remarks added via {@link DtoGeneratorBuilder#addRuleRemarksCustom(ICustomRuleRemark)}
+     * getting into only generator specified by this method, otherwise - to each custom generator class.
+     *
+     * @return - class of custom generator for which is intended this 'remark'
      */
-    Class<? extends ICustomGenerator<?>> getGeneratorClass();
+    default Class<? extends ICustomGenerator<?>> getGeneratorClass() {
+        return CustomGeneratorStub.class;
+    }
 
 }

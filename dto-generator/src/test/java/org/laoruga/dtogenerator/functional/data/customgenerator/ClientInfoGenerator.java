@@ -37,7 +37,8 @@ public class ClientInfoGenerator implements
     @Override
     public ClientInfoDto generate() {
 
-        if (ruleRemarks.containsKey(RemarkNonArgs.NULL_VALUE)) {
+        if (ruleRemarks.containsKey(RemarkNonArgs.NULL_VALUE) ||
+                ruleRemarks.containsKey(RemarkUniversal.NULL_VALUE)) {
             return null;
         }
 

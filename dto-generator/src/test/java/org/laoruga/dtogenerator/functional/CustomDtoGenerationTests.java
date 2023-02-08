@@ -14,6 +14,7 @@ import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable
 import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.functional.data.customgenerator.RemarkNonArgs;
+import org.laoruga.dtogenerator.functional.data.customgenerator.RemarkUniversal;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.*;
 
 import java.util.Set;
@@ -153,6 +154,9 @@ class CustomDtoGenerationTests {
         String someString;
         @CustomRule(generatorClass = FooGenerator.class)
         Foo foo;
+
+        @CustomRule(generatorClass = FooGenerator.class)
+        Foo bar;
     }
 
     static class Foo {
@@ -164,7 +168,8 @@ class CustomDtoGenerationTests {
 
         @Override
         public Foo generate() {
-            if (ruleRemarks.contains(RemarkNonArgs.NULL_VALUE)) {
+            if (ruleRemarks.contains(RemarkNonArgs.NULL_VALUE) ||
+                    ruleRemarks.contains(RemarkUniversal.NULL_VALUE)) {
                 return null;
             }
             return new Foo();
@@ -192,6 +197,76 @@ class CustomDtoGenerationTests {
 
         assertNotNull(dto);
         assertNotNull(dto2.getFoo());
+    }
+
+    @Test
+    @Feature("CUSTOM_RULES")
+    @DisplayName("Remark Without Generator Class Specified (Generator with NO args remarks)")
+    void remarkWithoutGeneratorClassSpecifiedGeneratorWithNoArgsRemarks() {
+
+        // health check
+
+        Dto dto0 = DtoGenerator.builder(Dto.class)
+                .build().generateDto();
+
+        assertNotNull(dto0.getFoo());
+
+
+        // field not specified
+
+        Dto dto1 = DtoGenerator.builder(Dto.class)
+                .addRuleRemarksCustom(RemarkUniversal.NULL_VALUE)
+                .build().generateDto();
+
+        assertNotNull(dto1);
+        assertAll(
+                () -> assertNull(dto1.getFoo()),
+                () -> assertNull(dto1.getBar())
+        );
+
+        // field specified
+
+        Dto dto2 = DtoGenerator.builder(Dto.class)
+                .addRuleRemarksCustom("foo", RemarkUniversal.NULL_VALUE)
+                .build().generateDto();
+
+        assertNotNull(dto2);
+        assertAll(
+                () -> assertNull(dto2.getFoo()),
+                () -> assertNotNull(dto2.getBar())
+        );
+
+    }
+
+    @Test
+    @Feature("CUSTOM_RULES")
+    @DisplayName("Remark Without Generator Class Specified (Generator with ARGS remarks)")
+    void remarkWithoutGeneratorClassSpecifiedGeneratorWithArgsRemarks() {
+
+        // field not specified
+
+        ClientDto dto = DtoGenerator.builder(ClientDto.class)
+                .addRuleRemarksCustom(RemarkUniversal.NULL_VALUE)
+                .build().generateDto();
+        assertNotNull(dto);
+
+        assertAll(
+                () -> assertNull(dto.getClientInfoWithPrefix()),
+                () -> assertNull(dto.getClientInfo())
+        );
+
+        // field specified
+
+        ClientDto dto2 = DtoGenerator.builder(ClientDto.class)
+                .addRuleRemarksCustom("clientInfo", RemarkUniversal.NULL_VALUE)
+                .build().generateDto();
+        assertNotNull(dto2);
+
+        assertAll(
+                () -> assertNotNull(dto2.getClientInfoWithPrefix()),
+                () -> assertNull(dto2.getClientInfo())
+        );
+
     }
 
 }

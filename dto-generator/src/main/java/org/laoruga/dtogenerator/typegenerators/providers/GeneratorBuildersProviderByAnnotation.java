@@ -375,20 +375,15 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
             } else if (usersGeneratorInstance instanceof ICustomGeneratorRemarkableArgs) {
 
-                ICustomGeneratorRemarkableArgs<?> remarkableGenerator =
-                        (ICustomGeneratorRemarkableArgs<?>) usersGeneratorInstance;
-                remarkableGenerator.setRuleRemarks(
-                        typeGeneratorRemarksProvider.getCustomRuleRemarksArgs(fieldName, remarkableGenerator));
+                ((ICustomGeneratorRemarkableArgs<?>) usersGeneratorInstance).setRuleRemarks(
+                        typeGeneratorRemarksProvider.getCustomRuleRemarksArgs(fieldName, usersGeneratorInstance.getClass()));
 
             } else if (usersGeneratorInstance instanceof ICustomGeneratorRemarkable) {
 
-                ICustomGeneratorRemarkable<?> remarkableGenerator =
-                        (ICustomGeneratorRemarkable<?>) usersGeneratorInstance;
-                remarkableGenerator.setRuleRemarks(
-                        typeGeneratorRemarksProvider.getCustomRuleRemarks(fieldName, remarkableGenerator));
+                ((ICustomGeneratorRemarkable<?>) usersGeneratorInstance).setRuleRemarks(
+                        typeGeneratorRemarksProvider.getCustomRuleRemarks(fieldName, usersGeneratorInstance.getClass()));
 
             }
-
         }
 
     }
