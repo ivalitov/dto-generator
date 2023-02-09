@@ -1,6 +1,8 @@
 package org.laoruga.dtogenerator.generators.providers;
 
-import org.laoruga.dtogenerator.FieldGeneratorsProvider;
+import lombok.AccessLevel;
+import lombok.Getter;
+import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
@@ -11,7 +13,6 @@ import org.laoruga.dtogenerator.generators.CollectionGenerator;
 import org.laoruga.dtogenerator.generators.EnumGenerator;
 import org.laoruga.dtogenerator.generators.IConfigDto;
 
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -22,65 +23,33 @@ import java.util.function.Supplier;
 public abstract class AbstractGeneratorBuildersProvider {
 
     private final DtoGeneratorInstanceConfig configuration;
-    private AbstractGeneratorBuildersProvider nextProvider;
-    volatile private IRuleRemark maybeRemark;
+    @Getter(AccessLevel.PROTECTED)
+    private final RemarksHolder remarksHolder;
 
-    protected AbstractGeneratorBuildersProvider(DtoGeneratorInstanceConfig configuration) {
+    protected AbstractGeneratorBuildersProvider(DtoGeneratorInstanceConfig configuration, RemarksHolder remarksHolder) {
         this.configuration = configuration;
-    }
-
-    public void addNextProvider(AbstractGeneratorBuildersProvider provider) {
-        nextProvider = provider;
-    }
-
-    public Optional<AbstractGeneratorBuildersProvider> getNextProvider() {
-        return Optional.ofNullable(nextProvider);
+        this.remarksHolder = remarksHolder;
     }
 
     protected DtoGeneratorInstanceConfig getConfiguration() {
         return configuration;
     }
 
-    abstract Optional<IGenerator<?>> selectOrCreateGenerator();
-
-    public Optional<IGenerator<?>> getGenerator() {
-        Optional<IGenerator<?>> maybeGenerator = selectOrCreateGenerator();
-        if (maybeGenerator.isPresent()) {
-            return maybeGenerator;
-        } else {
-            Optional<AbstractGeneratorBuildersProvider> provider = getNextProvider();
-            if (provider.isPresent()) {
-                return provider.get().getGenerator();
-            } else {
-                return Optional.empty();
-            }
-        }
-    }
-
-    public void accept(FieldGeneratorsProvider.ProvidersVisitor visitor) {
-        visitor.visit(this);
-        if (getNextProvider().isPresent()) {
-            getNextProvider().get().accept(visitor);
-        }
-    }
-
-    public IRuleRemark getRuleRemark() {
-        return maybeRemark;
-    }
-
-    public void setMaybeRemark(IRuleRemark maybeRemark) {
-        this.maybeRemark = maybeRemark;
+    public IRuleRemark getRuleRemark(String fieldName) {
+        return remarksHolder.getBasicRemarks().isBasicRuleRemarkExists(fieldName) ?
+                remarksHolder.getBasicRemarks().getBasicRuleRemark(fieldName) : null;
     }
 
     protected IGenerator<?> getGenerator(Supplier<IConfigDto> configDtoSupplier,
                                          Supplier<IGeneratorBuilderConfigurable> genBuildSupplier,
                                          BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier,
-                                         Class<?> fieldType) {
+                                         Class<?> fieldType,
+                                         String fieldName) {
         IGeneratorBuilderConfigurable genBuilder = genBuildSupplier.get();
 
         IConfigDto instanceConfig = getConfiguration().getGenBuildersConfig()
                 .getConfig(genBuilder.getClass(), fieldType);
-        IConfigDto staticConfig  = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig()
+        IConfigDto staticConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig()
                 .getConfig(genBuilder.getClass(), fieldType);
         IConfigDto config = configDtoSupplier.get();
 
@@ -92,8 +61,8 @@ public abstract class AbstractGeneratorBuildersProvider {
             config.merge(instanceConfig);
         }
 
-        if (getRuleRemark() != null) {
-            config.setRuleRemark(getRuleRemark());
+        if (getRuleRemark(fieldName) != null) {
+            config.setRuleRemark(getRuleRemark(fieldName));
         }
 
         return generatorSupplier.apply(config, genBuilder);
@@ -117,15 +86,11 @@ public abstract class AbstractGeneratorBuildersProvider {
         };
     }
 
-    protected BiFunction<
-            IConfigDto,
-            IGeneratorBuilderConfigurable,
+    protected BiFunction<IConfigDto, IGeneratorBuilderConfigurable,
             IGenerator<?>> collectionGeneratorSupplier(IGenerator<?> elementGenerator) {
         return (config, builder) -> {
-
             ((CollectionGenerator.ConfigDto) config).setElementGenerator((IGenerator<Object>) elementGenerator);
             return builder.build(config, true);
-
         };
     }
 }

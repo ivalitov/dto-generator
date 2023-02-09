@@ -1,7 +1,7 @@
 package org.laoruga.dtogenerator.generators.providers;
 
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
@@ -11,7 +11,6 @@ import org.laoruga.dtogenerator.generators.EnumGenerator;
 
 import java.lang.reflect.Field;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Il'dar Valitov
@@ -21,55 +20,39 @@ import java.util.Optional;
 public class GeneratorBuildersProviderByField extends AbstractGeneratorBuildersProvider {
 
     private final Map<String, IGeneratorBuilder> overriddenBuildersForFields;
-    @Setter
-    private Field field;
 
     public GeneratorBuildersProviderByField(DtoGeneratorInstanceConfig configuration,
-                                            Map<String, IGeneratorBuilder> overriddenBuildersForFields) {
-        super(configuration);
+                                            Map<String, IGeneratorBuilder> overriddenBuildersForFields,
+                                            RemarksHolder remarksHolder) {
+        super(configuration, remarksHolder);
         this.overriddenBuildersForFields = overriddenBuildersForFields;
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public Optional<IGenerator<?>> selectOrCreateGenerator() {
-        IGenerator<?> generator = null;
+    public IGenerator<?> getGenerator(Field field) {
 
-        if (overriddenBuildersForFields.containsKey(getFieldName())) {
-            IGeneratorBuilder genBuilder = overriddenBuildersForFields.get(getFieldName());
+        IGeneratorBuilder genBuilder = overriddenBuildersForFields.get(field.getName());
 
-            if (genBuilder instanceof IGeneratorBuilderConfigurable) {
+        if (genBuilder instanceof IGeneratorBuilderConfigurable) {
 
-                IGeneratorBuilderConfigurable genBuilderConfigurable = (IGeneratorBuilderConfigurable) genBuilder;
+            IGeneratorBuilderConfigurable genBuilderConfigurable = (IGeneratorBuilderConfigurable) genBuilder;
 
-                generator = getGenerator(
-                        () -> TypeGeneratorBuildersDefaultConfig.getInstance()
-                                .getConfig(genBuilderConfigurable.getClass(), getFieldType()),
-                        () -> genBuilderConfigurable,
-                        (config, builder) -> {
+            return getGenerator(
+                    () -> TypeGeneratorBuildersDefaultConfig.getInstance()
+                            .getConfig(genBuilderConfigurable.getClass(), field.getType()),
+                    () -> genBuilderConfigurable,
+                    (config, builder) -> {
 
-                            if (config instanceof EnumGenerator.ConfigDto) {
-                                ((EnumGenerator.ConfigDto) config).setEnumClass((Class<? extends Enum<?>>) getFieldType());
-                            }
-                            return builder.build(config, true);
-                        },
-                        getFieldType());
-            } else {
-                log.debug("GenBuilder explicitly set fo field builds as is.");
-
-                generator = genBuilder.build();
-            }
-
+                        if (config instanceof EnumGenerator.ConfigDto) {
+                            ((EnumGenerator.ConfigDto) config).setEnumClass((Class<? extends Enum<?>>) field.getType());
+                        }
+                        return builder.build(config, true);
+                    },
+                    field.getType(),
+                    field.getName());
         }
-        return Optional.ofNullable(generator);
-    }
 
-    private String getFieldName() {
-        return field.getName();
-    }
-
-    private Class<?> getFieldType() {
-        return field.getType();
+        log.debug("Because genBuilder was set explicitly fo field, it builds as is.");
+        return genBuilder.build();
     }
 
 }

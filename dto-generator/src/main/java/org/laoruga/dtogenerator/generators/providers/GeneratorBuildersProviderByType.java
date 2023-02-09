@@ -1,12 +1,11 @@
 package org.laoruga.dtogenerator.generators.providers;
 
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
-import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersDefaultConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generators.EnumGenerator;
@@ -29,70 +28,74 @@ public class GeneratorBuildersProviderByType extends AbstractGeneratorBuildersPr
 
     private final GeneratorBuildersHolder userGeneratorBuilders;
     private final GeneratorBuildersHolder generalGeneratorBuilders = GeneratorBuildersHolderGeneral.getInstance();
-    @Setter
-    private Field field;
 
-    public GeneratorBuildersProviderByType(DtoGeneratorInstanceConfig configuration,
-                                           GeneratorBuildersHolder userGeneratorBuilders) {
-        super(configuration);
+    public  GeneratorBuildersProviderByType(DtoGeneratorInstanceConfig configuration,
+                                           GeneratorBuildersHolder userGeneratorBuilders,
+                                           RemarksHolder remarksHolder) {
+        super(configuration, remarksHolder);
         this.userGeneratorBuilders = userGeneratorBuilders;
     }
 
-    @Override
-    public Optional<IGenerator<?>> selectOrCreateGenerator() {
-        if (DtoGeneratorStaticConfig.getInstance().getGenerateAllKnownTypes()) {
-            return selectOrCreateGenerator(getGeneratedType());
-        } else {
+    public Optional<IGenerator<?>> getGenerator(Field field, Class<?> generatedType) {
+
+        Optional<IGeneratorBuilder> maybeBuilder = getGeneratorBuilder(generatedType);
+
+        if (!maybeBuilder.isPresent()) {
+            log.debug("Generator builder not found for field type: " + generatedType);
             return Optional.empty();
         }
+
+        if (maybeBuilder.get() instanceof IGeneratorBuilderConfigurable) {
+            return configureGenerator(
+                    field,
+                    generatedType,
+                    (IGeneratorBuilderConfigurable) maybeBuilder.get());
+        }
+
+        log.debug("Unknown generator builder found by field type, trying to build 'as is' without configuring.");
+        return Optional.of(maybeBuilder.get().build());
     }
 
-    Optional<IGenerator<?>> selectOrCreateGenerator(Class<?> generatedType) {
+    private Optional<IGeneratorBuilder> getGeneratorBuilder(Class<?> generatedType) {
         Optional<IGeneratorBuilder> maybeBuilder = userGeneratorBuilders.getBuilder(generatedType);
         if (!maybeBuilder.isPresent()) {
             maybeBuilder = generalGeneratorBuilders.getBuilder(generatedType);
         }
+        return maybeBuilder;
+    }
 
-        IGenerator<?> generator = null;
+    private Optional<IGenerator<?>> configureGenerator(Field field,
+                                                       Class<?> generatedType,
+                                                       IGeneratorBuilderConfigurable genBuilder) {
+        BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier;
 
-        if (maybeBuilder.isPresent()) {
-            IGeneratorBuilder genBuilder = maybeBuilder.get();
+        if (Collection.class.isAssignableFrom(generatedType)) {
 
-            if (genBuilder instanceof IGeneratorBuilderConfigurable) {
+            Class<?> elementType = ReflectionUtils.getSingleGenericType(field);
+            Optional<IGenerator<?>> maybeElementGenerator = getGenerator(field, elementType);
+            generatorSupplier = collectionGeneratorSupplier(
+                    maybeElementGenerator.orElseThrow(
+                            () -> new DtoGeneratorException("Collection element generator not found, for type: " +
+                                    "'" + elementType + "'")));
 
-                BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier;
+        } else if (genBuilder instanceof EnumGenerator.EnumGeneratorBuilder) {
 
-                if (genBuilder instanceof EnumGenerator.EnumGeneratorBuilder) {
+            generatorSupplier = enumGeneratorSupplier(generatedType);
 
-                    generatorSupplier = enumGeneratorSupplier(getGeneratedType());
+        } else {
 
-                } else if (Collection.class.isAssignableFrom(generatedType)) {
+            generatorSupplier = (config, builder) -> builder.build(config, true);
 
-                    Class<?> elementType = ReflectionUtils.getSingleGenericType(field);
-                    Optional<IGenerator<?>> maybeElementGenerator = selectOrCreateGenerator(elementType);
-                    generatorSupplier = collectionGeneratorSupplier(
-                            maybeElementGenerator.orElseThrow(
-                                    () -> new DtoGeneratorException("Collection element generator not found, for type: " +
-                                            "'" + elementType + "'")));
-                } else {
-                    generatorSupplier = (config, builder) -> builder.build(config, true);
-                }
-
-                generator = getGenerator(
-                        () -> TypeGeneratorBuildersDefaultConfig.getInstance()
-                                .getConfig(genBuilder.getClass(), getGeneratedType()),
-                        () -> (IGeneratorBuilderConfigurable) genBuilder,
-                        generatorSupplier,
-                        getGeneratedType());
-            } else {
-                log.debug("Unknown generator builder found by field type, trying to build 'as is' without configuring.");
-            }
         }
 
-        return Optional.ofNullable(generator);
+        return Optional.of(
+                getGenerator(
+                        () -> TypeGeneratorBuildersDefaultConfig.getInstance()
+                                .getConfig(genBuilder.getClass(), generatedType),
+                        () -> genBuilder,
+                        generatorSupplier,
+                        generatedType,
+                        field.getName()));
     }
 
-    private Class<?> getGeneratedType() {
-        return field.getType();
-    }
 }

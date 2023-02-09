@@ -38,7 +38,7 @@ public class BasicRemarksHolder {
         this.basicRuleRemarkForAnyField = basicRuleRemarkForAnyField;
     }
 
-    boolean isBasicRuleRemarkExists(String fieldName) {
+    public boolean isBasicRuleRemarkExists(String fieldName) {
         return basicRuleRemarksMapByField.containsKey(fieldName) || basicRuleRemarkForAnyField.get() != null;
     }
 
@@ -63,7 +63,7 @@ public class BasicRemarksHolder {
         basicRuleRemarkForAnyField.set(basicRuleRemark);
     }
 
-    IRuleRemark getBasicRuleRemark(String fieldName) throws NullPointerException {
+    public IRuleRemark getBasicRuleRemark(String fieldName) throws NullPointerException {
         if (basicRuleRemarksMapByField.containsKey(fieldName)) {
             return basicRuleRemarksMapByField.get(fieldName);
         }

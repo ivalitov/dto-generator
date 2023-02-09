@@ -2,11 +2,9 @@ package org.laoruga.dtogenerator.generators.providers;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.RemarksHolder;
-import org.laoruga.dtogenerator.FieldGeneratorsProvider;
 import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
@@ -17,12 +15,12 @@ import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.rules.IRuleInfo;
-import org.laoruga.dtogenerator.rules.RuleInfoCollection;
 import org.laoruga.dtogenerator.generators.*;
 import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersFactory;
 import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersHolderGeneral;
+import org.laoruga.dtogenerator.rules.IRuleInfo;
+import org.laoruga.dtogenerator.rules.RuleInfoCollection;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
@@ -44,37 +42,31 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createCollectionInst
 public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuildersProvider {
 
     private final GeneratorBuildersProviderByType generatorBuildersProviderByType;
-    private final RemarksHolder remarksHolder;
     private final GeneratorBuildersHolder userGeneratorBuildersHolder;
     private final GeneratorBuildersHolder defaultGeneratorBuildersHolder = GeneratorBuildersHolderGeneral.getInstance();
-
-    @Setter
-    volatile private Field field;
-    @Setter
-    volatile private Supplier<?> dtoInstanceSupplier;
-    @Setter
-    volatile private IRuleInfo ruleInfo;
-    @Setter
-    volatile private Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier;
-    volatile private Class<?> generatedTypeOrCollectionElementType;
 
     public GeneratorBuildersProviderByAnnotation(DtoGeneratorInstanceConfig configuration,
                                                  GeneratorBuildersProviderByType generatorBuildersProviderByType,
                                                  RemarksHolder remarksHolder,
                                                  GeneratorBuildersHolder userGeneratorBuildersHolder) {
-        super(configuration);
+        super(configuration, remarksHolder);
         this.generatorBuildersProviderByType = generatorBuildersProviderByType;
-        this.remarksHolder = remarksHolder;
         this.userGeneratorBuildersHolder = userGeneratorBuildersHolder;
     }
 
-    public Optional<IGenerator<?>> selectOrCreateGenerator() {
+
+    public IGenerator<?> getGenerator(Field field,
+                                      IRuleInfo ruleInfo,
+                                      Supplier<?> dtoInstanceSupplier,
+                                      Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
+        final Class<?> fieldType = field.getType();
+        final String fieldName = field.getName();
 
         IGenerator<?> generator;
 
         if (ruleInfo.isTypesEqual(RuleType.COLLECTION)) {
 
-            generatedTypeOrCollectionElementType = ReflectionUtils.getSingleGenericType(field);
+            Class<?> collectionElementType = ReflectionUtils.getSingleGenericType(field);
 
             RuleInfoCollection collectionRuleInfo = (RuleInfoCollection) ruleInfo;
 
@@ -82,7 +74,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
             Optional<IGeneratorBuilder> maybeCollectionUserGenBuilder = getUsersGenBuilder(
                     collectionRuleInfo.getRule(),
-                    getFieldType());
+                    fieldType);
 
             boolean isUserCollectionBuilder = maybeCollectionUserGenBuilder.isPresent();
 
@@ -90,7 +82,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                     maybeCollectionUserGenBuilder.get() :
                     getDefaultGenBuilder(
                             collectionRuleInfo.getRule(),
-                            getFieldType());
+                            fieldType);
 
             // Collection element generator builder
 
@@ -100,7 +92,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
                 Optional<IGeneratorBuilder> maybeUsersElementGenBuilder = getUsersGenBuilder(
                         elementRuleInfo.getRule(),
-                        generatedTypeOrCollectionElementType);
+                        collectionElementType);
 
                 boolean isUserBuilder = maybeUsersElementGenBuilder.isPresent();
 
@@ -108,17 +100,20 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                         maybeUsersElementGenBuilder.get() :
                         getDefaultGenBuilder(
                                 elementRuleInfo.getRule(),
-                                generatedTypeOrCollectionElementType);
+                                collectionElementType);
 
                 elementGenerator = buildGenerator(
                         elementRuleInfo.getRule(),
                         elementGenBuilder,
-                        false);
+                        collectionElementType,
+                        fieldName,
+                        dtoInstanceSupplier,
+                        nestedDtoGeneratorSupplier);
 
             } else {
 
                 Optional<IGenerator<?>> maybeGenerator = generatorBuildersProviderByType
-                        .selectOrCreateGenerator(generatedTypeOrCollectionElementType);
+                        .getGenerator(field, collectionElementType);
 
                 if (!maybeGenerator.isPresent()) {
                     throw new DtoGeneratorException("Collection element rules absent on the field," +
@@ -128,38 +123,42 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                 elementGenerator = maybeGenerator.get();
             }
 
-            prepareCustomRemarks(elementGenerator, getFieldName());
+            prepareCustomRemarks(elementGenerator, fieldName);
 
             generator = buildCollectionGenerator(
                     collectionRuleInfo.getRule(),
                     collectionGenBuilder,
-                    elementGenerator
+                    elementGenerator,
+                    fieldType,
+                    fieldName
             );
 
         } else {
 
-            generatedTypeOrCollectionElementType = getFieldType();
-
             Optional<IGeneratorBuilder> maybeUsersGenBuilder = getUsersGenBuilder(
                     ruleInfo.getRule(),
-                    getFieldType());
+                    fieldType);
 
             boolean isUserBuilder = maybeUsersGenBuilder.isPresent();
             IGeneratorBuilder genBuilder = isUserBuilder ?
                     maybeUsersGenBuilder.get() :
                     getDefaultGenBuilder(
                             ruleInfo.getRule(),
-                            getFieldType());
+                            fieldType);
 
             generator = buildGenerator(
                     ruleInfo.getRule(),
                     genBuilder,
-                    generatedTypeOrCollectionElementType.isPrimitive());
+                    fieldType,
+                    fieldName,
+                    dtoInstanceSupplier,
+                    nestedDtoGeneratorSupplier);
         }
 
-        prepareCustomRemarks(generator, getFieldName());
+        prepareCustomRemarks(generator, fieldName);
 
-        return Optional.ofNullable(generator);
+        return generator;
+
     }
 
     private IGeneratorBuilder getDefaultGenBuilder(Annotation rules, Class<?> generatedType) {
@@ -174,13 +173,14 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
     private IGenerator<?> buildGenerator(Annotation rules,
                                          IGeneratorBuilder generatorBuilder,
-                                         boolean isPrimitive) {
+                                         Class<?> fieldType,
+                                         String fieldName,
+                                         Supplier<?> dtoInstanceSupplier,
+                                         Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
 
         Class<? extends Annotation> rulesClass = rules.annotationType();
 
-
         try {
-
 
             if (StringRule.class == rulesClass) {
 
@@ -190,7 +190,8 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                             () -> new StringGenerator.ConfigDto((StringRule) rules),
                             () -> (IGeneratorBuilderConfigurable) generatorBuilder,
                             (config, builder) -> builder.build(config, true),
-                            getFieldType());
+                            fieldType,
+                            fieldName);
                 }
 
             } else if (DoubleRule.class == rulesClass) {
@@ -200,8 +201,9 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                     return getGenerator(
                             () -> new DoubleGenerator.ConfigDto((DoubleRule) rules),
                             () -> (IGeneratorBuilderConfigurable) generatorBuilder,
-                            doubleGeneratorSupplier(isPrimitive),
-                            getFieldType());
+                            doubleGeneratorSupplier(fieldType, fieldName),
+                            fieldType,
+                            fieldName);
                 }
 
             } else if (IntegerRule.class == rulesClass) {
@@ -211,8 +213,9 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                     return getGenerator(
                             () -> new IntegerGenerator.ConfigDto((IntegerRule) rules),
                             () -> (IGeneratorBuilderConfigurable) generatorBuilder,
-                            integerGeneratorSupplier(isPrimitive),
-                            getFieldType());
+                            integerGeneratorSupplier(fieldType, fieldName),
+                            fieldType,
+                            fieldName);
                 }
 
             } else if (LongRule.class == rulesClass) {
@@ -222,8 +225,9 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                     return getGenerator(
                             () -> new LongGenerator.ConfigDto((LongRule) rules),
                             () -> (IGeneratorBuilderConfigurable) generatorBuilder,
-                            longGeneratorSupplier(isPrimitive),
-                            getFieldType());
+                            longGeneratorSupplier(fieldType, fieldName),
+                            fieldType,
+                            fieldName);
                 }
 
             } else if (EnumRule.class == rulesClass) {
@@ -232,8 +236,9 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                     return getGenerator(
                             () -> new EnumGenerator.ConfigDto((EnumRule) rules),
                             () -> (IGeneratorBuilderConfigurable) generatorBuilder,
-                            enumGeneratorSupplier(generatedTypeOrCollectionElementType),
-                            getFieldType()
+                            enumGeneratorSupplier(fieldType),
+                            fieldType,
+                            fieldName
                     );
                 }
 
@@ -244,22 +249,25 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                             () -> new LocalDateTimeGenerator.ConfigDto((LocalDateTimeRule) rules),
                             () -> (IGeneratorBuilderConfigurable) generatorBuilder,
                             (config, builder) -> builder.build(config, true),
-                            getFieldType());
+                            fieldType,
+                            fieldName);
                 }
 
             } else if (CustomRule.class == rulesClass) {
 
                 if (generatorBuilder instanceof CustomGenerator.CustomGeneratorBuilder) {
-                    return getCustomGenerator(
-                            ((CustomGenerator.CustomGeneratorBuilder) generatorBuilder),
-                            (CustomRule) rules);
+                    return ((CustomGenerator.CustomGeneratorBuilder) generatorBuilder)
+                            .setCustomGeneratorRules(rules)
+                            .setDtoInstanceSupplier(dtoInstanceSupplier)
+                            .build();
                 }
 
             } else if (NestedDtoRule.class == rulesClass) {
 
                 if (generatorBuilder instanceof NestedDtoGenerator.NestedDtoGeneratorBuilder) {
-                    return getNestedDtoGenerator(
-                            ((NestedDtoGenerator.NestedDtoGeneratorBuilder) generatorBuilder));
+                    return ((NestedDtoGenerator.NestedDtoGeneratorBuilder) generatorBuilder)
+                            .setNestedDtoGeneratorSupplier(nestedDtoGeneratorSupplier)
+                            .build();
                 }
 
             } else {
@@ -280,7 +288,9 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
     private IGenerator<?> buildCollectionGenerator(Annotation collectionRule,
                                                    IGeneratorBuilder collectionGenBuilder,
-                                                   IGenerator<?> elementGenerator) {
+                                                   IGenerator<?> elementGenerator,
+                                                   Class<?> fieldType,
+                                                   String fieldName) {
         Class<? extends Annotation> rulesClass = collectionRule.annotationType();
 
         if (collectionGenBuilder instanceof CollectionGenerator.CollectionGeneratorBuilder) {
@@ -307,7 +317,8 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
                     () -> configDto,
                     () -> (IGeneratorBuilderConfigurable) collectionGenBuilder,
                     collectionGeneratorSupplier(elementGenerator),
-                    getFieldType());
+                    fieldType,
+                    fieldName);
         }
 
         log.debug("Unknown collection builder builds as is, without Rules annotation params passing.");
@@ -315,24 +326,11 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
         return collectionGenBuilder.build();
     }
 
-    private IGenerator<?> getCustomGenerator(CustomGenerator.CustomGeneratorBuilder builder,
-                                             CustomRule rule) {
-        return builder
-                .setCustomGeneratorRules(rule)
-                .setDtoInstanceSupplier(dtoInstanceSupplier)
-                .build();
-    }
-
-    private IGenerator<?> getNestedDtoGenerator(NestedDtoGenerator.NestedDtoGeneratorBuilder builder) {
-        return builder
-                .setNestedDtoGeneratorSupplier(nestedDtoGeneratorSupplier)
-                .build();
-    }
-
-    BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> integerGeneratorSupplier(boolean isPrimitive) {
+    BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> integerGeneratorSupplier(Class<?> fieldType,
+                                                                                                  String fieldName) {
         return (config, builder) -> {
-            if (config.getRuleRemark() == NULL_VALUE && isPrimitive) {
-                reportPrimitiveCannotBeNull();
+            if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
+                reportPrimitiveCannotBeNull(fieldName);
                 return GeneratorBuildersFactory.integerBuilder()
                         .minValue(0)
                         .maxValue(0)
@@ -342,10 +340,11 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
         };
     }
 
-    BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> longGeneratorSupplier(boolean isPrimitive) {
+    BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> longGeneratorSupplier(Class<?> fieldType,
+                                                                                               String fieldName) {
         return (config, builder) -> {
-            if (config.getRuleRemark() == NULL_VALUE && isPrimitive) {
-                reportPrimitiveCannotBeNull();
+            if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
+                reportPrimitiveCannotBeNull(fieldName);
                 return GeneratorBuildersFactory.longBuilder()
                         .minValue(0L)
                         .maxValue(0L)
@@ -355,10 +354,11 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
         };
     }
 
-    BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> doubleGeneratorSupplier(boolean isPrimitive) {
+    BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> doubleGeneratorSupplier(Class<?> fieldType,
+                                                                                                 String fieldName) {
         return (config, builder) -> {
-            if (config.getRuleRemark() == NULL_VALUE && isPrimitive) {
-                reportPrimitiveCannotBeNull();
+            if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
+                reportPrimitiveCannotBeNull(fieldName);
                 return GeneratorBuildersFactory.doubleBuilder()
                         .minValue(0D)
                         .maxValue(0D)
@@ -395,25 +395,12 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
     }
 
-    private String getFieldName() {
-        return field.getName();
-    }
-
-    private Class<?> getFieldType() {
-        return field.getType();
-    }
-
     /*
      * Utils
      */
 
-    private void reportPrimitiveCannotBeNull() {
-        log.warn("Primitive field " + getFieldName() + " can't be null, it will be assigned to '0'");
+    private void reportPrimitiveCannotBeNull(String fieldName) {
+        log.warn("Primitive field " + fieldName + " can't be null, it will be assigned to '0'");
     }
 
-    @Override
-    public void accept(FieldGeneratorsProvider.ProvidersVisitor visitor) {
-        super.accept(visitor);
-        generatorBuildersProviderByType.accept(visitor);
-    }
 }

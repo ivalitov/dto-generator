@@ -91,7 +91,8 @@ public class DtoGenerator<T> {
             } catch (Exception e) {
                 errorsHolder.put(field, e);
             }
-            generator.ifPresent(typeGeneratorInstance -> getFieldGeneratorMap().put(field, typeGeneratorInstance));
+            generator.ifPresent(typeGeneratorInstance ->
+                            getFieldGeneratorMap().put(field, typeGeneratorInstance));
         }
         if (!errorsHolder.isEmpty()) {
             log.error("{} error(s) while generators preparation. See problems below: \n" + errorsHolder, errorsHolder.getErrorsNumber());
