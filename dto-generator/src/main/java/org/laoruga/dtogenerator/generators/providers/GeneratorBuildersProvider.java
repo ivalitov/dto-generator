@@ -28,6 +28,10 @@ public class GeneratorBuildersProvider {
         return generatorMap.containsKey(field);
     }
 
+    public IGenerator<?> getGeneratorFromPool(Field field) {
+        return generatorMap.get(field);
+    }
+
     public IGenerator<?> getGeneratorBuildersProviderOverriddenForField(Field field) {
         return generatorMap.compute(field, (key, oldValue) -> {
                     if (oldValue != null) {

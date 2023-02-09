@@ -129,7 +129,8 @@ public class FieldGeneratorsProvider {
     Optional<IGenerator<?>> getGenerator(Field field) {
 
         if (generatorBuildersProvider.isGeneratorCreated(field)) {
-            System.out.println("YES");
+            log.debug("Taking generator from pool for the field: '{}", field.getName());
+            return Optional.ofNullable(generatorBuildersProvider.getGeneratorFromPool(field));
         }
 
         // generator was set explicitly
