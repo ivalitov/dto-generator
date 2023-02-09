@@ -12,9 +12,7 @@ import org.laoruga.dtogenerator.generators.executors.ExecutorOfDtoDependentGener
 import org.laoruga.dtogenerator.generators.executors.ExecutorOfGenerator;
 
 import java.lang.reflect.Field;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -31,16 +29,22 @@ public class DtoGenerator<T> {
     @Getter(AccessLevel.PACKAGE)
     private final FieldGeneratorsProvider fieldGeneratorsProvider;
     @Getter(AccessLevel.PACKAGE)
-    private final Map<Field, IGenerator<?>> fieldGeneratorMap = new LinkedHashMap<>();
+    private final FieldGeneratorsHolder fieldGeneratorHolder = new FieldGeneratorsHolder();
     @Getter(AccessLevel.PACKAGE)
     private final DtoGeneratorBuilder<T> builderInstance;
-    final ErrorsHolder  errorsHolder = new ErrorsHolder();
+    final ErrorsHolder errorsHolder = new ErrorsHolder();
+
+    ExecutorOfDtoDependentGenerator executorsChain;
 
     protected DtoGenerator(FieldGeneratorsProvider fieldGeneratorsProvider,
                            DtoGeneratorBuilder<T> dtoGeneratorBuilder) {
         this.fieldGeneratorsProvider = fieldGeneratorsProvider;
         this.builderInstance = dtoGeneratorBuilder;
         this.dtoInstanceSupplier = fieldGeneratorsProvider.getDtoInstanceSupplier();
+        this.executorsChain =
+                new ExecutorOfDtoDependentGenerator(dtoInstanceSupplier,
+                        new ExecutorOfCollectionGenerator(dtoInstanceSupplier,
+                                new ExecutorOfGenerator(dtoInstanceSupplier)));
     }
 
     public static <T> DtoGeneratorBuilder<T> builder(Class<T> dtoClass) {
@@ -72,19 +76,14 @@ public class DtoGenerator<T> {
 
         int maxAttempts = DtoGeneratorStaticConfig.getInstance().getMaxDependentGenerationCycles();
 
-        ExecutorOfDtoDependentGenerator executorsChain =
-                new ExecutorOfDtoDependentGenerator(dtoInstanceSupplier,
-                        new ExecutorOfCollectionGenerator(dtoInstanceSupplier,
-                                new ExecutorOfGenerator(dtoInstanceSupplier)));
-
         BatchGeneratorsExecutor batchGeneratorsExecutor = new BatchGeneratorsExecutor(
-                executorsChain, getFieldGeneratorMap(), maxAttempts);
+                executorsChain, getFieldGeneratorHolder(), maxAttempts);
 
         batchGeneratorsExecutor.execute();
     }
 
     void prepareGenerators(Class<?> dtoClass) {
-        for (Field field : dtoClass.getDeclaredFields()) {
+            for (Field field : dtoClass.getDeclaredFields()) {
             Optional<IGenerator<?>> generator = Optional.empty();
             try {
                 generator = getFieldGeneratorsProvider().getGenerator(field);
@@ -92,20 +91,73 @@ public class DtoGenerator<T> {
                 errorsHolder.put(field, e);
             }
             generator.ifPresent(typeGeneratorInstance ->
-                            getFieldGeneratorMap().put(field, typeGeneratorInstance));
+                    getFieldGeneratorHolder().put(field, typeGeneratorInstance));
         }
         if (!errorsHolder.isEmpty()) {
-            log.error("{} error(s) while generators preparation. See problems below: \n" + errorsHolder, errorsHolder.getErrorsNumber());
+            log.error("{} error(s) while generators preparation. See problems below: \n"
+                    + errorsHolder, errorsHolder.getErrorsNumber());
             throw new DtoGeneratorException("Error while generators preparation (see log above)");
         }
-        if (getFieldGeneratorMap().isEmpty()) {
+        if (getFieldGeneratorHolder().isEmpty()) {
             log.debug("Generators not found");
         } else {
             final AtomicInteger idx = new AtomicInteger(0);
-            log.debug(getFieldGeneratorMap().size() + " generators created for fields: \n" +
-                    getFieldGeneratorMap().keySet().stream()
-                            .map(i -> idx.incrementAndGet() + ". " + i)
-                            .collect(Collectors.joining("\n")));
+            log.debug(getFieldGeneratorHolder().size() + " generators created for fields: \n" +
+                    getFieldGeneratorHolder().getString());
+        }
+    }
+
+    public static class FieldGeneratorsHolder {
+        private int size;
+        private final int bucketsNumber;
+        private final List<Map<Field, IGenerator<?>>> buckets;
+        private int nextIdx = 0;
+
+        public FieldGeneratorsHolder() {
+            bucketsNumber = 3;
+            buckets = new ArrayList<>(bucketsNumber);
+            for (int i = 0; i < bucketsNumber; i++) {
+                buckets.add(new HashMap<>());
+            }
+        }
+
+        public void put(Field field, IGenerator<?> generator) {
+            buckets.get(nextIdx()).put(field, generator);
+            size++;
+        }
+
+        private int nextIdx() {
+            if (nextIdx < bucketsNumber) {
+                return nextIdx++;
+            }
+            nextIdx = 0;
+            return nextIdx++;
+        }
+
+        public boolean isEmpty() {
+            return buckets.stream().allMatch(Map::isEmpty);
+        }
+
+        public int size() {
+            return size;
+        }
+
+        public String getString() {
+            StringBuilder stringBuilder = new StringBuilder();
+            final AtomicInteger idx = new AtomicInteger(0);
+            for (Map<Field, IGenerator<?>> bucket : buckets) {
+                stringBuilder.append(
+                        bucket.keySet().stream()
+                                .map(i -> idx.incrementAndGet() + ". " + i)
+                                .collect(Collectors.joining("\n"))
+                );
+                stringBuilder.append("\n");
+            }
+            return stringBuilder.toString();
+        }
+
+        public List<Map<Field, IGenerator<?>>> getBuckets() {
+            return buckets;
         }
     }
 }

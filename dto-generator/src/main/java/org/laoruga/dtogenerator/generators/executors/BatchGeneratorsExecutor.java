@@ -1,13 +1,16 @@
 package org.laoruga.dtogenerator.generators.executors;
 
 import lombok.extern.slf4j.Slf4j;
+import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.ErrorsHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -18,15 +21,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BatchGeneratorsExecutor {
 
-    private final Map<Field, IGenerator<?>> fieldGeneratorMap;
+    private final DtoGenerator.FieldGeneratorsHolder fieldGeneratorMap;
     private final AbstractExecutor executorsChain;
-    private  int maxAttempts;
+    private int maxAttempts;
     private final ErrorsHolder errorsHolder = new ErrorsHolder();
 
+    static ExecutorService executorService = Executors.newCachedThreadPool();
+
     public BatchGeneratorsExecutor(AbstractExecutor executorsChain,
-                                   Map<Field, IGenerator<?>> fieldGeneratorMap,
+                                   DtoGenerator.FieldGeneratorsHolder fieldGeneratorHolder,
                                    int maxAttempts) {
-        this.fieldGeneratorMap = fieldGeneratorMap;
+        this.fieldGeneratorMap = fieldGeneratorHolder;
         this.executorsChain = executorsChain;
         this.maxAttempts = maxAttempts;
     }
@@ -49,35 +54,55 @@ public class BatchGeneratorsExecutor {
     }
 
     private boolean executeEachRemaining(int attempt) {
-        Iterator<Map.Entry<Field, IGenerator<?>>> iterator = fieldGeneratorMap.entrySet().iterator();
-        while (iterator.hasNext() && maxAttempts > attempt) {
-            Map.Entry<Field, IGenerator<?>> nextGenerator = iterator.next();
-            Field field = nextGenerator.getKey();
+        AtomicInteger attemptsAtomic = new AtomicInteger(attempt);
 
-            boolean completed;
-            try {
-                completed = executorsChain.execute(field, nextGenerator.getValue());
-            } catch (Exception e) {
-                attempt++;
-                errorsHolder.put(field, e);
-                completed = false;
+        try {
+            List<Future<Boolean>> futures = executorService.invokeAll(
+                    fieldGeneratorMap.getBuckets()
+                            .stream().map(bucket -> getTask(bucket, attemptsAtomic))
+                            .collect(Collectors.toList())
+            );
+            boolean result = true;
+            for (Future<Boolean> future : futures) {
+                result &= future.get(5, TimeUnit.MINUTES);
             }
-            if (completed) {
-                iterator.remove();
-            }
+            return result;
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new RuntimeException(e);
         }
-        return fieldGeneratorMap.isEmpty();
+    }
+
+    private Callable<Boolean> getTask(Map<Field, IGenerator<?>> fieldGeneratorMap, AtomicInteger attemptsAtomic) {
+        Iterator<Map.Entry<Field, IGenerator<?>>> iterator = fieldGeneratorMap.entrySet().iterator();
+        return () -> {
+            while (iterator.hasNext() && maxAttempts > attemptsAtomic.get()) {
+                Map.Entry<Field, IGenerator<?>> nextGenerator = iterator.next();
+                Field field = nextGenerator.getKey();
+
+                boolean completed;
+
+                try {
+                    completed = executorsChain.execute(field, nextGenerator.getValue());
+                } catch (Exception e) {
+                    attemptsAtomic.incrementAndGet();
+                    errorsHolder.put(field, e);
+                    completed = false;
+                }
+
+                if (completed) {
+                    iterator.remove();
+                }
+            }
+            return fieldGeneratorMap.isEmpty();
+        };
     }
 
     private boolean checkIfAllGeneratorsExecuted() {
         boolean successful = fieldGeneratorMap.isEmpty();
         if (!successful) {
-            AtomicInteger counter = new AtomicInteger(0);
-            String leftGenerators = fieldGeneratorMap.entrySet().stream()
-                    .map((i) -> counter.incrementAndGet() + ". Field: '" + i.getKey() + "', generator: '" + i.getValue() + "'")
-                    .collect(Collectors.joining("\n"));
+            String generatorsLeft = fieldGeneratorMap.getString();
             log.error("Unexpected state. There {} unused generator(s) left:\n" +
-                    leftGenerators, fieldGeneratorMap.size());
+                    generatorsLeft, fieldGeneratorMap.size());
         }
         if (!errorsHolder.isEmpty()) {
             log.warn("{} error(s) while generators execution:\n" + errorsHolder, errorsHolder.getErrorsNumber());
