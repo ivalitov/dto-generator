@@ -7,6 +7,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersHolder;
+import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProvider;
 import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProviderByAnnotation;
 import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProviderByField;
 import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProviderByType;
@@ -42,17 +43,9 @@ public class FieldGeneratorsProvider {
     private final Map<Class<? extends Annotation>, IGeneratorBuilder> overriddenBuilders;
     private final Map<String, IGeneratorBuilder> overriddenBuildersForFields;
     private final GeneratorBuildersHolder userGenBuildersMapping;
-
     @Getter
     private final RulesInfoExtractor rulesInfoExtractor;
-
-    /*
-     * Generators provider
-     */
-
-    private GeneratorBuildersProviderByField generatorBuildersProviderOverriddenForField;
-    private GeneratorBuildersProviderByType generatorBuildersProviderByType;
-    private GeneratorBuildersProviderByAnnotation generatorBuildersProviderByAnnotation;
+    private final GeneratorBuildersProvider generatorBuildersProvider;
 
     FieldGeneratorsProvider(DtoGeneratorInstanceConfig configuration,
                             RemarksHolder typeGeneratorRemarksProvider,
@@ -67,7 +60,7 @@ public class FieldGeneratorsProvider {
         this.overriddenBuilders = new ConcurrentHashMap<>();
         this.rulesInfoExtractor = new RulesInfoExtractor(fieldGroupFilter);
         this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
-        initGeneratorProviders(overriddenBuildersForFields);
+        this.generatorBuildersProvider = initGeneratorProviders(overriddenBuildersForFields);
     }
 
     /**
@@ -84,7 +77,7 @@ public class FieldGeneratorsProvider {
         this.overriddenBuilders = copyFrom.getOverriddenBuilders();
         this.rulesInfoExtractor = copyFrom.getRulesInfoExtractor();
         this.dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
-        initGeneratorProviders(overriddenBuildersForFields);
+        this.generatorBuildersProvider = initGeneratorProviders(overriddenBuildersForFields);
     }
 
     /**
@@ -103,22 +96,24 @@ public class FieldGeneratorsProvider {
     }
 
 
-    private void initGeneratorProviders(Map<String, IGeneratorBuilder> buildersMapping) {
-        generatorBuildersProviderOverriddenForField = new GeneratorBuildersProviderByField(
-                configuration,
-                buildersMapping,
-                remarksHolder);
-
-        generatorBuildersProviderByType = new GeneratorBuildersProviderByType(
+    private GeneratorBuildersProvider initGeneratorProviders(Map<String, IGeneratorBuilder> buildersMapping) {
+        GeneratorBuildersProviderByType generatorBuildersProviderByType = new GeneratorBuildersProviderByType(
                 configuration,
                 userGenBuildersMapping,
                 remarksHolder);
-
-        generatorBuildersProviderByAnnotation = new GeneratorBuildersProviderByAnnotation(
+        GeneratorBuildersProviderByField generatorBuildersProviderByField = new GeneratorBuildersProviderByField(
+                configuration,
+                buildersMapping,
+                remarksHolder);
+        GeneratorBuildersProviderByAnnotation generatorBuildersProviderByAnnotation = new GeneratorBuildersProviderByAnnotation(
                 configuration,
                 generatorBuildersProviderByType,
                 remarksHolder,
                 userGenBuildersMapping);
+        return new GeneratorBuildersProvider(
+                generatorBuildersProviderByField,
+                generatorBuildersProviderByType,
+                generatorBuildersProviderByAnnotation);
     }
 
     /**
@@ -133,9 +128,14 @@ public class FieldGeneratorsProvider {
      */
     Optional<IGenerator<?>> getGenerator(Field field) {
 
+        if (generatorBuildersProvider.isGeneratorCreated(field)) {
+            System.out.println("YES");
+        }
+
         // generator was set explicitly
         if (getOverriddenBuildersForFields().containsKey(field.getName())) {
-            return Optional.of(generatorBuildersProviderOverriddenForField.getGenerator(field));
+            return Optional.of(
+                    generatorBuildersProvider.getGeneratorBuildersProviderOverriddenForField(field));
         }
 
         Optional<IRuleInfo> maybeRulesInfo = getRuleInfo(field);
@@ -143,7 +143,7 @@ public class FieldGeneratorsProvider {
         // field annotated with rules
         if (maybeRulesInfo.isPresent()) {
             return Optional.of(
-                    generatorBuildersProviderByAnnotation.getGenerator(
+                    generatorBuildersProvider.generatorBuildersProviderByAnnotation(
                             field,
                             maybeRulesInfo.get(),
                             getDtoInstanceSupplier(),
@@ -160,11 +160,11 @@ public class FieldGeneratorsProvider {
             );
         }
 
+        // try to generate value by field type
         if (getConfiguration().getGenerateAllKnownTypes()) {
-            return generatorBuildersProviderByType.getGenerator(field, field.getType());
+            return generatorBuildersProvider.getGeneratorBuildersProviderByType(field, field.getType());
         }
 
-        // field without rules annotation
         return Optional.empty();
     }
 
