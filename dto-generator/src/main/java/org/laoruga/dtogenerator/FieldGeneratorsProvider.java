@@ -128,11 +128,6 @@ public class FieldGeneratorsProvider {
      */
     Optional<IGenerator<?>> getGenerator(Field field) {
 
-        if (generatorBuildersProvider.isGeneratorCreated(field)) {
-            log.debug("Taking generator from pool for the field: '{}", field.getName());
-            return Optional.ofNullable(generatorBuildersProvider.getGeneratorFromPool(field));
-        }
-
         // generator was set explicitly
         if (getOverriddenBuildersForFields().containsKey(field.getName())) {
             return Optional.of(

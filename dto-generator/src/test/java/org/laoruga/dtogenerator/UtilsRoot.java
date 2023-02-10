@@ -30,7 +30,7 @@ public class UtilsRoot {
     }
 
     public static Map<String, Exception> getErrorsMap(DtoGenerator<?> dtoGenerator) {
-        return dtoGenerator.errorsHolder.getErrors().entrySet().stream().collect(Collectors.toMap(
+        return dtoGenerator.getErrorsHolder().getErrors().entrySet().stream().collect(Collectors.toMap(
                 (e) -> e.getKey().getName(),
                 Map.Entry::getValue
         ));

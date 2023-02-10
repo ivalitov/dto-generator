@@ -15,7 +15,6 @@ public abstract class AbstractExecutor {
 
     private final AbstractExecutor nextExecutor;
 
-
     public AbstractExecutor(AbstractExecutor nextExecutor) {
         this.nextExecutor = nextExecutor;
     }
