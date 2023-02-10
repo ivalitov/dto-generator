@@ -14,13 +14,13 @@ import java.util.function.Supplier;
 @Slf4j
 public class ExecutorOfGenerator extends AbstractExecutor {
 
-    private final Supplier<?> dtoInstanceSupplier;
+    private final ThreadLocal<Supplier<?>> dtoInstanceSupplier;
 
-    public ExecutorOfGenerator(Supplier<?> dtoInstanceSupplier) {
+    public ExecutorOfGenerator(ThreadLocal<Supplier<?>> dtoInstanceSupplier) {
         this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
-    public ExecutorOfGenerator(Supplier<?> dtoInstanceSupplier,
+    public ExecutorOfGenerator(ThreadLocal<Supplier<?>> dtoInstanceSupplier,
                                    AbstractExecutor nextExecutor) {
         super(nextExecutor);
         this.dtoInstanceSupplier = dtoInstanceSupplier;
@@ -37,7 +37,7 @@ public class ExecutorOfGenerator extends AbstractExecutor {
         }
             try {
             field.setAccessible(true);
-            field.set(dtoInstanceSupplier.get(), result);
+            field.set(dtoInstanceSupplier.get().get(), result);
         } catch (Exception e) {
             throw new DtoGeneratorException("Error while setting generated value of type: '" +
                     (result != null ? result.getClass() : null) + "' to the field: " +

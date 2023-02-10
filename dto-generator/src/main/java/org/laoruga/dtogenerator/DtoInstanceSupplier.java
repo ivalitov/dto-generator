@@ -2,7 +2,6 @@ package org.laoruga.dtogenerator;
 
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -20,10 +19,27 @@ public class DtoInstanceSupplier implements Supplier<Object> {
 
     @Override
     public Object get() {
-        return Objects.requireNonNull(dtoInstance, "DTO instance is null");
+        if (dtoInstance == null) {
+            updateInstance();
+        }
+        return dtoInstance;
     }
 
     public void updateInstance() {
         dtoInstance = ReflectionUtils.createInstance(dtoClass);
+    }
+
+    static class StaticInstance implements Supplier<Object> {
+
+        private final Object dtoInstance;
+
+        public StaticInstance(Object dtoInstance) {
+            this.dtoInstance = dtoInstance;
+        }
+
+        @Override
+        public Object get() {
+            return dtoInstance;
+        }
     }
 }

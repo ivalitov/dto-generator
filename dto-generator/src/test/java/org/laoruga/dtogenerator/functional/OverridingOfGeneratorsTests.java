@@ -28,9 +28,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.laoruga.dtogenerator.UtilsRoot.resetStaticConfig;
 import static org.laoruga.dtogenerator.constants.RuleRemark.MAX_VALUE;
 import static org.laoruga.dtogenerator.constants.RuleRemark.MIN_VALUE;
-import static org.laoruga.dtogenerator.UtilsRoot.resetStaticConfig;
 
 /**
  * @author Il'dar Valitov

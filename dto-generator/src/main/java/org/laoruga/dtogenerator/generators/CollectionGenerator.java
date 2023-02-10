@@ -31,7 +31,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
 
     private final int minSize;
     private final int maxSize;
-    private final Collection<Object> collectionInstance;
+    private final Supplier<Collection<Object>> collectionInstanceSupplier;
     private final IGenerator<Object> elementGenerator;
     private final IRuleRemark ruleRemark;
 
@@ -41,6 +41,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
 
     @Override
     public Collection<Object> generate() {
+        Collection<Object> collectionInstance = collectionInstanceSupplier.get();
         int maxAttempts = DtoGeneratorStaticConfig.getInstance().getMaxCollectionGenerationCycles();
         int size;
         switch ((RuleRemark) ruleRemark) {
@@ -98,7 +99,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
         }
 
         @SuppressWarnings("unchecked")
-        public CollectionGeneratorBuilder<?> collectionInstance(Supplier<Collection<?>> listInstance) {
+        public CollectionGeneratorBuilder<?> collectionInstance(Supplier<Collection<Object>> listInstance) {
             configDto.collectionInstance = listInstance;
             return this;
         }
@@ -128,7 +129,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
             return new CollectionGenerator(
                     collectionConfig.minSize,
                     collectionConfig.maxSize,
-                    (Collection<Object>) Objects.requireNonNull(collectionConfig.collectionInstance, "Collection instance must be set.").get(),
+                    Objects.requireNonNull(collectionConfig.collectionInstance, "Collection instance must be set."),
                     Objects.requireNonNull(collectionConfig.elementGenerator, "Collection element generator must be set"),
                     Objects.requireNonNull(collectionConfig.ruleRemark, "Unexpected error, rule remark haven't set."));
         }
@@ -142,13 +143,14 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
     public static class ConfigDto implements IConfigDto {
         private Integer minSize;
         private Integer maxSize;
-        private Supplier<Collection<?>> collectionInstance;
+        private Supplier<Collection<Object>> collectionInstance;
         private IGenerator<Object> elementGenerator;
         private IRuleRemark ruleRemark;
 
         public ConfigDto() {
         }
 
+        @SuppressWarnings("unchecked")
         public ConfigDto(SetRule rule) {
             this.minSize = rule.minSize();
             this.maxSize = rule.maxSize();
@@ -156,6 +158,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
             this.ruleRemark = rule.ruleRemark();
         }
 
+        @SuppressWarnings("unchecked")
         public ConfigDto(ListRule rule) {
             this.minSize = rule.minSize();
             this.maxSize = rule.maxSize();
@@ -163,7 +166,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
             this.ruleRemark = rule.ruleRemark();
         }
 
-        public ConfigDto setCollectionInstance(Supplier<Collection<?>> collectionInstance) {
+        public ConfigDto setCollectionInstance(Supplier<Collection<Object>> collectionInstance) {
             this.collectionInstance = collectionInstance;
             return this;
         }

@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 @Slf4j
 public class ExecutorOfDtoDependentGenerator extends ExecutorOfGenerator {
 
-    public ExecutorOfDtoDependentGenerator(Supplier<?> dtoInstanceSupplier,
+    public ExecutorOfDtoDependentGenerator(ThreadLocal<Supplier<?>> dtoInstanceSupplier,
                                            AbstractExecutor nextGenerator) {
         super(dtoInstanceSupplier, nextGenerator);
     }

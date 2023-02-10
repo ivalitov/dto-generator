@@ -1,6 +1,7 @@
 package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Epic;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,12 @@ import org.laoruga.dtogenerator.rules.RulesInstance;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.exparity.hamcrest.date.LocalDateMatchers.sameOrAfter;
 import static org.exparity.hamcrest.date.LocalDateMatchers.sameOrBefore;
@@ -79,6 +86,39 @@ class BuilderReuseTests {
                 () -> assertNotEquals(stringFromDto1, stringFromDto2),
                 () -> assertNotEquals(longFromDto1, longFromDto2)
         );
+    }
+
+    @Test
+    @DisplayName("Concurrent Execution")
+    @SneakyThrows
+    void concurrentExecution() {
+
+        DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
+        builder.getUserConfig().getGenBuildersConfig().getListConfig().setCollectionInstance(LinkedList::new);
+
+        DtoGenerator<DtoAllKnownTypes> dtoGenerator = builder.build();
+
+        Callable<DtoAllKnownTypes> generateDto = dtoGenerator::generateDto;
+
+        List<Callable<DtoAllKnownTypes>> generateDtoList = IntStream.range(0, 10).boxed()
+                .map(i -> generateDto).collect(Collectors.toList());
+
+        List<Future<DtoAllKnownTypes>> futures = Executors.newCachedThreadPool().invokeAll(generateDtoList);
+
+        for (int i = 1; i < futures.size(); i++) {
+            DtoAllKnownTypes dto_1 = futures.get(i - 1).get();
+            DtoAllKnownTypes dto_2 = futures.get(i).get();
+
+            assertNotSame(dto_1, dto_2);
+
+            assertAll(
+                    () -> assertNotEquals(dto_1, dto_2),
+                    () -> assertNotEquals(dto_1.hashCode(), dto_2.hashCode()),
+                    () -> assertNotEquals(dto_1.getString(), dto_2.getString()),
+                    () -> assertNotEquals(dto_1.getALong(), dto_2.getALong())
+            );
+        }
+
     }
 
     private void fieldsAssertions(DtoAllKnownTypes dto) {

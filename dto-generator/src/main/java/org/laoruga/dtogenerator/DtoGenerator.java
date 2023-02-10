@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DtoGenerator<T> {
 
-    private final Supplier<Object> dtoInstanceSupplier;
+    private final ThreadLocal<Supplier<?>> dtoInstanceSupplier;
     @Getter(AccessLevel.PACKAGE)
     private final FieldGeneratorsProvider fieldGeneratorsProvider;
     @Getter(AccessLevel.PACKAGE)
@@ -39,6 +39,7 @@ public class DtoGenerator<T> {
                            DtoGeneratorBuilder<T> dtoGeneratorBuilder) {
         this.fieldGeneratorsProvider = fieldGeneratorsProvider;
         this.builderInstance = dtoGeneratorBuilder;
+        // TODO suspicious link sharing
         this.dtoInstanceSupplier = fieldGeneratorsProvider.getDtoInstanceSupplier();
         this.errorsHolder = new ErrorsHolder();
     }
@@ -53,8 +54,8 @@ public class DtoGenerator<T> {
 
     @SuppressWarnings("unchecked")
     public T generateDto() {
-        if (dtoInstanceSupplier instanceof DtoInstanceSupplier) {
-            ((DtoInstanceSupplier) dtoInstanceSupplier).updateInstance();
+        if (dtoInstanceSupplier.get() instanceof DtoInstanceSupplier) {
+            ((DtoInstanceSupplier) dtoInstanceSupplier.get()).updateInstance();
         }
         try {
 
@@ -64,7 +65,7 @@ public class DtoGenerator<T> {
                             new ExecutorOfDtoDependentGenerator(dtoInstanceSupplier,
                                     new ExecutorOfCollectionGenerator(dtoInstanceSupplier,
                                             new ExecutorOfGenerator(dtoInstanceSupplier))),
-                            prepareGenerators(dtoInstanceSupplier.get().getClass(), new HashMap<>())
+                            prepareGenerators(dtoInstanceSupplier.get().get().getClass(), new HashMap<>())
                     );
                 }
             }
@@ -75,7 +76,7 @@ public class DtoGenerator<T> {
         } catch (Exception e) {
             throw new DtoGeneratorException(e);
         }
-        return (T) dtoInstanceSupplier.get();
+        return (T) dtoInstanceSupplier.get().get();
     }
 
     private Map<Field, IGenerator<?>> prepareGenerators(Class<?> dtoClass, Map<Field, IGenerator<?>> generatorMap) {

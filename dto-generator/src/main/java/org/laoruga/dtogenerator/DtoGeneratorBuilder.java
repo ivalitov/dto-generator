@@ -32,14 +32,14 @@ public class DtoGeneratorBuilder<T> {
     private final FieldGroupFilter fieldGroupFilter;
 
     DtoGeneratorBuilder(Class<T> dtoClass) {
-        this(new DtoInstanceSupplier(dtoClass));
+        this(ThreadLocal.withInitial(() -> new DtoInstanceSupplier(dtoClass)));
     }
 
     DtoGeneratorBuilder(T dtoInstance) {
-        this(() -> dtoInstance);
+        this(ThreadLocal.withInitial(() -> new DtoInstanceSupplier.StaticInstance(dtoInstance)));
     }
 
-    private DtoGeneratorBuilder(Supplier<Object> dtoInstanceSupplier) {
+    private DtoGeneratorBuilder(ThreadLocal<Supplier<?>> dtoInstanceSupplier) {
         this.configuration = new DtoGeneratorInstanceConfig();
         this.fieldGroupFilter = new FieldGroupFilter();
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
@@ -59,7 +59,7 @@ public class DtoGeneratorBuilder<T> {
      * Constructor to copy builder for nested DTO generation.
      *
      * @param configuration            - configuration instance
-     * @param fieldGeneratorsProvider   - generators provider for field values
+     * @param fieldGeneratorsProvider  - generators provider for field values
      * @param dtoGeneratorBuildersTree - generator builders tree
      * @param fieldGroupFilter         - groups for filtering fields
      */

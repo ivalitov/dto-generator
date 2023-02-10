@@ -3,6 +3,7 @@ package org.laoruga.dtogenerator.functional.data.dto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.functional.data.customgenerator.CustomIntegerGenerator;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
@@ -19,6 +20,7 @@ import java.util.Set;
  * Created on 11.12.2022
  */
 @Getter
+@Setter
 @NoArgsConstructor
 @EqualsAndHashCode
 public class DtoAllKnownTypes {
@@ -62,7 +64,7 @@ public class DtoAllKnownTypes {
     Map<String, Integer> stringIntegerMap;
 
     public String getLocalDateTime() {
-        return localDateTime.toString();
+         return localDateTime.toString();
     }
 
     @Transient
