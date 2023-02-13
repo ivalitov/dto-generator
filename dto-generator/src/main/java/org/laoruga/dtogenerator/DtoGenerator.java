@@ -34,7 +34,6 @@ public class DtoGenerator<T> {
 
     protected DtoGenerator(FieldGeneratorsProvider fieldGeneratorsProvider) {
         this.fieldGeneratorsProvider = fieldGeneratorsProvider;
-        ;
         this.dtoInstanceSupplier = fieldGeneratorsProvider.getDtoInstanceSupplier();
         this.errorsHolder = new ErrorsHolder();
     }
@@ -54,7 +53,12 @@ public class DtoGenerator<T> {
             ((DtoInstanceSupplier) dtoInstanceSupplier.get()).updateInstance();
         }
 
+        Object dtoInstance;
+
         try {
+
+            dtoInstance = dtoInstanceSupplier.get().get();
+
             synchronized (this) {
                 if (batchGeneratorsExecutor == null) {
 
@@ -69,7 +73,7 @@ public class DtoGenerator<T> {
 
                     batchGeneratorsExecutor = new BatchGeneratorsExecutor(
                             dtoDependentGeneratorExecutor,
-                            prepareGenerators(dtoInstanceSupplier.get().get().getClass(), new HashMap<>())
+                            prepareGenerators(dtoInstance.getClass(), new HashMap<>())
                     );
                 }
             }
@@ -78,8 +82,11 @@ public class DtoGenerator<T> {
 
         } catch (Exception e) {
             throw new DtoGeneratorException(e);
+        } finally {
+            dtoInstanceSupplier.remove();
         }
-        return (T) dtoInstanceSupplier.get().get();
+
+        return (T) dtoInstance;
     }
 
     private Map<Field, IGenerator<?>> prepareGenerators(Class<?> dtoClass, Map<Field, IGenerator<?>> generatorMap) {
