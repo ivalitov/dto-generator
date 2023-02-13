@@ -24,12 +24,13 @@ public class BatchGeneratorsExecutor {
     private final ThreadLocal<Map<Field, IGenerator<?>>> notExecutedGeneratorsMap;
     private final AbstractExecutor executorsChain;
     private final int maxAttempts = DtoGeneratorStaticConfig.getInstance().getMaxDependentGenerationCycles();
-    private final ErrorsHolder errorsHolder = new ErrorsHolder();
+    private final ErrorsHolder errorsHolder;
 
     public BatchGeneratorsExecutor(AbstractExecutor executorsChain, Map<Field, IGenerator<?>> generatorMap) {
         this.generatorMap = generatorMap;
         this.notExecutedGeneratorsMap = new ThreadLocal<>();
         this.executorsChain = executorsChain;
+        this.errorsHolder  = new ErrorsHolder();
     }
 
     public void execute() {
@@ -46,7 +47,6 @@ public class BatchGeneratorsExecutor {
             throw new DtoGeneratorException("Error while generators execution");
         }
     }
-
 
     private boolean executeEachRemaining(AtomicInteger attempt) {
         Map<Field, IGenerator<?>> failedGeneratorsMap = notExecutedGeneratorsMap.get();

@@ -27,19 +27,13 @@ import java.util.stream.Collectors;
 public class DtoGenerator<T> {
 
     private final ThreadLocal<Supplier<?>> dtoInstanceSupplier;
-    @Getter(AccessLevel.PACKAGE)
     private final FieldGeneratorsProvider fieldGeneratorsProvider;
-    @Getter(AccessLevel.PACKAGE)
-    private final DtoGeneratorBuilder<T> builderInstance;
     @Getter(AccessLevel.PACKAGE)
     private final ErrorsHolder errorsHolder;
     private BatchGeneratorsExecutor batchGeneratorsExecutor;
 
-    protected DtoGenerator(FieldGeneratorsProvider fieldGeneratorsProvider,
-                           DtoGeneratorBuilder<T> dtoGeneratorBuilder) {
-        this.fieldGeneratorsProvider = fieldGeneratorsProvider;
-        this.builderInstance = dtoGeneratorBuilder;
-        // TODO suspicious link sharing
+    protected DtoGenerator(FieldGeneratorsProvider fieldGeneratorsProvider) {
+        this.fieldGeneratorsProvider = fieldGeneratorsProvider;;
         this.dtoInstanceSupplier = fieldGeneratorsProvider.getDtoInstanceSupplier();
         this.errorsHolder = new ErrorsHolder();
     }
@@ -72,7 +66,6 @@ public class DtoGenerator<T> {
 
             batchGeneratorsExecutor.execute();
 
-
         } catch (Exception e) {
             throw new DtoGeneratorException(e);
         }
@@ -88,7 +81,7 @@ public class DtoGenerator<T> {
         for (Field field : dtoClass.getDeclaredFields()) {
             Optional<IGenerator<?>> generator = Optional.empty();
             try {
-                generator = getFieldGeneratorsProvider().getGenerator(field);
+                generator = fieldGeneratorsProvider.getGenerator(field);
             } catch (Exception e) {
                 errorsHolder.put(field, e);
             }

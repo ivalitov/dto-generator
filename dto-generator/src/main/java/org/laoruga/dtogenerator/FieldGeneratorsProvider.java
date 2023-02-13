@@ -51,7 +51,8 @@ public class FieldGeneratorsProvider {
                             RemarksHolder typeGeneratorRemarksProvider,
                             FieldGroupFilter fieldGroupFilter,
                             String[] pathFromDtoRoot,
-                            Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree) {
+                            Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree,
+                            ThreadLocal<Supplier<?>> dtoInstanceSupplier) {
         this.configuration = configuration;
         this.overriddenBuildersForFields = new HashMap<>();
         this.userGenBuildersMapping = new GeneratorBuildersHolder();
@@ -61,6 +62,7 @@ public class FieldGeneratorsProvider {
         this.rulesInfoExtractor = new RulesInfoExtractor(fieldGroupFilter);
         this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
         this.generatorBuildersProvider = initGeneratorProviders(overriddenBuildersForFields);
+        this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
     /**
@@ -82,7 +84,7 @@ public class FieldGeneratorsProvider {
 
     /**
      * Setter for delayed field initialisation.
-     * When nested DTO generation params are filling in {@link DtoGeneratorBuilder},
+     * When nested DTO params are setting {@link DtoGeneratorBuilder},
      * we don't know type of nested field yet.
      *
      * @param dtoInstanceSupplier dto instance to build
@@ -139,22 +141,11 @@ public class FieldGeneratorsProvider {
         // field annotated with rules
         if (maybeRulesInfo.isPresent()) {
             return Optional.of(
-                    // TODO refactor
                     generatorBuildersProvider.generatorBuildersProviderByAnnotation(
                             field,
                             maybeRulesInfo.get(),
                             getDtoInstanceSupplier().get(),
-                            () -> {
-                                String[] pathToNestedDtoField =
-                                        Arrays.copyOf(pathFromDtoRoot, pathFromDtoRoot.length + 1);
-                                pathToNestedDtoField[pathFromDtoRoot.length] = field.getName();
-                                DtoGeneratorBuilderTreeNode nestedDtoGeneratorBuilder =
-                                        dtoGeneratorBuildersTree.get().getBuilderLazy(pathToNestedDtoField);
-                                nestedDtoGeneratorBuilder.getFieldGeneratorsProvider().setDtoInstanceSupplier(
-                                        ThreadLocal.withInitial(() -> new DtoInstanceSupplier(field.getType()))
-                                );
-                                return nestedDtoGeneratorBuilder.build();
-                            })
+                            createDtoGeneratorSupplier(field))
             );
         }
 
@@ -164,6 +155,27 @@ public class FieldGeneratorsProvider {
         }
 
         return Optional.empty();
+    }
+
+    void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder genBuilder) throws DtoGeneratorException {
+        if (overriddenBuildersForFields.containsKey(fieldName)) {
+            throw new DtoGeneratorException("Generator has already been explicitly added for field: '" + fieldName + "'");
+        }
+        overriddenBuildersForFields.put(fieldName, genBuilder);
+    }
+
+    private Supplier<DtoGenerator<?>> createDtoGeneratorSupplier(Field field) {
+        return () -> {
+            String[] pathToNestedDtoField =
+                    Arrays.copyOf(pathFromDtoRoot, pathFromDtoRoot.length + 1);
+            pathToNestedDtoField[pathFromDtoRoot.length] = field.getName();
+            DtoGeneratorBuilderTreeNode nestedDtoGeneratorBuilder =
+                    dtoGeneratorBuildersTree.get().getBuilderLazy(pathToNestedDtoField);
+            nestedDtoGeneratorBuilder.getFieldGeneratorsProvider().setDtoInstanceSupplier(
+                    ThreadLocal.withInitial(() -> new DtoInstanceSupplier(field.getType()))
+            );
+            return nestedDtoGeneratorBuilder.build();
+        };
     }
 
     private Optional<IRuleInfo> getRuleInfo(Field field) {
@@ -177,13 +189,6 @@ public class FieldGeneratorsProvider {
         } catch (Exception e) {
             throw new DtoGeneratorException("Error while extracting rule annotations from field: '" + field + "'", e);
         }
-    }
-
-    void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder genBuilder) throws DtoGeneratorException {
-        if (overriddenBuildersForFields.containsKey(fieldName)) {
-            throw new DtoGeneratorException("Generator has already been explicitly added for field: '" + fieldName + "'");
-        }
-        overriddenBuildersForFields.put(fieldName, genBuilder);
     }
 
     void overrideGenerator(Class<? extends Annotation> rulesClass, @NonNull IGeneratorBuilder genBuilder) {

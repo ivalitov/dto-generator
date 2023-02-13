@@ -21,16 +21,14 @@ public class DtoGeneratorBuilderTreeNode extends DtoGeneratorBuilder<Object> {
     private DtoGeneratorBuilderTreeNode(DtoGeneratorBuilder<?> toCopy, String fieldName) {
         super(toCopy.getConfiguration(),
                 toCopy.getFieldGeneratorsProvider(),
-                toCopy.getDtoGeneratorBuildersTree(),
-                toCopy.getFieldGroupFilter());
+                toCopy.getDtoGeneratorBuildersTree());
         this.fieldName = fieldName;
     }
 
     public DtoGeneratorBuilderTreeNode(DtoGeneratorBuilder<?> toCopy, String fieldName, String[] pathFromRootDto) {
         super(toCopy.getConfiguration(),
                 new FieldGeneratorsProvider(toCopy.getFieldGeneratorsProvider(), pathFromRootDto),
-                toCopy.getDtoGeneratorBuildersTree(),
-                toCopy.getFieldGroupFilter());
+                toCopy.getDtoGeneratorBuildersTree());
         this.fieldName = fieldName;
     }
 

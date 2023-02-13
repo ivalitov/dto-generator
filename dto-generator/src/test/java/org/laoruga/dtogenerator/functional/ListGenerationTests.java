@@ -27,8 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Il'dar Valitov
  * Created on 03.05.2022
  */
-// TODO Needs to check and handle situation when item rules and generic are not same
-// TODO Add feature - remarks for item generator (maybe already exists?)
+// TODO To check and handle situation when item rules and generic are not the same
 @DisplayName("List Type Generators Tests")
 @Epic("LIST_RULES")
 class ListGenerationTests {

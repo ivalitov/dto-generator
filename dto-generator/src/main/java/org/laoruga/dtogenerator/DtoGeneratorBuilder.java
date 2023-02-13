@@ -28,8 +28,6 @@ public class DtoGeneratorBuilder<T> {
     private final FieldGeneratorsProvider fieldGeneratorsProvider;
     @Getter(AccessLevel.PROTECTED)
     private final DtoGeneratorBuildersTree dtoGeneratorBuildersTree;
-    @Getter(AccessLevel.PROTECTED)
-    private final FieldGroupFilter fieldGroupFilter;
 
     DtoGeneratorBuilder(Class<T> dtoClass) {
         this(ThreadLocal.withInitial(() -> new DtoInstanceSupplier(dtoClass)));
@@ -41,19 +39,17 @@ public class DtoGeneratorBuilder<T> {
 
     private DtoGeneratorBuilder(ThreadLocal<Supplier<?>> dtoInstanceSupplier) {
         this.configuration = new DtoGeneratorInstanceConfig();
-        this.fieldGroupFilter = new FieldGroupFilter();
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
                 configuration,
                 new RemarksHolder(),
-                fieldGroupFilter,
+                new FieldGroupFilter(),
                 new String[]{ROOT},
-                this::getDtoGeneratorBuildersTree);
-        this.fieldGeneratorsProvider.setDtoInstanceSupplier(dtoInstanceSupplier);
+                this::getDtoGeneratorBuildersTree,
+                dtoInstanceSupplier);
         this.dtoGeneratorBuildersTree = new DtoGeneratorBuildersTree(
                 DtoGeneratorBuilderTreeNode.createRootNode(this)
         );
     }
-
 
     /**
      * Constructor to copy builder for nested DTO generation.
@@ -61,16 +57,13 @@ public class DtoGeneratorBuilder<T> {
      * @param configuration            - configuration instance
      * @param fieldGeneratorsProvider  - generators provider for field values
      * @param dtoGeneratorBuildersTree - generator builders tree
-     * @param fieldGroupFilter         - groups for filtering fields
      */
     protected DtoGeneratorBuilder(DtoGeneratorInstanceConfig configuration,
                                   FieldGeneratorsProvider fieldGeneratorsProvider,
-                                  DtoGeneratorBuildersTree dtoGeneratorBuildersTree,
-                                  FieldGroupFilter fieldGroupFilter) {
+                                  DtoGeneratorBuildersTree dtoGeneratorBuildersTree) {
         this.configuration = configuration;
         this.fieldGeneratorsProvider = fieldGeneratorsProvider;
         this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
-        this.fieldGroupFilter = fieldGroupFilter;
     }
 
 
@@ -94,7 +87,7 @@ public class DtoGeneratorBuilder<T> {
     public DtoGeneratorBuilder<T> setGeneratorBuilder(@NonNull String fieldName,
                                                       @NonNull IGeneratorBuilder generatorBuilder) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
-        getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
+        dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
                 .getFieldGeneratorsProvider()
                 .setGeneratorBuilderForField(fieldNameAndPath.getLeft(), generatorBuilder);
         return this;
@@ -107,7 +100,7 @@ public class DtoGeneratorBuilder<T> {
     public DtoGeneratorBuilder<T> setRuleRemark(@NonNull String fieldName,
                                                 @NonNull RuleRemark ruleRemark) throws DtoGeneratorException {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
-        getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
+        dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
                 .getFieldGeneratorsProvider()
                 .getRemarksHolder()
                 .getBasicRemarks()
@@ -130,7 +123,7 @@ public class DtoGeneratorBuilder<T> {
     public DtoGeneratorBuilder<T> addRuleRemark(@NonNull String fieldName,
                                                 @NonNull ICustomRuleRemark ruleRemark) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
-        getDtoGeneratorBuildersTree().getBuilderLazy(fieldNameAndPath.getRight())
+        dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
                 .getFieldGeneratorsProvider()
                 .getRemarksHolder()
                 .getCustomRemarks()
@@ -180,7 +173,7 @@ public class DtoGeneratorBuilder<T> {
      * @return dto builder instance
      */
     public DtoGenerator<T> build() {
-        return new DtoGenerator<>(fieldGeneratorsProvider, this);
+        return new DtoGenerator<>(fieldGeneratorsProvider);
     }
 
 }

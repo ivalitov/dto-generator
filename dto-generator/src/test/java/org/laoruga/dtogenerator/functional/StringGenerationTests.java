@@ -57,7 +57,6 @@ class StringGenerationTests {
                 () -> assertThat(dto.getPhoneNumLetters(), hasLength(24)),
                 () -> assertThat(dto.getPhoneNumLetters(), matchesRegex("^[a-zA-Z] [+]89 [(]\\d{3}[)] \\d{3}[-]\\d{2}-\\d{2} [а-яёА-ЯЁ]{2}$"))
         );
-        dto.getPhoneNumLetters();
         assertNotNull(dto);
         assertAll(
                 () -> assertNotNull(dto.getPhoneNum())
