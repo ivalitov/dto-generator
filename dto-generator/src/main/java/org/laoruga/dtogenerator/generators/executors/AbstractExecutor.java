@@ -30,7 +30,7 @@ public abstract class AbstractExecutor {
 
     public abstract boolean execute(Field field, IGenerator<?> generator);
 
-    protected boolean executeNext(Field field, IGenerator<?> generator) {
+    protected boolean executeNextInstead(Field field, IGenerator<?> generator) {
         return nextExecutor.execute(field, generator);
     }
 }

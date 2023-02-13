@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Pair;
-import org.laoruga.dtogenerator.FieldGroupFilter;
+import org.laoruga.dtogenerator.FieldFilter;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
@@ -28,7 +28,7 @@ import static org.laoruga.dtogenerator.rules.RulesInfoHelper.*;
 @Slf4j
 public class RulesInfoExtractor {
 
-    private final FieldGroupFilter fieldsGroupFilter;
+    private final FieldFilter fieldsGroupFilter;
 
     /**
      * @param field            - field whose annotations are to be examined

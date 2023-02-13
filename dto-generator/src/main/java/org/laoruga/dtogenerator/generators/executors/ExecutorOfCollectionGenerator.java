@@ -29,8 +29,10 @@ public class ExecutorOfCollectionGenerator extends ExecutorOfDtoDependentGenerat
                 }
                 return false;
             }
+
             return super.execute(field, generator);
         }
-        return executeNext(field, generator);
+
+        return executeNextInstead(field, generator);
     }
 }

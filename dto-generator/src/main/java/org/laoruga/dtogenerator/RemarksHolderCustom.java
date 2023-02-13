@@ -13,7 +13,7 @@ import java.util.*;
  * Created on 19.05.2022
  */
 
-public class CustomRemarksHolder {
+public class RemarksHolderCustom {
 
     private final Map<String, Set<ICustomRuleRemark>> customRuleRemarksMapByField;
     private final Map<Class<? extends ICustomGenerator<?>>, Set<ICustomRuleRemark>> customRuleRemarksMapByGenerator;
@@ -22,7 +22,7 @@ public class CustomRemarksHolder {
     private static final Set<ICustomRuleRemark> EMPTY_SET = Collections.unmodifiableSet(new HashSet<>());
     private static final Map<ICustomRuleRemark, ICustomRuleRemarkArgs> EMPTY_MAP = Collections.unmodifiableMap(new HashMap<>());
 
-    public CustomRemarksHolder() {
+    public RemarksHolderCustom() {
         this(new HashMap<>());
     }
 
@@ -31,11 +31,11 @@ public class CustomRemarksHolder {
      *
      * @param toCopy - source
      */
-    CustomRemarksHolder(CustomRemarksHolder toCopy) {
+    RemarksHolderCustom(RemarksHolderCustom toCopy) {
         this(toCopy.customRuleRemarksMapByGenerator);
     }
 
-    private CustomRemarksHolder(
+    private RemarksHolderCustom(
             Map<Class<? extends ICustomGenerator<?>>, Set<ICustomRuleRemark>> customRuleRemarksMapByGenerator) {
         this.customRuleRemarksMapByField = new HashMap<>();
         this.customRuleRemarksMapByGenerator = customRuleRemarksMapByGenerator;

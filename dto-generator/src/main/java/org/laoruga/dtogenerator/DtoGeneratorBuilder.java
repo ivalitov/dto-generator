@@ -42,7 +42,7 @@ public class DtoGeneratorBuilder<T> {
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
                 configuration,
                 new RemarksHolder(),
-                new FieldGroupFilter(),
+                new FieldFilter(),
                 new String[]{ROOT},
                 this::getDtoGeneratorBuildersTree,
                 dtoInstanceSupplier);

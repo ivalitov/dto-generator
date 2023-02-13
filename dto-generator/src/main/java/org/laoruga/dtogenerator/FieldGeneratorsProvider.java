@@ -49,7 +49,7 @@ public class FieldGeneratorsProvider {
 
     FieldGeneratorsProvider(DtoGeneratorInstanceConfig configuration,
                             RemarksHolder typeGeneratorRemarksProvider,
-                            FieldGroupFilter fieldGroupFilter,
+                            FieldFilter fieldsFilter,
                             String[] pathFromDtoRoot,
                             Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree,
                             ThreadLocal<Supplier<?>> dtoInstanceSupplier) {
@@ -59,7 +59,7 @@ public class FieldGeneratorsProvider {
         this.remarksHolder = typeGeneratorRemarksProvider;
         this.pathFromDtoRoot = pathFromDtoRoot;
         this.overriddenBuilders = new ConcurrentHashMap<>();
-        this.rulesInfoExtractor = new RulesInfoExtractor(fieldGroupFilter);
+        this.rulesInfoExtractor = new RulesInfoExtractor(fieldsFilter);
         this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
         this.generatorBuildersProvider = initGeneratorProviders(overriddenBuildersForFields);
         this.dtoInstanceSupplier = dtoInstanceSupplier;

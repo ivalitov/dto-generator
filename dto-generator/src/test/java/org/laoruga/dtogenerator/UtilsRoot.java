@@ -19,14 +19,14 @@ import java.util.stream.Collectors;
 public class UtilsRoot {
 
     public static RulesInfoExtractor getExtractorInstance(String... groups) {
-        FieldGroupFilter fieldGroupFilter;
+        FieldFilter fieldsFilter;
         if (groups.length == 0) {
-            fieldGroupFilter = new FieldGroupFilter();
+            fieldsFilter = new FieldFilter();
         } else {
-            fieldGroupFilter = new FieldGroupFilter();
-            fieldGroupFilter.includeGroups(groups);
+            fieldsFilter = new FieldFilter();
+            fieldsFilter.includeGroups(groups);
         }
-        return new RulesInfoExtractor(fieldGroupFilter);
+        return new RulesInfoExtractor(fieldsFilter);
     }
 
     public static Map<String, Exception> getErrorsMap(DtoGenerator<?> dtoGenerator) {

@@ -29,7 +29,7 @@ public class ExecutorOfDtoDependentGenerator extends ExecutorOfGenerator {
             }
             return false;
         }
-        return executeNext(field, generator);
+        return executeNextInstead(field, generator);
     }
 
     /**

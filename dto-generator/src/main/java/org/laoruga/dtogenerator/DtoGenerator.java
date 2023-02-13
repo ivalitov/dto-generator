@@ -33,7 +33,8 @@ public class DtoGenerator<T> {
     private BatchGeneratorsExecutor batchGeneratorsExecutor;
 
     protected DtoGenerator(FieldGeneratorsProvider fieldGeneratorsProvider) {
-        this.fieldGeneratorsProvider = fieldGeneratorsProvider;;
+        this.fieldGeneratorsProvider = fieldGeneratorsProvider;
+        ;
         this.dtoInstanceSupplier = fieldGeneratorsProvider.getDtoInstanceSupplier();
         this.errorsHolder = new ErrorsHolder();
     }
@@ -48,17 +49,26 @@ public class DtoGenerator<T> {
 
     @SuppressWarnings("unchecked")
     public T generateDto() {
+
         if (dtoInstanceSupplier.get() instanceof DtoInstanceSupplier) {
             ((DtoInstanceSupplier) dtoInstanceSupplier.get()).updateInstance();
         }
-        try {
 
+        try {
             synchronized (this) {
                 if (batchGeneratorsExecutor == null) {
+
+                    ExecutorOfGenerator generalGeneratorExecutor =
+                            new ExecutorOfGenerator(dtoInstanceSupplier);
+
+                    ExecutorOfCollectionGenerator collectionGeneratorExecutor =
+                            new ExecutorOfCollectionGenerator(dtoInstanceSupplier, generalGeneratorExecutor);
+
+                    ExecutorOfDtoDependentGenerator dtoDependentGeneratorExecutor =
+                            new ExecutorOfDtoDependentGenerator(dtoInstanceSupplier, collectionGeneratorExecutor);
+
                     batchGeneratorsExecutor = new BatchGeneratorsExecutor(
-                            new ExecutorOfDtoDependentGenerator(dtoInstanceSupplier,
-                                    new ExecutorOfCollectionGenerator(dtoInstanceSupplier,
-                                            new ExecutorOfGenerator(dtoInstanceSupplier))),
+                            dtoDependentGeneratorExecutor,
                             prepareGenerators(dtoInstanceSupplier.get().get().getClass(), new HashMap<>())
                     );
                 }

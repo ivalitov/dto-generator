@@ -15,12 +15,12 @@ import java.util.concurrent.atomic.AtomicReference;
  * Created on 19.05.2022
  */
 
-public class BasicRemarksHolder {
+public class RemarksHolderBasic {
 
     private final Map<String, IRuleRemark> basicRuleRemarksMapByField;
     private final AtomicReference<IRuleRemark> basicRuleRemarkForAnyField;
 
-    public BasicRemarksHolder() {
+    public RemarksHolderBasic() {
         this(new AtomicReference<>());
     }
 
@@ -29,11 +29,11 @@ public class BasicRemarksHolder {
      *
      * @param toCopy - source
      */
-    BasicRemarksHolder(BasicRemarksHolder toCopy) {
+    RemarksHolderBasic(RemarksHolderBasic toCopy) {
         this(toCopy.basicRuleRemarkForAnyField);
     }
 
-    private BasicRemarksHolder(AtomicReference<IRuleRemark> basicRuleRemarkForAnyField) {
+    private RemarksHolderBasic(AtomicReference<IRuleRemark> basicRuleRemarkForAnyField) {
         this.basicRuleRemarksMapByField = new HashMap<>();
         this.basicRuleRemarkForAnyField = basicRuleRemarkForAnyField;
     }

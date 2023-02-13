@@ -9,11 +9,11 @@ import lombok.Getter;
 @Getter
 public class RemarksHolder {
 
-    private final BasicRemarksHolder basicRemarks;
-    private final CustomRemarksHolder customRemarks;
+    private final RemarksHolderBasic basicRemarks;
+    private final RemarksHolderCustom customRemarks;
 
     public RemarksHolder() {
-        this(new BasicRemarksHolder(), new CustomRemarksHolder());
+        this(new RemarksHolderBasic(), new RemarksHolderCustom());
     }
 
     /**
@@ -22,11 +22,11 @@ public class RemarksHolder {
      * @param toCopy - source
      */
     RemarksHolder(RemarksHolder toCopy) {
-        this(new BasicRemarksHolder(toCopy.getBasicRemarks()),
-                new CustomRemarksHolder(toCopy.getCustomRemarks()));
+        this(new RemarksHolderBasic(toCopy.getBasicRemarks()),
+                new RemarksHolderCustom(toCopy.getCustomRemarks()));
     }
 
-    private RemarksHolder(BasicRemarksHolder basicRemarks, CustomRemarksHolder customRemarks) {
+    private RemarksHolder(RemarksHolderBasic basicRemarks, RemarksHolderCustom customRemarks) {
         this.basicRemarks = basicRemarks;
         this.customRemarks = customRemarks;
     }

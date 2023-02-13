@@ -12,12 +12,12 @@ import java.util.Set;
  * @author Il'dar Valitov
  * Created on 18.06.2022
  */
-public class FieldGroupFilter {
+public class FieldFilter {
 
     private boolean isNew = true;
     private final Set<String> includeGroups = new HashSet<>();
 
-    public FieldGroupFilter() {
+    public FieldFilter() {
         includeGroups.add(Group.DEFAULT);
     }
 
