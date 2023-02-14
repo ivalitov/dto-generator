@@ -38,8 +38,12 @@ public class NegativeTests {
 
     static Stream<Arguments> unappropriatedDataSet() {
         return Stream.of(
-                Arguments.of("string", NegativeTests.DtoNegative1.class, "builder's generated type: 'class java.lang.Integer' not matched to field type: class java.lang.String'"),
-                Arguments.of("loong", NegativeTests.DtoNegative2.class, "builder's generated type: 'class java.lang.Integer' not matched to field type: class java.lang.Long'"));
+                Arguments.of("string",
+                        NegativeTests.DtoNegative1.class,
+                        "- Builder's generated type: 'java.lang.Integer'\n- Field type: class java.lang.String'"),
+                Arguments.of("loong",
+                        NegativeTests.DtoNegative2.class,
+                        "- Builder's generated type: 'java.lang.Integer'\n- Field type: class java.lang.Long'"));
     }
 
     @ParameterizedTest

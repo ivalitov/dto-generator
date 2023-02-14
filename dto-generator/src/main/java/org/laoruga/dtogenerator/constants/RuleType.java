@@ -1,8 +1,9 @@
 package org.laoruga.dtogenerator.constants;
 
+import org.laoruga.dtogenerator.rules.RulesInfoHelper;
+
 import java.lang.annotation.Annotation;
 
-import static org.laoruga.dtogenerator.rules.RulesInfoHelper.*;
 
 /**
  * @author Il'dar Valitov
@@ -15,15 +16,22 @@ public enum RuleType {
     COLLECTION;
 
     public static RuleType getType(Annotation rule) {
-        if (isItCustomRule(rule)) {
-            return CUSTOM;
-        } else if (isItNestedRule(rule)) {
-            return NESTED;
-        } else if (isItCollectionRule(rule)) {
-            return COLLECTION;
-        } else {
-            return BASIC;
+        switch (RulesInfoHelper.getHelperType(rule)) {
+            case RULE:
+            case RULES:
+                return BASIC;
+
+            case RULE_FOR_COLLECTION:
+            case RULES_FOR_COLLECTION:
+                return COLLECTION;
+
+            case CUSTOM_RULE:
+                return CUSTOM;
+
+            case NESTED_DTO_RULE:
+                return NESTED;
         }
+        throw new IllegalArgumentException("Unexpected annotation: " + rule);
     }
 
 }

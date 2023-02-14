@@ -14,6 +14,7 @@ import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +34,8 @@ class FieldsGroupingTests {
     @NoArgsConstructor
     static class Dto {
 
+        // this annotation do not mean anything
+        @XmlTransient
         @StringRule(group = REQUIRED)
         String reqStr;
 

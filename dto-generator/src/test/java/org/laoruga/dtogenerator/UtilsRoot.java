@@ -3,8 +3,10 @@ package org.laoruga.dtogenerator;
 import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.laoruga.dtogenerator.config.DtoGeneratorConfig;
+import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
+import org.laoruga.dtogenerator.rules.FiledAnnotationCountValidator;
 import org.laoruga.dtogenerator.rules.RulesInfoExtractor;
 
 import java.lang.reflect.Field;
@@ -26,7 +28,9 @@ public class UtilsRoot {
             fieldsFilter = new FieldFilter();
             fieldsFilter.includeGroups(groups);
         }
-        return new RulesInfoExtractor(fieldsFilter);
+        return new RulesInfoExtractor(
+                new FiledAnnotationCountValidator(new DtoGeneratorInstanceConfig()),
+                fieldsFilter);
     }
 
     public static Map<String, Exception> getErrorsMap(DtoGenerator<?> dtoGenerator) {

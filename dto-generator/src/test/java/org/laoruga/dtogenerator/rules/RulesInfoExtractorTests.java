@@ -89,7 +89,7 @@ class RulesInfoExtractorTests {
                           boolean multiple,
                           RulesInfoExtractor rulesInfoExtractor) {
         Field field = UtilsRoot.getField(dtoClass, fieldName);
-        Optional<IRuleInfo> iRuleInfo = rulesInfoExtractor.checkAndWrapAnnotations(field);
+        Optional<IRuleInfo> iRuleInfo = rulesInfoExtractor.extractRulesInfo(field);
 
         assertTrue(iRuleInfo.isPresent());
         assertInstanceOf(RuleInfo.class, iRuleInfo.get());
@@ -132,7 +132,7 @@ class RulesInfoExtractorTests {
                              String group,
                              boolean multipleRules) {
         Field field = UtilsRoot.getField(dtoClass, fieldName);
-        Optional<IRuleInfo> iRuleInfo = rulesInfoExtractor.checkAndWrapAnnotations(field);
+        Optional<IRuleInfo> iRuleInfo = rulesInfoExtractor.extractRulesInfo(field);
 
         assertTrue(iRuleInfo.isPresent());
         assertInstanceOf(RuleInfoCollection.class, iRuleInfo.get());

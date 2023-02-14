@@ -11,6 +11,8 @@ import org.laoruga.dtogenerator.api.rules.meta.RulesForCollection;
 
 import java.lang.annotation.Annotation;
 
+import static org.laoruga.dtogenerator.rules.RulesInfoHelper.RuleTypeHelper.*;
+
 /**
  * @author Il'dar Valitov
  * Created on 11.11.2022
@@ -18,28 +20,43 @@ import java.lang.annotation.Annotation;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RulesInfoHelper {
 
-    public static boolean isItCollectionRule(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType().getDeclaredAnnotation(RuleForCollection.class) != null;
+    public static RuleTypeHelper getHelperType(Annotation ruleAnnotation) {
+        if (ruleAnnotation.annotationType().getDeclaredAnnotation(Rule.class) != null) {
+            return RULE;
+        }
+
+        if (ruleAnnotation.annotationType().getDeclaredAnnotation(RuleForCollection.class) != null) {
+            return RULE_FOR_COLLECTION;
+        }
+
+        if (ruleAnnotation.annotationType().getDeclaredAnnotation(Rules.class) != null) {
+            return RULES;
+        }
+
+        if (ruleAnnotation.annotationType().getDeclaredAnnotation(RulesForCollection.class) != null) {
+            return RULES_FOR_COLLECTION;
+        }
+
+        if (ruleAnnotation.annotationType() == CustomRule.class) {
+            return CUSTOM_RULE;
+        }
+
+        if (ruleAnnotation.annotationType() == NestedDtoRule.class) {
+            return NESTED_DTO_RULE;
+        }
+
+        return UNKNOWN;
+
     }
 
-    public static boolean isItCollectionRules(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType().getDeclaredAnnotation(RulesForCollection.class) != null;
-    }
-
-    public static boolean isItCustomRule(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType() == CustomRule.class;
-    }
-
-    public static boolean isItNestedRule(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType() == NestedDtoRule.class;
-    }
-
-    public static boolean isItRule(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType().getDeclaredAnnotation(Rule.class) != null;
-    }
-
-    public static boolean isItMultipleRules(Annotation ruleAnnotation) {
-        return ruleAnnotation.annotationType().getDeclaredAnnotation(Rules.class) != null;
+    public enum RuleTypeHelper {
+        RULE,
+        RULE_FOR_COLLECTION,
+        RULES,
+        RULES_FOR_COLLECTION,
+        CUSTOM_RULE,
+        NESTED_DTO_RULE,
+        UNKNOWN
     }
 
 }

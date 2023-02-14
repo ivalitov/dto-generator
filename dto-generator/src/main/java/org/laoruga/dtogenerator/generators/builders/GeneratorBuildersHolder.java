@@ -56,7 +56,7 @@ public final class GeneratorBuildersHolder {
     }
 
     /**
-     * Get builder by generated type with check of type matching
+     * Picks builder by generated type with checking of types matching
      *
      * @param rulesAnnotation - rule for pick generator
      * @param generatedType   - type supposed to be generated
@@ -79,9 +79,10 @@ public final class GeneratorBuildersHolder {
             return Optional.of(foundInfo.getBuilderSupplier().get());
         }
 
-        throw new DtoGeneratorException("For rules: '" + rulesAnnotation + "'" +
-                " builder's generated type: '" + buildersGeneratedType + "'" +
-                " not matched to field type: " + generatedType + "'.");
+        throw new DtoGeneratorException("Builder's generated type does not match to the field type:" +
+                "\n- Rules: '" + rulesAnnotation.annotationType().getName() + "'" +
+                "\n- Builder's generated type: '" + buildersGeneratedType.getName() + "'" +
+                "\n- Field type: " + generatedType + "'.");
     }
 
     public void addBuilder(Class<? extends Annotation> rulesClass,

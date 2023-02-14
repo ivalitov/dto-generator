@@ -64,6 +64,7 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
         IGenerator<?> generator;
 
+        // TODO consider ability to divide this method on to parts
         if (ruleInfo.isTypesEqual(RuleType.COLLECTION)) {
 
             Class<?> collectionElementType = ReflectionUtils.getSingleGenericType(field);
@@ -163,8 +164,8 @@ public class GeneratorBuildersProviderByAnnotation extends AbstractGeneratorBuil
 
     private IGeneratorBuilder getDefaultGenBuilder(Annotation rules, Class<?> generatedType) {
         return defaultGeneratorBuildersHolder.getBuilder(rules, generatedType)
-                .orElseThrow(() -> new DtoGeneratorException("General generator builder not found. Rules: '" + rules + "'"
-                        + ", Genrated type: '" + generatedType + "'"));
+                .orElseThrow(() -> new DtoGeneratorException("General generator builder not found. Rules: '"
+                        + rules + "', Genrated type: '" + generatedType + "'"));
     }
 
     private Optional<IGeneratorBuilder> getUsersGenBuilder(Annotation rules, Class<?> generatedType) {

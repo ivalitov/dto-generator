@@ -1,6 +1,8 @@
 package org.laoruga.dtogenerator;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
@@ -11,9 +13,9 @@ import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProvider;
 import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProviderByAnnotation;
 import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProviderByField;
 import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProviderByType;
+import org.laoruga.dtogenerator.rules.FiledAnnotationCountValidator;
 import org.laoruga.dtogenerator.rules.IRuleInfo;
 import org.laoruga.dtogenerator.rules.RulesInfoExtractor;
-import org.laoruga.dtogenerator.rules.RulesInfoHelper;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -59,7 +61,9 @@ public class FieldGeneratorsProvider {
         this.remarksHolder = typeGeneratorRemarksProvider;
         this.pathFromDtoRoot = pathFromDtoRoot;
         this.overriddenBuilders = new ConcurrentHashMap<>();
-        this.rulesInfoExtractor = new RulesInfoExtractor(fieldsFilter);
+        this.rulesInfoExtractor = new RulesInfoExtractor(
+                new FiledAnnotationCountValidator(configuration),
+                fieldsFilter);
         this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
         this.generatorBuildersProvider = initGeneratorProviders(overriddenBuildersForFields);
         this.dtoInstanceSupplier = dtoInstanceSupplier;
@@ -119,7 +123,7 @@ public class FieldGeneratorsProvider {
     }
 
     /**
-     * Returns generator Instance for field value generation
+     * Returns generator Instance for the field value generation
      *
      * @param field - validated field
      * @return empty optional if:
@@ -180,14 +184,10 @@ public class FieldGeneratorsProvider {
 
     private Optional<IRuleInfo> getRuleInfo(Field field) {
         try {
-            AnnotatingErrorsHandler.ResultDto validationResult =
-                    new AnnotatingErrorsHandler(field.getDeclaredAnnotations(), getConfiguration()).validate();
-            if (!validationResult.getResultString().isEmpty()) {
-                throw new DtoGeneratorException("Field annotated wrong:\n" + validationResult.getResultString());
-            }
-            return rulesInfoExtractor.checkAndWrapAnnotations(field);
+            return rulesInfoExtractor.extractRulesInfo(field);
         } catch (Exception e) {
-            throw new DtoGeneratorException("Error while extracting rule annotations from field: '" + field + "'", e);
+            throw new DtoGeneratorException("Error while extracting rule annotations from field: '"
+                    + field.getType() + " " + field.getName() + "'", e);
         }
     }
 
@@ -205,115 +205,4 @@ public class FieldGeneratorsProvider {
 
     }
 
-    /**
-     * @author Il'dar Valitov
-     * Created on 11.11.2022
-     */
-    @RequiredArgsConstructor
-    static class AnnotatingErrorsHandler {
-
-        private final Annotation[] annotations;
-        private final ResultDto resultDto = new ResultDto();
-        private final DtoGeneratorInstanceConfig configuration;
-
-        void count() {
-            for (Annotation annotation : annotations) {
-
-                if (RulesInfoHelper.isItRule(annotation)) {
-                    resultDto.generalRule++;
-                }
-
-                if (RulesInfoHelper.isItMultipleRules(annotation)) {
-                    resultDto.groupOfGeneralRules++;
-                }
-
-                if (RulesInfoHelper.isItCollectionRule(annotation)) {
-                    resultDto.collectionRule++;
-                }
-
-                if (RulesInfoHelper.isItCollectionRules(annotation)) {
-                    resultDto.groupOfCollectionRules++;
-                }
-            }
-        }
-
-        public ResultDto validate() {
-            count();
-            int idx = 0;
-
-            if (resultDto.generalRule > 1) {
-                resultDto.resultString
-                        .append(++idx)
-                        .append(". Found '")
-                        .append(resultDto.generalRule)
-                        .append("' @Rule annotations for various types, ")
-                        .append("expected 1 or 0.")
-                        .append("\n");
-            }
-
-            if (resultDto.groupOfGeneralRules > 1) {
-                resultDto.resultString
-                        .append(++idx)
-                        .append(". Found '")
-                        .append(resultDto.groupOfGeneralRules)
-                        .append("' @Rules annotations for various types, expected @Rules for single type only.")
-                        .append("\n");
-            }
-
-            if (resultDto.collectionRule > 1) {
-                resultDto.resultString
-                        .append(++idx)
-                        .append(". Found '")
-                        .append(resultDto.collectionRule)
-                        .append("' @CollectionRule annotations for various collection types, expected 1 or 0.")
-                        .append("\n");
-            }
-
-            if (resultDto.groupOfCollectionRules > 1) {
-                resultDto.resultString
-                        .append(++idx)
-                        .append(". Found '")
-                        .append(resultDto.groupOfCollectionRules)
-                        .append("' @CollectionRules annotations for various collection types, ")
-                        .append("expected @CollectionRules for single collection type only.")
-                        .append("\n");
-            }
-
-            if (!configuration.getGenerateAllKnownTypes() &&
-                    (resultDto.getSumOfCollectionRules() > 0) &&
-                    (resultDto.getSumOfCollectionRules() != resultDto.getSumOfGeneralRules())) {
-                resultDto.resultString
-                        .append(++idx)
-                        .append(". Missed @Rule annotation for item of collection.")
-                        .append("\n");
-            }
-
-            return resultDto;
-        }
-
-        @Getter
-        @AllArgsConstructor
-        @NoArgsConstructor
-        static class ResultDto {
-
-            private final StringBuilder resultString = new StringBuilder();
-            private int generalRule = 0;
-            private int groupOfGeneralRules = 0;
-            private int collectionRule = 0;
-            private int groupOfCollectionRules = 0;
-
-            public String getResultString() {
-                return resultString.toString();
-            }
-
-            int getSumOfCollectionRules() {
-                return collectionRule + groupOfCollectionRules;
-            }
-
-            int getSumOfGeneralRules() {
-                return generalRule + groupOfGeneralRules;
-            }
-        }
-
-    }
 }
