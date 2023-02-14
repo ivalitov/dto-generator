@@ -42,7 +42,7 @@ public class RulesInfoExtractor {
      * This method validates if {@link Rule} annotations represented in the correct quantity.
      * But doesn't validate whether {@link Rule} annotations matched to type of the field or not.
      *
-     * @param field - field containing {@link Rule} and/or {@link Rules annotations
+     * @param field - field containing {@link Rule} and/or {@link Rules} annotations
      * @return - an empty Optional if Rules excluded by group filter {@link FieldFilter},
      * otherwise {@link IRuleInfo} object containing rules information.
      * @throws DtoGeneratorValidationException - if rules annotations quantity check failed.
