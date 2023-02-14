@@ -10,7 +10,7 @@ import java.util.function.Supplier;
  */
 public class DtoInstanceSupplier implements Supplier<Object> {
 
-    private Object dtoInstance;
+    private final ThreadLocal<Object> threadLocalDtoInstance = new ThreadLocal<>();
     private final Class<?> dtoClass;
 
     public DtoInstanceSupplier(Class<?> dtoClass) {
@@ -19,27 +19,17 @@ public class DtoInstanceSupplier implements Supplier<Object> {
 
     @Override
     public Object get() {
-        if (dtoInstance == null) {
+        if (threadLocalDtoInstance.get() == null) {
             updateInstance();
         }
-        return dtoInstance;
+        return threadLocalDtoInstance.get();
     }
 
     public void updateInstance() {
-        dtoInstance = ReflectionUtils.createInstance(dtoClass);
+        threadLocalDtoInstance.set(ReflectionUtils.createInstance(dtoClass));
     }
 
-    static class StaticInstance implements Supplier<Object> {
-
-        private final Object dtoInstance;
-
-        public StaticInstance(Object dtoInstance) {
-            this.dtoInstance = dtoInstance;
-        }
-
-        @Override
-        public Object get() {
-            return dtoInstance;
-        }
+    public void remove() {
+        threadLocalDtoInstance.remove();
     }
 }

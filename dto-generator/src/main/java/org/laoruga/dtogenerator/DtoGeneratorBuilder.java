@@ -30,14 +30,14 @@ public class DtoGeneratorBuilder<T> {
     private final DtoGeneratorBuildersTree dtoGeneratorBuildersTree;
 
     DtoGeneratorBuilder(Class<T> dtoClass) {
-        this(ThreadLocal.withInitial(() -> new DtoInstanceSupplier(dtoClass)));
+        this(new DtoInstanceSupplier(dtoClass));
     }
 
     DtoGeneratorBuilder(T dtoInstance) {
-        this(ThreadLocal.withInitial(() -> new DtoInstanceSupplier.StaticInstance(dtoInstance)));
+        this(() -> dtoInstance);
     }
 
-    private DtoGeneratorBuilder(ThreadLocal<Supplier<?>> dtoInstanceSupplier) {
+    private DtoGeneratorBuilder(Supplier<?> dtoInstanceSupplier) {
         this.configuration = new DtoGeneratorInstanceConfig();
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
                 configuration,

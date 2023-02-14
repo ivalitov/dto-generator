@@ -36,7 +36,7 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.getDefaultMethodValu
 public class FieldGeneratorsProvider {
 
     private final DtoGeneratorInstanceConfig configuration;
-    private ThreadLocal<Supplier<?>> dtoInstanceSupplier;
+    private Supplier<?> dtoInstanceSupplier;
     private final String[] pathFromDtoRoot;
     private final Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree;
     private final RemarksHolder remarksHolder;
@@ -52,7 +52,7 @@ public class FieldGeneratorsProvider {
                             FieldFilter fieldsFilter,
                             String[] pathFromDtoRoot,
                             Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree,
-                            ThreadLocal<Supplier<?>> dtoInstanceSupplier) {
+                            Supplier<?> dtoInstanceSupplier) {
         this.configuration = configuration;
         this.overriddenBuildersForFields = new HashMap<>();
         this.userGenBuildersMapping = new GeneratorBuildersHolder();
@@ -89,7 +89,7 @@ public class FieldGeneratorsProvider {
      *
      * @param dtoInstanceSupplier dto instance to build
      */
-    void setDtoInstanceSupplier(ThreadLocal<Supplier<?>> dtoInstanceSupplier) {
+    void setDtoInstanceSupplier(DtoInstanceSupplier dtoInstanceSupplier) {
         try {
             this.dtoInstanceSupplier = dtoInstanceSupplier;
         } catch (ClassCastException e) {
@@ -144,7 +144,7 @@ public class FieldGeneratorsProvider {
                     generatorBuildersProvider.generatorBuildersProviderByAnnotation(
                             field,
                             maybeRulesInfo.get(),
-                            getDtoInstanceSupplier().get(),
+                            getDtoInstanceSupplier(),
                             createDtoGeneratorSupplier(field))
             );
         }
@@ -172,7 +172,7 @@ public class FieldGeneratorsProvider {
             DtoGeneratorBuilderTreeNode nestedDtoGeneratorBuilder =
                     dtoGeneratorBuildersTree.get().getBuilderLazy(pathToNestedDtoField);
             nestedDtoGeneratorBuilder.getFieldGeneratorsProvider().setDtoInstanceSupplier(
-                    ThreadLocal.withInitial(() -> new DtoInstanceSupplier(field.getType()))
+                    new DtoInstanceSupplier(field.getType())
             );
             return nestedDtoGeneratorBuilder.build();
         };

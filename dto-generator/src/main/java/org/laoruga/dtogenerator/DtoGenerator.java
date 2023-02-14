@@ -26,7 +26,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DtoGenerator<T> {
 
-    private final ThreadLocal<Supplier<?>> dtoInstanceSupplier;
+    private final Supplier<?> dtoInstanceSupplier;
+    private final boolean classBasedInstanceSupplier;
     private final FieldGeneratorsProvider fieldGeneratorsProvider;
     @Getter(AccessLevel.PACKAGE)
     private final ErrorsHolder errorsHolder;
@@ -35,6 +36,7 @@ public class DtoGenerator<T> {
     protected DtoGenerator(FieldGeneratorsProvider fieldGeneratorsProvider) {
         this.fieldGeneratorsProvider = fieldGeneratorsProvider;
         this.dtoInstanceSupplier = fieldGeneratorsProvider.getDtoInstanceSupplier();
+        this.classBasedInstanceSupplier = dtoInstanceSupplier instanceof DtoInstanceSupplier;
         this.errorsHolder = new ErrorsHolder();
     }
 
@@ -49,15 +51,15 @@ public class DtoGenerator<T> {
     @SuppressWarnings("unchecked")
     public T generateDto() {
 
-        if (dtoInstanceSupplier.get() instanceof DtoInstanceSupplier) {
-            ((DtoInstanceSupplier) dtoInstanceSupplier.get()).updateInstance();
+        if (classBasedInstanceSupplier) {
+            ((DtoInstanceSupplier) dtoInstanceSupplier).updateInstance();
         }
 
         Object dtoInstance;
 
         try {
 
-            dtoInstance = dtoInstanceSupplier.get().get();
+            dtoInstance = dtoInstanceSupplier.get();
 
             synchronized (this) {
                 if (batchGeneratorsExecutor == null) {
@@ -83,7 +85,9 @@ public class DtoGenerator<T> {
         } catch (Exception e) {
             throw new DtoGeneratorException(e);
         } finally {
-            dtoInstanceSupplier.remove();
+            if (classBasedInstanceSupplier) {
+                ((DtoInstanceSupplier) dtoInstanceSupplier).remove();
+            }
         }
 
         return (T) dtoInstance;

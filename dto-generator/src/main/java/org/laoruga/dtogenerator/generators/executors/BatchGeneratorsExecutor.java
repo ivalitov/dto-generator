@@ -34,17 +34,21 @@ public class BatchGeneratorsExecutor {
     }
 
     public void execute() {
-        boolean areAllCompleted = generatorMap.isEmpty();
+        try {
+            boolean areAllCompleted = generatorMap.isEmpty();
 
-        AtomicInteger attempt = new AtomicInteger(1);
+            AtomicInteger attempt = new AtomicInteger(1);
 
-        while (!areAllCompleted && maxAttempts > attempt.get()) {
-            areAllCompleted = executeEachRemaining(attempt);
-        }
+            while (!areAllCompleted && maxAttempts > attempt.get()) {
+                areAllCompleted = executeEachRemaining(attempt);
+            }
 
-        if (!areAllCompleted) {
-            logErrorInfo();
-            throw new DtoGeneratorException("Error while generators execution");
+            if (!areAllCompleted) {
+                logErrorInfo();
+                throw new DtoGeneratorException("Error while generators execution");
+            }
+        } finally {
+            notExecutedGeneratorsMap.remove();
         }
     }
 

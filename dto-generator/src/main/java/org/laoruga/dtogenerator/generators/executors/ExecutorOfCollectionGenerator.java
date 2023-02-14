@@ -12,7 +12,7 @@ import java.util.function.Supplier;
  */
 
 public class ExecutorOfCollectionGenerator extends ExecutorOfDtoDependentGenerator {
-    public ExecutorOfCollectionGenerator(ThreadLocal<Supplier<?>> dtoInstanceSupplier,
+    public ExecutorOfCollectionGenerator(Supplier<?> dtoInstanceSupplier,
                                          AbstractExecutor nextGenerator) {
         super(dtoInstanceSupplier, nextGenerator);
     }
