@@ -29,8 +29,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.laoruga.dtogenerator.UtilsRoot.resetStaticConfig;
+import static org.laoruga.dtogenerator.constants.Group.*;
 import static org.laoruga.dtogenerator.constants.RuleRemark.MAX_VALUE;
 import static org.laoruga.dtogenerator.constants.RuleRemark.MIN_VALUE;
+import static org.laoruga.dtogenerator.generators.builders.GeneratorBuildersFactory.*;
 
 /**
  * @author Il'dar Valitov
@@ -38,7 +40,6 @@ import static org.laoruga.dtogenerator.constants.RuleRemark.MIN_VALUE;
  */
 
 
-//TODO need tests with grouping
 @DisplayName("Overriding of generators")
 @Epic("GENERATORS_OVERRIDING")
 @Slf4j
@@ -50,9 +51,9 @@ class OverridingOfGeneratorsTests {
     basicGeneratorOverridden() {
 
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class)
-                .setGeneratorBuilder(StringRule.class, GeneratorBuildersFactory.stringBuilder().minLength(5).maxLength(5).chars("x"))
-                .setGeneratorBuilder(IntegerRule.class, GeneratorBuildersFactory.integerBuilder().minValue(1).maxValue(1))
-                .setGeneratorBuilder(LongRule.class, GeneratorBuildersFactory.longBuilder().minValue(2L).maxValue(2L))
+                .setGeneratorBuilder(StringRule.class, stringBuilder().minLength(5).maxLength(5).chars("x"))
+                .setGeneratorBuilder(IntegerRule.class, integerBuilder().minValue(1).maxValue(1))
+                .setGeneratorBuilder(LongRule.class, longBuilder().minValue(2L).maxValue(2L))
                 .setGeneratorBuilder(DoubleRule.class, GeneratorBuildersFactory.doubleBuilder().minValue(3D).maxValue(3D))
                 .setGeneratorBuilder(LocalDateTimeRule.class, GeneratorBuildersFactory.localDateTimeBuilder().leftShiftDays(0).rightShiftDays(0))
                 .setGeneratorBuilder(EnumRule.class, GeneratorBuildersFactory.enumBuilder().possibleEnumNames("PERSON"))
@@ -108,9 +109,9 @@ class OverridingOfGeneratorsTests {
     void fieldGeneratorOverridden() {
 
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class)
-                .setGeneratorBuilder("string", GeneratorBuildersFactory.stringBuilder().minLength(5).maxLength(5).chars("x"))
-                .setGeneratorBuilder("integer", GeneratorBuildersFactory.integerBuilder().minValue(1).maxValue(1))
-                .setGeneratorBuilder("aLong", GeneratorBuildersFactory.longBuilder().minValue(2L).maxValue(2L))
+                .setGeneratorBuilder("string", stringBuilder().minLength(5).maxLength(5).chars("x"))
+                .setGeneratorBuilder("integer", integerBuilder().minValue(1).maxValue(1))
+                .setGeneratorBuilder("aLong", longBuilder().minValue(2L).maxValue(2L))
                 .setGeneratorBuilder("aDouble", GeneratorBuildersFactory.doubleBuilder().minValue(3D).maxValue(3D))
                 .setGeneratorBuilder("localDateTime", GeneratorBuildersFactory.localDateTimeBuilder().leftShiftDays(0).rightShiftDays(0))
                 .setGeneratorBuilder("clientType", GeneratorBuildersFactory.enumBuilder().possibleEnumNames("PERSON"))
@@ -127,9 +128,9 @@ class OverridingOfGeneratorsTests {
                         .collectionInstance(LinkedList::new)
                         .minSize(1).maxSize(1))
 
-                .setGeneratorBuilder("innerDto.integer", GeneratorBuildersFactory.integerBuilder().minValue(123).maxValue(123))
-                .setGeneratorBuilder("innerDto.string", GeneratorBuildersFactory.stringBuilder().minLength(3).maxLength(3).chars("f"))
-                .setGeneratorBuilder("innerDto.aLong", GeneratorBuildersFactory.longBuilder().minValue(4L).maxValue(4L))
+                .setGeneratorBuilder("innerDto.integer", integerBuilder().minValue(123).maxValue(123))
+                .setGeneratorBuilder("innerDto.string", stringBuilder().minLength(3).maxLength(3).chars("f"))
+                .setGeneratorBuilder("innerDto.aLong", longBuilder().minValue(4L).maxValue(4L))
                 .setGeneratorBuilder("innerDto.aDouble", GeneratorBuildersFactory.doubleBuilder().minValue(5D).maxValue(5D))
                 .setGeneratorBuilder("innerDto.localDateTime", GeneratorBuildersFactory.localDateTimeBuilder().leftShiftDays(1).rightShiftDays(-1))
                 .setGeneratorBuilder("innerDto.clientType", GeneratorBuildersFactory.enumBuilder().possibleEnumNames("ORG"))
@@ -431,7 +432,7 @@ class OverridingOfGeneratorsTests {
         TypeGeneratorBuildersConfig staticConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig();
         TypeGeneratorBuildersConfig userConfig = builder.getUserConfig().getGenBuildersConfig();
 
-        builder.setGeneratorBuilder(StringRule.class, GeneratorBuildersFactory.stringBuilder()
+        builder.setGeneratorBuilder(StringRule.class, stringBuilder()
                 .chars("o")
                 .minLength(1)
                 .maxLength(1)
@@ -439,7 +440,7 @@ class OverridingOfGeneratorsTests {
         userConfig.getStringConfig().setMinLength(2);
         staticConfig.getStringConfig().setMaxLength(2);
 
-        builder.setGeneratorBuilder("integerWithRule", GeneratorBuildersFactory.integerBuilder()
+        builder.setGeneratorBuilder("integerWithRule", integerBuilder()
                 .maxValue(2)
                 .ruleRemark(MAX_VALUE));
 
@@ -539,11 +540,103 @@ class OverridingOfGeneratorsTests {
 
     }
 
+    @Getter
+    static class DtoWithGroup {
+        @StringRule(group = GROUP_1, minLength = 1, maxLength = 1)
+        @StringRule(group = GROUP_2, minLength = 2, maxLength = 2)
+        String string;
+
+        @IntegerRule
+        Integer integer;
+
+        @LongRule(group = GROUP_1)
+        Long aLong;
+
+        @ListRule(minSize = 1, maxSize = 1)
+        @StringRule
+        List<String> listOfString;
+
+        @SetRule(group = GROUP_2, minSize = 2, maxSize = 2)
+        @LongRule(group = GROUP_2)
+        Set<Long> setOfLong;
+
+        @DoubleRule(group = GROUP_2)
+        double aDouble;
+    }
+
+    @Test
+    @DisplayName("With Grouping")
+    void withGrouping() {
+        TypeGeneratorBuildersConfig gensConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig();
+        gensConfig.getDoubleConfig().setMaxValue(1D);
+        gensConfig.getDoubleConfig().setMinValue(1D);
+
+        DtoWithGroup dto = DtoGenerator.builder(DtoWithGroup.class)
+                .includeGroups(DEFAULT, GROUP_2)
+                .setGeneratorBuilder(StringRule.class, stringBuilder().minLength(5).maxLength(5).chars("x"))
+                .setGeneratorBuilder(IntegerRule.class, integerBuilder().minValue(5).maxValue(5))
+                .setGeneratorBuilder("aLong", () -> () -> 123L)
+                .build().generateDto();
+
+        DtoWithGroup dto_2 = DtoGenerator.builder(new DtoWithGroup())
+                .setGeneratorBuilder(StringRule.class, stringBuilder().minLength(5).maxLength(5).chars("x"))
+                .setGeneratorBuilder(IntegerRule.class, integerBuilder().minValue(5).maxValue(5))
+                .build().generateDto();
+
+        DtoWithGroup dto_3 = DtoGenerator.builder(DtoWithGroup.class)
+                .includeGroups(GROUP_2)
+                .setGeneratorBuilder(SetRule.class, setBuilder().minSize(1).maxSize(1))
+                .build().generateDto();
+
+        DtoWithGroup dto_4 = DtoGenerator.builder(new DtoWithGroup())
+                .includeGroups(DEFAULT)
+                .setGeneratorBuilder(StringRule.class, stringBuilder().minLength(4).maxLength(4).chars("x"))
+                .setGeneratorBuilder(ListRule.class, listBuilder().minSize(3).maxSize(3))
+                .build().generateDto();
+
+        assertAll(
+                // dto 1
+                () -> assertThat(dto.getString(), equalTo("xxxxx")),
+                () -> assertThat(dto.getInteger(), equalTo(5)),
+                () -> assertThat(dto.getALong(), equalTo(123L)),
+                () -> assertThat(dto.getListOfString().get(0), equalTo("xxxxx")),
+                () -> assertThat(dto.getSetOfLong(), notNullValue()),
+                () -> assertThat(dto.getADouble(), equalTo(1D)),
+
+                // dto 2
+                () -> assertThat(dto_2.getString(), nullValue()),
+                () -> assertThat(dto_2.getInteger(), notNullValue()),
+                () -> assertThat(dto_2.getALong(), nullValue()),
+                () -> assertThat(dto_2.getListOfString().get(0), notNullValue()),
+                () -> assertThat(dto_2.getSetOfLong(), nullValue()),
+                () -> assertThat(dto.getADouble(), equalTo(1D)),
+
+                // dto 3
+                () -> assertThat(dto_3.getString().length(), equalTo(2)),
+                () -> assertThat(dto_3.getInteger(), nullValue()),
+                () -> assertThat(dto_3.getALong(), nullValue()),
+                () -> assertThat(dto_3.getListOfString(), nullValue()),
+                () -> assertThat(dto_3.getSetOfLong(), hasSize(1)),
+                () -> assertThat(dto.getADouble(), equalTo(1D)),
+
+
+                // dto 4
+                () -> assertThat(dto_4.getString(), nullValue()),
+                () -> assertThat(dto_4.getInteger(), notNullValue()),
+                () -> assertThat(dto_4.getALong(), nullValue()),
+                () -> assertThat(dto_4.getListOfString(), hasSize(3)),
+                () -> assertThat(dto_4.getListOfString().get(1), equalTo("xxxx")),
+                () -> assertThat(dto_4.getSetOfLong(), nullValue()),
+                () -> assertThat(dto.getADouble(), equalTo(1D))
+
+        );
+
+    }
+
     @AfterEach
     @SneakyThrows
     void restoreConfig() {
         resetStaticConfig();
     }
-
 
 }

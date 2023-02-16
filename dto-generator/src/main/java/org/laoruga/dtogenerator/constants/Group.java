@@ -4,6 +4,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
+ * Just constants.
+ * Every rule annotation contains {@link Group#DEFAULT} group by default.
+ * Except the {@link Group#DEFAULT} there is no logic behind these values.
+ *
  * @author Il'dar Valitov
  * Created on 31.05.2022
  */
