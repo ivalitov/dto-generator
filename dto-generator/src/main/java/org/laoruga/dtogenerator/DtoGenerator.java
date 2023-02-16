@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 /**
  * DtoGenerator generates random field values:
- * 1) in passed object {@link DtoGenerator#builder(T)};
+ * 1) in passed object {@link DtoGenerator#builder(Object)};
  * 2) or in new objects instantiated by passed class {@link DtoGenerator#builder(Class)}.
  * DtoGenerator is thread safe, so you can use single instance to generate new objects
  * from different threads simultaneously.
