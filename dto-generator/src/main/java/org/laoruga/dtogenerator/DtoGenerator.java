@@ -19,6 +19,14 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
+ * DtoGenerator generates random field values:
+ * 1) in passed object {@link DtoGenerator#builder(T)};
+ * 2) or in new objects instantiated by passed class {@link DtoGenerator#builder(Class)}.
+ * DtoGenerator is thread safe, so you can use single instance to generate new objects
+ * from different threads simultaneously.
+ * Generation rules are configuring via {@link DtoGeneratorBuilder}.
+ * You can't change configuration after instantiating.
+ *
  * @author Il'dar Valitov
  * Created on 16.04.2022
  */
@@ -33,7 +41,7 @@ public class DtoGenerator<T> {
     private final ErrorsHolder errorsHolder;
     private BatchGeneratorsExecutor batchGeneratorsExecutor;
 
-    protected DtoGenerator(FieldGeneratorsProvider fieldGeneratorsProvider) {
+    DtoGenerator(FieldGeneratorsProvider fieldGeneratorsProvider) {
         this.fieldGeneratorsProvider = fieldGeneratorsProvider;
         this.dtoInstanceSupplier = fieldGeneratorsProvider.getDtoInstanceSupplier();
         this.classBasedInstanceSupplier = dtoInstanceSupplier instanceof DtoInstanceSupplier;

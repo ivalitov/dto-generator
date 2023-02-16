@@ -6,6 +6,7 @@ import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
+import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
@@ -17,6 +18,11 @@ import static org.laoruga.dtogenerator.DtoGeneratorBuildersTree.ROOT;
 import static org.laoruga.dtogenerator.util.StringUtils.splitPath;
 
 /**
+ * DtoGeneratorBuilder is configuring {@link DtoGenerator} instance.
+ * It allows to change default field values generation logic and
+ * update generation parameters from {@link Rule} annotations.
+ * It also allows to add your own custom generators for specific fields.
+ *
  * @author Il'dar Valitov
  * Created on 16.04.2022
  */

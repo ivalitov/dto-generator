@@ -88,7 +88,9 @@ public final class GeneratorBuildersHolder {
     public void addBuilder(Class<? extends Annotation> rulesClass,
                            Class<?> generatedType,
                            IGeneratorBuilder genBuilder) {
-        GeneratorBuilderInfo info = GeneratorBuilderInfo.createInstance(rulesClass, generatedType, () -> genBuilder);
+        GeneratorBuilderInfo info = GeneratorBuilderInfo.createInstance(
+                rulesClass, generatedType, () -> genBuilder
+        );
         addBuilder(info);
     }
 
