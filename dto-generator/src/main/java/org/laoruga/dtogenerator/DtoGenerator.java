@@ -56,6 +56,9 @@ public class DtoGenerator<T> {
         return new DtoGeneratorBuilder<>(dtoInstance);
     }
 
+    /**
+     * @return updated or new DTO instance containing generated data
+     */
     @SuppressWarnings("unchecked")
     public T generateDto() {
 

@@ -72,11 +72,24 @@ public class DtoGeneratorBuilder<T> {
         this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
     }
 
+    /**
+     * @return {@link DtoGenerator} instance
+     */
+    public DtoGenerator<T> build() {
+        return new DtoGenerator<>(fieldGeneratorsProvider);
+    }
+
+    /*
+     * Generator Builders Overriding
+     */
 
     /**
-     * @param rulesAnnotationClass - not collection only
-     * @param generatorBuilder     - builder of not collection type
-     * @return - this
+     * Overrides generator builder related to the rule annotation.
+     * Provided generator will be used for any field annotated with rule of provided class.
+     *
+     * @param rulesAnnotationClass - rules annotation class
+     * @param generatorBuilder     - field generator builder related to provided rules annotation
+     * @return - builder instance
      */
     public DtoGeneratorBuilder<T> setGeneratorBuilder(@NonNull Class<? extends Annotation> rulesAnnotationClass,
                                                       @NonNull IGeneratorBuilder generatorBuilder) {
@@ -84,11 +97,16 @@ public class DtoGeneratorBuilder<T> {
         return this;
     }
 
-
     /**
-     * @param fieldName        name of field to generate value
-     * @param generatorBuilder builder of generator of any type
-     * @return - this
+     * Overrides generator builder for the provided field only.
+     * If the field is in nested object, path to the field must contain a "path" leads
+     * to the field - sequence of field names separated by dots.
+     * For example, if DTO contains 'person' object, path to the 'age' field inside it
+     * will the following: 'person.age'
+     *
+     * @param fieldName        - name of the field or path to the field separated by dots
+     * @param generatorBuilder - field generator builder related to the provided field
+     * @return - builder instance
      */
     public DtoGeneratorBuilder<T> setGeneratorBuilder(@NonNull String fieldName,
                                                       @NonNull IGeneratorBuilder generatorBuilder) {
@@ -169,17 +187,6 @@ public class DtoGeneratorBuilder<T> {
 
     public DtoGeneratorInstanceConfig getUserConfig() {
         return configuration;
-    }
-
-    /*
-     * Build
-     */
-
-    /**
-     * @return dto builder instance
-     */
-    public DtoGenerator<T> build() {
-        return new DtoGenerator<>(fieldGeneratorsProvider);
     }
 
 }
