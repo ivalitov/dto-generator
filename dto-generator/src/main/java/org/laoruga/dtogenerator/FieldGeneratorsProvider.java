@@ -13,7 +13,6 @@ import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProvider;
 import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProviderByAnnotation;
 import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProviderByField;
 import org.laoruga.dtogenerator.generators.providers.GeneratorBuildersProviderByType;
-import org.laoruga.dtogenerator.rules.FiledAnnotationCountValidator;
 import org.laoruga.dtogenerator.rules.IRuleInfo;
 import org.laoruga.dtogenerator.rules.RulesInfoExtractor;
 
@@ -61,9 +60,7 @@ public class FieldGeneratorsProvider {
         this.remarksHolder = typeGeneratorRemarksProvider;
         this.pathFromDtoRoot = pathFromDtoRoot;
         this.overriddenBuilders = new ConcurrentHashMap<>();
-        this.rulesInfoExtractor = new RulesInfoExtractor(
-                new FiledAnnotationCountValidator(configuration),
-                fieldsFilter);
+        this.rulesInfoExtractor = new RulesInfoExtractor(fieldsFilter);
         this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
         this.generatorBuildersProvider = initGeneratorProviders(overriddenBuildersForFields);
         this.dtoInstanceSupplier = dtoInstanceSupplier;

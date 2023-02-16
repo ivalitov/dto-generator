@@ -8,12 +8,12 @@ import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.api.rules.meta.RuleForCollection;
 import org.laoruga.dtogenerator.api.rules.meta.Rules;
 import org.laoruga.dtogenerator.api.rules.meta.RulesForCollection;
-import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorValidationException;
 
 import java.lang.annotation.Annotation;
 
 /**
+ * Stateless helper.
  * Validates quantity of rule annotations of the field.
  * Validates that array of annotations contains:
  * - no more than one {@link Rule} annotation
@@ -26,11 +26,9 @@ import java.lang.annotation.Annotation;
  * Created on 11.11.2022
  */
 @RequiredArgsConstructor
-public class FiledAnnotationCountValidator {
+public class RuleAnnotationsValidationHelper {
 
-    private final DtoGeneratorInstanceConfig configuration;
-
-    public void validate(Annotation[] annotations) throws DtoGeneratorValidationException {
+    public static void validate(Annotation[] annotations) throws DtoGeneratorValidationException {
 
         ResultDto resultDto = countAnnotations(annotations);
 
@@ -74,9 +72,7 @@ public class FiledAnnotationCountValidator {
                     .append("\n");
         }
 
-        // TODO this leads to failure if item rule is absent
-        if (!configuration.getGenerateAllKnownTypes() &&
-                (resultDto.getSumOfCollectionRules() > 0) &&
+        if ((resultDto.getSumOfCollectionRules() > 0) &&
                 (resultDto.getSumOfCollectionRules() != resultDto.getSumOfGeneralRules())) {
             resultDto.getErrorsDescription()
                     .append(++idx)
@@ -91,7 +87,7 @@ public class FiledAnnotationCountValidator {
 
     }
 
-    private ResultDto countAnnotations(Annotation[] annotations) {
+    private static ResultDto countAnnotations(Annotation[] annotations) {
         final ResultDto resultDto = new ResultDto();
 
         for (Annotation annotation : annotations) {

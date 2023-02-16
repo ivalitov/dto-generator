@@ -30,8 +30,6 @@ import java.util.Set;
 @Slf4j
 public class RulesInfoExtractor {
 
-    private final FiledAnnotationCountValidator validator;
-
     private final FieldFilter fieldsGroupFilter;
     private RuleInfoBuilder ruleInfoBuilder;
 
@@ -40,7 +38,7 @@ public class RulesInfoExtractor {
      * considering the group {@link FieldFilter}.
      * <p>
      * This method validates if {@link Rule} annotations represented in the correct quantity.
-     * But doesn't validate whether {@link Rule} annotations matched to type of the field or not.
+     * But doesn't validate whether {@link Rule} annotations matched to the type of the field or not.
      *
      * @param field - field containing {@link Rule} and/or {@link Rules} annotations
      * @return - an empty Optional if Rules excluded by group filter {@link FieldFilter},
@@ -49,7 +47,7 @@ public class RulesInfoExtractor {
      */
     synchronized public Optional<IRuleInfo> extractRulesInfo(Field field) throws DtoGeneratorValidationException {
 
-        validator.validate(field.getAnnotations());
+        RuleAnnotationsValidationHelper.validate(field.getAnnotations());
 
         ruleInfoBuilder = new RuleInfoBuilder();
 
