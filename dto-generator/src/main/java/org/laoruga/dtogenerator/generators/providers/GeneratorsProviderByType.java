@@ -24,14 +24,14 @@ import java.util.function.BiFunction;
  * Created on 24.11.2022
  */
 @Slf4j
-public class GeneratorBuildersProviderByType extends AbstractGeneratorBuildersProvider {
+public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
 
     private final GeneratorBuildersHolder userGeneratorBuilders;
     private final GeneratorBuildersHolder generalGeneratorBuilders = GeneratorBuildersHolderGeneral.getInstance();
 
-    public  GeneratorBuildersProviderByType(DtoGeneratorInstanceConfig configuration,
-                                           GeneratorBuildersHolder userGeneratorBuilders,
-                                           RemarksHolder remarksHolder) {
+    public GeneratorsProviderByType(DtoGeneratorInstanceConfig configuration,
+                                    GeneratorBuildersHolder userGeneratorBuilders,
+                                    RemarksHolder remarksHolder) {
         super(configuration, remarksHolder);
         this.userGeneratorBuilders = userGeneratorBuilders;
     }

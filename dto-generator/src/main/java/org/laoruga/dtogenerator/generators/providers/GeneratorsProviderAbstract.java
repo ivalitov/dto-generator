@@ -20,13 +20,13 @@ import java.util.function.Supplier;
  * @author Il'dar Valitov
  * Created on 24.11.2022
  */
-public abstract class AbstractGeneratorBuildersProvider {
+public abstract class GeneratorsProviderAbstract {
 
     private final DtoGeneratorInstanceConfig configuration;
     @Getter(AccessLevel.PROTECTED)
     private final RemarksHolder remarksHolder;
 
-    protected AbstractGeneratorBuildersProvider(DtoGeneratorInstanceConfig configuration, RemarksHolder remarksHolder) {
+    protected GeneratorsProviderAbstract(DtoGeneratorInstanceConfig configuration, RemarksHolder remarksHolder) {
         this.configuration = configuration;
         this.remarksHolder = remarksHolder;
     }

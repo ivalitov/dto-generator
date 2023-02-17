@@ -7,9 +7,11 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersDefaultConfig;
+import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generators.EnumGenerator;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -17,15 +19,14 @@ import java.util.Map;
  * Created on 24.11.2022
  */
 @Slf4j
-public class GeneratorBuildersProviderByField extends AbstractGeneratorBuildersProvider {
+public class GeneratorsProviderByField extends GeneratorsProviderAbstract {
 
     private final Map<String, IGeneratorBuilder> overriddenBuildersForFields;
 
-    public GeneratorBuildersProviderByField(DtoGeneratorInstanceConfig configuration,
-                                            Map<String, IGeneratorBuilder> overriddenBuildersForFields,
-                                            RemarksHolder remarksHolder) {
+    public GeneratorsProviderByField(DtoGeneratorInstanceConfig configuration,
+                                     RemarksHolder remarksHolder) {
         super(configuration, remarksHolder);
-        this.overriddenBuildersForFields = overriddenBuildersForFields;
+        this.overriddenBuildersForFields = new HashMap<>();
     }
 
     public IGenerator<?> getGenerator(Field field) {
@@ -55,4 +56,14 @@ public class GeneratorBuildersProviderByField extends AbstractGeneratorBuildersP
         return genBuilder.build();
     }
 
+    public boolean isBuilderOverridden(String fieldName) {
+        return overriddenBuildersForFields.containsKey(fieldName);
+    }
+
+    public void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder genBuilder) {
+        if (overriddenBuildersForFields.containsKey(fieldName)) {
+            throw new DtoGeneratorException("Generator already has been added explicitly for the field: '" + fieldName + "'");
+        }
+        overriddenBuildersForFields.put(fieldName, genBuilder);
+    }
 }
