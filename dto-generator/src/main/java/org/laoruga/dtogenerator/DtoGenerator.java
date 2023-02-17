@@ -11,6 +11,7 @@ import org.laoruga.dtogenerator.generators.executors.ExecutorOfDtoDependentGener
 import org.laoruga.dtogenerator.generators.executors.ExecutorOfGenerator;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -111,6 +112,12 @@ public class DtoGenerator<T> {
         }
 
         for (Field field : dtoClass.getDeclaredFields()) {
+
+            if (Modifier.isFinal(field.getModifiers())) {
+                log.info("Skipping final field '" + field.getType() + " " + field.getName() + "'");
+                continue;
+            }
+
             Optional<IGenerator<?>> generator = Optional.empty();
             try {
                 generator = fieldGeneratorsProvider.getGenerator(field);
@@ -120,11 +127,13 @@ public class DtoGenerator<T> {
             generator.ifPresent(typeGeneratorInstance ->
                     generatorMap.put(field, typeGeneratorInstance));
         }
+
         if (!errorsHolder.isEmpty()) {
-            log.error("{} error(s) while generators preparation. See problems below: \n"
+            log.error("{} error(s) while generators preparation. See problems below:\n"
                     + errorsHolder, errorsHolder.getErrorsNumber());
             throw new DtoGeneratorException("Error while generators preparation (see log above)");
         }
+
         if (generatorMap.isEmpty()) {
             log.debug("Generators not found");
         } else {

@@ -4,6 +4,7 @@ package org.laoruga.dtogenerator.config;
  * @author Il'dar Valitov
  * Created on 29.11.2022
  */
+// TODO to see ways to refactor these setters and getters
 public class DtoGeneratorInstanceConfig {
 
     private final DtoGeneratorConfig staticConfig = DtoGeneratorStaticConfig.getInstance();
@@ -21,19 +22,19 @@ public class DtoGeneratorInstanceConfig {
         instanceConfig.setGenerateAllKnownTypes(generateAllKnownTypes);
     }
 
-    public Integer getMaxDependentGenerationCycles() {
+    public int getMaxDependentGenerationCycles() {
         return getOrDefault(
                 instanceConfig.getMaxDependentGenerationCycles(),
                 staticConfig.getMaxDependentGenerationCycles());
     }
 
-    public Integer getMaxCollectionGenerationCycles() {
+    public int getMaxCollectionGenerationCycles() {
         return getOrDefault(
                 instanceConfig.getMaxCollectionGenerationCycles(),
                 staticConfig.getMaxCollectionGenerationCycles());
     }
 
-    public Boolean getGenerateAllKnownTypes() {
+    public boolean getGenerateAllKnownTypes() {
         return getOrDefault(
                 instanceConfig.getGenerateAllKnownTypes(),
                 staticConfig.getGenerateAllKnownTypes());

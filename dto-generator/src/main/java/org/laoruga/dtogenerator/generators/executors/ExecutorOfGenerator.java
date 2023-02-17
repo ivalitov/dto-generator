@@ -21,12 +21,11 @@ public class ExecutorOfGenerator extends AbstractExecutor {
     }
 
     public ExecutorOfGenerator(Supplier<?> dtoInstanceSupplier,
-                                   AbstractExecutor nextExecutor) {
+                               AbstractExecutor nextExecutor) {
         super(nextExecutor);
         this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
-    // TODO consolidate errors
     @Override
     public boolean execute(Field field, IGenerator<?> generator) {
         Object result;
@@ -35,7 +34,7 @@ public class ExecutorOfGenerator extends AbstractExecutor {
         } catch (Exception e) {
             throw new DtoGeneratorException("Error while generating value for the field: " + field, e);
         }
-            try {
+        try {
             field.setAccessible(true);
             field.set(dtoInstanceSupplier.get(), result);
         } catch (Exception e) {
