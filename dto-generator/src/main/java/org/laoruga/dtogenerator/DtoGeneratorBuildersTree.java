@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Tree of generator builders when nested DTOs exist.
+ * Tree for storing generators for nested DTOs.
  */
 public class DtoGeneratorBuildersTree {
 
@@ -16,12 +16,12 @@ public class DtoGeneratorBuildersTree {
         this.tree = rootNode;
     }
 
-    public DtoGeneratorBuilderTreeNode getBuilderLazy(String[] fields) {
+    public DtoGeneratorBuilder<?> getBuilderLazy(String[] fields) {
         if (fields.length < 1) {
             throw new IllegalArgumentException(
                     "Field path must contain at least 1 element, but was: " + Arrays.asList(fields));
         }
-        return getBuilderLazy(fields, 0, tree);
+        return getBuilderLazy(fields, 0, tree).getDtoGeneratorBuilder();
     }
 
     private DtoGeneratorBuilderTreeNode getBuilderLazy(String[] fields, int idx, DtoGeneratorBuilderTreeNode node) {

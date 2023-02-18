@@ -34,6 +34,8 @@ public class DtoGeneratorBuilder<T> {
     private final FieldGeneratorsProvider fieldGeneratorsProvider;
     @Getter(AccessLevel.PROTECTED)
     private final DtoGeneratorBuildersTree dtoGeneratorBuildersTree;
+    @Getter(AccessLevel.PROTECTED)
+    private final RemarksHolder remarksHolder;
 
     DtoGeneratorBuilder(Class<T> dtoClass) {
         this(new DtoInstanceSupplier(dtoClass));
@@ -45,9 +47,10 @@ public class DtoGeneratorBuilder<T> {
 
     private DtoGeneratorBuilder(Supplier<?> dtoInstanceSupplier) {
         this.configuration = new DtoGeneratorInstanceConfig();
+        this.remarksHolder = new RemarksHolder();
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
                 configuration,
-                new RemarksHolder(),
+                remarksHolder,
                 new FieldFilter(),
                 new String[]{ROOT},
                 this::getDtoGeneratorBuildersTree,
@@ -60,17 +63,20 @@ public class DtoGeneratorBuilder<T> {
     /**
      * Constructor to copy builder for nested DTO generation.
      *
-     * @param configuration            - configuration instance
-     * @param fieldGeneratorsProvider  - generators provider for field values
-     * @param dtoGeneratorBuildersTree - generator builders tree
+     * @param copyFrom source builder
+     * @param pathFromRootDto path to nested dto
      */
-    protected DtoGeneratorBuilder(DtoGeneratorInstanceConfig configuration,
-                                  FieldGeneratorsProvider fieldGeneratorsProvider,
-                                  DtoGeneratorBuildersTree dtoGeneratorBuildersTree) {
-        this.configuration = configuration;
-        this.fieldGeneratorsProvider = fieldGeneratorsProvider;
-        this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
+
+    protected DtoGeneratorBuilder(DtoGeneratorBuilder<?> copyFrom, String[] pathFromRootDto) {
+        this.remarksHolder = new RemarksHolder(copyFrom.getRemarksHolder());
+        this.configuration = copyFrom.getConfiguration();
+        this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
+                copyFrom.getFieldGeneratorsProvider(),
+                remarksHolder,
+                pathFromRootDto);
+        this.dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
     }
+
 
     /**
      * @return {@link DtoGenerator} instance
@@ -125,7 +131,6 @@ public class DtoGeneratorBuilder<T> {
                                                 @NonNull RuleRemark ruleRemark) throws DtoGeneratorException {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
-                .getFieldGeneratorsProvider()
                 .getRemarksHolder()
                 .getBasicRemarks()
                 .setBasicRuleRemarkForField(fieldNameAndPath.getLeft(), ruleRemark);
@@ -133,8 +138,7 @@ public class DtoGeneratorBuilder<T> {
     }
 
     public DtoGeneratorBuilder<T> setRuleRemark(@NonNull RuleRemark basicRuleRemark) throws DtoGeneratorException {
-        getFieldGeneratorsProvider()
-                .getRemarksHolder()
+        getRemarksHolder()
                 .getBasicRemarks()
                 .setBasicRuleRemarkForAnyField(basicRuleRemark);
         return this;
@@ -148,7 +152,6 @@ public class DtoGeneratorBuilder<T> {
                                                 @NonNull ICustomRuleRemark ruleRemark) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
-                .getFieldGeneratorsProvider()
                 .getRemarksHolder()
                 .getCustomRemarks()
                 .addRemark(fieldNameAndPath.getLeft(), ruleRemark);
@@ -156,8 +159,7 @@ public class DtoGeneratorBuilder<T> {
     }
 
     public DtoGeneratorBuilder<T> addRuleRemark(@NonNull ICustomRuleRemark ruleRemarks) {
-        fieldGeneratorsProvider
-                .getRemarksHolder()
+        getRemarksHolder()
                 .getCustomRemarks()
                 .addRemarkForAnyField(ruleRemarks);
         return this;

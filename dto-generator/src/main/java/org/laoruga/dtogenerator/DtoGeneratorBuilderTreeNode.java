@@ -11,24 +11,17 @@ import static org.laoruga.dtogenerator.DtoGeneratorBuildersTree.ROOT;
  * @author Il'dar Valitov
  * Created on 31.01.2023
  */
-public class DtoGeneratorBuilderTreeNode extends DtoGeneratorBuilder<Object> {
+public class DtoGeneratorBuilderTreeNode  {
 
     @Getter
     private final String fieldName;
     @Getter
+    private final DtoGeneratorBuilder<?> dtoGeneratorBuilder;
+    @Getter
     private final List<DtoGeneratorBuilderTreeNode> children = new LinkedList<>();
 
     private DtoGeneratorBuilderTreeNode(DtoGeneratorBuilder<?> toCopy, String fieldName) {
-        super(toCopy.getConfiguration(),
-                toCopy.getFieldGeneratorsProvider(),
-                toCopy.getDtoGeneratorBuildersTree());
-        this.fieldName = fieldName;
-    }
-
-    public DtoGeneratorBuilderTreeNode(DtoGeneratorBuilder<?> toCopy, String fieldName, String[] pathFromRootDto) {
-        super(toCopy.getConfiguration(),
-                new FieldGeneratorsProvider(toCopy.getFieldGeneratorsProvider(), pathFromRootDto),
-                toCopy.getDtoGeneratorBuildersTree());
+        this.dtoGeneratorBuilder = toCopy;
         this.fieldName = fieldName;
     }
 
@@ -36,9 +29,11 @@ public class DtoGeneratorBuilderTreeNode extends DtoGeneratorBuilder<Object> {
         return new DtoGeneratorBuilderTreeNode(dtoGenBuilder, ROOT);
     }
 
-    public static DtoGeneratorBuilderTreeNode createNode(DtoGeneratorBuilder<?> dtoGenBuilder,
+    public static DtoGeneratorBuilderTreeNode createNode(DtoGeneratorBuilderTreeNode dtoGenBuilder,
                                                          String fieldName,
                                                          String[] pathFromRootDto) {
-        return new DtoGeneratorBuilderTreeNode(dtoGenBuilder, fieldName, pathFromRootDto);
+        return new DtoGeneratorBuilderTreeNode(
+                new DtoGeneratorBuilder<>(dtoGenBuilder.getDtoGeneratorBuilder(), pathFromRootDto),
+                fieldName);
     }
 }
