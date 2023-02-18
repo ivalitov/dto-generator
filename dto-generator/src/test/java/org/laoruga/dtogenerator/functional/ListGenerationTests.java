@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Il'dar Valitov
  * Created on 03.05.2022
  */
-// TODO To check and handle situation when item rules and generic are not the same
 @DisplayName("List Type Generators Tests")
 @Epic("LIST_RULES")
 class ListGenerationTests {
@@ -194,6 +193,32 @@ class ListGenerationTests {
         assertTrue(errorsMap.containsKey("listOfString"));
         assertThat(errorsMap.get("listOfString").getCause().getMessage(),
                 stringContainsInOrder("Missed @Rule annotation for item of collection"));
+
+    }
+
+    static class Dto3 {
+
+        @ListRule
+        @IntegerRule
+        List<String> some;
+
+    }
+
+    @Test
+    @Feature("NEGATIVE_TESTS")
+    @DisplayName("Some")
+    void some() {
+
+        DtoGenerator<Dto3> generator = DtoGenerator.builder(Dto3.class).build();
+
+        assertThrows(DtoGeneratorException.class, generator::generateDto);
+
+        Map<String, Exception> errorsMap = UtilsRoot.getErrorsMap(generator);
+
+        assertThat(errorsMap.size(), equalTo(1));
+        assertThat(errorsMap.get("some").getMessage(),
+                stringContainsInOrder("Builder's generated type does not match to the field type"));
+
 
     }
 

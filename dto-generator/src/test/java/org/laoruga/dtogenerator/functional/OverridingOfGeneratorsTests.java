@@ -422,7 +422,6 @@ class OverridingOfGeneratorsTests {
         Set<String> setOfStringWithEmptyRule;
     }
 
-    // TODO need more coverage
     @Test
     @DisplayName("Overridden builders and configs combinations")
     void overriddenBuildersAndConfigsCombination() {

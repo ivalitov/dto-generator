@@ -59,7 +59,7 @@ public class DtoGeneratorBuilder<T> {
     }
 
     /**
-     * Constructor to copy builder for nested DTO generation.
+     * Constructor for copying a builder for nested DTO generation.
      *
      * @param copyFrom source builder
      * @param pathFromRootDto path to nested dto
