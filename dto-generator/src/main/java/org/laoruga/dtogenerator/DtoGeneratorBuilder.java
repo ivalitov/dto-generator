@@ -55,9 +55,7 @@ public class DtoGeneratorBuilder<T> {
                 new String[]{ROOT},
                 this::getDtoGeneratorBuildersTree,
                 dtoInstanceSupplier);
-        this.dtoGeneratorBuildersTree = new DtoGeneratorBuildersTree(
-                DtoGeneratorBuilderTreeNode.createRootNode(this)
-        );
+        this.dtoGeneratorBuildersTree = new DtoGeneratorBuildersTree(this);
     }
 
     /**
