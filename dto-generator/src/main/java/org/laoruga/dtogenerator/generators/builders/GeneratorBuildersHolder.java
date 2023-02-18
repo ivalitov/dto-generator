@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * An object contains all the possible to use generator providers.
+ * An instance contain all the possible to use generator providers.
  * It gives methods to retrieving generators by generated type or @Rules.
  *
  * @author Il'dar Valitov

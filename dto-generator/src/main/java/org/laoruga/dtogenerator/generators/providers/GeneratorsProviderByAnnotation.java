@@ -39,7 +39,7 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
 
     private final GeneratorsProviderByType generatorsProviderByType;
     private final GeneratorBuildersHolder userGeneratorBuildersHolder;
-    private final GeneratorBuildersHolder defaultGeneratorBuildersHolder = GeneratorBuildersHolderGeneral.getInstance();
+    private final GeneratorBuildersHolder defaultGeneratorBuildersHolder;
 
     public GeneratorsProviderByAnnotation(DtoGeneratorInstanceConfig configuration,
                                           GeneratorsProviderByType generatorsProviderByType,
@@ -48,6 +48,7 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
         super(configuration, remarksHolder);
         this.generatorsProviderByType = generatorsProviderByType;
         this.userGeneratorBuildersHolder = userGeneratorBuildersHolder;
+        this.defaultGeneratorBuildersHolder = GeneratorBuildersHolderGeneral.getInstance();
     }
 
     protected IGenerator<?> getGenerator(Field field,

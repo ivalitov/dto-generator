@@ -20,10 +20,9 @@ import java.util.function.Supplier;
  */
 public class GeneratorProvidersMediator {
 
-    private final GeneratorsProviderByField generatorBuildersProviderOverriddenForField;
+    private final GeneratorsProviderByField generatorProviderOverriddenForField;
     private final GeneratorsProviderByType generatorsProviderByType;
     private final generatorsProviderByAnnotationSupportingCollections generatorsProviderByAnnotation;
-    private final RemarksHolder remarksHolder;
 
     public GeneratorProvidersMediator(DtoGeneratorInstanceConfig configuration,
                                       GeneratorBuildersHolder userGenBuildersMapping,
@@ -32,7 +31,7 @@ public class GeneratorProvidersMediator {
                 configuration,
                 userGenBuildersMapping,
                 remarksHolder);
-        generatorBuildersProviderOverriddenForField = new GeneratorsProviderByField(
+        generatorProviderOverriddenForField = new GeneratorsProviderByField(
                 configuration,
                 remarksHolder);
         generatorsProviderByAnnotation =
@@ -41,42 +40,37 @@ public class GeneratorProvidersMediator {
                         generatorsProviderByType,
                         remarksHolder,
                         userGenBuildersMapping);
-        this.remarksHolder = remarksHolder;
     }
 
-    public RemarksHolder getRemarksHolder() {
-        return remarksHolder;
-    }
+    /*
+     * By field
+     */
 
-    //    /**
-//     * Constructor to copy
-//     *
-//     * @param generatorsProvider copy from
-//     */
-//    public GeneratorProvidersMediator(GeneratorProvidersMediator generatorsProvider) {
-//        this(generatorsProvider.generatorBuildersProviderOverriddenForField,
-//                generatorsProvider.generatorsProviderByType,
-//                generatorsProvider.generatorsProviderByAnnotation);
-//    }
-
-    public boolean isBuilderOverridden(String fieldName) {
-        return generatorBuildersProviderOverriddenForField.isBuilderOverridden(fieldName);
+    public boolean isGeneratorBuilderOverridden(String fieldName) {
+        return generatorProviderOverriddenForField.isBuilderOverridden(fieldName);
     }
 
     public void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder genBuilder) {
-        generatorBuildersProviderOverriddenForField.setGeneratorBuilderForField(fieldName, genBuilder);
+        generatorProviderOverriddenForField.setGeneratorBuilderForField(fieldName, genBuilder);
     }
 
     public IGenerator<?> getGeneratorOverriddenForField(Field field) {
-        return generatorBuildersProviderOverriddenForField.getGenerator(field);
+        return generatorProviderOverriddenForField.getGenerator(field);
     }
 
+    /*
+     * By type
+     */
 
     public Optional<IGenerator<?>> getGeneratorsByType(Field field, Class<?> generatedType) {
         return generatorsProviderByType
                 .getGenerator(field, generatedType)
                 .map(Objects::requireNonNull);
     }
+
+    /*
+     * By rules annotation
+     */
 
     public IGenerator<?> getGeneratorByAnnotation(Field field,
                                                   IRuleInfo ruleInfo,

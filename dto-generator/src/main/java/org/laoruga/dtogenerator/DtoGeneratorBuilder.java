@@ -180,7 +180,7 @@ public class DtoGeneratorBuilder<T> {
      */
     public DtoGeneratorBuilder<T> includeGroups(String... groups) {
         if (groups != null && groups.length != 0) {
-            fieldGeneratorsProvider.getRulesInfoExtractor().getFieldsGroupFilter().includeGroups(groups);
+            fieldGeneratorsProvider.addGroups(groups);
         }
         return this;
     }

@@ -36,9 +36,7 @@ public class FieldGeneratorsProvider {
     private Supplier<?> dtoInstanceSupplier;
     private final String[] pathFromDtoRoot;
     private final Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree;
-    private final Map<Class<? extends Annotation>, IGeneratorBuilder> overriddenBuilders;
     private final GeneratorBuildersHolder userGenBuildersMapping;
-    @Getter
     private final RulesInfoExtractor rulesInfoExtractor;
     private final GeneratorProvidersMediator generatorProvidersMediator;
 
@@ -51,24 +49,23 @@ public class FieldGeneratorsProvider {
         this.configuration = configuration;
         this.userGenBuildersMapping = new GeneratorBuildersHolder();
         this.pathFromDtoRoot = pathFromDtoRoot;
-        this.overriddenBuilders = new HashMap<>();
         this.rulesInfoExtractor = new RulesInfoExtractor(fieldsFilter);
         this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
-        this.generatorProvidersMediator = new GeneratorProvidersMediator(configuration, userGenBuildersMapping, remarksProvider);
+        this.generatorProvidersMediator = new GeneratorProvidersMediator(
+                configuration,
+                userGenBuildersMapping,
+                remarksProvider
+        );
         this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
     /**
      * Constructor to copy
-     *
-     * @param copyFrom      source object
-     * @param remarksHolder
      */
     FieldGeneratorsProvider(FieldGeneratorsProvider copyFrom, RemarksHolder remarksHolder, String[] pathFromDtoRoot) {
         this.configuration = copyFrom.getConfiguration();
         this.userGenBuildersMapping = copyFrom.getUserGenBuildersMapping();
         this.pathFromDtoRoot = pathFromDtoRoot;
-        this.overriddenBuilders = copyFrom.getOverriddenBuilders();
         this.rulesInfoExtractor = copyFrom.getRulesInfoExtractor();
         this.dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
         this.generatorProvidersMediator = new GeneratorProvidersMediator(
@@ -93,7 +90,7 @@ public class FieldGeneratorsProvider {
     }
 
     /**
-     * Returns generator Instance for the field value generation
+     * Returns generator instance for the field value generation.
      *
      * @param field - validated field
      * @return empty optional if:
@@ -105,9 +102,10 @@ public class FieldGeneratorsProvider {
     Optional<IGenerator<?>> getGenerator(Field field) {
 
         // generator was set explicitly
-        if (generatorProvidersMediator.isBuilderOverridden(field.getName())) {
+        if (generatorProvidersMediator.isGeneratorBuilderOverridden(field.getName())) {
             return Optional.of(
-                    generatorProvidersMediator.getGeneratorOverriddenForField(field));
+                    generatorProvidersMediator.getGeneratorOverriddenForField(field)
+            );
         }
 
         Optional<IRuleInfo> maybeRulesInfo = getRuleInfo(field);
@@ -123,7 +121,7 @@ public class FieldGeneratorsProvider {
             );
         }
 
-        // try to generate value by field type
+        // attempt to generate value by field type
         if (getConfiguration().getGenerateAllKnownTypes()) {
             return generatorProvidersMediator.getGeneratorsByType(field, field.getType());
         }
@@ -133,6 +131,24 @@ public class FieldGeneratorsProvider {
 
     void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder genBuilder) throws DtoGeneratorException {
         generatorProvidersMediator.setGeneratorBuilderForField(fieldName, genBuilder);
+    }
+
+    void overrideGenerator(Class<? extends Annotation> rulesClass, @NonNull IGeneratorBuilder genBuilder) {
+        try {
+            Class<?> generatedType = getDefaultMethodValue(rulesClass, "generatedType", Class.class);
+            userGenBuildersMapping.addBuilder(
+                    rulesClass,
+                    generatedType,
+                    genBuilder);
+        } catch (NoSuchMethodException e) {
+            throw new DtoGeneratorException("Rules annotation '" + rulesClass.getName() +
+                    "' does not contain 'generatedType' method with return type 'Class'", e);
+        }
+
+    }
+
+    void addGroups(String[] groups) {
+        rulesInfoExtractor.getFieldsGroupFilter().includeGroups(groups);
     }
 
     private Supplier<DtoGenerator<?>> createDtoGeneratorSupplier(Field field) {
@@ -153,23 +169,8 @@ public class FieldGeneratorsProvider {
         try {
             return rulesInfoExtractor.extractRulesInfo(field);
         } catch (Exception e) {
-            throw new DtoGeneratorException("Error while extracting rule annotations from field: '"
+            throw new DtoGeneratorException("Error while extracting rule annotations from the field: '"
                     + field.getType() + " " + field.getName() + "'", e);
         }
     }
-
-    void overrideGenerator(Class<? extends Annotation> rulesClass, @NonNull IGeneratorBuilder genBuilder) {
-        try {
-            Class<?> generatedType = getDefaultMethodValue(rulesClass, "generatedType", Class.class);
-            getUserGenBuildersMapping().addBuilder(
-                    rulesClass,
-                    generatedType,
-                    genBuilder);
-        } catch (NoSuchMethodException e) {
-            throw new DtoGeneratorException("Rules annotation '" + rulesClass.getName() +
-                    "' does not contain 'generatedType' method with return type 'Class'", e);
-        }
-
-    }
-
 }

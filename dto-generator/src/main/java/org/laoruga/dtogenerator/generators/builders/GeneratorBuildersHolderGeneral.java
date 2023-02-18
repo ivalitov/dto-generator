@@ -18,69 +18,69 @@ public final class GeneratorBuildersHolderGeneral {
 
     public static synchronized GeneratorBuildersHolder getInstance() {
         if (instance == null) {
-            instance = init();
+            instance = createInstance();
         }
         return instance;
     }
 
-    private static GeneratorBuildersHolder init() {
+    private static GeneratorBuildersHolder createInstance() {
         GeneratorBuildersHolder generatorBuildersHolder = new GeneratorBuildersHolder();
 
         // general
         generatorBuildersHolder.addBuilder(
-                createInstance(
+                GeneratorBuilderInfo.createInstance(
                         StringRule.class,
                         RulesInstance.stringRule.generatedType(),
                         GeneratorBuildersFactory::stringBuilder));
         generatorBuildersHolder.addBuilder(
-                createInstance(
+                GeneratorBuilderInfo.createInstance(
                         IntegerRule.class,
                         RulesInstance.integerRule.generatedType(),
                         Integer.TYPE,
                         GeneratorBuildersFactory::integerBuilder));
         generatorBuildersHolder.addBuilder(
-                createInstance(
+                GeneratorBuilderInfo.createInstance(
                         DoubleRule.class,
                         RulesInstance.doubleRule.generatedType(),
                         Double.TYPE,
                         GeneratorBuildersFactory::doubleBuilder));
         generatorBuildersHolder.addBuilder(
-                createInstance(
+                GeneratorBuilderInfo.createInstance(
                         LongRule.class,
                         RulesInstance.longRule.generatedType(),
                         Long.TYPE,
                         GeneratorBuildersFactory::longBuilder));
         generatorBuildersHolder.addBuilder(
-                createInstance(
+                GeneratorBuilderInfo.createInstance(
                         EnumRule.class,
                         RulesInstance.enumRule.generatedType(),
                         GeneratorBuildersFactory::enumBuilder));
         generatorBuildersHolder.addBuilder(
-                createInstance(
+                GeneratorBuilderInfo.createInstance(
                         LocalDateTimeRule.class,
                         RulesInstance.localDateTimeRule.generatedType(),
                         GeneratorBuildersFactory::localDateTimeBuilder));
 
         // collection
         generatorBuildersHolder.addBuilder(
-                createInstance(
+                GeneratorBuilderInfo.createInstance(
                         SetRule.class,
                         RulesInstance.setRule.generatedType(),
                         GeneratorBuildersFactory::setBuilder));
         generatorBuildersHolder.addBuilder(
-                createInstance(
+                GeneratorBuilderInfo.createInstance(
                         ListRule.class,
                         RulesInstance.listRule.generatedType(),
                         GeneratorBuildersFactory::listBuilder));
 
         // extended
         generatorBuildersHolder.addBuilder(
-                createInstance(
+                GeneratorBuilderInfo.createInstance(
                         CustomRule.class,
                         RulesInstance.customRule.generatedType(),
                         GeneratorBuildersFactory::customBuilder));
         generatorBuildersHolder.addBuilder(
-                createInstance(
+                GeneratorBuilderInfo.createInstance(
                         NestedDtoRule.class,
                         RulesInstance.nestedDtoRule.generatedType(),
                         GeneratorBuildersFactory::nestedDtoBuilder));
