@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.functional.data.dto.DtoAllKnownTypes;
-import org.laoruga.dtogenerator.rules.RulesInstance;
+import org.laoruga.dtogenerator.rule.RulesInstance;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

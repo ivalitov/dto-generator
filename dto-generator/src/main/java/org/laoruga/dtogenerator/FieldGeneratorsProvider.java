@@ -8,16 +8,14 @@ import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersHolder;
-import org.laoruga.dtogenerator.generators.providers.GeneratorProvidersMediator;
-import org.laoruga.dtogenerator.rules.IRuleInfo;
-import org.laoruga.dtogenerator.rules.RulesInfoExtractor;
+import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
+import org.laoruga.dtogenerator.generator.providers.GeneratorProvidersMediator;
+import org.laoruga.dtogenerator.rule.IRuleInfo;
+import org.laoruga.dtogenerator.rule.RulesInfoExtractor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.api.rules.SetRule;
-import org.laoruga.dtogenerator.rules.RulesInstance;
+import org.laoruga.dtogenerator.rule.RulesInstance;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;

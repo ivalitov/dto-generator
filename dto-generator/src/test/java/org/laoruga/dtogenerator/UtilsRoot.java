@@ -5,7 +5,7 @@ import lombok.SneakyThrows;
 import org.laoruga.dtogenerator.config.DtoGeneratorConfig;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
-import org.laoruga.dtogenerator.rules.RulesInfoExtractor;
+import org.laoruga.dtogenerator.rule.RulesInfoExtractor;
 
 import java.lang.reflect.Field;
 import java.util.Map;

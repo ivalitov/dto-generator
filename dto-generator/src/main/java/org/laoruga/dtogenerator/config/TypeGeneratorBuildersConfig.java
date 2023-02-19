@@ -3,7 +3,8 @@ package org.laoruga.dtogenerator.config;
 import lombok.Getter;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generators.*;
+import org.laoruga.dtogenerator.generator.builder.builders.*;
+import org.laoruga.dtogenerator.generator.configs.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,7 @@ public class TypeGeneratorBuildersConfig {
     }
 
     void setConfig(Class<? extends IGeneratorBuilder> genBuilderClass, Supplier<IConfigDto> configDtoSupplier) {
-        if (genBuilderClass.isAssignableFrom(CollectionGenerator.CollectionGeneratorBuilder.class)) {
+        if (genBuilderClass.isAssignableFrom(CollectionGeneratorBuilder.class)) {
             throw new DtoGeneratorException("For collection builder configuration use 'setCollectionConfig' method.");
         }
         configMap.put(genBuilderClass, configDtoSupplier);
@@ -81,76 +82,76 @@ public class TypeGeneratorBuildersConfig {
      * Lazy getters
      */
 
-    public StringGenerator.ConfigDto getStringConfig() {
-        IConfigDto config = getConfig(StringGenerator.StringGeneratorBuilder.class);
+    public StringConfigDto getStringConfig() {
+        IConfigDto config = getConfig(StringGeneratorBuilder.class);
         if (config == null) {
-            config = new StringGenerator.ConfigDto();
+            config = new StringConfigDto();
             setConfig(config);
         }
-        return (StringGenerator.ConfigDto) config;
+        return (StringConfigDto) config;
     }
 
-    public IntegerGenerator.ConfigDto getIntegerConfig() {
-        IConfigDto config = getConfig(IntegerGenerator.IntegerGeneratorBuilder.class);
+    public IntegerConfigDto getIntegerConfig() {
+        IConfigDto config = getConfig(IntegerGeneratorBuilder.class);
         if (config == null) {
-            config = new IntegerGenerator.ConfigDto();
+            config = new IntegerConfigDto();
             setConfig(config);
         }
-        return (IntegerGenerator.ConfigDto) config;
+        return (IntegerConfigDto) config;
     }
 
-    public LongGenerator.ConfigDto getLongConfig() {
-        IConfigDto config = getConfig(LongGenerator.LongGeneratorBuilder.class);
+    public LongConfigDto getLongConfig() {
+        IConfigDto config = getConfig(LongGeneratorBuilder.class);
         if (config == null) {
-            config = new LongGenerator.ConfigDto();
+            config = new LongConfigDto();
             setConfig(config);
         }
-        return (LongGenerator.ConfigDto) getConfig(LongGenerator.LongGeneratorBuilder.class);
+        return (LongConfigDto) getConfig(LongGeneratorBuilder.class);
     }
 
-    public DoubleGenerator.ConfigDto getDoubleConfig() {
-        IConfigDto config = getConfig(DoubleGenerator.DoubleGeneratorBuilder.class);
+    public DoubleConfigDto getDoubleConfig() {
+        IConfigDto config = getConfig(DoubleGeneratorBuilder.class);
         if (config == null) {
-            config = new DoubleGenerator.ConfigDto();
+            config = new DoubleConfigDto();
             setConfig(config);
         }
-        return (DoubleGenerator.ConfigDto) config;
+        return (DoubleConfigDto) config;
     }
 
-    public LocalDateTimeGenerator.ConfigDto getLocalDateTimeConfig() {
-        IConfigDto config = getConfig(LocalDateTimeGenerator.LocalDateTimeGeneratorBuilder.class);
+    public LocalDateTimeConfigDto getLocalDateTimeConfig() {
+        IConfigDto config = getConfig(LocalDateTimeGeneratorBuilder.class);
         if (config == null) {
-            config = new LocalDateTimeGenerator.ConfigDto();
+            config = new LocalDateTimeConfigDto();
             setConfig(config);
         }
-        return (LocalDateTimeGenerator.ConfigDto) config;
+        return (LocalDateTimeConfigDto) config;
     }
 
-    public EnumGenerator.ConfigDto getEnumConfig() {
-        IConfigDto config = getConfig(EnumGenerator.EnumGeneratorBuilder.class);
+    public EnumConfigDto getEnumConfig() {
+        IConfigDto config = getConfig(EnumGeneratorBuilder.class);
         if (config == null) {
-            config = new EnumGenerator.ConfigDto();
+            config = new EnumConfigDto();
             setConfig(config);
         }
-        return (EnumGenerator.ConfigDto) getConfig(EnumGenerator.EnumGeneratorBuilder.class);
+        return (EnumConfigDto) getConfig(EnumGeneratorBuilder.class);
     }
 
-    public CollectionGenerator.ConfigDto getListConfig() {
-        IConfigDto config = getConfig(CollectionGenerator.CollectionGeneratorBuilder.class, List.class);
+    public CollectionConfigDto getListConfig() {
+        IConfigDto config = getConfig(CollectionGeneratorBuilder.class, List.class);
         if (config == null) {
-            config = new CollectionGenerator.ConfigDto();
+            config = new CollectionConfigDto();
             setCollectionConfig(List.class, config);
         }
-        return (CollectionGenerator.ConfigDto) config;
+        return (CollectionConfigDto) config;
     }
 
-    public CollectionGenerator.ConfigDto getSetConfig() {
-        IConfigDto config = getConfig(CollectionGenerator.CollectionGeneratorBuilder.class, Set.class);
+    public CollectionConfigDto getSetConfig() {
+        IConfigDto config = getConfig(CollectionGeneratorBuilder.class, Set.class);
         if (config == null) {
-            config = new CollectionGenerator.ConfigDto();
+            config = new CollectionConfigDto();
             setCollectionConfig(Set.class, config);
         }
-        return (CollectionGenerator.ConfigDto) config;
+        return (CollectionConfigDto) config;
     }
 
 }

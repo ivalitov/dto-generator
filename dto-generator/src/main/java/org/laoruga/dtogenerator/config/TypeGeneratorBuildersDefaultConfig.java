@@ -2,8 +2,9 @@ package org.laoruga.dtogenerator.config;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.generators.*;
-import org.laoruga.dtogenerator.rules.RulesInstance;
+import org.laoruga.dtogenerator.generator.builder.builders.*;
+import org.laoruga.dtogenerator.generator.configs.*;
+import org.laoruga.dtogenerator.rule.RulesInstance;
 
 import java.util.Objects;
 
@@ -18,15 +19,15 @@ public final class TypeGeneratorBuildersDefaultConfig extends TypeGeneratorBuild
     private static final TypeGeneratorBuildersDefaultConfig instance = new TypeGeneratorBuildersDefaultConfig();
 
     private TypeGeneratorBuildersDefaultConfig() {
-        setConfig(StringGenerator.StringGeneratorBuilder.class, () -> new StringGenerator.ConfigDto(RulesInstance.stringRule));
-        setConfig(IntegerGenerator.IntegerGeneratorBuilder.class, () -> new IntegerGenerator.ConfigDto(RulesInstance.integerRule));
-        setConfig(LongGenerator.LongGeneratorBuilder.class, () -> new LongGenerator.ConfigDto(RulesInstance.longRule));
-        setConfig(DoubleGenerator.DoubleGeneratorBuilder.class, () -> new DoubleGenerator.ConfigDto(RulesInstance.doubleRule));
-        setConfig(LocalDateTimeGenerator.LocalDateTimeGeneratorBuilder.class, () -> new LocalDateTimeGenerator.ConfigDto(RulesInstance.localDateTimeRule));
-        setConfig(EnumGenerator.EnumGeneratorBuilder.class, () -> new EnumGenerator.ConfigDto(RulesInstance.enumRule));
+        setConfig(StringGeneratorBuilder.class, () -> new StringConfigDto(RulesInstance.stringRule));
+        setConfig(IntegerGeneratorBuilder.class, () -> new IntegerConfigDto(RulesInstance.integerRule));
+        setConfig(LongGeneratorBuilder.class, () -> new LongConfigDto(RulesInstance.longRule));
+        setConfig(DoubleGeneratorBuilder.class, () -> new DoubleConfigDto(RulesInstance.doubleRule));
+        setConfig(LocalDateTimeGeneratorBuilder.class, () -> new LocalDateTimeConfigDto(RulesInstance.localDateTimeRule));
+        setConfig(EnumGeneratorBuilder.class, () -> new EnumConfigDto(RulesInstance.enumRule));
 
-        setCollectionConfig(RulesInstance.listRule.generatedType(), () -> new CollectionGenerator.ConfigDto(RulesInstance.listRule));
-        setCollectionConfig(RulesInstance.setRule.generatedType(), () -> new CollectionGenerator.ConfigDto(RulesInstance.setRule));
+        setCollectionConfig(RulesInstance.listRule.generatedType(), () -> new CollectionConfigDto(RulesInstance.listRule));
+        setCollectionConfig(RulesInstance.setRule.generatedType(), () -> new CollectionConfigDto(RulesInstance.setRule));
     }
 
     @Override

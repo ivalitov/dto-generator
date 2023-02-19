@@ -1,6 +1,6 @@
 package org.laoruga.dtogenerator.constants;
 
-import org.laoruga.dtogenerator.rules.RulesInfoHelper;
+import org.laoruga.dtogenerator.rule.RulesInfoHelper;
 
 import java.lang.annotation.Annotation;
 

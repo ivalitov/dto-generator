@@ -17,8 +17,8 @@ import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
 import org.laoruga.dtogenerator.functional.data.dto.DtoAllKnownTypes;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
-import org.laoruga.dtogenerator.generators.*;
-import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersFactory;
+import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersFactory;
+import org.laoruga.dtogenerator.generator.configs.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,7 +32,7 @@ import static org.laoruga.dtogenerator.UtilsRoot.resetStaticConfig;
 import static org.laoruga.dtogenerator.constants.Group.*;
 import static org.laoruga.dtogenerator.constants.RuleRemark.MAX_VALUE;
 import static org.laoruga.dtogenerator.constants.RuleRemark.MIN_VALUE;
-import static org.laoruga.dtogenerator.generators.builders.GeneratorBuildersFactory.*;
+import static org.laoruga.dtogenerator.generator.builder.GeneratorBuildersFactory.*;
 
 /**
  * @author Il'dar Valitov
@@ -195,48 +195,48 @@ class OverridingOfGeneratorsTests {
         TypeGeneratorBuildersConfig gensConfig = builder.getUserConfig().getGenBuildersConfig();
 
         gensConfig.setConfig(
-                StringGenerator.ConfigDto.builder()
+                StringConfigDto.builder()
                         .minLength(1)
                         .maxLength(100)
                         .ruleRemark(MIN_VALUE)
                         .chars("x").build());
 
         gensConfig.setConfig(
-                IntegerGenerator.ConfigDto.builder()
+                IntegerConfigDto.builder()
                         .minValue(-100)
                         .maxValue(1)
                         .ruleRemark(MAX_VALUE)
                         .build());
 
         gensConfig.setConfig(
-                DoubleGenerator.ConfigDto.builder()
+                DoubleConfigDto.builder()
                         .minValue(2D)
                         .maxValue(100D)
                         .ruleRemark(MIN_VALUE)
                         .build());
 
         gensConfig.setConfig(
-                LongGenerator.ConfigDto.builder()
+                LongConfigDto.builder()
                         .minValue(-100L)
                         .maxValue(3L)
                         .ruleRemark(MAX_VALUE)
                         .build());
 
         gensConfig.setConfig(
-                LocalDateTimeGenerator.ConfigDto.builder()
+                LocalDateTimeConfigDto.builder()
                         .leftShiftDays(-1)
                         .rightShiftDays(100)
                         .ruleRemark(MIN_VALUE)
                         .build());
 
         gensConfig.setConfig(
-                EnumGenerator.ConfigDto.builder()
+                EnumConfigDto.builder()
                         .ruleRemark(MIN_VALUE)
                         .build());
 
         gensConfig.setCollectionConfig(
                 List.class,
-                CollectionGenerator.ConfigDto.builder()
+                CollectionConfigDto.builder()
                         .minSize(2)
                         .maxSize(100)
                         .collectionInstance(LinkedList::new)
@@ -245,7 +245,7 @@ class OverridingOfGeneratorsTests {
 
         gensConfig.setCollectionConfig(
                 Set.class,
-                CollectionGenerator.ConfigDto.builder()
+                CollectionConfigDto.builder()
                         .minSize(0)
                         .maxSize(1)
                         .ruleRemark(MAX_VALUE)

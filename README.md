@@ -340,7 +340,7 @@ For overriding you can use:
 ```java
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.*;
-import org.laoruga.dtogenerator.generators.builders.GeneratorBuildersFactory;
+import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersFactory;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.List;

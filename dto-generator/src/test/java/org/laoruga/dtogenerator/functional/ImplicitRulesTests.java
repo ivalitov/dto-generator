@@ -13,7 +13,7 @@ import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
-import org.laoruga.dtogenerator.rules.RulesInstance;
+import org.laoruga.dtogenerator.rule.RulesInstance;
 
 import java.time.LocalDateTime;
 import java.util.List;

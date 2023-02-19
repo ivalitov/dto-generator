@@ -1,6 +1,6 @@
 package org.laoruga.dtogenerator.api.generators;
 
-import org.laoruga.dtogenerator.generators.IConfigDto;
+import org.laoruga.dtogenerator.generator.configs.IConfigDto;
 
 /**
  * @author Il'dar Valitov

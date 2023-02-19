@@ -5,10 +5,10 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generators.executors.BatchGeneratorsExecutor;
-import org.laoruga.dtogenerator.generators.executors.ExecutorOfCollectionGenerator;
-import org.laoruga.dtogenerator.generators.executors.ExecutorOfDtoDependentGenerator;
-import org.laoruga.dtogenerator.generators.executors.ExecutorOfGenerator;
+import org.laoruga.dtogenerator.generator.executors.BatchGeneratorsExecutor;
+import org.laoruga.dtogenerator.generator.executors.ExecutorOfCollectionGenerator;
+import org.laoruga.dtogenerator.generator.executors.ExecutorOfDtoDependentGenerator;
+import org.laoruga.dtogenerator.generator.executors.ExecutorOfGenerator;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
