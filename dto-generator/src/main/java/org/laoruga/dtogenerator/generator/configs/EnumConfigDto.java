@@ -19,7 +19,7 @@ import org.laoruga.dtogenerator.generator.builder.builders.EnumGeneratorBuilder;
 @AllArgsConstructor
 public class EnumConfigDto implements IConfigDto {
     private String[] possibleEnumNames;
-    private Class<? extends Enum> enumClass;
+    private Class<? extends Enum<?>> enumClass;
     private IRuleRemark ruleRemark;
 
     public EnumConfigDto(EnumRule enumRule) {

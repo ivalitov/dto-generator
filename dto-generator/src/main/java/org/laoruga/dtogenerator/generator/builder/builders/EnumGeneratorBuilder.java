@@ -64,4 +64,5 @@ public final class EnumGeneratorBuilder implements IGeneratorBuilderConfigurable
                 enumConfigDto.getEnumClass(),
                 enumConfigDto.getRuleRemark());
     }
+
 }

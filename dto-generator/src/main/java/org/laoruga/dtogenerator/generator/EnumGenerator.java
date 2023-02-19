@@ -21,7 +21,7 @@ import java.util.Comparator;
 public class EnumGenerator implements IGenerator<Enum<?>> {
 
     private final String[] possibleEnumNames;
-    private final Class<? extends Enum> enumClass;
+    private final Class<? extends Enum<?>> enumClass;
     private final IRuleRemark ruleRemark;
 
     @Override
