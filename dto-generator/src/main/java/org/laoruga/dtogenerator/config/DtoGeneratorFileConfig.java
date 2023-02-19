@@ -5,10 +5,13 @@ import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
 /**
+ * Loads properties from files, overriding properties from file with prefix: 'default-'.
+ *
  * @author Il'dar Valitov
  * Created on 13.11.2022
  */
@@ -16,32 +19,43 @@ import java.util.Properties;
 @Slf4j
 public class DtoGeneratorFileConfig extends DtoGeneratorConfig {
 
-    Properties properties;
+    private final Properties properties;
+    private final String propsFileName;
+    private static final String DEFAULT_PREFIX = "default-";
 
     public DtoGeneratorFileConfig(String propsFile) {
-        this.properties = loadProperties(propsFile);
-        initPropsDto();
+        this.propsFileName = propsFile;
+        this.properties = loadPropertiesFromFiles();
+        initConfigDto();
     }
 
-    protected Properties loadProperties(String propsFile) {
-        Optional<Properties> defaultProps = loadProperties(DtoGeneratorFileConfig.class.getClassLoader(), "default-" + propsFile);
-        Optional<Properties> customProps = loadProperties(Thread.currentThread().getContextClassLoader(), propsFile);
+    private Properties loadPropertiesFromFiles() {
+
+        Optional<Properties> defaultProps = loadPropertiesFromFile(
+                DtoGeneratorFileConfig.class.getClassLoader(), DEFAULT_PREFIX + propsFileName);
+
+        Optional<Properties> customProps = loadPropertiesFromFile(
+                Thread.currentThread().getContextClassLoader(), propsFileName);
+
         Properties props = defaultProps.orElseGet(Properties::new);
         customProps.ifPresent(props::putAll);
         return props;
     }
 
-    private void initPropsDto() {
-        setMaxDependentGenerationCycles(Integer.parseInt(getProperty("maxDependentGenerationCycles", "100")));
-        setMaxCollectionGenerationCycles(Integer.parseInt(getProperty("maxCollectionGenerationCycles", "100")));
-        setGenerateAllKnownTypes(Boolean.parseBoolean(getProperty("generateAllKnownTypes", "false")));
+    private void initConfigDto() {
+        setMaxDependentGenerationCycles(Integer.parseInt(getProperty("maxDependentGenerationCycles")));
+        setMaxCollectionGenerationCycles(Integer.parseInt(getProperty("maxCollectionGenerationCycles")));
+        setGenerateAllKnownTypes(Boolean.parseBoolean(getProperty("generateAllKnownTypes")));
     }
 
-    private String getProperty(String name, String defaultValue) {
-        return properties.getProperty(name, defaultValue);
+    private String getProperty(String name) {
+        return Objects.requireNonNull(
+                properties.getProperty(name),
+                "Property '" + name + "' not found in the: '" + DEFAULT_PREFIX + propsFileName + "' ()"
+        );
     }
 
-    private static Optional<Properties> loadProperties(ClassLoader classLoader, String fileName) {
+    private static Optional<Properties> loadPropertiesFromFile(ClassLoader classLoader, String fileName) {
         Properties properties = new Properties();
         URL resource = classLoader.getResource(fileName);
         if (resource == null) {

@@ -13,6 +13,6 @@ public class CustomGeneratorStub implements ICustomGenerator<Object> {
 
     @Override
     public Object generate() {
-        throw new IllegalStateException("This object is only a stub.");
+        throw new IllegalStateException("This class is not supposed to be instantiated!");
     }
 }
