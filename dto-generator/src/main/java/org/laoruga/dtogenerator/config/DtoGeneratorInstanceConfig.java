@@ -1,50 +1,62 @@
 package org.laoruga.dtogenerator.config;
 
+import org.laoruga.dtogenerator.DtoGenerator;
+
 /**
+ * Config decorator for {@link DtoGenerator} instance,
+ * provides instance specific config parameter if exists,
+ * otherwise - value from static config.
+ *
  * @author Il'dar Valitov
  * Created on 29.11.2022
  */
-// TODO to see ways to refactor these setters and getters
-public class DtoGeneratorInstanceConfig {
+public class DtoGeneratorInstanceConfig extends DtoGeneratorConfig {
 
     private final DtoGeneratorConfig staticConfig = DtoGeneratorStaticConfig.getInstance();
     private final DtoGeneratorConfig instanceConfig = new DtoGeneratorConfig();
 
+    @Override
     public void setMaxDependentGenerationCycles(Integer maxDependentGenerationCycles) {
         instanceConfig.setMaxDependentGenerationCycles(maxDependentGenerationCycles);
     }
 
+    @Override
     public void setMaxCollectionGenerationCycles(Integer maxCollectionGenerationCycles) {
         instanceConfig.setMaxCollectionGenerationCycles(maxCollectionGenerationCycles);
     }
 
+    @Override
     public void setGenerateAllKnownTypes(Boolean generateAllKnownTypes) {
         instanceConfig.setGenerateAllKnownTypes(generateAllKnownTypes);
     }
 
-    public int getMaxDependentGenerationCycles() {
-        return getOrDefault(
+    @Override
+    public Integer getMaxDependentGenerationCycles() {
+        return getInsatnceOrStatic(
                 instanceConfig.getMaxDependentGenerationCycles(),
                 staticConfig.getMaxDependentGenerationCycles());
     }
 
-    public int getMaxCollectionGenerationCycles() {
-        return getOrDefault(
+    @Override
+    public Integer getMaxCollectionGenerationCycles() {
+        return getInsatnceOrStatic(
                 instanceConfig.getMaxCollectionGenerationCycles(),
                 staticConfig.getMaxCollectionGenerationCycles());
     }
 
-    public boolean getGenerateAllKnownTypes() {
-        return getOrDefault(
+    @Override
+    public Boolean getGenerateAllKnownTypes() {
+        return getInsatnceOrStatic(
                 instanceConfig.getGenerateAllKnownTypes(),
                 staticConfig.getGenerateAllKnownTypes());
     }
 
+    @Override
     public TypeGeneratorBuildersConfig getGenBuildersConfig() {
         return instanceConfig.getGenBuildersConfig();
     }
 
-    private <T> T getOrDefault(T value, T defaultValue) {
+    private <T> T getInsatnceOrStatic(T value, T defaultValue) {
         return value == null ? defaultValue : value;
     }
 }
