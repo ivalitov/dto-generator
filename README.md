@@ -527,9 +527,12 @@ More info and more examples of usage you may see in the project with examples: [
 
 ### 9. Requirements for DTO classes
 
-Requirements:
-1. DTO class must have declared no-args constructor with any visibility
-2. DTO class shouldn't be a NOT-static nested class
+Requirements, when using DTO instantiation via class:
+
+``` DtoGenerator.builder(Foo.class).build().generateDto(); ```
+
+1. DTO class must have declared no-args constructor with any visibility or don't have any constructors
+2. DTO class cannot be an inner class (non-static nested class)
 
 Supported:
 1. DTO classes may extend abstract or concrete classes via inheritance
