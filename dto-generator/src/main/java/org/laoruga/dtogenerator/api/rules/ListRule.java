@@ -1,6 +1,5 @@
 package org.laoruga.dtogenerator.api.rules;
 
-import org.laoruga.dtogenerator.api.BoundType;
 import org.laoruga.dtogenerator.api.rules.meta.RuleForCollection;
 import org.laoruga.dtogenerator.constants.Group;
 import org.laoruga.dtogenerator.constants.RuleRemark;
@@ -22,10 +21,8 @@ public @interface ListRule {
 
     Class<? extends List> listClass() default ArrayList.class;
 
-    @BoundType(RuleRemark.MAX_VALUE)
     int maxSize() default 10;
 
-    @BoundType(RuleRemark.MIN_VALUE)
     int minSize() default 1;
 
     RuleRemark ruleRemark() default RuleRemark.RANDOM_VALUE;

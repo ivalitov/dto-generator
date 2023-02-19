@@ -1,6 +1,5 @@
 package org.laoruga.dtogenerator.api.rules;
 
-import org.laoruga.dtogenerator.api.BoundType;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.constants.Group;
 import org.laoruga.dtogenerator.constants.RuleRemark;
@@ -19,10 +18,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(IntegerRules.class)
 public @interface IntegerRule {
 
-    @BoundType(RuleRemark.MAX_VALUE)
     int maxValue() default 999999999;
 
-    @BoundType(RuleRemark.MIN_VALUE)
     int minValue() default 0;
 
     RuleRemark ruleRemark() default RuleRemark.RANDOM_VALUE;
