@@ -30,33 +30,4 @@ public final class TypeGeneratorBuildersDefaultConfig extends TypeGeneratorBuild
         setCollectionConfig(RulesInstance.setRule.generatedType(), () -> new CollectionConfigDto(RulesInstance.setRule));
     }
 
-    @Override
-    public IConfigDto getConfig(Class<?> builderClass) {
-        return Objects.requireNonNull(super.getConfig(builderClass), "Default config not set for builder's class: " +
-                "'" + builderClass + "'");
-    }
-
-    @Override
-    public IConfigDto getConfig(Class<?> builderClass, Class<?> generatedType) {
-        return Objects.requireNonNull(super.getConfig(builderClass, generatedType),
-                "Default config not set for builder's class: " +
-                        "'" + builderClass + "' and field type: '" + generatedType + "'");
-    }
-
-    @Override
-    public void setConfig(IConfigDto configDto) {
-        super.setConfig(configDto);
-        logWarning();
-    }
-
-    @Override
-    public void setCollectionConfig(Class<?> superTypeClass, IConfigDto configDto) {
-        super.setCollectionConfig(superTypeClass, configDto);
-        logWarning();
-    }
-
-    private static void logWarning() {
-        log.warn("Default type generator's config have changed, this may conclude to unexpected behaviour.");
-    }
-
 }
