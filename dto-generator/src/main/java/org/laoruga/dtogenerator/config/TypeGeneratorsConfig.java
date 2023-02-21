@@ -1,6 +1,7 @@
 package org.laoruga.dtogenerator.config;
 
 import com.google.common.primitives.Primitives;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.generator.builder.builders.*;
@@ -15,9 +16,10 @@ import java.util.function.Supplier;
  * Created on 29.11.2022
  */
 
-@Getter
+
 public class TypeGeneratorsConfig {
 
+    @Getter(AccessLevel.PACKAGE)
     private final
     Map<Class<? extends IGeneratorBuilder>, Map<Class<?>, IConfigDto>>
             configMap = new HashMap<>();
