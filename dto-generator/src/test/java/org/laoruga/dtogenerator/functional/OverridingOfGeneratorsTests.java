@@ -14,7 +14,7 @@ import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
-import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
+import org.laoruga.dtogenerator.config.TypeGeneratorsConfig;
 import org.laoruga.dtogenerator.functional.data.dto.DtoAllKnownTypes;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersFactory;
@@ -192,7 +192,7 @@ class OverridingOfGeneratorsTests {
     @DisplayName("Overridden instance configs of known type generators")
     void overriddenInstanceConfig() {
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
-        TypeGeneratorBuildersConfig gensConfig = builder.getUserConfig().getGenBuildersConfig();
+        TypeGeneratorsConfig gensConfig = builder.getUserConfig().getGeneratorsConfig();
 
         gensConfig.setConfig(
                 StringConfigDto.builder()
@@ -262,7 +262,7 @@ class OverridingOfGeneratorsTests {
     @DisplayName("Overridden static config of known type generators")
     void overriddenStaticConfig() {
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
-        TypeGeneratorBuildersConfig gensConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig();
+        TypeGeneratorsConfig gensConfig = DtoGeneratorStaticConfig.getInstance().getGeneratorsConfig();
 
         gensConfig.getStringConfig().setMinLength(1);
         gensConfig.getStringConfig().setMaxLength(100);
@@ -428,8 +428,8 @@ class OverridingOfGeneratorsTests {
         DtoGeneratorStaticConfig.getInstance().setGenerateAllKnownTypes(true);
         DtoGeneratorBuilder<DtoDifferent> builder = DtoGenerator.builder(DtoDifferent.class);
 
-        TypeGeneratorBuildersConfig staticConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig();
-        TypeGeneratorBuildersConfig userConfig = builder.getUserConfig().getGenBuildersConfig();
+        TypeGeneratorsConfig staticConfig = DtoGeneratorStaticConfig.getInstance().getGeneratorsConfig();
+        TypeGeneratorsConfig userConfig = builder.getUserConfig().getGeneratorsConfig();
 
         builder.setGeneratorBuilder(StringRule.class, stringBuilder()
                 .chars("o")
@@ -476,11 +476,11 @@ class OverridingOfGeneratorsTests {
         DtoGeneratorBuilder<DtoDifferent> builder2 = DtoGenerator.builder(DtoDifferent.class);
 
         DtoGeneratorInstanceConfig userConfig2 = builder2.getUserConfig();
-        userConfig2.getGenBuildersConfig().getIntegerConfig().setMinValue(5);
-        userConfig2.getGenBuildersConfig().getIntegerConfig().setMaxValue(5);
-        userConfig2.getGenBuildersConfig().getStringConfig().setChars("i");
-        userConfig2.getGenBuildersConfig().getSetConfig().setMaxSize(1);
-        userConfig2.getGenBuildersConfig().getSetConfig().setMinSize(1);
+        userConfig2.getGeneratorsConfig().getIntegerConfig().setMinValue(5);
+        userConfig2.getGeneratorsConfig().getIntegerConfig().setMaxValue(5);
+        userConfig2.getGeneratorsConfig().getStringConfig().setChars("i");
+        userConfig2.getGeneratorsConfig().getSetConfig().setMaxSize(1);
+        userConfig2.getGeneratorsConfig().getSetConfig().setMinSize(1);
         builder2.setGeneratorBuilder(ListRule.class, GeneratorBuildersFactory.listBuilder().maxSize(1).minSize(1));
 
         DtoDifferent dto2 = builder2.build().generateDto();
@@ -566,11 +566,11 @@ class OverridingOfGeneratorsTests {
     @Test
     @DisplayName("With Grouping")
     void withGrouping() {
-        TypeGeneratorBuildersConfig gensConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig();
+        TypeGeneratorsConfig gensConfig = DtoGeneratorStaticConfig.getInstance().getGeneratorsConfig();
         gensConfig.getDoubleConfig().setMaxValue(1D);
         gensConfig.getDoubleConfig().setMinValue(1D);
 
-        DtoWithGroup dto = DtoGenerator.builder(DtoWithGroup.class)
+        DtoWithGroup dto_1 = DtoGenerator.builder(DtoWithGroup.class)
                 .includeGroups(DEFAULT, GROUP_2)
                 .setGeneratorBuilder(StringRule.class, stringBuilder().minLength(5).maxLength(5).chars("x"))
                 .setGeneratorBuilder(IntegerRule.class, integerBuilder().minValue(5).maxValue(5))
@@ -595,12 +595,12 @@ class OverridingOfGeneratorsTests {
 
         assertAll(
                 // dto 1
-                () -> assertThat(dto.getString(), equalTo("xxxxx")),
-                () -> assertThat(dto.getInteger(), equalTo(5)),
-                () -> assertThat(dto.getALong(), equalTo(123L)),
-                () -> assertThat(dto.getListOfString().get(0), equalTo("xxxxx")),
-                () -> assertThat(dto.getSetOfLong(), notNullValue()),
-                () -> assertThat(dto.getADouble(), equalTo(1D)),
+                () -> assertThat(dto_1.getString(), equalTo("xxxxx")),
+                () -> assertThat(dto_1.getInteger(), equalTo(5)),
+                () -> assertThat(dto_1.getALong(), equalTo(123L)),
+                () -> assertThat(dto_1.getListOfString().get(0), equalTo("xxxxx")),
+                () -> assertThat(dto_1.getSetOfLong(), notNullValue()),
+                () -> assertThat(dto_1.getADouble(), equalTo(1D)),
 
                 // dto 2
                 () -> assertThat(dto_2.getString(), nullValue()),
@@ -608,7 +608,7 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto_2.getALong(), nullValue()),
                 () -> assertThat(dto_2.getListOfString().get(0), notNullValue()),
                 () -> assertThat(dto_2.getSetOfLong(), nullValue()),
-                () -> assertThat(dto.getADouble(), equalTo(1D)),
+                () -> assertThat(dto_2.getADouble(), equalTo(0D)),
 
                 // dto 3
                 () -> assertThat(dto_3.getString().length(), equalTo(2)),
@@ -616,7 +616,7 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto_3.getALong(), nullValue()),
                 () -> assertThat(dto_3.getListOfString(), nullValue()),
                 () -> assertThat(dto_3.getSetOfLong(), hasSize(1)),
-                () -> assertThat(dto.getADouble(), equalTo(1D)),
+                () -> assertThat(dto_3.getADouble(), equalTo(1D)),
 
 
                 // dto 4
@@ -626,7 +626,7 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto_4.getListOfString(), hasSize(3)),
                 () -> assertThat(dto_4.getListOfString().get(1), equalTo("xxxx")),
                 () -> assertThat(dto_4.getSetOfLong(), nullValue()),
-                () -> assertThat(dto.getADouble(), equalTo(1D))
+                () -> assertThat(dto_4.getADouble(), equalTo(0D))
 
         );
 

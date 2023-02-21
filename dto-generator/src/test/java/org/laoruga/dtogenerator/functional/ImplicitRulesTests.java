@@ -81,10 +81,10 @@ public class ImplicitRulesTests {
     @DisplayName("Generation with implicit rules")
     void GenerationWithImplicitRules() {
 
-        DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig().getListConfig().setMinSize(1);
-        DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig().getListConfig().setMaxSize(1);
-        DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig().getSetConfig().setMinSize(1);
-        DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig().getSetConfig().setMaxSize(1);
+        DtoGeneratorStaticConfig.getInstance().getGeneratorsConfig().getListConfig().setMinSize(1);
+        DtoGeneratorStaticConfig.getInstance().getGeneratorsConfig().getListConfig().setMaxSize(1);
+        DtoGeneratorStaticConfig.getInstance().getGeneratorsConfig().getSetConfig().setMinSize(1);
+        DtoGeneratorStaticConfig.getInstance().getGeneratorsConfig().getSetConfig().setMaxSize(1);
 
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
 

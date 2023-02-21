@@ -4,7 +4,7 @@ import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.laoruga.dtogenerator.config.DtoGeneratorConfig;
 import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
-import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
+import org.laoruga.dtogenerator.config.TypeGeneratorsConfig;
 import org.laoruga.dtogenerator.rule.RulesInfoExtractor;
 
 import java.lang.reflect.Field;
@@ -51,10 +51,10 @@ public class UtilsRoot {
     public static void resetStaticConfig() {
         DtoGeneratorConfig config = DtoGeneratorStaticConfig.getInstance();
         config.setGenerateAllKnownTypes(false);
-        Field configField = config.getClass().getSuperclass().getDeclaredField("genBuildersConfig");
+        Field configField = config.getClass().getSuperclass().getDeclaredField("generatorsConfig");
         configField.setAccessible(true);
-        AtomicReference<TypeGeneratorBuildersConfig> buildersConfig =
-                (AtomicReference<TypeGeneratorBuildersConfig>) configField.get(config);
-        buildersConfig.set(new TypeGeneratorBuildersConfig());
+        AtomicReference<TypeGeneratorsConfig> buildersConfig =
+                (AtomicReference<TypeGeneratorsConfig>) configField.get(config);
+        buildersConfig.set(new TypeGeneratorsConfig());
     }
 }

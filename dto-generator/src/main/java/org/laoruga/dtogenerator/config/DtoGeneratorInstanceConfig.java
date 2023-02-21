@@ -52,8 +52,8 @@ public class DtoGeneratorInstanceConfig extends DtoGeneratorConfig {
     }
 
     @Override
-    public TypeGeneratorBuildersConfig getGenBuildersConfig() {
-        return instanceConfig.getGenBuildersConfig();
+    public TypeGeneratorsConfig getGeneratorsConfig() {
+        return instanceConfig.getGeneratorsConfig();
     }
 
     private <T> T getInsatnceOrStatic(T value, T defaultValue) {

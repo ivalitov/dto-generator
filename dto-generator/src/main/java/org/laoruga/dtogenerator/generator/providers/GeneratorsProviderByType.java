@@ -6,7 +6,7 @@ import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
-import org.laoruga.dtogenerator.config.TypeGeneratorBuildersDefaultConfig;
+import org.laoruga.dtogenerator.config.TypeGeneratorDefaultConfigSupplier;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolderGeneral;
@@ -90,8 +90,7 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
 
         return Optional.of(
                 getGenerator(
-                        () -> TypeGeneratorBuildersDefaultConfig.getInstance()
-                                .getConfig(genBuilder.getClass(), generatedType),
+                        TypeGeneratorDefaultConfigSupplier.getDefaultConfigSupplier(generatedType),
                         () -> genBuilder,
                         generatorSupplier,
                         generatedType,

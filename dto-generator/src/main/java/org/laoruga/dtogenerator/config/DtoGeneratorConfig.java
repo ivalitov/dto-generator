@@ -16,5 +16,5 @@ public class DtoGeneratorConfig {
     private Boolean generateAllKnownTypes;
 
     @Getter(lazy = true)
-    private final TypeGeneratorBuildersConfig genBuildersConfig = new TypeGeneratorBuildersConfig();
+    private final TypeGeneratorsConfig generatorsConfig = new TypeGeneratorsConfig();
 }

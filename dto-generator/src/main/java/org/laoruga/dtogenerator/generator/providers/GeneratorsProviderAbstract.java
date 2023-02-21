@@ -48,10 +48,11 @@ public abstract class GeneratorsProviderAbstract {
                                          String fieldName) {
         IGeneratorBuilderConfigurable genBuilder = genBuildSupplier.get();
 
-        IConfigDto instanceConfig = getConfiguration().getGenBuildersConfig()
-                .getConfig(genBuilder.getClass(), fieldType);
-        IConfigDto staticConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig()
-                .getConfig(genBuilder.getClass(), fieldType);
+
+        IConfigDto instanceConfig = getConfiguration().getGeneratorsConfig()
+                .getOrNull(genBuilder.getClass(), fieldType);
+        IConfigDto staticConfig = DtoGeneratorStaticConfig.getInstance().getGeneratorsConfig()
+                .getOrNull(genBuilder.getClass(), fieldType);
         IConfigDto config = configDtoSupplier.get();
 
         if (staticConfig != null) {
