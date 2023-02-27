@@ -173,7 +173,7 @@ Known types are those types for which *@Rules* annotations exists.
 There are several ways to configuring of generation, one of them is using of static configuration:
 
 ```java
-DtoGeneratorStaticConfig.getInstance().setGenerateAllKnownTypes(true);
+DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
 ```
 
 For example, if we use next DTO class:
@@ -242,10 +242,10 @@ public class Example3 {
         DtoGeneratorBuilder<Dto3> builder = DtoGenerator.builder(Dto3.class);
 
         // user config
-        builder.getUserConfig().getGenBuildersConfig().getStringConfig().setMaxLength(5);
+        builder.getTypeGeneratorsConfig().getStringConfig().setMaxLength(5);
 
         // static config
-        DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig().getStringConfig().setChars("x");
+        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getStringConfig().setChars("x");
 
         Dto3 dtoInstance = builder.build().generateDto();
     }
