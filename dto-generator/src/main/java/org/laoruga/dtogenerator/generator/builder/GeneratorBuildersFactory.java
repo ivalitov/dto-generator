@@ -15,6 +15,10 @@ public final class GeneratorBuildersFactory {
         return StringGenerator.builder();
     }
 
+    public static BooleanGeneratorBuilder booleanBuilder() {
+        return BooleanGenerator.builder();
+    }
+
     public static DoubleGeneratorBuilder doubleBuilder() {
         return DoubleGenerator.builder();
     }

@@ -50,6 +50,7 @@ class OverridingOfGeneratorsTests {
     basicGeneratorOverridden() {
 
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class)
+                .setGeneratorBuilder(BooleanRule.class, () -> () -> false)
                 .setGeneratorBuilder(StringRule.class, stringBuilder().minLength(5).maxLength(5).chars("x"))
                 .setGeneratorBuilder(IntegerRule.class, integerBuilder().minValue(1).maxValue(1))
                 .setGeneratorBuilder(LongRule.class, longBuilder().minValue(2L).maxValue(2L))
@@ -72,6 +73,7 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto.getInteger(), equalTo(1)),
                 () -> assertThat(dto.getALong(), equalTo(2L)),
                 () -> assertThat(dto.getADouble(), equalTo(3D)),
+                () -> assertThat(dto.getABoolean(), equalTo(false)),
                 () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now())),
                 () -> assertThat(dto.getClientType(), equalTo(ClientType.PERSON)),
 
@@ -111,18 +113,19 @@ class OverridingOfGeneratorsTests {
                 .setGeneratorBuilder("string", stringBuilder().minLength(5).maxLength(5).chars("x"))
                 .setGeneratorBuilder("integer", integerBuilder().minValue(1).maxValue(1))
                 .setGeneratorBuilder("aLong", longBuilder().minValue(2L).maxValue(2L))
-                .setGeneratorBuilder("aDouble", GeneratorBuildersFactory.doubleBuilder().minValue(3D).maxValue(3D))
-                .setGeneratorBuilder("localDateTime", GeneratorBuildersFactory.localDateTimeBuilder().leftShiftDays(0).rightShiftDays(0))
-                .setGeneratorBuilder("clientType", GeneratorBuildersFactory.enumBuilder().possibleEnumNames("PERSON"))
-                .setGeneratorBuilder("listOfString", GeneratorBuildersFactory.listBuilder()
+                .setGeneratorBuilder("aDouble", doubleBuilder().minValue(3D).maxValue(3D))
+                .setGeneratorBuilder("aBoolean", booleanBuilder().trueProbability(1))
+                .setGeneratorBuilder("localDateTime", localDateTimeBuilder().leftShiftDays(0).rightShiftDays(0))
+                .setGeneratorBuilder("clientType", enumBuilder().possibleEnumNames("PERSON"))
+                .setGeneratorBuilder("listOfString", listBuilder()
                         .collectionInstance(LinkedList::new)
                         .elementGenerator(() -> "yyy")
                         .minSize(1).maxSize(1))
-                .setGeneratorBuilder("setOfLong", GeneratorBuildersFactory.setBuilder()
+                .setGeneratorBuilder("setOfLong", setBuilder()
                         .elementGenerator(() -> 2L)
                         .collectionInstance(HashSet::new)
                         .minSize(1).maxSize(1))
-                .setGeneratorBuilder("linkedListOfEnum", GeneratorBuildersFactory.setBuilder()
+                .setGeneratorBuilder("linkedListOfEnum", setBuilder()
                         .elementGenerator(() -> ClientType.LEGAL_PERSON)
                         .collectionInstance(LinkedList::new)
                         .minSize(1).maxSize(1))
@@ -130,18 +133,18 @@ class OverridingOfGeneratorsTests {
                 .setGeneratorBuilder("innerDto.integer", integerBuilder().minValue(123).maxValue(123))
                 .setGeneratorBuilder("innerDto.string", stringBuilder().minLength(3).maxLength(3).chars("f"))
                 .setGeneratorBuilder("innerDto.aLong", longBuilder().minValue(4L).maxValue(4L))
-                .setGeneratorBuilder("innerDto.aDouble", GeneratorBuildersFactory.doubleBuilder().minValue(5D).maxValue(5D))
-                .setGeneratorBuilder("innerDto.localDateTime", GeneratorBuildersFactory.localDateTimeBuilder().leftShiftDays(1).rightShiftDays(-1))
-                .setGeneratorBuilder("innerDto.clientType", GeneratorBuildersFactory.enumBuilder().possibleEnumNames("ORG"))
-                .setGeneratorBuilder("innerDto.listOfDouble", GeneratorBuildersFactory.listBuilder()
+                .setGeneratorBuilder("innerDto.aDouble", doubleBuilder().minValue(5D).maxValue(5D))
+                .setGeneratorBuilder("innerDto.localDateTime", localDateTimeBuilder().leftShiftDays(1).rightShiftDays(-1))
+                .setGeneratorBuilder("innerDto.clientType", enumBuilder().possibleEnumNames("ORG"))
+                .setGeneratorBuilder("innerDto.listOfDouble", listBuilder()
                         .collectionInstance(CopyOnWriteArrayList::new)
                         .elementGenerator(() -> 99.99D)
                         .minSize(1).maxSize(1))
-                .setGeneratorBuilder("innerDto.setOfInteger", GeneratorBuildersFactory.setBuilder()
+                .setGeneratorBuilder("innerDto.setOfInteger", setBuilder()
                         .elementGenerator(() -> 12345)
                         .collectionInstance(LinkedHashSet::new)
                         .minSize(1).maxSize(1))
-                .setGeneratorBuilder("innerDto.linkedListOfEnum", GeneratorBuildersFactory.setBuilder()
+                .setGeneratorBuilder("innerDto.linkedListOfEnum", setBuilder()
                         .elementGenerator(() -> ClientType.ORG)
                         .collectionInstance(LinkedList::new)
                         .minSize(1).maxSize(1));
@@ -155,6 +158,7 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto.getInteger(), equalTo(1)),
                 () -> assertThat(dto.getALong(), equalTo(2L)),
                 () -> assertThat(dto.getADouble(), equalTo(3D)),
+                () -> assertThat(dto.getABoolean(), equalTo(true)),
                 () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now())),
                 () -> assertThat(dto.getClientType(), equalTo(ClientType.PERSON)),
 
@@ -456,7 +460,7 @@ class OverridingOfGeneratorsTests {
         userConfig2.getStringConfig().setChars("i");
         userConfig2.getSetConfig().setMaxSize(1);
         userConfig2.getSetConfig().setMinSize(1);
-        builder2.setGeneratorBuilder(ListRule.class, GeneratorBuildersFactory.listBuilder().maxSize(1).minSize(1));
+        builder2.setGeneratorBuilder(ListRule.class, listBuilder().maxSize(1).minSize(1));
 
         DtoDifferent dto2 = builder2.build().generateDto();
 

@@ -9,10 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
-import org.laoruga.dtogenerator.api.rules.CustomRule;
-import org.laoruga.dtogenerator.api.rules.IntegerRule;
-import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
-import org.laoruga.dtogenerator.api.rules.StringRule;
+import org.laoruga.dtogenerator.api.rules.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,6 +63,12 @@ class FieldsGroupingTests {
 
         @IntegerRule(group = GROUP_2)
         Integer secondGroupInt;
+
+        @BooleanRule(group = REQUIRED)
+        Boolean reqBoolean;
+
+        @BooleanRule
+        Boolean defaultBoolean;
     }
 
     @Getter
@@ -121,6 +124,7 @@ class FieldsGroupingTests {
                 () -> assertNotNull(dto.getReqInnerDto()),
                 () -> assertNotNull(dto.getReqInnerDto().getReqInt()),
                 () -> assertNotNull(dto.getReqInnerDto().getReqStr()),
+                () -> assertNotNull(dto.getReqBoolean()),
                 () -> assertNull(dto.getReqInnerDto().getDefaultMap()),
                 () -> assertNull(dto.getReqInnerDto().getDefaultInt()),
                 () -> assertNull(dto.getReqInnerDto().getDefaultStr()),
@@ -133,7 +137,8 @@ class FieldsGroupingTests {
                 () -> assertNull(dto.getFirstGroupInt()),
                 () -> assertNull(dto.getFirstGroupMap()),
                 () -> assertNull(dto.getFirstGroupInnerDto()),
-                () -> assertNull(dto.getSecondGroupInt())
+                () -> assertNull(dto.getSecondGroupInt()),
+                () -> assertNull(dto.getDefaultBoolean())
         );
     }
 

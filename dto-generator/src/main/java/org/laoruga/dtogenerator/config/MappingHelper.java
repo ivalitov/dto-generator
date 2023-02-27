@@ -29,6 +29,11 @@ public class MappingHelper {
         Map<Class<?>, Supplier<ConfigDto>> configSupplier = new HashMap<>(16);
 
         add(configToGeneratedType, configToBuilder, configSupplier,
+                RulesInstance.booleanRule,
+                BooleanConfigDto.class,
+                BooleanGeneratorBuilder.class);
+
+        add(configToGeneratedType, configToBuilder, configSupplier,
                 RulesInstance.stringRule,
                 StringConfigDto.class,
                 StringGeneratorBuilder.class);

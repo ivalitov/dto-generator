@@ -16,6 +16,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RulesInstance {
 
+    @BooleanRule
     @StringRule
     @IntegerRule
     @LongRule
@@ -28,6 +29,7 @@ public final class RulesInstance {
     @NestedDtoRule
     private static Object annotations;
 
+    public static final BooleanRule booleanRule;
     public static final StringRule stringRule;
     public static final IntegerRule integerRule;
     public static final LongRule longRule;
@@ -43,6 +45,7 @@ public final class RulesInstance {
         try {
             Field annotations = RulesInstance.class.getDeclaredField("annotations");
 
+            booleanRule = getAnnotationInstance(annotations, BooleanRule.class);
             stringRule = getAnnotationInstance(annotations, StringRule.class);
             integerRule = getAnnotationInstance(annotations, IntegerRule.class);
             longRule = getAnnotationInstance(annotations, LongRule.class);

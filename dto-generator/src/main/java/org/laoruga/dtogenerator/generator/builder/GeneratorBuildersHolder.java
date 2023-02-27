@@ -1,5 +1,6 @@
 package org.laoruga.dtogenerator.generator.builder;
 
+import com.google.common.primitives.Primitives;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
@@ -56,13 +57,15 @@ public final class GeneratorBuildersHolder {
     }
 
     /**
-     * Picks builder by generated type with checking of types matching
+     * Picks builder by generated type with checking of type matching
      *
      * @param rulesAnnotation - rule for pick generator
      * @param generatedType   - type supposed to be generated
      * @return - builder if exists
      */
     public Optional<IGeneratorBuilder> getBuilder(Annotation rulesAnnotation, Class<?> generatedType) {
+
+        generatedType = generatedType.isPrimitive() ? Primitives.wrap(generatedType) : generatedType;
 
         GeneratorBuilderInfo foundInfo = buildersInfoMap.get(rulesAnnotation.annotationType());
 
@@ -72,10 +75,7 @@ public final class GeneratorBuildersHolder {
 
         Class<?> buildersGeneratedType = foundInfo.getGeneratedType();
 
-        if (buildersGeneratedType.isAssignableFrom(generatedType) ||
-                (generatedType.isPrimitive() &&
-                        generatedType == foundInfo.getGeneratedTypePrimitive())) {
-
+        if (buildersGeneratedType.isAssignableFrom(generatedType)) {
             return Optional.of(foundInfo.getBuilderSupplier().get());
         }
 

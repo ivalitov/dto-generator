@@ -27,6 +27,11 @@ public final class GeneratorBuildersHolderGeneral {
         // general
         generatorBuildersHolder.addBuilder(
                 GeneratorBuilderInfo.createInstance(
+                        BooleanRule.class,
+                        RulesInstance.booleanRule.generatedType(),
+                        GeneratorBuildersFactory::booleanBuilder));
+        generatorBuildersHolder.addBuilder(
+                GeneratorBuilderInfo.createInstance(
                         StringRule.class,
                         RulesInstance.stringRule.generatedType(),
                         GeneratorBuildersFactory::stringBuilder));

@@ -54,9 +54,9 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
     }
 
     protected IGenerator<?> getGenerator(Field field,
-                                       IRuleInfo ruleInfo,
-                                       Supplier<?> dtoInstanceSupplier,
-                                       Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
+                                         IRuleInfo ruleInfo,
+                                         Supplier<?> dtoInstanceSupplier,
+                                         Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
 
         final Class<?> fieldType = field.getType();
         final String fieldName = field.getName();
@@ -102,7 +102,19 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
 
         try {
 
-            if (StringRule.class == rulesClass) {
+            if (BooleanRule.class == rulesClass) {
+
+                if (generatorBuilder instanceof BooleanGeneratorBuilder) {
+
+                    return getGenerator(
+                            () -> new BooleanConfigDto((BooleanRule) rules),
+                            () -> (IGeneratorBuilderConfigurable) generatorBuilder,
+                            booleanGeneratorSupplier(fieldType, fieldName),
+                            fieldType,
+                            fieldName);
+                }
+
+            } else if (StringRule.class == rulesClass) {
 
                 if (generatorBuilder instanceof StringGeneratorBuilder) {
 
@@ -242,6 +254,19 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
                 return GeneratorBuildersFactory.doubleBuilder()
                         .minValue(0D)
                         .maxValue(0D)
+                        .ruleRemark(MIN_VALUE).build();
+            }
+            return builder.build(config, true);
+        };
+    }
+
+    BiFunction<ConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> booleanGeneratorSupplier(Class<?> fieldType,
+                                                                                                 String fieldName) {
+        return (config, builder) -> {
+            if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
+                reportPrimitiveCannotBeNull(fieldName);
+                return GeneratorBuildersFactory.booleanBuilder()
+                        .trueProbability(0D)
                         .ruleRemark(MIN_VALUE).build();
             }
             return builder.build(config, true);

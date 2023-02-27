@@ -29,10 +29,10 @@ import static org.laoruga.dtogenerator.UtilsRoot.resetStaticConfig;
  * @author Il'dar Valitov
  * Created on 24.11.2022
  */
-@DisplayName("Implicit rules")
-@Epic("IMPLICIT_RULES")
+@DisplayName("All Known Types Generating Tests")
+@Epic("ALL_KNOWN_TYPES_GENERATING")
 @Slf4j
-public class ImplicitRulesTests {
+public class AllKnownTypesGeneratingTests {
 
     @NoArgsConstructor
     @Getter
@@ -42,6 +42,7 @@ public class ImplicitRulesTests {
         Integer integer;
         Long aLong;
         Double aDouble;
+        Boolean aBoolean;
         LocalDateTime localDateTime;
         ClientType clientType;
         List<String> listOfString;
@@ -62,6 +63,7 @@ public class ImplicitRulesTests {
         Integer integer;
         Long aLong;
         Double aDouble;
+        Boolean aBoolean;
         LocalDateTime localDateTime;
         ClientType clientType;
         List<String> listOfString;
@@ -107,7 +109,8 @@ public class ImplicitRulesTests {
                 () -> assertThat(dto.getLocalDateTime(), notNullValue()),
                 () -> assertThat(dto.getClientType(), notNullValue()),
                 () -> assertThat(dto.getListOfString().size(), equalTo(1)),
-                () -> assertThat(dto.getSetOfLong().size(), equalTo(1))
+                () -> assertThat(dto.getSetOfLong().size(), equalTo(1)),
+                () -> assertThat(dto.getADouble(), notNullValue())
         );
 
         assertAll(
@@ -126,7 +129,8 @@ public class ImplicitRulesTests {
                 () -> assertThat(dto.getInnerDto().getLocalDateTime(), notNullValue()),
                 () -> assertThat(dto.getInnerDto().getClientType(), notNullValue()),
                 () -> assertThat(dto.getInnerDto().getListOfString().size(), equalTo(1)),
-                () -> assertThat(dto.getInnerDto().getSetOfLong().size(), equalTo(1))
+                () -> assertThat(dto.getInnerDto().getSetOfLong().size(), equalTo(1)),
+                () -> assertThat(dto.getInnerDto().getADouble(), notNullValue())
         );
     }
 

@@ -8,10 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.UtilsRoot;
-import org.laoruga.dtogenerator.api.rules.IntegerRule;
-import org.laoruga.dtogenerator.api.rules.ListRule;
-import org.laoruga.dtogenerator.api.rules.SetRule;
-import org.laoruga.dtogenerator.api.rules.StringRule;
+import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientDto;
 import org.laoruga.dtogenerator.rule.RulesInstance;
@@ -124,6 +121,27 @@ class ListGenerationTests {
     }
 
     @Getter
+    static class DtoVariousTypes {
+
+        @ListRule(minSize = 10)
+        @BooleanRule(trueProbability = 1)
+        private List<Boolean> listOfBoolean;
+
+    }
+
+    @Test
+    @DisplayName("Various Element Types")
+    void variousElementTypes() {
+
+        DtoVariousTypes dto = DtoGenerator.builder(new DtoVariousTypes()).build().generateDto();
+
+        assertAll(
+                () -> assertThat(dto.getListOfBoolean().stream().filter(i -> i).count(), equalTo(10L))
+        );
+
+    }
+
+    @Getter
     static class DtoWithWildcardList {
         @ListRule
         @StringRule
@@ -206,8 +224,8 @@ class ListGenerationTests {
 
     @Test
     @Feature("NEGATIVE_TESTS")
-    @DisplayName("Some")
-    void some() {
+    @DisplayName("Wrong Element Rule Annotation")
+    void wrongElementRuleAnnotation() {
 
         DtoGenerator<Dto3> generator = DtoGenerator.builder(Dto3.class).build();
 
@@ -218,7 +236,6 @@ class ListGenerationTests {
         assertThat(errorsMap.size(), equalTo(1));
         assertThat(errorsMap.get("some").getMessage(),
                 stringContainsInOrder("Builder's generated type does not match to the field type"));
-
 
     }
 

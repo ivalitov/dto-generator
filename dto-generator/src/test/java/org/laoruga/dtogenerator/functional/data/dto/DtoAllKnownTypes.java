@@ -37,6 +37,9 @@ public class DtoAllKnownTypes {
     @DoubleRule
     Double aDouble;
 
+    @BooleanRule
+    Boolean aBoolean;
+
     @LocalDateTimeRule
     LocalDateTime localDateTime;
 
