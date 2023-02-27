@@ -24,10 +24,7 @@ public class ExecutorOfCollectionGenerator extends ExecutorOfDtoDependentGenerat
             IGenerator<?> innerGenerator = ((ICollectionGenerator<?>) generator).getElementGenerator();
 
             if (isItDtoDependentGenerator(innerGenerator)) {
-                if (isDtoReadyForFieldGeneration(innerGenerator)) {
-                    return super.execute(field, generator);
-                }
-                return false;
+                return super.execute(field, generator);
             }
 
             return super.execute(field, generator);

@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * Created on 09.11.2022
  */
 @Slf4j
-public class BatchGeneratorsExecutor {
+public class BatchExecutor {
 
     private final Map<Field, IGenerator<?>> generatorMap;
     private final ThreadLocal<Map<Field, IGenerator<?>>> notExecutedGeneratorsMap;
@@ -27,7 +27,7 @@ public class BatchGeneratorsExecutor {
             .getDtoGeneratorConfig().getMaxDependentGenerationCycles();
     private final ErrorsHolder errorsHolder;
 
-    public BatchGeneratorsExecutor(AbstractExecutor executorsChain, Map<Field, IGenerator<?>> generatorMap) {
+    public BatchExecutor(AbstractExecutor executorsChain, Map<Field, IGenerator<?>> generatorMap) {
         this.generatorMap = generatorMap;
         this.notExecutedGeneratorsMap = new ThreadLocal<>();
         this.executorsChain = executorsChain;

@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
  * Created on 09.11.2022
  */
 @Getter(AccessLevel.PROTECTED)
-public abstract class AbstractExecutor {
+abstract class AbstractExecutor {
 
     private final AbstractExecutor nextExecutor;
 
@@ -20,12 +20,7 @@ public abstract class AbstractExecutor {
     }
 
     public AbstractExecutor() {
-        this.nextExecutor = new AbstractExecutor(null) {
-            @Override
-            public boolean execute(Field field, IGenerator<?> generator) {
-                throw new IllegalStateException("There is no next executor defined");
-            }
-        };
+        this.nextExecutor = DUMMY;
     }
 
     public abstract boolean execute(Field field, IGenerator<?> generator);
@@ -33,4 +28,11 @@ public abstract class AbstractExecutor {
     protected boolean executeNextInstead(Field field, IGenerator<?> generator) {
         return nextExecutor.execute(field, generator);
     }
+
+    private static final AbstractExecutor DUMMY = new AbstractExecutor() {
+        @Override
+        public boolean execute(Field field, IGenerator<?> generator) {
+            throw new IllegalStateException("Next executor haven't defined");
+        }
+    };
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.executors.BatchGeneratorsExecutor;
+import org.laoruga.dtogenerator.generator.executors.BatchExecutor;
 import org.laoruga.dtogenerator.generator.executors.ExecutorOfCollectionGenerator;
 import org.laoruga.dtogenerator.generator.executors.ExecutorOfDtoDependentGenerator;
 import org.laoruga.dtogenerator.generator.executors.ExecutorOfGenerator;
@@ -40,7 +40,7 @@ public class DtoGenerator<T> {
     private final FieldGeneratorsProvider fieldGeneratorsProvider;
     @Getter(AccessLevel.PACKAGE)
     private final ErrorsHolder errorsHolder;
-    private BatchGeneratorsExecutor batchGeneratorsExecutor;
+    private BatchExecutor batchExecutor;
 
     DtoGenerator(FieldGeneratorsProvider fieldGeneratorsProvider) {
         this.fieldGeneratorsProvider = fieldGeneratorsProvider;
@@ -74,7 +74,7 @@ public class DtoGenerator<T> {
             dtoInstance = dtoInstanceSupplier.get();
 
             synchronized (this) {
-                if (batchGeneratorsExecutor == null) {
+                if (batchExecutor == null) {
 
                     ExecutorOfGenerator generalGeneratorExecutor =
                             new ExecutorOfGenerator(dtoInstanceSupplier);
@@ -85,14 +85,14 @@ public class DtoGenerator<T> {
                     ExecutorOfDtoDependentGenerator dtoDependentGeneratorExecutor =
                             new ExecutorOfDtoDependentGenerator(dtoInstanceSupplier, collectionGeneratorExecutor);
 
-                    batchGeneratorsExecutor = new BatchGeneratorsExecutor(
+                    batchExecutor = new BatchExecutor(
                             dtoDependentGeneratorExecutor,
                             prepareGenerators(dtoInstance.getClass(), new HashMap<>())
                     );
                 }
             }
 
-            batchGeneratorsExecutor.execute();
+            batchExecutor.execute();
 
         } catch (Exception e) {
             throw new DtoGeneratorException(e);
