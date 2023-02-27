@@ -4,7 +4,7 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
-import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
+import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.rule.IRuleInfo;
@@ -24,7 +24,7 @@ public class GeneratorProvidersMediator {
     private final GeneratorsProviderByType generatorsProviderByType;
     private final generatorsProviderByAnnotationSupportingCollections generatorsProviderByAnnotation;
 
-    public GeneratorProvidersMediator(DtoGeneratorInstanceConfig configuration,
+    public GeneratorProvidersMediator(ConfigurationHolder configuration,
                                       GeneratorBuildersHolder userGenBuildersMapping,
                                       RemarksHolder remarksHolder) {
         generatorsProviderByType = new GeneratorsProviderByType(

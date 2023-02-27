@@ -1,6 +1,6 @@
 package org.laoruga.dtogenerator.api.generators;
 
-import org.laoruga.dtogenerator.generator.configs.IConfigDto;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 
 /**
  * @author Il'dar Valitov
@@ -9,5 +9,5 @@ import org.laoruga.dtogenerator.generator.configs.IConfigDto;
 
 public interface IGeneratorBuilderConfigurable extends IGeneratorBuilder {
 
-    IGenerator<?> build(IConfigDto configDto, boolean merge);
+    IGenerator<?> build(ConfigDto configDto, boolean merge);
 }

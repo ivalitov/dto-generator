@@ -5,11 +5,11 @@ import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
-import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
-import org.laoruga.dtogenerator.config.TypeGeneratorDefaultConfigSupplier;
+import org.laoruga.dtogenerator.config.ConfigurationHolder;
+import org.laoruga.dtogenerator.config.types.TypeGeneratorsDefaultConfigSupplier;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.generator.configs.EnumConfigDto;
-import org.laoruga.dtogenerator.generator.configs.IConfigDto;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public class GeneratorsProviderByField extends GeneratorsProviderAbstract {
 
     private final Map<String, IGeneratorBuilder> overriddenBuildersForFields;
 
-    public GeneratorsProviderByField(DtoGeneratorInstanceConfig configuration,
+    public GeneratorsProviderByField(ConfigurationHolder configuration,
                                      RemarksHolder remarksHolder) {
         super(configuration, remarksHolder);
         this.overriddenBuildersForFields = new HashMap<>();
@@ -40,7 +40,7 @@ public class GeneratorsProviderByField extends GeneratorsProviderAbstract {
 
             IGeneratorBuilderConfigurable genBuilderConfigurable = (IGeneratorBuilderConfigurable) genBuilder;
 
-            BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier =
+            BiFunction<ConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier =
                     (config, builder) -> {
                         if (config instanceof EnumConfigDto) {
                             if (field.getType().isEnum()) {
@@ -53,7 +53,7 @@ public class GeneratorsProviderByField extends GeneratorsProviderAbstract {
                     };
 
             return getGenerator(
-                    TypeGeneratorDefaultConfigSupplier.getDefaultConfigSupplier(field.getType()),
+                    TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(field.getType()),
                     () -> genBuilderConfigurable,
                     generatorSupplier,
                     field.getType(),

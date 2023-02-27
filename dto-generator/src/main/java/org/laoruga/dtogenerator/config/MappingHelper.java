@@ -19,15 +19,14 @@ import java.util.function.Supplier;
  */
 public class MappingHelper {
 
-    static final Map<Class<?>, Class<?>> CONFIG_TYPE_TO_GENERATED_TYPE;
-    static final Map<Class<?>, Class<? extends IGeneratorBuilder>> CONFIG_TYPE_TO_BUILDER_TYPE;
-    static final Map<Class<?>, Supplier<IConfigDto>> GENERATED_TYPE_TO_DEFAULT_CONFIG_DTO_SUPPLIER;
-
+    public static final Map<Class<?>, Class<?>> CONFIG_TYPE_TO_GENERATED_TYPE;
+    public static final Map<Class<?>, Class<? extends IGeneratorBuilder>> CONFIG_TYPE_TO_BUILDER_TYPE;
+    public static final Map<Class<?>, Supplier<ConfigDto>> GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER;
 
     static {
         Map<Class<?>, Class<?>> configToGeneratedType = new HashMap<>(16);
         Map<Class<?>, Class<? extends IGeneratorBuilder>> configToBuilder = new HashMap<>(16);
-        Map<Class<?>, Supplier<IConfigDto>> configSupplier = new HashMap<>(16);
+        Map<Class<?>, Supplier<ConfigDto>> configSupplier = new HashMap<>(16);
 
         add(configToGeneratedType, configToBuilder, configSupplier,
                 RulesInstance.stringRule,
@@ -71,15 +70,15 @@ public class MappingHelper {
 
         CONFIG_TYPE_TO_GENERATED_TYPE = ImmutableMap.copyOf(configToGeneratedType);
         CONFIG_TYPE_TO_BUILDER_TYPE = ImmutableMap.copyOf(configToBuilder);
-        GENERATED_TYPE_TO_DEFAULT_CONFIG_DTO_SUPPLIER = ImmutableMap.copyOf(configSupplier);
+        GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER = ImmutableMap.copyOf(configSupplier);
     }
 
     private static void add(
             Map<Class<?>, Class<?>> configToGeneratedType,
             Map<Class<?>, Class<? extends IGeneratorBuilder>> configToBuilder,
-            Map<Class<?>, Supplier<IConfigDto>> generatedTypeToConfigSupplier,
+            Map<Class<?>, Supplier<ConfigDto>> generatedTypeToConfigSupplier,
             Annotation rule,
-            Class<? extends IConfigDto> configClass,
+            Class<? extends ConfigDto> configClass,
             Class<? extends IGeneratorBuilder> builderClass
     ) {
         Class<?> generatedType;

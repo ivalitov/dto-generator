@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.config;
+package org.laoruga.dtogenerator.config.dto;
 
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
@@ -17,7 +17,7 @@ import java.util.Properties;
  */
 
 @Slf4j
-public class DtoGeneratorFileConfig extends DtoGeneratorConfig {
+public class DtoGeneratorFileConfig extends DtoGeneratorConfigParams {
 
     private final Properties properties;
     private final String propsFileName;

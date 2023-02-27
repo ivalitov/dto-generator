@@ -12,7 +12,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkableArgs;
 import org.laoruga.dtogenerator.api.rules.*;
-import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
+import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.CustomGenerator;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersFactory;
@@ -43,7 +43,7 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
     private final GeneratorBuildersHolder userGeneratorBuildersHolder;
     private final GeneratorBuildersHolder defaultGeneratorBuildersHolder;
 
-    public GeneratorsProviderByAnnotation(DtoGeneratorInstanceConfig configuration,
+    public GeneratorsProviderByAnnotation(ConfigurationHolder configuration,
                                           GeneratorsProviderByType generatorsProviderByType,
                                           RemarksHolder remarksHolder,
                                           GeneratorBuildersHolder userGeneratorBuildersHolder) {
@@ -206,8 +206,8 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
         return generatorBuilder.build();
     }
 
-    BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> integerGeneratorSupplier(Class<?> fieldType,
-                                                                                                  String fieldName) {
+    BiFunction<ConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> integerGeneratorSupplier(Class<?> fieldType,
+                                                                                                 String fieldName) {
         return (config, builder) -> {
             if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
                 reportPrimitiveCannotBeNull(fieldName);
@@ -220,8 +220,8 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
         };
     }
 
-    BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> longGeneratorSupplier(Class<?> fieldType,
-                                                                                               String fieldName) {
+    BiFunction<ConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> longGeneratorSupplier(Class<?> fieldType,
+                                                                                              String fieldName) {
         return (config, builder) -> {
             if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
                 reportPrimitiveCannotBeNull(fieldName);
@@ -234,8 +234,8 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
         };
     }
 
-    BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> doubleGeneratorSupplier(Class<?> fieldType,
-                                                                                                 String fieldName) {
+    BiFunction<ConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> doubleGeneratorSupplier(Class<?> fieldType,
+                                                                                                String fieldName) {
         return (config, builder) -> {
             if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
                 reportPrimitiveCannotBeNull(fieldName);

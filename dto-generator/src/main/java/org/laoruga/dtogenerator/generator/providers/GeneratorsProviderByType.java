@@ -5,13 +5,13 @@ import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
-import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
-import org.laoruga.dtogenerator.config.TypeGeneratorDefaultConfigSupplier;
+import org.laoruga.dtogenerator.config.ConfigurationHolder;
+import org.laoruga.dtogenerator.config.types.TypeGeneratorsDefaultConfigSupplier;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolderGeneral;
 import org.laoruga.dtogenerator.generator.builder.builders.EnumGeneratorBuilder;
-import org.laoruga.dtogenerator.generator.configs.IConfigDto;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -29,7 +29,7 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
     private final GeneratorBuildersHolder userGeneratorBuilders;
     private final GeneratorBuildersHolder generalGeneratorBuilders = GeneratorBuildersHolderGeneral.getInstance();
 
-    public GeneratorsProviderByType(DtoGeneratorInstanceConfig configuration,
+    public GeneratorsProviderByType(ConfigurationHolder configuration,
                                     GeneratorBuildersHolder userGeneratorBuilders,
                                     RemarksHolder remarksHolder) {
         super(configuration, remarksHolder);
@@ -67,7 +67,7 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
     private Optional<IGenerator<?>> configureGenerator(Field field,
                                                        Class<?> generatedType,
                                                        IGeneratorBuilderConfigurable genBuilder) {
-        BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier;
+        BiFunction<ConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier;
 
         if (Collection.class.isAssignableFrom(generatedType)) {
 
@@ -90,7 +90,7 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
 
         return Optional.of(
                 getGenerator(
-                        TypeGeneratorDefaultConfigSupplier.getDefaultConfigSupplier(generatedType),
+                        TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(generatedType),
                         () -> genBuilder,
                         generatorSupplier,
                         generatedType,

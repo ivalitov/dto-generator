@@ -1,9 +1,10 @@
 package org.laoruga.dtogenerator.generator.configs;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
@@ -21,17 +22,15 @@ import java.util.function.Supplier;
  */
 @Getter
 @Setter
-@Builder
+@Accessors(chain = true)
+@NoArgsConstructor
 @AllArgsConstructor
-public class CollectionConfigDto implements IConfigDto {
+public class CollectionConfigDto implements ConfigDto {
     private Integer minSize;
     private Integer maxSize;
     private Supplier<Collection<Object>> collectionInstance;
     private IGenerator<Object> elementGenerator;
     private IRuleRemark ruleRemark;
-
-    public CollectionConfigDto() {
-    }
 
     @SuppressWarnings("unchecked")
     public CollectionConfigDto(SetRule rule) {
@@ -49,16 +48,6 @@ public class CollectionConfigDto implements IConfigDto {
         this.ruleRemark = rule.ruleRemark();
     }
 
-    public CollectionConfigDto setCollectionInstance(Supplier<Collection<Object>> collectionInstance) {
-        this.collectionInstance = collectionInstance;
-        return this;
-    }
-
-    public CollectionConfigDto setElementGenerator(IGenerator<Object> elementGenerator) {
-        this.elementGenerator = elementGenerator;
-        return this;
-    }
-
     public void merge(CollectionConfigDto from) {
         if (from.getMinSize() != null) this.minSize = from.getMinSize();
         if (from.getMaxSize() != null) this.maxSize = from.getMaxSize();
@@ -73,7 +62,7 @@ public class CollectionConfigDto implements IConfigDto {
     }
 
     @Override
-    public void merge(IConfigDto from) {
+    public void merge(ConfigDto from) {
         CollectionConfigDto fromConfig = (CollectionConfigDto) from;
         if (fromConfig.getMinSize() != null) this.minSize = fromConfig.getMinSize();
         if (fromConfig.getMaxSize() != null) this.maxSize = fromConfig.getMaxSize();

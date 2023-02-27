@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
-import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
+import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
 import org.laoruga.dtogenerator.rule.RulesInstance;
 
@@ -74,17 +74,17 @@ public class ImplicitRulesTests {
 
     @BeforeEach
     void before() {
-        DtoGeneratorStaticConfig.getInstance().setGenerateAllKnownTypes(true);
+        DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
     }
 
     @Test
     @DisplayName("Generation with implicit rules")
     void GenerationWithImplicitRules() {
 
-        DtoGeneratorStaticConfig.getInstance().getGeneratorsConfig().getListConfig().setMinSize(1);
-        DtoGeneratorStaticConfig.getInstance().getGeneratorsConfig().getListConfig().setMaxSize(1);
-        DtoGeneratorStaticConfig.getInstance().getGeneratorsConfig().getSetConfig().setMinSize(1);
-        DtoGeneratorStaticConfig.getInstance().getGeneratorsConfig().getSetConfig().setMaxSize(1);
+        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getListConfig().setMinSize(1);
+        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getListConfig().setMaxSize(1);
+        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getSetConfig().setMinSize(1);
+        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getSetConfig().setMaxSize(1);
 
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
 
@@ -132,7 +132,7 @@ public class ImplicitRulesTests {
 
     @AfterEach
     void after() {
-        DtoGeneratorStaticConfig.getInstance().setGenerateAllKnownTypes(false);
+        DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().setGenerateAllKnownTypes(false);
         resetStaticConfig();
     }
 }

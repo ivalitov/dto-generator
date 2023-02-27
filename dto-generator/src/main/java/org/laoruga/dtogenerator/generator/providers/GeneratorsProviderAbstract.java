@@ -6,13 +6,13 @@ import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
-import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
+import org.laoruga.dtogenerator.config.ConfigurationHolder;
+import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.builders.EnumGeneratorBuilder;
 import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.generator.configs.EnumConfigDto;
-import org.laoruga.dtogenerator.generator.configs.IConfigDto;
 
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -23,16 +23,16 @@ import java.util.function.Supplier;
  */
 public abstract class GeneratorsProviderAbstract {
 
-    private final DtoGeneratorInstanceConfig configuration;
+    private final ConfigurationHolder configuration;
     @Getter(AccessLevel.PROTECTED)
     private final RemarksHolder remarksHolder;
 
-    protected GeneratorsProviderAbstract(DtoGeneratorInstanceConfig configuration, RemarksHolder remarksHolder) {
+    protected GeneratorsProviderAbstract(ConfigurationHolder configuration, RemarksHolder remarksHolder) {
         this.configuration = configuration;
         this.remarksHolder = remarksHolder;
     }
 
-    protected DtoGeneratorInstanceConfig getConfiguration() {
+    protected ConfigurationHolder getConfiguration() {
         return configuration;
     }
 
@@ -41,19 +41,19 @@ public abstract class GeneratorsProviderAbstract {
                 remarksHolder.getBasicRemarks().getBasicRuleRemark(fieldName) : null;
     }
 
-    protected IGenerator<?> getGenerator(Supplier<IConfigDto> configDtoSupplier,
+    protected IGenerator<?> getGenerator(Supplier<ConfigDto> configDtoSupplier,
                                          Supplier<IGeneratorBuilderConfigurable> genBuildSupplier,
-                                         BiFunction<IConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier,
+                                         BiFunction<ConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier,
                                          Class<?> fieldType,
                                          String fieldName) {
         IGeneratorBuilderConfigurable genBuilder = genBuildSupplier.get();
 
 
-        IConfigDto instanceConfig = getConfiguration().getGeneratorsConfig()
+        ConfigDto instanceConfig = getConfiguration().getTypeGeneratorsConfig()
                 .getOrNull(genBuilder.getClass(), fieldType);
-        IConfigDto staticConfig = DtoGeneratorStaticConfig.getInstance().getGeneratorsConfig()
+        ConfigDto staticConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig()
                 .getOrNull(genBuilder.getClass(), fieldType);
-        IConfigDto config = configDtoSupplier.get();
+        ConfigDto config = configDtoSupplier.get();
 
         if (staticConfig != null) {
             config.merge(staticConfig);
@@ -71,7 +71,7 @@ public abstract class GeneratorsProviderAbstract {
     }
 
     protected BiFunction<
-            IConfigDto,
+            ConfigDto,
             IGeneratorBuilderConfigurable,
             IGenerator<?>> enumGeneratorSupplier(Class<?> generatedType) {
         return (config, builder) -> {
@@ -88,7 +88,7 @@ public abstract class GeneratorsProviderAbstract {
         };
     }
 
-    protected BiFunction<IConfigDto, IGeneratorBuilderConfigurable,
+    protected BiFunction<ConfigDto, IGeneratorBuilderConfigurable,
             IGenerator<?>> collectionGeneratorSupplier(IGenerator<?> elementGenerator) {
         return (config, builder) -> {
             ((CollectionConfigDto) config).setElementGenerator((IGenerator<Object>) elementGenerator);

@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.config;
+package org.laoruga.dtogenerator.config.types;
 
 import com.google.common.primitives.Primitives;
 import lombok.AccessLevel;
@@ -8,31 +8,42 @@ import org.laoruga.dtogenerator.generator.builder.builders.*;
 import org.laoruga.dtogenerator.generator.configs.*;
 import org.laoruga.dtogenerator.rule.RulesInstance;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
+ * Provides lazy getters of config instances containing default configuration (default values from annotations).
+ *
  * @author Il'dar Valitov
  * Created on 29.11.2022
  */
 
 
-public class TypeGeneratorsConfig {
+public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
 
     @Getter(AccessLevel.PACKAGE)
     private final
-    Map<Class<? extends IGeneratorBuilder>, Map<Class<?>, IConfigDto>>
+    Map<Class<? extends IGeneratorBuilder>, Map<Class<?>, ConfigDto>>
             configMap = new HashMap<>();
 
-    public IConfigDto getOrNull(Class<?> builderClass, Class<?> generatedType) {
+    /**
+     * @param builderClass  type generator builder class
+     * @param generatedType field type for which the value is supposed to be generated
+     *
+     * @return config instance or null if there is no config found according to the given classes
+     */
+    public ConfigDto getOrNull(Class<?> builderClass, Class<?> generatedType) {
 
         generatedType = generatedType.isPrimitive() ? Primitives.wrap(generatedType) : generatedType;
 
         if (configMap.containsKey(builderClass)) {
-            Set<Map.Entry<Class<?>, IConfigDto>> generatedTypeConfigSupplierEntrySet
+            Set<Map.Entry<Class<?>, ConfigDto>> generatedTypeConfigSupplierEntrySet
                     = configMap.get(builderClass).entrySet();
 
-            for (Map.Entry<Class<?>, IConfigDto> typeSupplierEntry : generatedTypeConfigSupplierEntrySet) {
+            for (Map.Entry<Class<?>, ConfigDto> typeSupplierEntry : generatedTypeConfigSupplierEntrySet) {
                 if (typeSupplierEntry.getKey().isAssignableFrom(generatedType)) {
                     return typeSupplierEntry.getValue();
                 }
@@ -43,24 +54,8 @@ public class TypeGeneratorsConfig {
         return null;
     }
 
-    public void setConfig(IConfigDto configDto) {
-
-        Class<? extends IGeneratorBuilder> generatorBuilderClass =
-                Objects.requireNonNull(MappingHelper.CONFIG_TYPE_TO_BUILDER_TYPE.get(configDto.getClass()));
-
-        configMap.putIfAbsent(
-                generatorBuilderClass,
-                new HashMap<>()
-        );
-
-        configMap.get(generatorBuilderClass).put(
-                MappingHelper.CONFIG_TYPE_TO_GENERATED_TYPE.get(configDto.getClass()),
-                configDto
-        );
-    }
-
     public void setCollectionConfig(Class<?> superTypeClass,
-                                    IConfigDto configDto) {
+                                    ConfigDto configDto) {
         Class<? extends IGeneratorBuilder> genBuilderClass = configDto.getBuilderClass();
         configMap.putIfAbsent(genBuilderClass, new HashMap<>());
         configMap.get(genBuilderClass).put(superTypeClass, configDto);
@@ -119,7 +114,7 @@ public class TypeGeneratorsConfig {
     }
 
     public CollectionConfigDto getListConfig() {
-        IConfigDto config = getOrNull(CollectionGeneratorBuilder.class, List.class);
+        ConfigDto config = getOrNull(CollectionGeneratorBuilder.class, List.class);
         if (config == null) {
             config = new CollectionConfigDto();
             setCollectionConfig(List.class, config);
@@ -128,7 +123,7 @@ public class TypeGeneratorsConfig {
     }
 
     public CollectionConfigDto getSetConfig() {
-        IConfigDto config = getOrNull(CollectionGeneratorBuilder.class, Set.class);
+        ConfigDto config = getOrNull(CollectionGeneratorBuilder.class, Set.class);
         if (config == null) {
             config = new CollectionConfigDto();
             setCollectionConfig(Set.class, config);
@@ -136,12 +131,12 @@ public class TypeGeneratorsConfig {
         return (CollectionConfigDto) config;
     }
 
-    private IConfigDto getConfigLazy(Class<? extends IGeneratorBuilder> genBuilderClass,
-                                     Class<?> generatedType,
-                                     Supplier<IConfigDto> configSupplier) {
+    private ConfigDto getConfigLazy(Class<? extends IGeneratorBuilder> genBuilderClass,
+                                    Class<?> generatedType,
+                                    Supplier<ConfigDto> configSupplier) {
         configMap.putIfAbsent(genBuilderClass, new HashMap<>());
         if (!configMap.get(genBuilderClass).containsKey(generatedType)) {
-            IConfigDto configDto = configSupplier.get();
+            ConfigDto configDto = configSupplier.get();
             configMap.get(genBuilderClass).putIfAbsent(generatedType, configDto);
         }
         return configMap.get(genBuilderClass).get(generatedType);

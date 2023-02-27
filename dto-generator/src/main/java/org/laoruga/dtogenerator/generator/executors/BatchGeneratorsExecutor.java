@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator.executors;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.ErrorsHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
+import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.reflect.Field;
@@ -23,7 +23,8 @@ public class BatchGeneratorsExecutor {
     private final Map<Field, IGenerator<?>> generatorMap;
     private final ThreadLocal<Map<Field, IGenerator<?>>> notExecutedGeneratorsMap;
     private final AbstractExecutor executorsChain;
-    private final int maxAttempts = DtoGeneratorStaticConfig.getInstance().getMaxDependentGenerationCycles();
+    private final int maxAttempts = DtoGeneratorStaticConfig.getInstance()
+            .getDtoGeneratorConfig().getMaxDependentGenerationCycles();
     private final ErrorsHolder errorsHolder;
 
     public BatchGeneratorsExecutor(AbstractExecutor executorsChain, Map<Field, IGenerator<?>> generatorMap) {

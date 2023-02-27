@@ -5,7 +5,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.generator.CollectionGenerator;
 import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
-import org.laoruga.dtogenerator.generator.configs.IConfigDto;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -55,7 +55,7 @@ public class CollectionGeneratorBuilder<V> implements IGeneratorBuilderConfigura
 
     @Override
     @SuppressWarnings("unchecked")
-    public CollectionGenerator build(IConfigDto configDto, boolean merge) {
+    public CollectionGenerator build(ConfigDto configDto, boolean merge) {
         if (merge) {
             configDto.merge(this.configDto);
         }
