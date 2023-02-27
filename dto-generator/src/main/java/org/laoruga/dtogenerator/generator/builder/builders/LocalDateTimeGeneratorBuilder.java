@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator.builder.builders;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.generator.LocalDateTimeGenerator;
-import org.laoruga.dtogenerator.generator.configs.IConfigDto;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.generator.configs.LocalDateTimeConfigDto;
 
 /**
@@ -37,7 +37,7 @@ public final class LocalDateTimeGeneratorBuilder implements IGeneratorBuilderCon
         return build(configDto, false);
     }
 
-    public LocalDateTimeGenerator build(IConfigDto configDto, boolean merge) {
+    public LocalDateTimeGenerator build(ConfigDto configDto, boolean merge) {
         if (merge) {
             configDto.merge(this.configDto);
         }

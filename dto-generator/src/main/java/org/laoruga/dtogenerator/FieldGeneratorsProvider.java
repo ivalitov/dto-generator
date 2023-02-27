@@ -6,7 +6,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
-import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
+import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.generator.providers.GeneratorProvidersMediator;
@@ -30,7 +30,7 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.getDefaultMethodValu
 @Getter(AccessLevel.PACKAGE)
 public class FieldGeneratorsProvider {
 
-    private final DtoGeneratorInstanceConfig configuration;
+    private final ConfigurationHolder configuration;
     private Supplier<?> dtoInstanceSupplier;
     private final String[] pathFromDtoRoot;
     private final Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree;
@@ -38,7 +38,7 @@ public class FieldGeneratorsProvider {
     private final RulesInfoExtractor rulesInfoExtractor;
     private final GeneratorProvidersMediator generatorProvidersMediator;
 
-    FieldGeneratorsProvider(DtoGeneratorInstanceConfig configuration,
+    FieldGeneratorsProvider(ConfigurationHolder configuration,
                             RemarksHolder remarksProvider,
                             FieldFilter fieldsFilter,
                             String[] pathFromDtoRoot,
@@ -120,7 +120,7 @@ public class FieldGeneratorsProvider {
         }
 
         // attempt to generate value by field type
-        if (getConfiguration().getGenerateAllKnownTypes()) {
+        if (getConfiguration().getDtoGeneratorConfig().getGenerateAllKnownTypes()) {
             return generatorProvidersMediator.getGeneratorsByType(field, field.getType());
         }
 

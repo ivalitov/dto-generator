@@ -15,6 +15,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.stream.Collectors.joining;
+
 /**
  * @author Il'dar Valitov
  * Created on 25.05.2022
@@ -53,34 +55,58 @@ public final class ReflectionUtils {
         }
     }
 
-    private static final String FAILED_MSG_PATTERN = "Failed to instantiate class: '%s'";
-
     /**
-     * @param dtoClass class to instantiate, must have no-args constructor
-     * @param <T>      - type to create
-     * @return instance of class
+     * @param classToCreate   class to instantiate
+     * @param constructorArgs constructor arguments or empty
+     * @param <T>             type of instantiating class
+     * @return class instance
      */
     @SuppressWarnings("unchecked")
-    public static <T> T createInstance(Class<T> dtoClass) {
+
+    public static <T> T createInstance(Class<T> classToCreate, Object... constructorArgs) {
+        Optional<Constructor<?>> suitableConstructor;
         try {
-            Constructor<?>[] declaredConstructors = dtoClass.getDeclaredConstructors();
-            Optional<Constructor<?>> maybeNoArgsConstructor = Arrays.stream(declaredConstructors)
-                    .filter(constructor -> constructor.getParameterCount() == 0)
+
+            suitableConstructor = Arrays.stream(classToCreate.getDeclaredConstructors())
+                    .filter(constructor ->
+                            constructor.getParameterCount() == constructorArgs.length &&
+                                    isTypesAssignableFromObjects(constructor.getParameterTypes(), constructorArgs))
                     .findAny();
-            if (!maybeNoArgsConstructor.isPresent()) {
-                throw new DtoGeneratorException(String.format(FAILED_MSG_PATTERN, dtoClass) +
-                        " Class must have no-args constructor.");
+
+            if (!suitableConstructor.isPresent()) {
+                String failedMsg = constructorArgs.length == 0 ? "Class must have no-args constructor." :
+                        "Class must have constructor with params: " +
+                                Arrays.stream(constructorArgs)
+                                        .map(arg -> arg.getClass().toString())
+                                        .collect(joining(",", "'", "'"));
+
+                throw new DtoGeneratorException(failedMsg);
             }
-            Constructor<?> constructor = maybeNoArgsConstructor.get();
+
+            Constructor<?> constructor = suitableConstructor.get();
             constructor.setAccessible(true);
-            return (T) constructor.newInstance();
-        } catch (InstantiationException ie) {
-            throw new DtoGeneratorException(String.format(FAILED_MSG_PATTERN, dtoClass) +
-                    " Maybe no-args constructor was not found.", ie);
+            return (T) constructor.newInstance(constructorArgs);
+
         } catch (Exception e) {
-            throw new DtoGeneratorException(String.format(FAILED_MSG_PATTERN, dtoClass), e);
+            throw new DtoGeneratorException("Failed to instantiate class: '" + classToCreate + "'", e);
         }
     }
+
+    private static boolean isTypesAssignableFromObjects(Class<?>[] types, Object[] objects) {
+
+        if (types.length != objects.length) {
+            throw new IllegalArgumentException("Arg lengths must be the same.");
+        }
+
+        for (int i = 0; i < types.length; i++) {
+            if (!(types[i].isAssignableFrom(objects[i].getClass()))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
     /**
      * 1. Filed type should be assignable from required collectionClass

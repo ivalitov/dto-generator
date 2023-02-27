@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator.builder.builders;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.generator.StringGenerator;
-import org.laoruga.dtogenerator.generator.configs.IConfigDto;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.generator.configs.StringConfigDto;
 
 import java.util.Objects;
@@ -55,7 +55,7 @@ public final class StringGeneratorBuilder implements IGeneratorBuilderConfigurab
         return build(this.configDto, false);
     }
 
-    public StringGenerator build(IConfigDto configDto, boolean merge) {
+    public StringGenerator build(ConfigDto configDto, boolean merge) {
         if (merge) {
             configDto.merge(this.configDto);
         }

@@ -3,8 +3,8 @@ package org.laoruga.dtogenerator.generator.builder.builders;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.generator.DoubleGenerator;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.generator.configs.DoubleConfigDto;
-import org.laoruga.dtogenerator.generator.configs.IConfigDto;
 
 /**
  * @author Il'dar Valitov
@@ -37,7 +37,7 @@ public final class DoubleGeneratorBuilder implements IGeneratorBuilderConfigurab
         return this;
     }
 
-    public DoubleGenerator build(IConfigDto configDto, boolean merge) {
+    public DoubleGenerator build(ConfigDto configDto, boolean merge) {
         if (merge) {
             configDto.merge(this.configDto);
         }

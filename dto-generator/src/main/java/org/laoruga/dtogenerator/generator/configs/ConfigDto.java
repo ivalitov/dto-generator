@@ -7,12 +7,11 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
  * @author Il'dar Valitov
  * Created on 02.12.2022
  */
-public interface IConfigDto {
+public interface ConfigDto {
 
     Class<? extends IGeneratorBuilder> getBuilderClass();
-    void merge(IConfigDto staticConfig);
-    void setRuleRemark(IRuleRemark ruleRemark);
+    void merge(ConfigDto staticConfig);
+    ConfigDto setRuleRemark(IRuleRemark ruleRemark);
     IRuleRemark getRuleRemark();
-
 
 }

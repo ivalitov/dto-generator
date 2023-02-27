@@ -12,13 +12,12 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.*;
-import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
-import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
-import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
+import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
+import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
+import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.functional.data.dto.DtoAllKnownTypes;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersFactory;
-import org.laoruga.dtogenerator.generator.configs.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -192,64 +191,40 @@ class OverridingOfGeneratorsTests {
     @DisplayName("Overridden instance configs of known type generators")
     void overriddenInstanceConfig() {
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
-        TypeGeneratorBuildersConfig gensConfig = builder.getUserConfig().getGenBuildersConfig();
+        TypeGeneratorsConfigSupplier gensConfig = builder.getTypeGeneratorsConfig();
 
-        gensConfig.setConfig(
-                StringConfigDto.builder()
-                        .minLength(1)
-                        .maxLength(100)
-                        .ruleRemark(MIN_VALUE)
-                        .chars("x").build());
+        gensConfig.getStringConfig()
+                .setMinLength(1)
+                .setMaxLength(100)
+                .setRuleRemark(MIN_VALUE)
+                .setChars("x");
 
-        gensConfig.setConfig(
-                IntegerConfigDto.builder()
-                        .minValue(-100)
-                        .maxValue(1)
-                        .ruleRemark(MAX_VALUE)
-                        .build());
+        gensConfig.getIntegerConfig().setMinValue(-100);
+        gensConfig.getIntegerConfig().setMaxValue(1);
+        gensConfig.getIntegerConfig().setRuleRemark(MAX_VALUE);
 
-        gensConfig.setConfig(
-                DoubleConfigDto.builder()
-                        .minValue(2D)
-                        .maxValue(100D)
-                        .ruleRemark(MIN_VALUE)
-                        .build());
+        gensConfig.getDoubleConfig().setMinValue(2D);
+        gensConfig.getDoubleConfig().setMaxValue(100D);
+        gensConfig.getDoubleConfig().setRuleRemark(MIN_VALUE);
 
-        gensConfig.setConfig(
-                LongConfigDto.builder()
-                        .minValue(-100L)
-                        .maxValue(3L)
-                        .ruleRemark(MAX_VALUE)
-                        .build());
+        gensConfig.getLongConfig().setMinValue(-100L);
+        gensConfig.getLongConfig().setMaxValue(3L);
+        gensConfig.getLongConfig().setRuleRemark(MAX_VALUE);
 
-        gensConfig.setConfig(
-                LocalDateTimeConfigDto.builder()
-                        .leftShiftDays(-1)
-                        .rightShiftDays(100)
-                        .ruleRemark(MIN_VALUE)
-                        .build());
+        gensConfig.getLocalDateTimeConfig().setLeftShiftDays(-1);
+        gensConfig.getLocalDateTimeConfig().setRightShiftDays(100);
+        gensConfig.getLocalDateTimeConfig().setRuleRemark(MIN_VALUE);
 
-        gensConfig.setConfig(
-                EnumConfigDto.builder()
-                        .ruleRemark(MIN_VALUE)
-                        .build());
+        gensConfig.getEnumConfig().setRuleRemark(MIN_VALUE);
 
-        gensConfig.setCollectionConfig(
-                List.class,
-                CollectionConfigDto.builder()
-                        .minSize(2)
-                        .maxSize(100)
-                        .collectionInstance(LinkedList::new)
-                        .ruleRemark(MIN_VALUE)
-                        .build());
+        gensConfig.getListConfig().setMinSize(2);
+        gensConfig.getListConfig().setMaxSize(100);
+        gensConfig.getListConfig().setCollectionInstance(LinkedList::new);
+        gensConfig.getListConfig().setRuleRemark(MIN_VALUE);
 
-        gensConfig.setCollectionConfig(
-                Set.class,
-                CollectionConfigDto.builder()
-                        .minSize(0)
-                        .maxSize(1)
-                        .ruleRemark(MAX_VALUE)
-                        .build());
+        gensConfig.getSetConfig().setMinSize(0);
+        gensConfig.getSetConfig().setMaxSize(1);
+        gensConfig.getSetConfig().setRuleRemark(MAX_VALUE);
 
         DtoAllKnownTypes dto = builder.build().generateDto();
 
@@ -262,7 +237,7 @@ class OverridingOfGeneratorsTests {
     @DisplayName("Overridden static config of known type generators")
     void overriddenStaticConfig() {
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
-        TypeGeneratorBuildersConfig gensConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig();
+        TypeGeneratorsConfigLazy gensConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
 
         gensConfig.getStringConfig().setMinLength(1);
         gensConfig.getStringConfig().setMaxLength(100);
@@ -425,11 +400,11 @@ class OverridingOfGeneratorsTests {
     @Test
     @DisplayName("Overridden builders and configs combinations")
     void overriddenBuildersAndConfigsCombination() {
-        DtoGeneratorStaticConfig.getInstance().setGenerateAllKnownTypes(true);
+        DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
         DtoGeneratorBuilder<DtoDifferent> builder = DtoGenerator.builder(DtoDifferent.class);
 
-        TypeGeneratorBuildersConfig staticConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig();
-        TypeGeneratorBuildersConfig userConfig = builder.getUserConfig().getGenBuildersConfig();
+        TypeGeneratorsConfigLazy staticConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
+        TypeGeneratorsConfigSupplier userConfig = builder.getTypeGeneratorsConfig();
 
         builder.setGeneratorBuilder(StringRule.class, stringBuilder()
                 .chars("o")
@@ -475,12 +450,12 @@ class OverridingOfGeneratorsTests {
 
         DtoGeneratorBuilder<DtoDifferent> builder2 = DtoGenerator.builder(DtoDifferent.class);
 
-        DtoGeneratorInstanceConfig userConfig2 = builder2.getUserConfig();
-        userConfig2.getGenBuildersConfig().getIntegerConfig().setMinValue(5);
-        userConfig2.getGenBuildersConfig().getIntegerConfig().setMaxValue(5);
-        userConfig2.getGenBuildersConfig().getStringConfig().setChars("i");
-        userConfig2.getGenBuildersConfig().getSetConfig().setMaxSize(1);
-        userConfig2.getGenBuildersConfig().getSetConfig().setMinSize(1);
+        TypeGeneratorsConfigSupplier userConfig2 = builder2.getTypeGeneratorsConfig();
+        userConfig2.getIntegerConfig().setMinValue(5);
+        userConfig2.getIntegerConfig().setMaxValue(5);
+        userConfig2.getStringConfig().setChars("i");
+        userConfig2.getSetConfig().setMaxSize(1);
+        userConfig2.getSetConfig().setMinSize(1);
         builder2.setGeneratorBuilder(ListRule.class, GeneratorBuildersFactory.listBuilder().maxSize(1).minSize(1));
 
         DtoDifferent dto2 = builder2.build().generateDto();
@@ -566,11 +541,11 @@ class OverridingOfGeneratorsTests {
     @Test
     @DisplayName("With Grouping")
     void withGrouping() {
-        TypeGeneratorBuildersConfig gensConfig = DtoGeneratorStaticConfig.getInstance().getGenBuildersConfig();
+        TypeGeneratorsConfigLazy gensConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
         gensConfig.getDoubleConfig().setMaxValue(1D);
         gensConfig.getDoubleConfig().setMinValue(1D);
 
-        DtoWithGroup dto = DtoGenerator.builder(DtoWithGroup.class)
+        DtoWithGroup dto_1 = DtoGenerator.builder(DtoWithGroup.class)
                 .includeGroups(DEFAULT, GROUP_2)
                 .setGeneratorBuilder(StringRule.class, stringBuilder().minLength(5).maxLength(5).chars("x"))
                 .setGeneratorBuilder(IntegerRule.class, integerBuilder().minValue(5).maxValue(5))
@@ -595,12 +570,12 @@ class OverridingOfGeneratorsTests {
 
         assertAll(
                 // dto 1
-                () -> assertThat(dto.getString(), equalTo("xxxxx")),
-                () -> assertThat(dto.getInteger(), equalTo(5)),
-                () -> assertThat(dto.getALong(), equalTo(123L)),
-                () -> assertThat(dto.getListOfString().get(0), equalTo("xxxxx")),
-                () -> assertThat(dto.getSetOfLong(), notNullValue()),
-                () -> assertThat(dto.getADouble(), equalTo(1D)),
+                () -> assertThat(dto_1.getString(), equalTo("xxxxx")),
+                () -> assertThat(dto_1.getInteger(), equalTo(5)),
+                () -> assertThat(dto_1.getALong(), equalTo(123L)),
+                () -> assertThat(dto_1.getListOfString().get(0), equalTo("xxxxx")),
+                () -> assertThat(dto_1.getSetOfLong(), notNullValue()),
+                () -> assertThat(dto_1.getADouble(), equalTo(1D)),
 
                 // dto 2
                 () -> assertThat(dto_2.getString(), nullValue()),
@@ -608,7 +583,7 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto_2.getALong(), nullValue()),
                 () -> assertThat(dto_2.getListOfString().get(0), notNullValue()),
                 () -> assertThat(dto_2.getSetOfLong(), nullValue()),
-                () -> assertThat(dto.getADouble(), equalTo(1D)),
+                () -> assertThat(dto_2.getADouble(), equalTo(0D)),
 
                 // dto 3
                 () -> assertThat(dto_3.getString().length(), equalTo(2)),
@@ -616,7 +591,7 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto_3.getALong(), nullValue()),
                 () -> assertThat(dto_3.getListOfString(), nullValue()),
                 () -> assertThat(dto_3.getSetOfLong(), hasSize(1)),
-                () -> assertThat(dto.getADouble(), equalTo(1D)),
+                () -> assertThat(dto_3.getADouble(), equalTo(1D)),
 
 
                 // dto 4
@@ -626,7 +601,7 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto_4.getListOfString(), hasSize(3)),
                 () -> assertThat(dto_4.getListOfString().get(1), equalTo("xxxx")),
                 () -> assertThat(dto_4.getSetOfLong(), nullValue()),
-                () -> assertThat(dto.getADouble(), equalTo(1D))
+                () -> assertThat(dto_4.getADouble(), equalTo(0D))
 
         );
 

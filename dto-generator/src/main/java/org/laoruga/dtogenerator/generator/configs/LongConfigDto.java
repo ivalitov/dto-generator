@@ -1,9 +1,7 @@
 package org.laoruga.dtogenerator.generator.configs;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.Accessors;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.LongRule;
@@ -16,8 +14,10 @@ import org.laoruga.dtogenerator.generator.builder.builders.LongGeneratorBuilder;
 @Builder
 @Setter
 @Getter
+@Accessors(chain = true)
+@NoArgsConstructor
 @AllArgsConstructor
-public class LongConfigDto implements IConfigDto {
+public class LongConfigDto implements ConfigDto {
     private Long maxValue;
     private Long minValue;
     private IRuleRemark ruleRemark;
@@ -28,15 +28,12 @@ public class LongConfigDto implements IConfigDto {
         this.ruleRemark = rule.ruleRemark();
     }
 
-    public LongConfigDto() {
-    }
-
     @Override
     public Class<? extends IGeneratorBuilder> getBuilderClass() {
         return LongGeneratorBuilder.class;
     }
 
-    public void merge(IConfigDto from) {
+    public void merge(ConfigDto from) {
         LongConfigDto configDto = (LongConfigDto) from;
         if (configDto.getMaxValue() != null) this.maxValue = configDto.getMaxValue();
         if (configDto.getMinValue() != null) this.minValue = configDto.getMinValue();

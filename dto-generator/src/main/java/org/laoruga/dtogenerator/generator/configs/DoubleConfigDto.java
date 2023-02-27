@@ -1,9 +1,10 @@
 package org.laoruga.dtogenerator.generator.configs;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.DoubleRule;
@@ -15,16 +16,14 @@ import org.laoruga.dtogenerator.generator.builder.builders.DoubleGeneratorBuilde
  */
 @Getter
 @Setter
-@Builder
+@Accessors(chain = true)
+@NoArgsConstructor
 @AllArgsConstructor
-public class DoubleConfigDto implements IConfigDto {
+public class DoubleConfigDto implements ConfigDto {
     private Double maxValue;
     private Double minValue;
     private Integer precision;
     private IRuleRemark ruleRemark;
-
-    public DoubleConfigDto() {
-    }
 
     public DoubleConfigDto(DoubleRule rule) {
         this.maxValue = rule.maxValue();
@@ -38,7 +37,7 @@ public class DoubleConfigDto implements IConfigDto {
         return DoubleGeneratorBuilder.class;
     }
 
-    public void merge(IConfigDto from) {
+    public void merge(ConfigDto from) {
         DoubleConfigDto fromConfigDto = (DoubleConfigDto) from;
         if (fromConfigDto.getMaxValue() != null) this.maxValue = fromConfigDto.getMaxValue();
         if (fromConfigDto.getMinValue() != null) this.minValue = fromConfigDto.getMinValue();

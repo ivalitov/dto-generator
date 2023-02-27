@@ -5,14 +5,16 @@ import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
-import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
-import org.laoruga.dtogenerator.config.TypeGeneratorBuildersDefaultConfig;
+import org.laoruga.dtogenerator.config.ConfigurationHolder;
+import org.laoruga.dtogenerator.config.types.TypeGeneratorsDefaultConfigSupplier;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.generator.configs.EnumConfigDto;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * @author Il'dar Valitov
@@ -23,12 +25,13 @@ public class GeneratorsProviderByField extends GeneratorsProviderAbstract {
 
     private final Map<String, IGeneratorBuilder> overriddenBuildersForFields;
 
-    public GeneratorsProviderByField(DtoGeneratorInstanceConfig configuration,
+    public GeneratorsProviderByField(ConfigurationHolder configuration,
                                      RemarksHolder remarksHolder) {
         super(configuration, remarksHolder);
         this.overriddenBuildersForFields = new HashMap<>();
     }
 
+    @SuppressWarnings("unchecked")
     public IGenerator<?> getGenerator(Field field) {
 
         IGeneratorBuilder genBuilder = overriddenBuildersForFields.get(field.getName());
@@ -37,17 +40,22 @@ public class GeneratorsProviderByField extends GeneratorsProviderAbstract {
 
             IGeneratorBuilderConfigurable genBuilderConfigurable = (IGeneratorBuilderConfigurable) genBuilder;
 
-            return getGenerator(
-                    () -> TypeGeneratorBuildersDefaultConfig.getInstance()
-                            .getConfig(genBuilderConfigurable.getClass(), field.getType()),
-                    () -> genBuilderConfigurable,
+            BiFunction<ConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier =
                     (config, builder) -> {
-
                         if (config instanceof EnumConfigDto) {
-                            ((EnumConfigDto) config).setEnumClass((Class<? extends Enum<?>>) field.getType());
+                            if (field.getType().isEnum()) {
+                                ((EnumConfigDto) config).setEnumClass((Class<? extends Enum<?>>) field.getType());
+                            } else {
+                                throw new IllegalStateException("Enum field type expected.");
+                            }
                         }
                         return builder.build(config, true);
-                    },
+                    };
+
+            return getGenerator(
+                    TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(field.getType()),
+                    () -> genBuilderConfigurable,
+                    generatorSupplier,
                     field.getType(),
                     field.getName());
         }

@@ -2,14 +2,13 @@ package org.laoruga.dtogenerator;
 
 import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.laoruga.dtogenerator.config.DtoGeneratorConfig;
-import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
-import org.laoruga.dtogenerator.config.TypeGeneratorBuildersConfig;
+import org.laoruga.dtogenerator.config.ConfigurationHolder;
+import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
+import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 import org.laoruga.dtogenerator.rule.RulesInfoExtractor;
 
 import java.lang.reflect.Field;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -49,12 +48,10 @@ public class UtilsRoot {
     @SneakyThrows
     @SuppressWarnings("unchecked")
     public static void resetStaticConfig() {
-        DtoGeneratorConfig config = DtoGeneratorStaticConfig.getInstance();
-        config.setGenerateAllKnownTypes(false);
-        Field configField = config.getClass().getSuperclass().getDeclaredField("genBuildersConfig");
+        ConfigurationHolder configurationHolder = DtoGeneratorStaticConfig.getInstance();
+        configurationHolder.getDtoGeneratorConfig().setGenerateAllKnownTypes(false);
+        Field configField = configurationHolder.getClass().getDeclaredField("typeGeneratorsConfig");
         configField.setAccessible(true);
-        AtomicReference<TypeGeneratorBuildersConfig> buildersConfig =
-                (AtomicReference<TypeGeneratorBuildersConfig>) configField.get(config);
-        buildersConfig.set(new TypeGeneratorBuildersConfig());
+        configField.set(configurationHolder, new TypeGeneratorsConfigLazy());
     }
 }

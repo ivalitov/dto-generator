@@ -7,7 +7,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
-import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
+import org.laoruga.dtogenerator.config.ConfigurationHolder;
+import org.laoruga.dtogenerator.config.dto.DtoGeneratorConfig;
+import org.laoruga.dtogenerator.config.dto.DtoGeneratorInstanceConfig;
+import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
+import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
@@ -29,7 +33,7 @@ import static org.laoruga.dtogenerator.util.StringUtils.splitPath;
 public class DtoGeneratorBuilder<T> {
 
     @Getter(AccessLevel.PROTECTED)
-    private final DtoGeneratorInstanceConfig configuration;
+    private final ConfigurationHolder configuration;
     @Getter(AccessLevel.PROTECTED)
     private final FieldGeneratorsProvider fieldGeneratorsProvider;
     @Getter(AccessLevel.PROTECTED)
@@ -46,7 +50,10 @@ public class DtoGeneratorBuilder<T> {
     }
 
     private DtoGeneratorBuilder(Supplier<?> dtoInstanceSupplier) {
-        this.configuration = new DtoGeneratorInstanceConfig();
+        this.configuration = new ConfigurationHolder(
+                new DtoGeneratorInstanceConfig(),
+                new TypeGeneratorsConfigLazy()
+        );
         this.remarksHolder = new RemarksHolder();
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
                 configuration,
@@ -54,14 +61,15 @@ public class DtoGeneratorBuilder<T> {
                 new FieldFilter(),
                 new String[]{ROOT},
                 this::getDtoGeneratorBuildersTree,
-                dtoInstanceSupplier);
+                dtoInstanceSupplier
+        );
         this.dtoGeneratorBuildersTree = new DtoGeneratorBuildersTree(this);
     }
 
     /**
      * Constructor for copying a builder for nested DTO generation.
      *
-     * @param copyFrom source builder
+     * @param copyFrom        source builder
      * @param pathFromRootDto path to nested dto
      */
 
@@ -185,8 +193,16 @@ public class DtoGeneratorBuilder<T> {
         return this;
     }
 
-    public DtoGeneratorInstanceConfig getUserConfig() {
-        return configuration;
+    /*
+     * Configuration
+     */
+
+    public DtoGeneratorConfig getDtoGeneratorConfig() {
+        return configuration.getDtoGeneratorConfig();
+    }
+
+    public TypeGeneratorsConfigSupplier getTypeGeneratorsConfig() {
+        return configuration.getTypeGeneratorsConfig();
     }
 
 }

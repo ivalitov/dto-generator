@@ -4,8 +4,8 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.EnumGenerator;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.generator.configs.EnumConfigDto;
-import org.laoruga.dtogenerator.generator.configs.IConfigDto;
 
 import java.util.Arrays;
 
@@ -45,7 +45,7 @@ public final class EnumGeneratorBuilder implements IGeneratorBuilderConfigurable
         return build(configDto, false);
     }
 
-    public EnumGenerator build(IConfigDto configDto, boolean merge) {
+    public EnumGenerator build(ConfigDto configDto, boolean merge) {
         if (merge) {
             configDto.merge(this.configDto);
         }

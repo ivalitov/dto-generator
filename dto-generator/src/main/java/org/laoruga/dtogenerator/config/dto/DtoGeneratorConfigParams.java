@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.config;
+package org.laoruga.dtogenerator.config.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,12 +9,10 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class DtoGeneratorConfig {
+public class DtoGeneratorConfigParams implements DtoGeneratorConfig {
 
     private Integer maxDependentGenerationCycles;
     private Integer maxCollectionGenerationCycles;
     private Boolean generateAllKnownTypes;
 
-    @Getter(lazy = true)
-    private final TypeGeneratorBuildersConfig genBuildersConfig = new TypeGeneratorBuildersConfig();
 }

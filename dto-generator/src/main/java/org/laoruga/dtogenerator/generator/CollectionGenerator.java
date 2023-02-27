@@ -5,7 +5,7 @@ import org.apache.commons.math3.random.RandomDataGenerator;
 import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
+import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.builders.CollectionGeneratorBuilder;
@@ -34,7 +34,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
     @Override
     public Collection<Object> generate() {
         Collection<Object> collectionInstance = collectionInstanceSupplier.get();
-        int maxAttempts = DtoGeneratorStaticConfig.getInstance().getMaxCollectionGenerationCycles();
+        int maxAttempts = DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().getMaxCollectionGenerationCycles();
         int size;
         switch ((RuleRemark) ruleRemark) {
             case MIN_VALUE:

@@ -10,7 +10,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.rules.ListRule;
 import org.laoruga.dtogenerator.api.rules.SetRule;
-import org.laoruga.dtogenerator.config.DtoGeneratorInstanceConfig;
+import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.generator.builder.builders.CollectionGeneratorBuilder;
@@ -34,7 +34,7 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createCollectionInst
 @Getter(AccessLevel.PRIVATE)
 public class generatorsProviderByAnnotationSupportingCollections extends GeneratorsProviderByAnnotation {
 
-    public generatorsProviderByAnnotationSupportingCollections(DtoGeneratorInstanceConfig configuration,
+    public generatorsProviderByAnnotationSupportingCollections(ConfigurationHolder configuration,
                                                                GeneratorsProviderByType generatorsProviderByType,
                                                                RemarksHolder remarksHolder,
                                                                GeneratorBuildersHolder userGeneratorBuildersHolder) {
