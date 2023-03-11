@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.generator.configs.*;
-import org.laoruga.dtogenerator.rule.RulesInstance;
+import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
@@ -26,38 +26,38 @@ public final class TypeGeneratorsDefaultConfigSupplier {
 
         add(configSupplier,
                 BooleanRule.GENERATED_TYPES,
-                RulesInstance.booleanRule,
+                RulesInstance.BOOLEAN_RULE,
                 BooleanConfigDto.class);
 
         add(configSupplier,
                 StringRule.GENERATED_TYPES,
-                RulesInstance.stringRule,
+                RulesInstance.STRING_RULE,
                 StringConfigDto.class);
 
         add(configSupplier,
                 NumberRule.GENERATED_TYPES,
-                RulesInstance.numberRule,
+                RulesInstance.NUMBER_RULE,
                 NumberConfigDto.class,
                 true);
 
         add(configSupplier,
                 DoubleRule.GENERATED_TYPES,
-                RulesInstance.doubleRule,
+                RulesInstance.DECIMAL_RULE,
                 DoubleConfigDto.class);
 
         add(configSupplier,
                 LocalDateTimeRule.GENERATED_TYPES,
-                RulesInstance.localDateTimeRule,
+                RulesInstance.LOCAL_DATE_TIME_RULE,
                 LocalDateTimeConfigDto.class);
 
         add(configSupplier,
                 EnumRule.GENERATED_TYPES,
-                RulesInstance.enumRule,
+                RulesInstance.ENUM_RULE,
                 EnumConfigDto.class);
 
         add(configSupplier,
                 CollectionRule.GENERATED_TYPES,
-                RulesInstance.collectionRule,
+                RulesInstance.COLLECTION_RULE,
                 CollectionConfigDto.class);
 
         GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER = ImmutableMap.copyOf(configSupplier);

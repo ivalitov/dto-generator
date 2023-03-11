@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.functional.data.dto.DtoAllKnownTypes;
-import org.laoruga.dtogenerator.rule.RulesInstance;
+import org.laoruga.dtogenerator.constants.RulesInstance;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -125,31 +125,31 @@ class BuilderReuseTests {
         LocalDate now = LocalDateTime.now().toLocalDate();
         assertAll(
                 () -> assertThat(dto.getString().length(), both(
-                        greaterThanOrEqualTo(RulesInstance.stringRule.minLength())).and(
-                        lessThanOrEqualTo(RulesInstance.stringRule.maxLength()))),
+                        greaterThanOrEqualTo(RulesInstance.STRING_RULE.minLength())).and(
+                        lessThanOrEqualTo(RulesInstance.STRING_RULE.maxLength()))),
                 () -> assertThat(dto.getInteger(), both(
-                        greaterThanOrEqualTo(RulesInstance.numberRule.minInt())).and(
-                        lessThanOrEqualTo(RulesInstance.numberRule.maxInt()))),
+                        greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt())).and(
+                        lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt()))),
                 () -> assertThat(dto.getALong(), both(
-                        greaterThanOrEqualTo(RulesInstance.numberRule.minLong())).and(
-                        lessThanOrEqualTo(RulesInstance.numberRule.maxLong()))),
+                        greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minLong())).and(
+                        lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxLong()))),
                 () -> assertThat(dto.getADouble(), both(
-                        greaterThanOrEqualTo(RulesInstance.doubleRule.minValue())).and(
-                        lessThanOrEqualTo(RulesInstance.doubleRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minValue())).and(
+                        lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxValue()))),
                 () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), both(
-                        sameOrAfter(now.minusDays(RulesInstance.localDateTimeRule.leftShiftDays()))).and(
-                        sameOrBefore(now.plusDays(RulesInstance.localDateTimeRule.rightShiftDays())))),
+                        sameOrAfter(now.minusDays(RulesInstance.LOCAL_DATE_TIME_RULE.leftShiftDays()))).and(
+                        sameOrBefore(now.plusDays(RulesInstance.LOCAL_DATE_TIME_RULE.rightShiftDays())))),
                 () -> assertThat(dto.getClientType(), notNullValue()),
 
                 () -> assertThat(dto.getListOfString().size(), both(
-                        greaterThanOrEqualTo(RulesInstance.collectionRule.minSize())).and(
-                        lessThanOrEqualTo(RulesInstance.collectionRule.maxSize()))),
+                        greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
+                        lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
                 () -> assertThat(dto.getSetOfLong().size(), both(
-                        greaterThanOrEqualTo(RulesInstance.collectionRule.minSize())).and(
-                        lessThanOrEqualTo(RulesInstance.collectionRule.maxSize()))),
+                        greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
+                        lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
                 () -> assertThat(dto.getLinkedListOfEnum().size(), both(
-                        greaterThanOrEqualTo(RulesInstance.collectionRule.minSize())).and(
-                        lessThanOrEqualTo(RulesInstance.collectionRule.maxSize()))),
+                        greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
+                        lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
 
                 () -> assertThat(dto.getInnerDto(), notNullValue()),
                 () -> assertThat(dto.getStringIntegerMap(), nullValue()),
@@ -160,31 +160,31 @@ class BuilderReuseTests {
 
         assertAll(
                 () -> assertThat(dto.getString().length(), both(
-                        greaterThanOrEqualTo(RulesInstance.stringRule.minLength())).and(
-                        lessThanOrEqualTo(RulesInstance.stringRule.maxLength()))),
+                        greaterThanOrEqualTo(RulesInstance.STRING_RULE.minLength())).and(
+                        lessThanOrEqualTo(RulesInstance.STRING_RULE.maxLength()))),
                 () -> assertThat(dto.getInteger(), both(
-                        greaterThanOrEqualTo(RulesInstance.numberRule.minInt())).and(
-                        lessThanOrEqualTo(RulesInstance.numberRule.maxInt()))),
+                        greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt())).and(
+                        lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt()))),
                 () -> assertThat(dto.getALong(), both(
-                        greaterThanOrEqualTo(RulesInstance.numberRule.minLong())).and(
-                        lessThanOrEqualTo(RulesInstance.numberRule.maxLong()))),
+                        greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minLong())).and(
+                        lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxLong()))),
                 () -> assertThat(dto.getADouble(), both(
-                        greaterThanOrEqualTo(RulesInstance.doubleRule.minValue())).and(
-                        lessThanOrEqualTo(RulesInstance.doubleRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minValue())).and(
+                        lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxValue()))),
                 () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), both(
-                        sameOrAfter(now.minusDays(RulesInstance.localDateTimeRule.leftShiftDays()))).and(
-                        sameOrBefore(now.plusDays(RulesInstance.localDateTimeRule.rightShiftDays())))),
+                        sameOrAfter(now.minusDays(RulesInstance.LOCAL_DATE_TIME_RULE.leftShiftDays()))).and(
+                        sameOrBefore(now.plusDays(RulesInstance.LOCAL_DATE_TIME_RULE.rightShiftDays())))),
                 () -> assertThat(dto.getClientType(), notNullValue()),
 
                 () -> assertThat(dto.getListOfString().size(), both(
-                        greaterThanOrEqualTo(RulesInstance.collectionRule.minSize())).and(
-                        lessThanOrEqualTo(RulesInstance.collectionRule.maxSize()))),
+                        greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
+                        lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
                 () -> assertThat(dto.getSetOfLong().size(), both(
-                        greaterThanOrEqualTo(RulesInstance.collectionRule.minSize())).and(
-                        lessThanOrEqualTo(RulesInstance.collectionRule.maxSize()))),
+                        greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
+                        lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
                 () -> assertThat(dto.getLinkedListOfEnum().size(), both(
-                        greaterThanOrEqualTo(RulesInstance.collectionRule.minSize())).and(
-                        lessThanOrEqualTo(RulesInstance.collectionRule.maxSize()))),
+                        greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
+                        lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
 
                 () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue()),
 

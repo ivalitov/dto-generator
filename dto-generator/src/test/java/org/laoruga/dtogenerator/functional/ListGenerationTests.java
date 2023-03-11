@@ -21,7 +21,7 @@ import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientDto;
 import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
 import org.laoruga.dtogenerator.generator.configs.StringConfigDto;
-import org.laoruga.dtogenerator.rule.RulesInstance;
+import org.laoruga.dtogenerator.constants.RulesInstance;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -69,10 +69,10 @@ class ListGenerationTests {
         assertNotNull(dto);
         List<Integer> numbers = dto.getArrayListIntegerRules();
         assertThat(numbers.size(), both(
-                greaterThanOrEqualTo(RulesInstance.collectionRule.minSize())).and(lessThanOrEqualTo(RulesInstance.collectionRule.maxSize())));
+                greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize())));
         for (Integer number : numbers) {
             assertThat(number, both(
-                    greaterThanOrEqualTo(RulesInstance.numberRule.minInt())).and(lessThanOrEqualTo(RulesInstance.numberRule.maxInt())));
+                    greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt())).and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt())));
         }
     }
 
@@ -104,16 +104,16 @@ class ListGenerationTests {
 
         Consumer<List<String>> assertListOfStrings = (list) -> {
             assertThat(list.size(), both(
-                    greaterThanOrEqualTo(RulesInstance.collectionRule.minSize()))
-                    .and(lessThanOrEqualTo(RulesInstance.collectionRule.maxSize())));
+                    greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize()))
+                    .and(lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize())));
             assertThat(list, everyItem(
                     notNullValue()
             ));
 
             for (String str : list) {
                 assertThat(str.length(), both(
-                        greaterThanOrEqualTo(RulesInstance.stringRule.minLength()))
-                        .and(lessThanOrEqualTo(RulesInstance.stringRule.maxLength())));
+                        greaterThanOrEqualTo(RulesInstance.STRING_RULE.minLength()))
+                        .and(lessThanOrEqualTo(RulesInstance.STRING_RULE.maxLength())));
             }
         };
 
@@ -318,11 +318,11 @@ class ListGenerationTests {
 
     private static void checkNumbers(Set<Integer> numbers) {
         assertThat(numbers.size(), both(
-                greaterThanOrEqualTo(RulesInstance.collectionRule.minSize())).and(lessThanOrEqualTo(RulesInstance.collectionRule.maxSize())));
+                greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize())));
         for (Integer number : numbers) {
             assertThat(number, both(
-                    greaterThanOrEqualTo(RulesInstance.numberRule.minInt()))
-                    .and(lessThanOrEqualTo(RulesInstance.numberRule.maxInt())));
+                    greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt()))
+                    .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt())));
         }
     }
 

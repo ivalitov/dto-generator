@@ -35,7 +35,7 @@ import java.util.function.Supplier;
 
 import static org.laoruga.dtogenerator.constants.RuleRemark.MIN_VALUE;
 import static org.laoruga.dtogenerator.constants.RuleRemark.NULL_VALUE;
-import static org.laoruga.dtogenerator.rule.RulesInstance.NUMBER_RULE_ZEROS;
+import static org.laoruga.dtogenerator.constants.RulesInstance.NUMBER_RULE_ZEROS;
 
 /**
  * @author Il'dar Valitov
