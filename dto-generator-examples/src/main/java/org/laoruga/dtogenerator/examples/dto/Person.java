@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.examples.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.laoruga.dtogenerator.api.rules.IntegerRule;
+import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class Person {
 
     @StringRule(regexp = "[A-Z]{1}[a-z]{5} [A-Z]{1}[a-z]{5} [A-Z]{1}[a-z]{5}")
     private String fio;
-    @IntegerRule(minValue = 1, maxValue = 101)
+    @NumberRule(minInt = 1, maxInt = 101)
     private Integer age;
     @StringRule(words = {"red", "yellow", "black", "gray", "white"})
     private String hairColor;

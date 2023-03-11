@@ -50,7 +50,7 @@ public class GeneratorProvidersMediator {
         return generatorProviderOverriddenForField.isBuilderOverridden(fieldName);
     }
 
-    public void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder genBuilder) {
+    public void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder<?> genBuilder) {
         generatorProviderOverriddenForField.setGeneratorBuilderForField(fieldName, genBuilder);
     }
 
@@ -62,7 +62,7 @@ public class GeneratorProvidersMediator {
      * By type
      */
 
-    public Optional<IGenerator<?>> getGeneratorsByType(Field field, Class<?> generatedType) {
+    public Optional<IGenerator<?>> getGeneratorByType(Field field, Class<?> generatedType) {
         return generatorsProviderByType
                 .getGenerator(field, generatedType)
                 .map(Objects::requireNonNull);
@@ -90,6 +90,4 @@ public class GeneratorProvidersMediator {
 
         return generator;
     }
-
-
 }

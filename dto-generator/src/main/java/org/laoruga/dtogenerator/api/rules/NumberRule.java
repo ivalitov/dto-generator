@@ -15,16 +15,29 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({FIELD, TYPE_USE})
 @Rule
-@Repeatable(IntegerRules.class)
-public @interface IntegerRule {
+@Repeatable(NumberRules.class)
+public @interface NumberRule {
 
-    int maxValue() default 999999999;
+    Class<?>[] GENERATED_TYPES = new Class<?>[]{Byte.class, Short.class, Integer.class, Long.class};
 
-    int minValue() default 0;
+    long maxLong() default Long.MAX_VALUE;
+
+    long minLong() default Long.MIN_VALUE;
+
+    int maxInt() default Integer.MAX_VALUE;
+
+    int minInt() default Integer.MIN_VALUE;
+
+    short maxShort() default Short.MAX_VALUE;
+
+    short minShort() default Short.MIN_VALUE;
+
+    byte maxByte() default Byte.MAX_VALUE;
+
+    byte minByte() default Byte.MIN_VALUE;
 
     RuleRemark ruleRemark() default RuleRemark.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 
-    Class<?> generatedType() default Integer.class;
 }

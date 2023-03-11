@@ -10,7 +10,7 @@ import org.laoruga.dtogenerator.generator.configs.DoubleConfigDto;
  * @author Il'dar Valitov
  * Created on 19.02.2023
  */
-public final class DoubleGeneratorBuilder implements IGeneratorBuilderConfigurable {
+public final class DoubleGeneratorBuilder implements IGeneratorBuilderConfigurable<Double> {
     private final DoubleConfigDto configDto;
 
     public DoubleGeneratorBuilder() {

@@ -2,7 +2,8 @@ package org.laoruga.dtogenerator;
 
 import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.laoruga.dtogenerator.config.ConfigurationHolder;
+import lombok.extern.slf4j.Slf4j;
+import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 import org.laoruga.dtogenerator.rule.RulesInfoExtractor;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
  * @author Il'dar Valitov
  * Created on 05.02.2023
  */
+@Slf4j
 public class UtilsRoot {
 
     public static RulesInfoExtractor getExtractorInstance(String... groups) {
@@ -48,10 +50,11 @@ public class UtilsRoot {
     @SneakyThrows
     @SuppressWarnings("unchecked")
     public static void resetStaticConfig() {
-        ConfigurationHolder configurationHolder = DtoGeneratorStaticConfig.getInstance();
+        Configuration configurationHolder = DtoGeneratorStaticConfig.getInstance();
         configurationHolder.getDtoGeneratorConfig().setGenerateAllKnownTypes(false);
         Field configField = configurationHolder.getClass().getDeclaredField("typeGeneratorsConfig");
         configField.setAccessible(true);
         configField.set(configurationHolder, new TypeGeneratorsConfigLazy());
+        log.info("Static context restored");
     }
 }

@@ -5,10 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.DoubleRule;
-import org.laoruga.dtogenerator.generator.builder.builders.DoubleGeneratorBuilder;
 
 /**
  * @author Il'dar Valitov
@@ -32,13 +30,8 @@ public class DoubleConfigDto implements ConfigDto {
         this.ruleRemark = rule.ruleRemark();
     }
 
-    @Override
-    public Class<? extends IGeneratorBuilder> getBuilderClass() {
-        return DoubleGeneratorBuilder.class;
-    }
-
-    public void merge(ConfigDto from) {
-        DoubleConfigDto fromConfigDto = (DoubleConfigDto) from;
+    public void merge(ConfigDto configDto) {
+        DoubleConfigDto fromConfigDto = (DoubleConfigDto) configDto;
         if (fromConfigDto.getMaxValue() != null) this.maxValue = fromConfigDto.getMaxValue();
         if (fromConfigDto.getMinValue() != null) this.minValue = fromConfigDto.getMinValue();
         if (fromConfigDto.getPrecision() != null) this.precision = fromConfigDto.getPrecision();

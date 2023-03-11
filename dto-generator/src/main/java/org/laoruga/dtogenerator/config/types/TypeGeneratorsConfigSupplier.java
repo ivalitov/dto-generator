@@ -2,6 +2,8 @@ package org.laoruga.dtogenerator.config.types;
 
 import org.laoruga.dtogenerator.generator.configs.*;
 
+import java.util.Collection;
+
 /**
  * @author Il'dar Valitov
  * Created on 21.02.2023
@@ -10,9 +12,7 @@ public interface TypeGeneratorsConfigSupplier {
 
     StringConfigDto getStringConfig();
 
-    IntegerConfigDto getIntegerConfig();
-
-    LongConfigDto getLongConfig();
+    NumberCommonConfigDto getNumberConfig();
 
     DoubleConfigDto getDoubleConfig();
 
@@ -20,7 +20,6 @@ public interface TypeGeneratorsConfigSupplier {
 
     EnumConfigDto getEnumConfig();
 
-    CollectionConfigDto getListConfig();
+    CollectionConfigDto getCollectionConfig(Class<? extends Collection> collectionType);
 
-    CollectionConfigDto getSetConfig();
 }

@@ -13,7 +13,7 @@ import java.util.Arrays;
  * @author Il'dar Valitov
  * Created on 19.02.2023
  */
-public final class EnumGeneratorBuilder implements IGeneratorBuilderConfigurable {
+public final class EnumGeneratorBuilder implements IGeneratorBuilderConfigurable<Enum> {
 
     EnumConfigDto configDto;
 
@@ -23,16 +23,6 @@ public final class EnumGeneratorBuilder implements IGeneratorBuilderConfigurable
 
     public EnumGeneratorBuilder possibleEnumNames(String... possibleEnumNames) {
         configDto.setPossibleEnumNames(possibleEnumNames);
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public EnumGeneratorBuilder enumClass(Class<?> enumClass) {
-        if (enumClass.isEnum()) {
-            configDto.setEnumClass((Class<? extends Enum<?>>) enumClass);
-        } else {
-            throw new DtoGeneratorException(new ClassCastException("Enum class expected"));
-        }
         return this;
     }
 

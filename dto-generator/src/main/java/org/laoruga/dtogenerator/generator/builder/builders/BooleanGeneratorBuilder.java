@@ -10,7 +10,7 @@ import org.laoruga.dtogenerator.generator.configs.ConfigDto;
  * @author Il'dar Valitov
  * Created on 19.02.2023
  */
-public final class BooleanGeneratorBuilder implements IGeneratorBuilderConfigurable {
+public final class BooleanGeneratorBuilder implements IGeneratorBuilderConfigurable<Boolean> {
     private final BooleanConfigDto configDto;
 
     public BooleanGeneratorBuilder() {

@@ -18,28 +18,37 @@ public final class RulesInstance {
 
     @BooleanRule
     @StringRule
-    @IntegerRule
-    @LongRule
+    @NumberRule
     @DoubleRule
     @EnumRule
     @LocalDateTimeRule
-    @ListRule
-    @SetRule
+    @CollectionRule
     @CustomRule(generatorClass = Object.class)
     @NestedDtoRule
     private static Object annotations;
 
+    @NumberRule(maxInt = 0, minInt = 0, maxLong = 0, minLong = 0, maxByte = 0, minByte = 0, maxShort = 0, minShort = 0)
+    private static Object annotationsNumberZeros;
+
+    /*
+     * Default Values
+     */
     public static final BooleanRule booleanRule;
     public static final StringRule stringRule;
-    public static final IntegerRule integerRule;
-    public static final LongRule longRule;
+    public static final NumberRule numberRule;
     public static final EnumRule enumRule;
     public static final DoubleRule doubleRule;
     public static final LocalDateTimeRule localDateTimeRule;
-    public static final SetRule setRule;
-    public static final ListRule listRule;
+    public static final CollectionRule collectionRule;
     public static final CustomRule customRule;
     public static final NestedDtoRule nestedDtoRule;
+
+    /*
+     * Other
+     */
+
+    public static final NumberRule NUMBER_RULE_ZEROS;
+
 
     static {
         try {
@@ -47,24 +56,24 @@ public final class RulesInstance {
 
             booleanRule = getAnnotationInstance(annotations, BooleanRule.class);
             stringRule = getAnnotationInstance(annotations, StringRule.class);
-            integerRule = getAnnotationInstance(annotations, IntegerRule.class);
-            longRule = getAnnotationInstance(annotations, LongRule.class);
+            numberRule = getAnnotationInstance(annotations, NumberRule.class);
             enumRule = getAnnotationInstance(annotations, EnumRule.class);
             doubleRule = getAnnotationInstance(annotations, DoubleRule.class);
             localDateTimeRule = getAnnotationInstance(annotations, LocalDateTimeRule.class);
-            setRule = getAnnotationInstance(annotations, SetRule.class);
-            listRule = getAnnotationInstance(annotations, ListRule.class);
+            collectionRule = getAnnotationInstance(annotations, CollectionRule.class);
             customRule = getAnnotationInstance(annotations, CustomRule.class);
             nestedDtoRule = getAnnotationInstance(annotations, NestedDtoRule.class);
+
+            NUMBER_RULE_ZEROS = getAnnotationInstance(annotations, NumberRule.class);
 
         } catch (NoSuchFieldException e) {
             throw new DtoGeneratorException(e);
         }
     }
 
-    private static <T extends Annotation> T getAnnotationInstance(Field field, Class<T> annotationClass){
-       return Objects.requireNonNull(field.getDeclaredAnnotation(annotationClass),
-               "Annotation instance was not set for class: '" + annotationClass + "'");
+    private static <T extends Annotation> T getAnnotationInstance(Field field, Class<T> annotationClass) {
+        return Objects.requireNonNull(field.getDeclaredAnnotation(annotationClass),
+                "Annotation instance was not set for class: '" + annotationClass + "'");
     }
 
 }

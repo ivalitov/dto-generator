@@ -39,25 +39,25 @@ class RulesInfoExtractorTests {
     static class Dto {
         @StringRule(minLength = 1, maxLength = 1, chars = CharSet.NUM)
         String string;
-        @IntegerRule
+        @NumberRule
         int integer;
         @DoubleRule
         Double decimal;
-        @LongRule
+        @NumberRule
         long loong;
         @LocalDateTimeRule
         LocalDateTime localDateTime;
 
-        @ListRule
+        @CollectionRule
         @LocalDateTimeRule
         List<LocalDateTime> listOfDates;
-        @SetRule
-        @IntegerRule
+        @CollectionRule
+        @NumberRule
         Set<Integer> setOfInts;
 
-        @ListRule(group = GROUP_1)
+        @CollectionRule(group = GROUP_1)
         @StringRule(group = GROUP_1)
-        @ListRule
+        @CollectionRule
         @StringRule
         List<String> listOfStringMultipleRules;
 
@@ -71,9 +71,9 @@ class RulesInfoExtractorTests {
     static Stream<Arguments> generalRulesDataSet() {
         return Stream.of(
                 Arguments.of(Dto.class, "string", StringRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
-                Arguments.of(Dto.class, "integer", IntegerRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
+                Arguments.of(Dto.class, "integer", NumberRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
                 Arguments.of(Dto.class, "decimal", DoubleRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
-                Arguments.of(Dto.class, "loong", LongRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
+                Arguments.of(Dto.class, "loong", NumberRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
                 Arguments.of(Dto.class, "localDateTime", LocalDateTimeRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
                 Arguments.of(Dto.class, "stringMultipleRules", StringRule.class, Group.GROUP_3, true, UtilsRoot.getExtractorInstance(Group.GROUP_3))
         );
@@ -106,15 +106,15 @@ class RulesInfoExtractorTests {
 
     static Stream<Arguments> collectionRulesDataSet() {
         return Stream.of(
-                Arguments.of(Dto.class, "listOfDates", ListRule.class, LocalDateTimeRule.class,
+                Arguments.of(Dto.class, "listOfDates", CollectionRule.class, LocalDateTimeRule.class,
                         UtilsRoot.getExtractorInstance(),
                         Group.DEFAULT,
                         false),
-                Arguments.of(Dto.class, "setOfInts", SetRule.class, IntegerRule.class,
+                Arguments.of(Dto.class, "setOfInts", CollectionRule.class, NumberRule.class,
                         UtilsRoot.getExtractorInstance(),
                         Group.DEFAULT,
                         false),
-                Arguments.of(Dto.class, "listOfStringMultipleRules", ListRule.class, StringRule.class,
+                Arguments.of(Dto.class, "listOfStringMultipleRules", CollectionRule.class, StringRule.class,
                         UtilsRoot.getExtractorInstance(GROUP_1),
                         GROUP_1,
                         true)
@@ -166,39 +166,44 @@ class RulesInfoExtractorTests {
     }
 
     static class DtoNegative3 {
-        @LongRule
-        @IntegerRule
+        @StringRule
+        @NumberRule
         Long loong;
     }
 
     static class DtoNegative4 {
-        @LongRule
-        @LongRule
+        @NumberRule
+        @NumberRule
         @StringRule
         @StringRule
         Long loong;
     }
 
     static class DtoNegative5 {
-        @ListRule
-        @SetRule
+        @CollectionRule
         List<String> list;
     }
 
     static class DtoNegative6 {
-        @ListRule
-        @ListRule(group = GROUP_1)
-        @SetRule
-        @SetRule(group = GROUP_1)
+        @CollectionRule
+        @CollectionRule(group = GROUP_1)
         List<String> list;
+    }
+
+    static class DtoNegative7 {
+        @StringRule
+        @StringRule
+        @NumberRule
+        String string;
     }
 
     static Stream<Arguments> unappropriatedDataSet() {
         return Stream.of(
-                Arguments.of("loong", DtoNegative3.class, "Found '2' @Rule annotations for various types, expected 1 or 0"),
-                Arguments.of("loong", DtoNegative4.class, "Found '2' @Rules annotations for various types, expected @Rules for single type only"),
-                Arguments.of("list", DtoNegative5.class, "Found '2' @CollectionRule annotations for various collection types, expected 1 or 0"),
-                Arguments.of("list", DtoNegative6.class, "Found '2' @CollectionRules annotations for various collection types, expected @CollectionRules for single collection type only")
+                Arguments.of("loong", DtoNegative3.class, "Found @Rule annotations for '2' different types"),
+                Arguments.of("loong", DtoNegative4.class, "Found repeatable @Rule annotations for '2' different types"),
+                Arguments.of("list", DtoNegative5.class, "Missed @Rule annotation for collection element"),
+                Arguments.of("list", DtoNegative6.class, "Missed @Rule annotation for collection element"),
+                Arguments.of("string", DtoNegative7.class, "Found @Rule annotations for '2' different types (one repeatable)")
         );
     }
 

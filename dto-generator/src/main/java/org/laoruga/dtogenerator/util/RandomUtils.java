@@ -4,13 +4,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.commons.text.RandomStringGenerator;
 import org.laoruga.dtogenerator.constants.CharSet;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author Il'dar Valitov
@@ -27,6 +27,8 @@ public final class RandomUtils {
     @Getter
     private static final Random random = new Random();
 
+    private static final RandomDataGenerator RANDOM_DATA_GENERATOR = new RandomDataGenerator();
+
     public static Double nextDouble(int minNumber, int maxNumber) {
         double floatPart = random.nextDouble();
         int integerPart = nextInt(minNumber, maxNumber);
@@ -34,12 +36,24 @@ public final class RandomUtils {
     }
 
     /**
-     * @param minNumber min value inclusive
-     * @param maxNumber max value inclusive
+     * @param minNumber min value inclusive, may be negative
+     * @param maxNumber max value inclusive, may be negative,
+     *                  must be greater than minNumber or equal
      * @return random int
      */
-    public static Integer nextInt(int minNumber, int maxNumber) {
-        return random.nextInt((maxNumber - minNumber) + 1) + minNumber;
+    public static int nextInt(int minNumber, int maxNumber) {
+        if (minNumber == maxNumber) {
+            return minNumber;
+        }
+        return RANDOM_DATA_GENERATOR.nextInt(minNumber, maxNumber);
+    }
+
+    public static Short nextShort(short minNumber, short maxNumber) {
+        return (short) nextInt(minNumber, maxNumber);
+    }
+
+    public static byte nextByte(byte minNumber, byte maxNumber) {
+        return (byte) nextInt(minNumber, maxNumber);
     }
 
     /**
@@ -52,7 +66,7 @@ public final class RandomUtils {
     }
 
     public static boolean nextBoolean() {
-        return nextInt(0, 1) == 1;
+        return random.nextInt(2) == 1;
     }
 
     /*
@@ -61,7 +75,7 @@ public final class RandomUtils {
 
     /**
      * @param collection - collection to take a random element
-     * @param <T> collection element type
+     * @param <T>        collection element type
      * @return - random element from collection
      */
     public static <T> T getRandomItem(Collection<T> collection) {
@@ -78,7 +92,7 @@ public final class RandomUtils {
 
     /**
      * @param items - array to take a random element
-     * @param <T> array element type
+     * @param <T>   array element type
      * @return - random element from array
      */
     public static <T> T getRandomItem(T... items) {
@@ -91,10 +105,30 @@ public final class RandomUtils {
     public static long nextLong(long minNumber, long maxNumber) {
         if (minNumber == maxNumber) {
             return minNumber;
+        }
+        return RANDOM_DATA_GENERATOR.nextLong(minNumber, maxNumber);
+    }
+
+    public static Number nextNumber(Number minNumber, Number maxNumber) {
+        if (minNumber.equals(maxNumber)) {
+            return minNumber;
         } else {
-            return ThreadLocalRandom.current().nextLong(minNumber, maxNumber);
+            if (minNumber.getClass() == Integer.class) {
+                return nextInt((Integer) minNumber, (Integer) maxNumber);
+            }
+            if (minNumber.getClass() == Long.class) {
+                return nextLong((Long) minNumber, (Long) maxNumber);
+            }
+            if (minNumber.getClass() == Short.class) {
+                return nextShort((Short) minNumber, (Short) maxNumber);
+            }
+            if (minNumber.getClass() == Byte.class) {
+                return nextByte((Byte) minNumber, (Byte) maxNumber);
+            }
+            throw new IllegalArgumentException();
         }
     }
+
 
     public static String nextString(char[] chars, int length) {
         return new RandomStringGenerator.Builder()

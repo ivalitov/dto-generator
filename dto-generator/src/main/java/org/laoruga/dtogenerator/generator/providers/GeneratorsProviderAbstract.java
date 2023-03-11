@@ -14,8 +14,12 @@ import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
 import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.generator.configs.EnumConfigDto;
 
+import java.lang.reflect.Modifier;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
+
+import static org.laoruga.dtogenerator.util.ReflectionUtils.createCollectionInstance;
 
 /**
  * @author Il'dar Valitov
@@ -23,6 +27,7 @@ import java.util.function.Supplier;
  */
 public abstract class GeneratorsProviderAbstract {
 
+    @Getter(AccessLevel.PROTECTED)
     private final ConfigurationHolder configuration;
     @Getter(AccessLevel.PROTECTED)
     private final RemarksHolder remarksHolder;
@@ -32,28 +37,28 @@ public abstract class GeneratorsProviderAbstract {
         this.remarksHolder = remarksHolder;
     }
 
-    protected ConfigurationHolder getConfiguration() {
-        return configuration;
-    }
-
     public IRuleRemark getRuleRemark(String fieldName) {
         return remarksHolder.getBasicRemarks().isBasicRuleRemarkExists(fieldName) ?
                 remarksHolder.getBasicRemarks().getBasicRuleRemark(fieldName) : null;
     }
 
     protected IGenerator<?> getGenerator(Supplier<ConfigDto> configDtoSupplier,
-                                         Supplier<IGeneratorBuilderConfigurable> genBuildSupplier,
-                                         BiFunction<ConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier,
+                                         Supplier<IGeneratorBuilderConfigurable<?>> genBuildSupplier,
+                                         BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>, IGenerator<?>> generatorSupplier,
                                          Class<?> fieldType,
                                          String fieldName) {
-        IGeneratorBuilderConfigurable genBuilder = genBuildSupplier.get();
+        IGeneratorBuilderConfigurable<?> genBuilder = genBuildSupplier.get();
 
+        ConfigDto config = configDtoSupplier.get();
+
+        ConfigDto staticConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig()
+                .getOrNull(fieldType);
 
         ConfigDto instanceConfig = getConfiguration().getTypeGeneratorsConfig()
-                .getOrNull(genBuilder.getClass(), fieldType);
-        ConfigDto staticConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig()
-                .getOrNull(genBuilder.getClass(), fieldType);
-        ConfigDto config = configDtoSupplier.get();
+                .getOrNull(fieldType);
+
+        ConfigDto fieldConfig = getConfiguration().getTypeGeneratorsConfigForField()
+                .getOrNull(fieldName, config.getClass());
 
         if (staticConfig != null) {
             config.merge(staticConfig);
@@ -61,6 +66,10 @@ public abstract class GeneratorsProviderAbstract {
 
         if (instanceConfig != null) {
             config.merge(instanceConfig);
+        }
+
+        if (fieldConfig != null) {
+            config.merge(fieldConfig);
         }
 
         if (getRuleRemark(fieldName) != null) {
@@ -72,7 +81,7 @@ public abstract class GeneratorsProviderAbstract {
 
     protected BiFunction<
             ConfigDto,
-            IGeneratorBuilderConfigurable,
+            IGeneratorBuilderConfigurable<?>,
             IGenerator<?>> enumGeneratorSupplier(Class<?> generatedType) {
         return (config, builder) -> {
             EnumConfigDto enumConfig = (EnumConfigDto) config;
@@ -88,11 +97,37 @@ public abstract class GeneratorsProviderAbstract {
         };
     }
 
-    protected BiFunction<ConfigDto, IGeneratorBuilderConfigurable,
-            IGenerator<?>> collectionGeneratorSupplier(IGenerator<?> elementGenerator) {
+    protected BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>,
+            IGenerator<?>> collectionGeneratorSupplier(Class<? extends Collection<?>> generatedType, IGenerator<?> elementGenerator) {
         return (config, builder) -> {
-            ((CollectionConfigDto) config).setElementGenerator((IGenerator<Object>) elementGenerator);
+            CollectionConfigDto collectionConfig = (CollectionConfigDto) config;
+            if (collectionConfig.getCollectionInstanceSupplier() == null) {
+                collectionConfig.setCollectionInstanceSupplier(
+                        () -> createCollectionInstance(generatedType)
+                );
+            }
+            ((CollectionConfigDto) config).setElementGenerator(elementGenerator);
             return builder.build(config, true);
         };
+    }
+
+    public static Class<?> getConcreteCollectionClass(Class<? extends Collection<?>> fieldType) {
+
+        if (!Modifier.isInterface(fieldType.getModifiers()) && !Modifier.isAbstract(fieldType.getModifiers())) {
+            return fieldType;
+        }
+
+        if (List.class.isAssignableFrom(fieldType)) {
+            return ArrayList.class;
+        } else if (Set.class.isAssignableFrom(fieldType)) {
+            return HashSet.class;
+        } else if (Queue.class.isAssignableFrom(fieldType)) {
+            return PriorityQueue.class;
+        } else if (Collection.class.isAssignableFrom(fieldType)) {
+            return ArrayList.class;
+        } else {
+            throw new DtoGeneratorException("Unsupported collection type: '" + fieldType.getTypeName() + "'");
+        }
+
     }
 }

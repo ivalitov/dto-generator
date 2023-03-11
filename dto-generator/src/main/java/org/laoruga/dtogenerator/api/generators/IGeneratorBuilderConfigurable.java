@@ -7,7 +7,7 @@ import org.laoruga.dtogenerator.generator.configs.ConfigDto;
  * Created on 18.05.2022
  */
 
-public interface IGeneratorBuilderConfigurable extends IGeneratorBuilder {
+public interface IGeneratorBuilderConfigurable<T> extends IGeneratorBuilder<T> {
 
-    IGenerator<?> build(ConfigDto configDto, boolean merge);
+    IGenerator<? extends T> build(ConfigDto configDto, boolean merge);
 }

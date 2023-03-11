@@ -28,10 +28,10 @@ public class DtoAllKnownTypes {
     @StringRule
     String string;
 
-    @IntegerRule
+    @NumberRule
     Integer integer;
 
-    @LongRule
+    @NumberRule
     Long aLong;
 
     @DoubleRule
@@ -46,15 +46,15 @@ public class DtoAllKnownTypes {
     @EnumRule
     ClientType clientType;
 
-    @ListRule
+    @CollectionRule
     @StringRule
     List<String> listOfString;
 
-    @SetRule
-    @LongRule
+    @CollectionRule
+    @NumberRule
     Set<Long> setOfLong;
 
-    @ListRule
+    @CollectionRule
     @EnumRule
     LinkedList<ClientType> linkedListOfEnum;
 

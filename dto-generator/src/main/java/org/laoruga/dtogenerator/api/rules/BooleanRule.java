@@ -18,11 +18,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(BooleanRules.class)
 public @interface BooleanRule {
 
+    Class<?>[] GENERATED_TYPES = {Boolean.class};
+
     double trueProbability() default 0.5D;
 
     RuleRemark ruleRemark() default RuleRemark.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 
-    Class<?> generatedType() default Boolean.class;
 }

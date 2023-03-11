@@ -6,11 +6,13 @@ import org.laoruga.dtogenerator.generator.LocalDateTimeGenerator;
 import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.generator.configs.LocalDateTimeConfigDto;
 
+import java.time.LocalDateTime;
+
 /**
  * @author Il'dar Valitov
  * Created on 19.02.2023
  */
-public final class LocalDateTimeGeneratorBuilder implements IGeneratorBuilderConfigurable {
+public final class LocalDateTimeGeneratorBuilder implements IGeneratorBuilderConfigurable<LocalDateTime> {
 
     private final LocalDateTimeConfigDto configDto;
 

@@ -21,7 +21,7 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
  * Created on 19.02.2023
  */
 @Slf4j
-public class CustomGeneratorBuilder implements IGeneratorBuilder {
+public class CustomGeneratorBuilder implements IGeneratorBuilder<Object> {
 
     private Supplier<?> dtoInstanceSupplier;
     private Annotation customGeneratorRules;

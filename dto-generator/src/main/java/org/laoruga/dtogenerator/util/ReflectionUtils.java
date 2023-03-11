@@ -6,10 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -152,5 +149,30 @@ public final class ReflectionUtils {
             return (T) defaultValue;
         }
         throw new ClassCastException("Field");
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T[] getStaticFieldValueArray(Class<?> sourceClass, String fieldName, Class<T> fieldType) {
+        try {
+            Field field = sourceClass.getField(fieldName);
+            return (T[]) field.get(sourceClass);
+        } catch (Exception e) {
+            throw new DtoGeneratorException("Unable to get value of the field: '" + fieldName + "'", e);
+        }
+    }
+
+    public static Annotation[] getRepeatableAnnotations(Annotation repeatableAnnotationSource) {
+        try {
+            Method value = repeatableAnnotationSource.annotationType().getMethod("value");
+            Object arr = value.invoke(repeatableAnnotationSource);
+            Annotation[] copy = new Annotation[Array.getLength(arr)];
+            Array.getLength(arr);
+            for (int i = 0; i < copy.length; i++) {
+                copy[i] = (Annotation) Array.get(arr, 0);
+            }
+            return copy;
+        } catch (Exception e) {
+            throw new DtoGeneratorException("Error while extracting first of repeatable annotation", e);
+        }
     }
 }

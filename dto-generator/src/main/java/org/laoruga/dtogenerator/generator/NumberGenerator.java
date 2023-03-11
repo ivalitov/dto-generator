@@ -4,7 +4,8 @@ import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.generator.builder.builders.IntegerGeneratorBuilder;
+import org.laoruga.dtogenerator.generator.builder.builders.NumberGeneratorBuilder;
+import org.laoruga.dtogenerator.generator.configs.NumberConfigDto;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 /**
@@ -13,14 +14,16 @@ import org.laoruga.dtogenerator.util.RandomUtils;
  */
 
 @AllArgsConstructor
-public class IntegerGenerator implements IGenerator<Integer> {
+public class NumberGenerator implements IGenerator<Number> {
 
-    private final int maxValue;
-    private final int minValue;
+    private final Number maxValue;
+    private final Number minValue;
     private final IRuleRemark ruleRemark;
 
+
     @Override
-    public Integer generate() {
+    public Number generate() {
+
         if (ruleRemark == RuleRemark.MIN_VALUE) {
             return minValue;
         }
@@ -28,16 +31,21 @@ public class IntegerGenerator implements IGenerator<Integer> {
             return maxValue;
         }
         if (ruleRemark == RuleRemark.RANDOM_VALUE) {
-            return RandomUtils.nextInt(minValue, maxValue);
+            return RandomUtils.nextNumber(minValue, maxValue);
         }
         if (ruleRemark == RuleRemark.NULL_VALUE) {
             return null;
         }
+
         throw new IllegalStateException("Unexpected value " + ruleRemark);
     }
 
-    public static IntegerGeneratorBuilder builder() {
-        return new IntegerGeneratorBuilder();
+    public static NumberGeneratorBuilder builder() {
+        return new NumberGeneratorBuilder();
+    }
+
+    public static NumberGeneratorBuilder builder(NumberConfigDto configDto) {
+        return new NumberGeneratorBuilder(configDto);
     }
 
 }

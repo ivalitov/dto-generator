@@ -26,10 +26,10 @@ public class DtoAllKnownTypesNested {
     @StringRule
     String string;
 
-    @IntegerRule
+    @NumberRule
     Integer integer;
 
-    @LongRule
+    @NumberRule
     Long aLong;
 
     @DoubleRule
@@ -41,15 +41,15 @@ public class DtoAllKnownTypesNested {
     @EnumRule
     ClientType clientType;
 
-    @ListRule
+    @CollectionRule
     @DoubleRule
     List<Double> listOfDouble;
 
-    @SetRule
-    @IntegerRule
+    @CollectionRule
+    @NumberRule
     Set<Integer> setOfInteger;
 
-    @ListRule
+    @CollectionRule
     @EnumRule
     LinkedList<ClientType> linkedListOfEnum;
 

@@ -5,12 +5,22 @@ import io.qameta.allure.Feature;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.DtoGeneratorBuilder;
+import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.UtilsRoot;
-import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.api.rules.BooleanRule;
+import org.laoruga.dtogenerator.api.rules.CollectionRule;
+import org.laoruga.dtogenerator.api.rules.NumberRule;
+import org.laoruga.dtogenerator.api.rules.StringRule;
+import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientDto;
+import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
+import org.laoruga.dtogenerator.generator.configs.StringConfigDto;
 import org.laoruga.dtogenerator.rule.RulesInstance;
 
 import java.util.*;
@@ -19,32 +29,34 @@ import java.util.function.Consumer;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.laoruga.dtogenerator.Constants.RESTORE_STATIC_CONFIG;
 
 /**
  * @author Il'dar Valitov
  * Created on 03.05.2022
  */
 @DisplayName("List Type Generators Tests")
-@Epic("LIST_RULES")
+@Epic("COLLECTION_RULES")
+@ExtendWith(Extensions.RestoreStaticConfig.class)
 class ListGenerationTests {
 
     @Getter
     @NoArgsConstructor
     static class DtoList {
 
-        @ListRule(listClass = LinkedList.class)
+        @CollectionRule(collectionClass = LinkedList.class)
         @StringRule
         private List<String> linkedListOfStrings;
 
-        @ListRule(listClass = Vector.class)
+        @CollectionRule(collectionClass = Vector.class)
         @StringRule
         private List<String> vectorOfStrings;
 
-        @ListRule
+        @CollectionRule
         @StringRule
         private ArrayList<String> arrayListOfStringsImplicit;
 
-        @ListRule(listClass = LinkedList.class)
+        @CollectionRule(collectionClass = LinkedList.class)
         @StringRule
         private LinkedList<String> linkedListOfStringsImplicit;
     }
@@ -57,10 +69,10 @@ class ListGenerationTests {
         assertNotNull(dto);
         List<Integer> numbers = dto.getArrayListIntegerRules();
         assertThat(numbers.size(), both(
-                greaterThanOrEqualTo(RulesInstance.listRule.minSize())).and(lessThanOrEqualTo(RulesInstance.listRule.maxSize())));
+                greaterThanOrEqualTo(RulesInstance.collectionRule.minSize())).and(lessThanOrEqualTo(RulesInstance.collectionRule.maxSize())));
         for (Integer number : numbers) {
             assertThat(number, both(
-                    greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue())));
+                    greaterThanOrEqualTo(RulesInstance.numberRule.minInt())).and(lessThanOrEqualTo(RulesInstance.numberRule.maxInt())));
         }
     }
 
@@ -92,8 +104,8 @@ class ListGenerationTests {
 
         Consumer<List<String>> assertListOfStrings = (list) -> {
             assertThat(list.size(), both(
-                    greaterThanOrEqualTo(RulesInstance.listRule.minSize()))
-                    .and(lessThanOrEqualTo(RulesInstance.listRule.maxSize())));
+                    greaterThanOrEqualTo(RulesInstance.collectionRule.minSize()))
+                    .and(lessThanOrEqualTo(RulesInstance.collectionRule.maxSize())));
             assertThat(list, everyItem(
                     notNullValue()
             ));
@@ -123,7 +135,7 @@ class ListGenerationTests {
     @Getter
     static class DtoVariousTypes {
 
-        @ListRule(minSize = 10)
+        @CollectionRule(minSize = 10)
         @BooleanRule(trueProbability = 1)
         private List<Boolean> listOfBoolean;
 
@@ -141,27 +153,54 @@ class ListGenerationTests {
 
     }
 
+    @Test
+    @Tag(RESTORE_STATIC_CONFIG)
+    void staticAndInstanceAndFieldConfig() {
+
+        DtoGeneratorBuilder<DtoList> builder = DtoGenerator.builder(DtoList.class);
+
+        builder.setTypeGeneratorConfig("linkedListOfStrings", CollectionConfigDto.builder().maxSize(2).minSize(2).build());
+        builder.setTypeGeneratorConfig("linkedListOfStrings", StringConfigDto.builder().words(new String[]{"PEACE"}).build());
+        builder.setTypeGeneratorConfig("vectorOfStrings", StringConfigDto.builder().words(new String[]{"LIFE"}).build());
+        builder.setTypeGeneratorConfig("linkedListOfStringsImplicit", CollectionConfigDto.builder().maxSize(3).minSize(3).build());
+
+        builder.getTypeGeneratorConfig().getCollectionConfig(List.class).setMinSize(1);
+        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getCollectionConfig(List.class).setMaxSize(1);
+
+        DtoList dto = builder.build().generateDto();
+
+        assertAll(
+                () -> assertThat(dto.linkedListOfStrings, hasSize(2)),
+                () -> assertThat(dto.linkedListOfStrings, everyItem(equalTo("PEACE"))),
+                () -> assertThat(dto.vectorOfStrings, hasSize(1)),
+                () -> assertThat(dto.vectorOfStrings, everyItem(equalTo("LIFE"))),
+                () -> assertThat(dto.arrayListOfStringsImplicit, hasSize(1)),
+                () -> assertThat(dto.linkedListOfStringsImplicit, hasSize(3))
+        );
+
+    }
+
     @Getter
     static class DtoWithWildcardList {
-        @ListRule
+        @CollectionRule
         @StringRule
         List<?> wildCardList;
     }
 
     @Getter
     static class DtoWithRawList {
-        @ListRule
-        @IntegerRule
+        @CollectionRule
+        @NumberRule
         List rawList;
     }
 
     @Getter
     static class DtoWithListOfCollections {
-        @ListRule()
-        @SetRule()
+        @CollectionRule()
+        @CollectionRule()
         List<Set<String>> listOfSet;
 
-        @ListRule(listClass = LinkedList.class)
+        @CollectionRule(collectionClass = LinkedList.class)
         List<String> listOfString;
     }
 
@@ -176,8 +215,8 @@ class ListGenerationTests {
 
         assertEquals(1, errorsMap.size());
         assertTrue(errorsMap.containsKey("wildCardList"));
-        assertThat(errorsMap.get("wildCardList").getMessage(),
-                equalTo("Next type must have single generic type: 'java.util.List<?>'"));
+        assertThat(errorsMap.get("wildCardList").getCause().getMessage(),
+                containsString("Next type must have single generic type: 'java.util.List<?>'"));
     }
 
     @Test
@@ -191,8 +230,8 @@ class ListGenerationTests {
 
         assertEquals(1, errorsMap.size());
         assertTrue(errorsMap.containsKey("rawList"));
-        assertThat(errorsMap.get("rawList").getMessage(),
-                equalTo("Next type must have single generic type: 'java.util.List'"));
+        assertThat(errorsMap.get("rawList").getCause().getMessage(),
+                containsString("Next type must have single generic type: 'java.util.List'"));
     }
 
     @Test
@@ -204,20 +243,22 @@ class ListGenerationTests {
 
         Map<String, Exception> errorsMap = UtilsRoot.getErrorsMap(generator);
 
+        final String ERROR_MSG_PART = "Missed @Rule annotation for collection element";
+
         assertEquals(2, errorsMap.size());
         assertTrue(errorsMap.containsKey("listOfSet"));
         assertThat(errorsMap.get("listOfSet").getCause().getMessage(),
-                stringContainsInOrder("Found '2' @CollectionRule annotations for various collection types"));
+                containsString(ERROR_MSG_PART));
         assertTrue(errorsMap.containsKey("listOfString"));
         assertThat(errorsMap.get("listOfString").getCause().getMessage(),
-                stringContainsInOrder("Missed @Rule annotation for item of collection"));
+                containsString(ERROR_MSG_PART));
 
     }
 
     static class Dto3 {
 
-        @ListRule
-        @IntegerRule
+        @CollectionRule
+        @NumberRule
         List<String> some;
 
     }
@@ -234,9 +275,55 @@ class ListGenerationTests {
         Map<String, Exception> errorsMap = UtilsRoot.getErrorsMap(generator);
 
         assertThat(errorsMap.size(), equalTo(1));
-        assertThat(errorsMap.get("some").getMessage(),
-                stringContainsInOrder("Builder's generated type does not match to the field type"));
+        assertThat(errorsMap.get("some").getCause().getMessage(),
+                stringContainsInOrder("Wrong collection element type"));
+    }
 
+    @Getter
+    @NoArgsConstructor
+    static class DtoSet {
+        @CollectionRule
+        @NumberRule
+        Set<Integer> numbers;
+
+        @CollectionRule(collectionClass = LinkedHashSet.class)
+        @NumberRule
+        Set<Integer> linkedHashSet;
+
+        @CollectionRule(collectionClass = TreeSet.class)
+        @NumberRule
+        TreeSet<Integer> treeSet;
+
+        @CollectionRule
+        @NumberRule
+        HashSet<Integer> hashSet;
+    }
+
+    @Test
+    @DisplayName("Set Of Integers Generation (default rules params)")
+    void setOfIntegerWithDefaultRulesPrams() {
+        DtoSet dto = DtoGenerator.builder(DtoSet.class).build().generateDto();
+
+        assertNotNull(dto);
+        checkNumbers(dto.getNumbers());
+        assertEquals(HashSet.class, dto.getNumbers().getClass());
+
+        checkNumbers(dto.getLinkedHashSet());
+        assertEquals(LinkedHashSet.class, dto.getLinkedHashSet().getClass());
+
+        checkNumbers(dto.getTreeSet());
+        checkNumbers(dto.getHashSet());
+
+    }
+
+    private static void checkNumbers(Set<Integer> numbers) {
+        assertThat(numbers.size(), both(
+                greaterThanOrEqualTo(RulesInstance.collectionRule.minSize())).and(lessThanOrEqualTo(RulesInstance.collectionRule.maxSize())));
+        for (Integer number : numbers) {
+            assertThat(number, both(
+                    greaterThanOrEqualTo(RulesInstance.numberRule.minInt()))
+                    .and(lessThanOrEqualTo(RulesInstance.numberRule.maxInt())));
+        }
     }
 
 }

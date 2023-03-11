@@ -17,6 +17,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(DoubleRules.class)
 public @interface DoubleRule {
 
+    Class<?>[] GENERATED_TYPES = new Class<?>[]{Double.class};
+
     double maxValue() default 999999999999999999D;
 
     double minValue() default 0D;
@@ -27,5 +29,4 @@ public @interface DoubleRule {
 
     String group() default Group.DEFAULT;
 
-    Class<?> generatedType() default Double.class;
 }

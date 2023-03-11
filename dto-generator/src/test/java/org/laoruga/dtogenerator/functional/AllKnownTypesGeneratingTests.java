@@ -83,10 +83,11 @@ public class AllKnownTypesGeneratingTests {
     @DisplayName("Generation with implicit rules")
     void GenerationWithImplicitRules() {
 
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getListConfig().setMinSize(1);
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getListConfig().setMaxSize(1);
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getSetConfig().setMinSize(1);
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getSetConfig().setMaxSize(1);
+        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getCollectionConfig(List.class).setMinSize(1);
+        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getCollectionConfig(List.class).setMaxSize(1);
+
+        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getCollectionConfig(Set.class).setMinSize(1);
+        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getCollectionConfig(Set.class).setMaxSize(1);
 
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
 
@@ -98,11 +99,11 @@ public class AllKnownTypesGeneratingTests {
                         greaterThanOrEqualTo(RulesInstance.stringRule.minLength()))
                         .and(lessThanOrEqualTo(RulesInstance.stringRule.maxLength()))),
                 () -> assertThat(dto.getInteger(), both(
-                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue()))
-                        .and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.numberRule.minInt()))
+                        .and(lessThanOrEqualTo(RulesInstance.numberRule.maxInt()))),
                 () -> assertThat(dto.getALong(), both(
-                        greaterThanOrEqualTo(RulesInstance.longRule.minValue()))
-                        .and(lessThanOrEqualTo(RulesInstance.longRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.numberRule.minLong()))
+                        .and(lessThanOrEqualTo(RulesInstance.numberRule.maxLong()))),
                 () -> assertThat(dto.getADouble(), both(
                         greaterThanOrEqualTo(RulesInstance.doubleRule.minValue()))
                         .and(lessThanOrEqualTo(RulesInstance.doubleRule.maxValue()))),
@@ -118,11 +119,11 @@ public class AllKnownTypesGeneratingTests {
                         greaterThanOrEqualTo(RulesInstance.stringRule.minLength()))
                         .and(lessThanOrEqualTo(RulesInstance.stringRule.maxLength()))),
                 () -> assertThat(dto.getInnerDto().getInteger(), both(
-                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue()))
-                        .and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.numberRule.minInt()))
+                        .and(lessThanOrEqualTo(RulesInstance.numberRule.maxInt()))),
                 () -> assertThat(dto.getInnerDto().getALong(), both(
-                        greaterThanOrEqualTo(RulesInstance.longRule.minValue()))
-                        .and(lessThanOrEqualTo(RulesInstance.longRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.numberRule.minLong()))
+                        .and(lessThanOrEqualTo(RulesInstance.numberRule.maxLong()))),
                 () -> assertThat(dto.getInnerDto().getADouble(), both(
                         greaterThanOrEqualTo(RulesInstance.doubleRule.minValue()))
                         .and(lessThanOrEqualTo(RulesInstance.doubleRule.maxValue()))),

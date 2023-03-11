@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Value;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.Group;
@@ -33,22 +35,23 @@ import static org.laoruga.dtogenerator.constants.RuleRemark.*;
  */
 @DisplayName("Rule Grouping Tests")
 @Epic("RULES_GROUPING")
+@ExtendWith(Extensions.RestoreStaticConfig.class)
 class RulesGroupingTests {
 
     @Getter
     @NoArgsConstructor
     static class Dto {
 
-        @IntegerRule(group = GROUP_1, ruleRemark = MAX_VALUE)
-        @IntegerRule(group = GROUP_2, ruleRemark = MIN_VALUE)
-        @IntegerRule(ruleRemark = RANDOM_VALUE, minValue = 10, maxValue = 10)
+        @NumberRule(group = GROUP_1, ruleRemark = MAX_VALUE)
+        @NumberRule(group = GROUP_2, ruleRemark = MIN_VALUE)
+        @NumberRule(ruleRemark = RANDOM_VALUE, minInt = 10, maxInt = 10)
         private Integer intFirst;
 
-        @IntegerRule(group = GROUP_1, ruleRemark = MIN_VALUE)
-        @IntegerRule(group = Group.GROUP_3, minValue = 99, maxValue = 99)
+        @NumberRule(group = GROUP_1, ruleRemark = MIN_VALUE)
+        @NumberRule(group = Group.GROUP_3, minInt = 99, maxInt = 99)
         private Integer intSecond;
 
-        @IntegerRule(minValue = 0, maxValue = 0)
+        @NumberRule(minInt = 0, maxInt = 0)
         private Integer defaultGroup;
     }
 
@@ -57,18 +60,18 @@ class RulesGroupingTests {
     static class DtoList {
 
         //GR_1
-        @ListRule(group = GROUP_1, minSize = 1, maxSize = 1)
-        @IntegerRule(group = GROUP_1, ruleRemark = MAX_VALUE)
+        @CollectionRule(group = GROUP_1, minSize = 1, maxSize = 1)
+        @NumberRule(group = GROUP_1, ruleRemark = MAX_VALUE)
         //GR_2
-        @ListRule(group = GROUP_2, minSize = 2, maxSize = 2)
-        @IntegerRule(group = GROUP_2, ruleRemark = MIN_VALUE)
+        @CollectionRule(group = GROUP_2, minSize = 2, maxSize = 2)
+        @NumberRule(group = GROUP_2, ruleRemark = MIN_VALUE)
         //DEFAULT
-        @ListRule(minSize = 3, maxSize = 3)
-        @IntegerRule(minValue = 10, maxValue = 10)
+        @CollectionRule(minSize = 3, maxSize = 3)
+        @NumberRule(minInt = 10, maxInt = 10)
         private List<Integer> intList;
 
-        @ListRule(minSize = 6, maxSize = 6)
-        @IntegerRule
+        @CollectionRule(minSize = 6, maxSize = 6)
+        @NumberRule
         private List<Integer> intListDefault;
     }
 
@@ -91,8 +94,8 @@ class RulesGroupingTests {
                 .build()
                 .generateDto();
         assertAll(
-                () -> assertThat(dto.getIntFirst(), equalTo(RulesInstance.integerRule.maxValue())),
-                () -> assertThat(dto.getIntSecond(), equalTo(RulesInstance.integerRule.minValue())),
+                () -> assertThat(dto.getIntFirst(), equalTo(RulesInstance.numberRule.maxInt())),
+                () -> assertThat(dto.getIntSecond(), equalTo(RulesInstance.numberRule.minInt())),
                 () -> assertThat(dto.getDefaultGroup(), nullValue())
         );
     }
@@ -105,7 +108,7 @@ class RulesGroupingTests {
                 .build()
                 .generateDto();
         assertAll(
-                () -> assertThat(dto.getIntFirst(), equalTo(RulesInstance.integerRule.minValue())),
+                () -> assertThat(dto.getIntFirst(), equalTo(RulesInstance.numberRule.minInt())),
                 () -> assertThat(dto.getIntSecond(), equalTo(99)),
                 () -> assertThat(dto.getDefaultGroup(), nullValue())
         );
@@ -120,9 +123,13 @@ class RulesGroupingTests {
         assertAll(
                 () -> assertThat(dto.getIntList(), both(hasSize(3))
                         .and(everyItem(equalTo(10)))),
-                () -> assertThat(dto.getIntListDefault(), hasSize(6)),
-                () -> assertThat(dto.getIntListDefault(), everyItem(both(
-                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue())))));
+                () -> assertThat(dto.getIntListDefault(), hasSize(6))
+        );
+        for (Integer integer : dto.getIntListDefault()) {
+            assertThat(integer,
+                    both(greaterThanOrEqualTo(RulesInstance.numberRule.minInt()))
+                            .and(lessThanOrEqualTo(RulesInstance.numberRule.maxInt())));
+        }
     }
 
     /*
@@ -173,28 +180,28 @@ class RulesGroupingTests {
         @StringRule(chars = ENG)
         private String string;
 
-        @SetRule(group = GROUP_1, minSize = 1, maxSize = 1)
-        @IntegerRule(group = GROUP_1, minValue = 1, maxValue = 1)
-        @SetRule(minSize = 2, maxSize = 2)
-        @IntegerRule(minValue = 2, maxValue = 3)
+        @CollectionRule(group = GROUP_1, minSize = 1, maxSize = 1)
+        @NumberRule(group = GROUP_1, minInt = 1, maxInt = 1)
+        @CollectionRule(minSize = 2, maxSize = 2)
+        @NumberRule(minInt = 2, maxInt = 3)
         private Set<Integer> set;
 
-        @LongRule(group = GROUP_1, minValue = 1, maxValue = 1)
-        @LongRule(minValue = 2, maxValue = 2)
+        @NumberRule(group = GROUP_1, minLong = 1, maxLong = 1)
+        @NumberRule(minLong = 2, maxLong = 2)
         private Long aLong;
 
         @LocalDateTimeRule(group = GROUP_1, leftShiftDays = 0, rightShiftDays = 0)
         @LocalDateTimeRule(leftShiftDays = -1, rightShiftDays = 1)
         private LocalDateTime localDateTime;
 
-        @ListRule(group = GROUP_1, minSize = 1, maxSize = 1)
+        @CollectionRule(group = GROUP_1, minSize = 1, maxSize = 1)
         @DoubleRule(group = GROUP_1, minValue = 1, maxValue = 1)
-        @ListRule(minSize = 2, maxSize = 2)
+        @CollectionRule(minSize = 2, maxSize = 2)
         @DoubleRule(minValue = 2, maxValue = 2)
         private List<Double> list;
 
-        @IntegerRule(group = GROUP_1, minValue = 1, maxValue = 1)
-        @IntegerRule(minValue = 2, maxValue = 2)
+        @NumberRule(group = GROUP_1, minInt = 1, maxInt = 1)
+        @NumberRule(minInt = 2, maxInt = 2)
         private int integer;
 
         @DoubleRule(group = GROUP_1, minValue = 1, maxValue = 1)

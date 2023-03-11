@@ -1,5 +1,6 @@
 package org.laoruga.dtogenerator.generator.providers;
 
+import com.google.common.primitives.Primitives;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
@@ -16,6 +17,7 @@ import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -38,42 +40,55 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
 
     public Optional<IGenerator<?>> getGenerator(Field field, Class<?> generatedType) {
 
-        Optional<IGeneratorBuilder> maybeBuilder = getGeneratorBuilder(generatedType);
+        generatedType = Primitives.wrap(generatedType);
+
+        Optional<IGeneratorBuilder<?>> maybeBuilder = getGeneratorBuilder(generatedType);
 
         if (!maybeBuilder.isPresent()) {
             log.debug("Generator builder not found for field type: " + generatedType);
             return Optional.empty();
         }
 
-        if (maybeBuilder.get() instanceof IGeneratorBuilderConfigurable) {
+        IGeneratorBuilder<?> generatorBuilder = maybeBuilder.get();
+
+        if (generatorBuilder instanceof IGeneratorBuilderConfigurable) {
             return configureGenerator(
                     field,
                     generatedType,
-                    (IGeneratorBuilderConfigurable) maybeBuilder.get());
+                    (IGeneratorBuilderConfigurable<?>) generatorBuilder);
         }
 
         log.debug("Unknown generator builder found by field type, trying to build 'as is' without configuring.");
-        return Optional.of(maybeBuilder.get().build());
+        return Optional.of(generatorBuilder.build());
     }
 
-    private Optional<IGeneratorBuilder> getGeneratorBuilder(Class<?> generatedType) {
-        Optional<IGeneratorBuilder> maybeBuilder = userGeneratorBuilders.getBuilder(generatedType);
+    private Optional<IGeneratorBuilder<?>> getGeneratorBuilder(Class<?> generatedType) {
+        Optional<IGeneratorBuilder<?>> maybeBuilder = userGeneratorBuilders.getBuilder(generatedType);
         if (!maybeBuilder.isPresent()) {
             maybeBuilder = generalGeneratorBuilders.getBuilder(generatedType);
         }
         return maybeBuilder;
     }
 
+    static class Some {
+        List<String> some;
+    }
+
+
+    @SuppressWarnings("unchecked")
     private Optional<IGenerator<?>> configureGenerator(Field field,
                                                        Class<?> generatedType,
-                                                       IGeneratorBuilderConfigurable genBuilder) {
-        BiFunction<ConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier;
+                                                       IGeneratorBuilderConfigurable<?> genBuilder) {
+        BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>, IGenerator<?>> generatorSupplier;
 
         if (Collection.class.isAssignableFrom(generatedType)) {
+
+            Class<? extends Collection<?>> generatedTypeCollection = (Class<? extends Collection<?>>) generatedType;
 
             Class<?> elementType = ReflectionUtils.getSingleGenericType(field);
             Optional<IGenerator<?>> maybeElementGenerator = getGenerator(field, elementType);
             generatorSupplier = collectionGeneratorSupplier(
+                    (Class<? extends Collection<?>>) getConcreteCollectionClass(generatedTypeCollection),
                     maybeElementGenerator.orElseThrow(
                             () -> new DtoGeneratorException("Collection element generator not found, for type: " +
                                     "'" + elementType + "'")));
@@ -90,7 +105,9 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
 
         return Optional.of(
                 getGenerator(
-                        TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(generatedType),
+                        TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(
+                                Primitives.wrap(generatedType)
+                        ),
                         () -> genBuilder,
                         generatorSupplier,
                         generatedType,

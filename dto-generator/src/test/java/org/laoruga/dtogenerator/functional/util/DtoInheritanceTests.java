@@ -7,10 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
+import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersFactory;
+import org.laoruga.dtogenerator.generator.configs.StringConfigDto;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -63,7 +63,7 @@ class DtoInheritanceTests {
         @StringRule(words = "stringNested")
         String stringNested;
 
-        @IntegerRule(minValue = 1, maxValue = 1)
+        @NumberRule(minInt = 1, maxInt = 1)
         Integer integerNested;
     }
 
@@ -73,8 +73,8 @@ class DtoInheritanceTests {
     void dtoWithInheritance() {
 
         Dto dto = DtoGenerator.builder(Dto.class)
-                .setGeneratorBuilder("stringAbstract", GeneratorBuildersFactory.stringBuilder().words("stringAbstract_2"))
-                .setGeneratorBuilder("dtoNested.stringNested", GeneratorBuildersFactory.stringBuilder().words("stringNested_2"))
+                .setTypeGeneratorConfig("stringAbstract", StringConfigDto.builder().words(new String[]{"stringAbstract_2"}).build())
+                .setTypeGeneratorConfig("dtoNested.stringNested", StringConfigDto.builder().words(new String[]{"stringNested_2"}).build())
                 .build().generateDto();
         assertAll(
                 () -> assertThat(dto.getString(), equalTo("string")),

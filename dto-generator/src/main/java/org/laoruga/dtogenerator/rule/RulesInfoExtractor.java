@@ -21,7 +21,6 @@ import java.util.Set;
 
 
 /**
- *
  * @author Il'dar Valitov
  * Created on 21.07.2022
  */
@@ -47,7 +46,7 @@ public class RulesInfoExtractor {
      */
     synchronized public Optional<IRuleInfo> extractRulesInfo(Field field) throws DtoGeneratorValidationException {
 
-        RuleAnnotationsValidationHelper.validate(field.getAnnotations());
+        RuleAnnotationsValidationHelper.validate(field);
 
         ruleInfoBuilder = new RuleInfoBuilder();
 
@@ -56,6 +55,8 @@ public class RulesInfoExtractor {
             switch (RulesInfoHelper.getHelperType(annotation)) {
 
                 case RULE:
+                case NESTED_DTO_RULE:
+                case CUSTOM_RULE:
                     extractRuleInfo(annotation);
                     break;
 

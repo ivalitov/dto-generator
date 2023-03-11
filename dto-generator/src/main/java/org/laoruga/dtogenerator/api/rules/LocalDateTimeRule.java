@@ -18,6 +18,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(LocalDateTimeRules.class)
 public @interface LocalDateTimeRule {
 
+    Class<?>[] GENERATED_TYPES = new Class<?>[]{LocalDateTime.class};
+
     int leftShiftDays() default 365 * 5;
 
     int rightShiftDays() default 365 * 5;
@@ -26,5 +28,4 @@ public @interface LocalDateTimeRule {
 
     String group() default Group.DEFAULT;
 
-    Class<?> generatedType() default LocalDateTime.class;
 }

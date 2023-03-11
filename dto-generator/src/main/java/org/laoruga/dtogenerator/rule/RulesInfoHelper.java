@@ -21,6 +21,15 @@ import static org.laoruga.dtogenerator.rule.RulesInfoHelper.RuleTypeHelper.*;
 public final class RulesInfoHelper {
 
     public static RuleTypeHelper getHelperType(Annotation ruleAnnotation) {
+
+        if (ruleAnnotation.annotationType() == CustomRule.class) {
+            return CUSTOM_RULE;
+        }
+
+        if (ruleAnnotation.annotationType() == NestedDtoRule.class) {
+            return NESTED_DTO_RULE;
+        }
+
         if (ruleAnnotation.annotationType().getDeclaredAnnotation(Rule.class) != null) {
             return RULE;
         }
@@ -37,13 +46,9 @@ public final class RulesInfoHelper {
             return RULES_FOR_COLLECTION;
         }
 
-        if (ruleAnnotation.annotationType() == CustomRule.class) {
-            return CUSTOM_RULE;
-        }
 
-        if (ruleAnnotation.annotationType() == NestedDtoRule.class) {
-            return NESTED_DTO_RULE;
-        }
+
+
 
         return UNKNOWN;
 

@@ -368,7 +368,7 @@ public class Example5 {
                         .minLength(5)
                         .maxLength(5))
                 // lambda expression is used to override generator of the exact field
-                .setGeneratorBuilder("secondName", () -> () -> RandomUtils.getRandomItem("Smith", "Claus"))
+                .setGeneratorBuilder("secondName", () -> RandomUtils.getRandomItem("Smith", "Claus"))
                 .build()
                 .generateDto();
 
@@ -425,7 +425,7 @@ public class Example6 {
     public static void main(String[] args) {
         Dto6 dto = DtoGenerator.builder(Dto6.class)
                 .setRuleRemark("nestedDto.comment", NULL_VALUE)
-                .setGeneratorBuilder("nestedDto.phoneType", () -> () -> "Other")
+                .setGeneratorBuilder("nestedDto.phoneType", () -> "Other")
                 .build()
                 .generateDto();
     }

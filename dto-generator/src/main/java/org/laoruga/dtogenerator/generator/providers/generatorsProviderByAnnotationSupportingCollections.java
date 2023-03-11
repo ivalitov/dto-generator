@@ -8,8 +8,7 @@ import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
-import org.laoruga.dtogenerator.api.rules.ListRule;
-import org.laoruga.dtogenerator.api.rules.SetRule;
+import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
@@ -17,10 +16,12 @@ import org.laoruga.dtogenerator.generator.builder.builders.CollectionGeneratorBu
 import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
 import org.laoruga.dtogenerator.rule.IRuleInfo;
 import org.laoruga.dtogenerator.rule.RuleInfoCollection;
+import org.laoruga.dtogenerator.util.DummyCollectionClass;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -45,9 +46,9 @@ public class generatorsProviderByAnnotationSupportingCollections extends Generat
     }
 
     protected IGenerator<?> getCollectionGenerator(Field field,
-                                                 IRuleInfo ruleInfo,
-                                                 Supplier<?> dtoInstanceSupplier,
-                                                 Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
+                                                   IRuleInfo ruleInfo,
+                                                   Supplier<?> dtoInstanceSupplier,
+                                                   Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
 
         final Class<?> fieldType = field.getType();
         final String fieldName = field.getName();
@@ -58,13 +59,13 @@ public class generatorsProviderByAnnotationSupportingCollections extends Generat
 
         // Collection generator builder
 
-        Optional<IGeneratorBuilder> maybeCollectionUserGenBuilder = getUsersGenBuilder(
+        Optional<IGeneratorBuilder<?>> maybeCollectionUserGenBuilder = getUsersGenBuilder(
                 collectionRuleInfo.getRule(),
                 fieldType);
 
         boolean isUserCollectionBuilder = maybeCollectionUserGenBuilder.isPresent();
 
-        IGeneratorBuilder collectionGenBuilder = isUserCollectionBuilder ?
+        IGeneratorBuilder<?> collectionGenBuilder = isUserCollectionBuilder ?
                 maybeCollectionUserGenBuilder.get() :
                 getDefaultGenBuilder(
                         collectionRuleInfo.getRule(),
@@ -76,13 +77,13 @@ public class generatorsProviderByAnnotationSupportingCollections extends Generat
         if (collectionRuleInfo.isElementRulesExist()) {
             IRuleInfo elementRuleInfo = collectionRuleInfo.getElementRule();
 
-            Optional<IGeneratorBuilder> maybeUsersElementGenBuilder = getUsersGenBuilder(
+            Optional<IGeneratorBuilder<?>> maybeUsersElementGenBuilder = getUsersGenBuilder(
                     elementRuleInfo.getRule(),
                     collectionElementType);
 
             boolean isUserBuilder = maybeUsersElementGenBuilder.isPresent();
 
-            IGeneratorBuilder elementGenBuilder = isUserBuilder ?
+            IGeneratorBuilder<?> elementGenBuilder = isUserBuilder ?
                     maybeUsersElementGenBuilder.get() :
                     getDefaultGenBuilder(
                             elementRuleInfo.getRule(),
@@ -121,10 +122,9 @@ public class generatorsProviderByAnnotationSupportingCollections extends Generat
 
     }
 
-
     @SuppressWarnings("unchecked")
     private IGenerator<?> buildCollectionGenerator(Annotation collectionRule,
-                                                   IGeneratorBuilder collectionGenBuilder,
+                                                   IGeneratorBuilder<?> collectionGenBuilder,
                                                    IGenerator<?> elementGenerator,
                                                    Class<?> fieldType,
                                                    String fieldName) {
@@ -134,28 +134,28 @@ public class generatorsProviderByAnnotationSupportingCollections extends Generat
 
             CollectionConfigDto configDto;
 
-            if (ListRule.class == rulesClass) {
+            if (CollectionRule.class == rulesClass && Collection.class.isAssignableFrom(fieldType)) {
 
-                configDto = new CollectionConfigDto((ListRule) collectionRule)
-                        .setCollectionInstance(
-                                () -> createCollectionInstance(((ListRule) collectionRule).listClass()));
+                CollectionRule rule = (CollectionRule) collectionRule;
 
-            } else if (SetRule.class == rulesClass) {
+                Class<? extends Collection<?>> collectionClass = rule.collectionClass() == DummyCollectionClass.class
+                        ? (Class<? extends Collection<?>>) getConcreteCollectionClass((Class<? extends Collection<?>>) fieldType)
+                        : (Class<? extends Collection<?>>) rule.collectionClass();
 
-                configDto = new CollectionConfigDto((SetRule) collectionRule)
-                        .setCollectionInstance(
-                                () -> createCollectionInstance(((SetRule) collectionRule).setClass()));
+                configDto = new CollectionConfigDto((CollectionRule) collectionRule)
+                        .setCollectionInstanceSupplier(
+                                () -> createCollectionInstance(collectionClass));
+                return getGenerator(
+                        () -> configDto,
+                        () -> (IGeneratorBuilderConfigurable<?>) collectionGenBuilder,
+                        collectionGeneratorSupplier(collectionClass, elementGenerator),
+                        fieldType,
+                        fieldName);
 
             } else {
                 throw new DtoGeneratorException("Unknown rules annotation class '" + rulesClass + "'");
             }
 
-            return getGenerator(
-                    () -> configDto,
-                    () -> (IGeneratorBuilderConfigurable) collectionGenBuilder,
-                    collectionGeneratorSupplier(elementGenerator),
-                    fieldType,
-                    fieldName);
         }
 
         log.debug("Unknown collection builder builds as is, without Rules annotation params passing.");

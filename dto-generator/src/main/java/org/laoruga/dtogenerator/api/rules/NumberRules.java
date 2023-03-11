@@ -11,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(FIELD)
 @Rules
-public @interface IntegerRules {
+public @interface NumberRules {
 
-    IntegerRule[] value();
+    NumberRule[] value();
 }

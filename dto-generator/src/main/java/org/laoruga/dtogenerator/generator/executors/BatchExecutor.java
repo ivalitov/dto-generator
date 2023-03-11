@@ -53,6 +53,7 @@ public class BatchExecutor {
         }
     }
 
+    //TODO hard to understand
     private boolean executeEachRemaining(AtomicInteger attempt) {
         Map<Field, IGenerator<?>> failedGeneratorsMap = notExecutedGeneratorsMap.get();
         boolean failedGenerations = failedGeneratorsMap != null && !failedGeneratorsMap.isEmpty();

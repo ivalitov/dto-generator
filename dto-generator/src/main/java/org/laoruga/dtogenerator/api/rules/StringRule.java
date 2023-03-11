@@ -18,6 +18,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(StringRules.class)
 public @interface StringRule {
 
+    Class<?>[] GENERATED_TYPES = new Class<?>[]{String.class};
+
     String DEFAULT_REGEXP = "";
 
     int minLength() default 0;

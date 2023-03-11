@@ -3,7 +3,9 @@ package org.laoruga.dtogenerator.config.dto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
+import org.laoruga.dtogenerator.config.TypeGeneratorsConfigForFiled;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 
 /**
@@ -20,11 +22,12 @@ public final class DtoGeneratorStaticConfig {
     static {
         INSTANCE = new ConfigurationHolder(
                 new DtoGeneratorFileConfig("dtogenerator.properties"),
-                new TypeGeneratorsConfigLazy()
+                new TypeGeneratorsConfigLazy(),
+                new TypeGeneratorsConfigForFiled()
         );
     }
 
-    synchronized public static ConfigurationHolder getInstance() {
+    synchronized public static Configuration getInstance() {
         return INSTANCE;
     }
 

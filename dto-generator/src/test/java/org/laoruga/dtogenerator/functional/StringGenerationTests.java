@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersFactory;
+import org.laoruga.dtogenerator.generator.configs.StringConfigDto;
 
 import java.util.stream.Stream;
 
@@ -46,7 +46,7 @@ class StringGenerationTests {
     }
 
 
-    @RepeatedTest(1)
+    @RepeatedTest(5)
     @DisplayName("Generated string by mask (phone number)")
     void maskPhoneNumber() {
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
@@ -75,11 +75,12 @@ class StringGenerationTests {
             "[%]{3}",})
     @DisplayName("Generated string by regexp")
     void generateByRegexp(String regexp) {
+
         Dto_2 dto = DtoGenerator.builder(Dto_2.class)
-                .setGeneratorBuilder("string",
-                        GeneratorBuildersFactory.stringBuilder()
+                .setTypeGeneratorConfig(String.class,
+                        StringConfigDto.builder()
                                 .regexp(regexp)
-                                .chars(NUM))
+                                .chars(NUM).build())
                 .build().generateDto();
         assertAll(
                 () -> assertThat(dto.getString(), matchesRegex("^" + regexp + "$"))
@@ -102,11 +103,11 @@ class StringGenerationTests {
     @DisplayName("Generated string by mask (type chars + wildcard)")
     void generateByLength(String charSet, Integer minLength, Integer maxLength, String regexpForAssert) {
         Dto_2 dto = DtoGenerator.builder(Dto_2.class)
-                .setGeneratorBuilder("string",
-                        GeneratorBuildersFactory.stringBuilder()
+                .setTypeGeneratorConfig(String.class,
+                        StringConfigDto.builder()
                                 .minLength(minLength)
                                 .maxLength(maxLength)
-                                .chars(charSet))
+                                .chars(charSet).build())
                 .build().generateDto();
         assertAll(
                 () -> assertThat(dto.getString().length(), both(lessThanOrEqualTo(maxLength))

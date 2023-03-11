@@ -10,11 +10,12 @@ import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
  * Created on 29.11.2022
  */
 @AllArgsConstructor
-public class ConfigurationHolder {
+public class ConfigurationHolder implements Configuration {
 
     @Getter
     private DtoGeneratorConfig dtoGeneratorConfig;
     @Getter
     private TypeGeneratorsConfigLazy typeGeneratorsConfig;
-
+    @Getter
+    private TypeGeneratorsConfigForFiled typeGeneratorsConfigForField;
 }

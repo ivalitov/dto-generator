@@ -2,10 +2,8 @@ package org.laoruga.dtogenerator.generator.configs;
 
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.LocalDateTimeRule;
-import org.laoruga.dtogenerator.generator.builder.builders.LocalDateTimeGeneratorBuilder;
 
 /**
  * @author Il'dar Valitov
@@ -26,11 +24,6 @@ public class LocalDateTimeConfigDto implements ConfigDto {
         this.leftShiftDays = rule.leftShiftDays();
         this.rightShiftDays = rule.rightShiftDays();
         this.ruleRemark = rule.ruleRemark();
-    }
-
-    @Override
-    public Class<? extends IGeneratorBuilder> getBuilderClass() {
-        return LocalDateTimeGeneratorBuilder.class;
     }
 
     public void merge(ConfigDto from) {

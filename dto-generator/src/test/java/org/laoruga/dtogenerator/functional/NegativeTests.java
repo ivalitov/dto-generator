@@ -7,7 +7,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.UtilsRoot;
-import org.laoruga.dtogenerator.api.rules.IntegerRule;
+import org.laoruga.dtogenerator.api.rules.NumberRule;
+import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.util.stream.Stream;
@@ -26,13 +27,13 @@ import static org.laoruga.dtogenerator.constants.Group.GROUP_1;
 public class NegativeTests {
 
     static class DtoNegative1 {
-        @IntegerRule
+        @NumberRule
         String string;
     }
 
     static class DtoNegative2 {
-        @IntegerRule
-        @IntegerRule(group = GROUP_1)
+        @StringRule
+        @StringRule(group = GROUP_1)
         Long loong;
     }
 
@@ -40,10 +41,10 @@ public class NegativeTests {
         return Stream.of(
                 Arguments.of("string",
                         NegativeTests.DtoNegative1.class,
-                        "- Builder's generated type: 'java.lang.Integer'\n- Field type: class java.lang.String'"),
+                        "Wrong field type: 'class java.lang.String'"),
                 Arguments.of("loong",
                         NegativeTests.DtoNegative2.class,
-                        "- Builder's generated type: 'java.lang.Integer'\n- Field type: class java.lang.Long'"));
+                        "Wrong field type: 'class java.lang.Long'"));
     }
 
     @ParameterizedTest
@@ -53,7 +54,7 @@ public class NegativeTests {
         DtoGenerator<?> generator = DtoGenerator.builder(dtoClass).build();
         assertThrows(DtoGeneratorException.class, generator::generateDto);
         Throwable exception = UtilsRoot.getErrorsMap(generator).get(fieldName);
-        assertThat(exception.getMessage(),
+        assertThat(exception.getCause().getMessage(),
                 containsString(errMsgPart));
     }
 

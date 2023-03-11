@@ -5,9 +5,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * An instance contain all the possible to use generator providers.
@@ -19,55 +17,31 @@ import java.util.Optional;
 public final class GeneratorBuildersHolder {
 
     private final Map<Class<?>, GeneratorBuilderInfo> buildersInfoMap;
+    private final Map<Class<?>, GeneratorBuilderInfo> buildersInfoMapByGeneratedType;
 
     public GeneratorBuildersHolder() {
         this.buildersInfoMap = new HashMap<>();
+        this.buildersInfoMapByGeneratedType = new HashMap<>();
     }
-
     /**
      * Get builder by generated type
      *
      * @param generatedType - type supposed to be generated
      * @return - builder if exists
      */
-    public Optional<IGeneratorBuilder> getBuilder(Class<?> generatedType) {
-        if (generatedType == Object.class) {
-            throw new IllegalArgumentException("It is not possible to pick generator for type: '" + generatedType + "'");
-        }
-        if (generatedType.isEnum()) {
-            return getEnumBuilder(generatedType);
-        }
-        if (buildersInfoMap.containsKey(generatedType)) {
-            return Optional.of(buildersInfoMap.get(generatedType).getBuilderSupplier().get());
-        }
-        return Optional.empty();
-    }
-
-    private Optional<IGeneratorBuilder> getEnumBuilder(Class<?> generatedType) {
-
-        if (buildersInfoMap.containsKey(generatedType)) {
-            return Optional.of(buildersInfoMap.get(generatedType).getBuilderSupplier().get());
-        }
-
-        if (buildersInfoMap.containsKey(Enum.class)) {
-            return Optional.of(buildersInfoMap.get(Enum.class).getBuilderSupplier().get());
-        }
-
-        return Optional.empty();
-    }
-
-    /**
-     * Picks builder by generated type with checking of type matching
-     *
-     * @param rulesAnnotation - rule for pick generator
-     * @param generatedType   - type supposed to be generated
-     * @return - builder if exists
-     */
-    public Optional<IGeneratorBuilder> getBuilder(Annotation rulesAnnotation, Class<?> generatedType) {
+    public Optional<IGeneratorBuilder<?>> getBuilder(Class<?> generatedType) {
 
         generatedType = generatedType.isPrimitive() ? Primitives.wrap(generatedType) : generatedType;
 
-        GeneratorBuilderInfo foundInfo = buildersInfoMap.get(rulesAnnotation.annotationType());
+        GeneratorBuilderInfo foundInfo = buildersInfoMapByGeneratedType.get(generatedType);
+
+        if (foundInfo == null && generatedType.isEnum()) {
+            foundInfo = buildersInfoMapByGeneratedType.get(Enum.class);
+        }
+
+        if (foundInfo == null && Collection.class.isAssignableFrom(generatedType)) {
+            foundInfo = buildersInfoMapByGeneratedType.get(Collection.class);
+        }
 
         if (foundInfo == null) {
             return Optional.empty();
@@ -79,34 +53,48 @@ public final class GeneratorBuildersHolder {
             return Optional.of(foundInfo.getBuilderSupplier().get());
         }
 
-        throw new DtoGeneratorException("Builder's generated type does not match to the field type:" +
-                "\n- Rules: '" + rulesAnnotation.annotationType().getName() + "'" +
+        throw new DtoGeneratorException("Unexpected error. " +
+                "Builder's generated type does not match to the field type:" +
                 "\n- Builder's generated type: '" + buildersGeneratedType.getName() + "'" +
                 "\n- Field type: " + generatedType + "'.");
     }
 
-    public void addBuilder(Class<? extends Annotation> rulesClass,
-                           Class<?> generatedType,
-                           IGeneratorBuilder genBuilder) {
-        GeneratorBuilderInfo info = GeneratorBuilderInfo.createInstance(
-                rulesClass, generatedType, () -> genBuilder
-        );
-        addBuilder(info);
+    public Optional<IGeneratorBuilder<?>> getBuilder(Annotation rulesAnnotation) {
+        return Optional.ofNullable(buildersInfoMap.get(rulesAnnotation.annotationType()))
+                .map(i -> i.getBuilderSupplier().get());
     }
 
     public void addBuilder(GeneratorBuilderInfo info) {
-        if (info.getGeneratedType() != Object.class) {
-            if (buildersInfoMap.containsKey(info.getGeneratedType())) {
+        if (info.getGeneratedType() == Object.class) {
+            buildersInfoMap.put(info.getRules(), info);
+        } else {
+            if (buildersInfoMapByGeneratedType.containsKey(info.getGeneratedType())) {
                 throw new IllegalArgumentException(
                         "Generator for next type already exists: '" + info.getGeneratedType() + "'");
             }
-            buildersInfoMap.put(info.getGeneratedType(), info);
+            buildersInfoMapByGeneratedType.put(info.getGeneratedType(), info);
         }
-        if (buildersInfoMap.containsKey(info.getRules())) {
-            throw new IllegalArgumentException(
-                    "Generator for next rules annotation already exists: '" + info.getGeneratedType() + "'");
-        }
-        buildersInfoMap.put(info.getRules(), info);
+
     }
 
+    void addBuilders(List<GeneratorBuilderInfo> infoList) {
+        for (GeneratorBuilderInfo info : infoList) {
+            if (info.getGeneratedType() == Object.class) {
+                buildersInfoMap.put(info.getRules(), info);
+            } else {
+                if (buildersInfoMapByGeneratedType.containsKey(info.getGeneratedType())) {
+                    throw new IllegalArgumentException(
+                            "Generator for next type already exists: '" + info.getGeneratedType() + "'");
+                }
+                buildersInfoMapByGeneratedType.put(info.getGeneratedType(), info);
+            }
+        }
+    }
+
+    public void addBuilder(Class<?> generatedType, IGeneratorBuilder<?> genBuilder) {
+        GeneratorBuilderInfo info = GeneratorBuilderInfo.createInstance(
+                null, generatedType, () -> genBuilder
+        );
+        addBuilder(info);
+    }
 }

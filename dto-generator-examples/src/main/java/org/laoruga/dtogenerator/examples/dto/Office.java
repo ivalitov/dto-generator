@@ -2,8 +2,8 @@ package org.laoruga.dtogenerator.examples.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
-import org.laoruga.dtogenerator.api.rules.ListRule;
 import org.laoruga.dtogenerator.examples.generators.custom.CustomGeneratorRemarkable;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 public class Office {
 
-    @ListRule(minSize = 2, maxSize = 2)
+    @CollectionRule(minSize = 2, maxSize = 2)
     @CustomRule(generatorClass = CustomGeneratorRemarkable.class)
     List<Person> people;
 }

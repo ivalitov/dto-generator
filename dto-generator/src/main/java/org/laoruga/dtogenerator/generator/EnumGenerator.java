@@ -18,7 +18,7 @@ import java.util.Comparator;
  */
 
 @AllArgsConstructor
-public class EnumGenerator implements IGenerator<Enum<?>> {
+public class EnumGenerator implements IGenerator<Enum> {
 
     private final String[] possibleEnumNames;
     private final Class<? extends Enum<?>> enumClass;

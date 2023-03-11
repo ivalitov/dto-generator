@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.IntegerRule;
-import org.laoruga.dtogenerator.api.rules.ListRule;
+import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.LocalDateTimeRule;
+import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 
 import java.time.LocalDateTime;
@@ -28,7 +28,7 @@ class InheritedDtoTests {
     @Getter
     @NoArgsConstructor
     static class Dto extends DtoSuper {
-        @IntegerRule()
+        @NumberRule()
         private Integer upperInt;
         @StringRule()
         private String upperString;
@@ -37,7 +37,7 @@ class InheritedDtoTests {
     @Getter
     @NoArgsConstructor
     static class DtoSuper {
-        @ListRule
+        @CollectionRule
         @StringRule
         private List<String> superList;
         @LocalDateTimeRule
