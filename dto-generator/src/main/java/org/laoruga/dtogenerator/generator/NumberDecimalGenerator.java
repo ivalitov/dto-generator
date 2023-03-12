@@ -1,7 +1,6 @@
 package org.laoruga.dtogenerator.generator;
 
 import lombok.AllArgsConstructor;
-import org.apache.commons.math3.util.Precision;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
@@ -14,15 +13,15 @@ import org.laoruga.dtogenerator.util.RandomUtils;
  */
 
 @AllArgsConstructor
-public class DoubleGenerator implements IGenerator<Double> {
+public class NumberDecimalGenerator implements IGenerator<Number> {
 
-    private final double maxValue;
-    private final double minValue;
+    private final Number maxValue;
+    private final Number minValue;
     private final int precision;
     private final IRuleRemark ruleRemark;
 
     @Override
-    public Double generate() {
+    public Number generate() {
         if (ruleRemark == RuleRemark.MIN_VALUE) {
             return minValue;
         }
@@ -30,11 +29,7 @@ public class DoubleGenerator implements IGenerator<Double> {
             return maxValue;
         }
         if (ruleRemark == RuleRemark.RANDOM_VALUE) {
-            double generated = minValue + RandomUtils.getRandom().nextDouble() * (maxValue - minValue);
-            return Precision.round(generated, precision);
-        }
-        if (ruleRemark == RuleRemark.NULL_VALUE) {
-            return null;
+            return RandomUtils.nextNumberDecimal(minValue, maxValue, precision);
         }
         throw new IllegalStateException("Unexpected value " + ruleRemark);
     }

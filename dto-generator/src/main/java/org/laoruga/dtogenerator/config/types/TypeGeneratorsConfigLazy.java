@@ -69,11 +69,11 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
-    public DoubleConfigDto getDoubleConfig() {
-        return (DoubleConfigDto) getConfigLazy(
+    public DecimalConfigDto getDoubleConfig() {
+        return (DecimalConfigDto) getConfigLazy(
                 DoubleGeneratorBuilder.class,
-                DoubleRule.GENERATED_TYPES,
-                DoubleConfigDto::new
+                DecimalRule.GENERATED_TYPES,
+                DecimalConfigDto::new
         );
     }
 

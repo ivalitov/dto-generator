@@ -28,18 +28,18 @@ class RandomUtilsTests {
     @DisplayName("Random double")
     void nextDouble() {
         assertThat(
-                RandomUtils.nextDouble(1, 2),
-                both(greaterThanOrEqualTo(1D))
-                        .and(lessThanOrEqualTo(2D)));
+                RandomUtils.nextDouble(1, 2, 0),
+                either(equalTo(1D))
+                        .or(equalTo(2D)));
 
         assertThat(
-                RandomUtils.nextDouble(500, 1000),
-                both(greaterThanOrEqualTo(500D))
-                        .and(lessThanOrEqualTo(1000D)));
+                RandomUtils.nextDouble(500.1, 500.99, 2),
+                both(greaterThanOrEqualTo(500.10))
+                        .and(lessThanOrEqualTo(500.99)));
 
         assertThat(
-                RandomUtils.nextDouble(100, 100),
-                equalTo(100D));
+                RandomUtils.nextDouble(100.1, 100.1, 1),
+                equalTo(100.1D));
     }
 
     @RepeatedTest(10)

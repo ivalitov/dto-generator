@@ -22,7 +22,7 @@ public class GeneratedTypes {
 
         add(generatedTypes, StringRule.class);
         add(generatedTypes, NumberRule.class);
-        add(generatedTypes, DoubleRule.class);
+        add(generatedTypes, DecimalRule.class);
         add(generatedTypes, LocalDateTimeRule.class);
         add(generatedTypes, EnumRule.class);
         add(generatedTypes, CollectionRule.class);

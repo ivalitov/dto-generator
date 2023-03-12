@@ -11,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(FIELD)
 @Rules
-public @interface DoubleRules {
+public @interface DecimalRules {
 
-    DoubleRule[] value();
+    DecimalRule[] value();
 }

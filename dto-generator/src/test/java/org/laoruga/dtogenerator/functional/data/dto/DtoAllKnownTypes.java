@@ -34,7 +34,7 @@ public class DtoAllKnownTypes {
     @NumberRule
     Long aLong;
 
-    @DoubleRule
+    @DecimalRule
     Double aDouble;
 
     @BooleanRule

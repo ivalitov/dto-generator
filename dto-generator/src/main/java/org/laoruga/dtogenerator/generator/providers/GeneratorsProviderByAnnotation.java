@@ -19,7 +19,7 @@ import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.BooleanGenerator;
 import org.laoruga.dtogenerator.generator.CustomGenerator;
-import org.laoruga.dtogenerator.generator.DoubleGenerator;
+import org.laoruga.dtogenerator.generator.NumberDecimalGenerator;
 import org.laoruga.dtogenerator.generator.NumberGenerator;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolderGeneral;
@@ -135,14 +135,25 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
                         fieldType,
                         fieldName);
 
-            } else if (DoubleRule.class == rulesClass && generatorBuilder instanceof DoubleGeneratorBuilder) {
+            } else if (DecimalRule.class == rulesClass
+                    && generatorBuilder instanceof DoubleGeneratorBuilder) {
 
-                return getGenerator(
-                        () -> new DoubleConfigDto((DoubleRule) rules),
-                        () -> (IGeneratorBuilderConfigurable<?>) generatorBuilder,
-                        doubleGeneratorSupplier(fieldType, fieldName),
-                        fieldType,
-                        fieldName);
+                if (Number.class.isAssignableFrom(Primitives.wrap(fieldType))) {
+
+                    @SuppressWarnings("unchecked")
+                    Class<? extends Number> fieldTypeNumber = (Class<? extends Number>) fieldType;
+
+                    return getGenerator(
+                            () -> new DecimalConfigDto((DecimalRule) rules, fieldTypeNumber),
+                            () -> (IGeneratorBuilderConfigurable<?>) generatorBuilder,
+                            doubleGeneratorSupplier(fieldType, fieldName),
+                            fieldType,
+                            fieldName);
+
+                }
+
+                throw new IllegalArgumentException("Unexpected state. Field type '" + fieldType
+                        + "' doesn't extend Number.class");
 
             } else if (NumberRule.class == rulesClass
                     && generatorBuilder instanceof NumberGeneratorBuilder) {
@@ -159,7 +170,8 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
                             fieldName);
                 }
 
-                throw new IllegalArgumentException("Unexpected state. Field type " + fieldType + " doesn't extend Number.class");
+                throw new IllegalArgumentException("Unexpected state. Field type '" + fieldType
+                        + "' doesn't extend Number.class");
 
             } else if (EnumRule.class == rulesClass && generatorBuilder instanceof EnumGeneratorBuilder) {
 
@@ -244,7 +256,7 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
         return (config, builder) -> {
             if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
                 reportPrimitiveCannotBeNull(fieldName);
-                return DoubleGenerator.builder()
+                return NumberDecimalGenerator.builder()
                         .minValue(0D)
                         .maxValue(0D)
                         .ruleRemark(MIN_VALUE).build();

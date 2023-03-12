@@ -41,7 +41,7 @@ class RulesInfoExtractorTests {
         String string;
         @NumberRule
         int integer;
-        @DoubleRule
+        @DecimalRule
         Double decimal;
         @NumberRule
         long loong;
@@ -72,7 +72,7 @@ class RulesInfoExtractorTests {
         return Stream.of(
                 Arguments.of(Dto.class, "string", StringRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
                 Arguments.of(Dto.class, "integer", NumberRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
-                Arguments.of(Dto.class, "decimal", DoubleRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
+                Arguments.of(Dto.class, "decimal", DecimalRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
                 Arguments.of(Dto.class, "loong", NumberRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
                 Arguments.of(Dto.class, "localDateTime", LocalDateTimeRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
                 Arguments.of(Dto.class, "stringMultipleRules", StringRule.class, Group.GROUP_3, true, UtilsRoot.getExtractorInstance(Group.GROUP_3))

@@ -195,17 +195,17 @@ class RulesGroupingTests {
         private LocalDateTime localDateTime;
 
         @CollectionRule(group = GROUP_1, minSize = 1, maxSize = 1)
-        @DoubleRule(group = GROUP_1, minValue = 1, maxValue = 1)
+        @DecimalRule(group = GROUP_1, minDouble = 1, maxDouble = 1)
         @CollectionRule(minSize = 2, maxSize = 2)
-        @DoubleRule(minValue = 2, maxValue = 2)
+        @DecimalRule(minDouble = 2, maxDouble = 2)
         private List<Double> list;
 
         @NumberRule(group = GROUP_1, minInt = 1, maxInt = 1)
         @NumberRule(minInt = 2, maxInt = 2)
         private int integer;
 
-        @DoubleRule(group = GROUP_1, minValue = 1, maxValue = 1)
-        @DoubleRule(minValue = 2, maxValue = 2)
+        @DecimalRule(group = GROUP_1, minDouble = 1, maxDouble = 1)
+        @DecimalRule(minDouble = 2, maxDouble = 2)
         private Double aDouble;
 
         @EnumRule(group = GROUP_1, possibleEnumNames = "FOO")

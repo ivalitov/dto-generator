@@ -32,7 +32,7 @@ public class DtoAllKnownTypesNested {
     @NumberRule
     Long aLong;
 
-    @DoubleRule
+    @DecimalRule
     Double aDouble;
 
     @LocalDateTimeRule
@@ -42,7 +42,7 @@ public class DtoAllKnownTypesNested {
     ClientType clientType;
 
     @CollectionRule
-    @DoubleRule
+    @DecimalRule
     List<Double> listOfDouble;
 
     @CollectionRule

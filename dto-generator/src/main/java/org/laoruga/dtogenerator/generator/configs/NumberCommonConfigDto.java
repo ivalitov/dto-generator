@@ -1,8 +1,7 @@
 package org.laoruga.dtogenerator.generator.configs;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.NotImplementedException;
@@ -15,20 +14,15 @@ import java.util.Map;
  * @author Il'dar Valitov
  * Created on 19.02.2023
  */
-@Builder
-@Setter
-@Accessors(chain = true)
-@AllArgsConstructor
+@NoArgsConstructor
 public class NumberCommonConfigDto implements ConfigDto {
 
     private final Map<Class<?>, NumberConfigDto> map = new HashMap<>();
 
     @Getter
     @Setter
+    @Accessors(chain = true)
     private IRuleRemark ruleRemark;
-
-    public NumberCommonConfigDto() {
-    }
 
     public NumberCommonConfigDto setMaxIntValue(int maxIntValue) {
         map.putIfAbsent(Integer.class, new NumberConfigDto());

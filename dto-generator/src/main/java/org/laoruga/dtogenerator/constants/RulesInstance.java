@@ -19,7 +19,7 @@ public final class RulesInstance {
     @BooleanRule
     @StringRule
     @NumberRule
-    @DoubleRule
+    @DecimalRule
     @EnumRule
     @LocalDateTimeRule
     @CollectionRule
@@ -34,7 +34,7 @@ public final class RulesInstance {
     public static final StringRule STRING_RULE;
     public static final NumberRule NUMBER_RULE;
     public static final EnumRule ENUM_RULE;
-    public static final DoubleRule DECIMAL_RULE;
+    public static final DecimalRule DECIMAL_RULE;
     public static final LocalDateTimeRule LOCAL_DATE_TIME_RULE;
     public static final CollectionRule COLLECTION_RULE;
     public static final CustomRule CUSTOM_RULE;
@@ -55,7 +55,7 @@ public final class RulesInstance {
             STRING_RULE = getAnnotationInstance(annotations, StringRule.class);
             NUMBER_RULE = getAnnotationInstance(annotations, NumberRule.class);
             ENUM_RULE = getAnnotationInstance(annotations, EnumRule.class);
-            DECIMAL_RULE = getAnnotationInstance(annotations, DoubleRule.class);
+            DECIMAL_RULE = getAnnotationInstance(annotations, DecimalRule.class);
             LOCAL_DATE_TIME_RULE = getAnnotationInstance(annotations, LocalDateTimeRule.class);
             COLLECTION_RULE = getAnnotationInstance(annotations, CollectionRule.class);
             CUSTOM_RULE = getAnnotationInstance(annotations, CustomRule.class);

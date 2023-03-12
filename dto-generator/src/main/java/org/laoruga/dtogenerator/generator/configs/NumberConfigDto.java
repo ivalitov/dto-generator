@@ -15,6 +15,7 @@ import org.laoruga.dtogenerator.api.rules.NumberRule;
 @Setter
 @Accessors(chain = true)
 @AllArgsConstructor
+@NoArgsConstructor
 public class NumberConfigDto implements ConfigDto {
 
     private Number maxValue;
@@ -24,9 +25,6 @@ public class NumberConfigDto implements ConfigDto {
     @Setter(AccessLevel.PRIVATE)
     private Class<? extends Number> fieldType;
     private IRuleRemark ruleRemark;
-
-    public NumberConfigDto() {
-    }
 
     public NumberConfigDto(NumberRule rules, Class<? extends Number> fieldType) {
         fieldType = Primitives.wrap(fieldType);
@@ -47,7 +45,7 @@ public class NumberConfigDto implements ConfigDto {
             minValue = rules.minByte();
             maxValue = rules.maxByte();
         } else {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Unexpected field type: '" + fieldType + "'");
         }
     }
 

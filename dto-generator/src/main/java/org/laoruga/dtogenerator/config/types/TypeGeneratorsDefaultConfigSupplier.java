@@ -41,9 +41,10 @@ public final class TypeGeneratorsDefaultConfigSupplier {
                 true);
 
         add(configSupplier,
-                DoubleRule.GENERATED_TYPES,
+                DecimalRule.GENERATED_TYPES,
                 RulesInstance.DECIMAL_RULE,
-                DoubleConfigDto.class);
+                DecimalConfigDto.class,
+                true);
 
         add(configSupplier,
                 LocalDateTimeRule.GENERATED_TYPES,

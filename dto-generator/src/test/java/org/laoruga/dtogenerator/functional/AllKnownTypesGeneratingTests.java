@@ -105,8 +105,8 @@ public class AllKnownTypesGeneratingTests {
                         greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minLong()))
                         .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxLong()))),
                 () -> assertThat(dto.getADouble(), both(
-                        greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minValue()))
-                        .and(lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble()))
+                        .and(lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
                 () -> assertThat(dto.getLocalDateTime(), notNullValue()),
                 () -> assertThat(dto.getClientType(), notNullValue()),
                 () -> assertThat(dto.getListOfString().size(), equalTo(1)),
@@ -125,8 +125,8 @@ public class AllKnownTypesGeneratingTests {
                         greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minLong()))
                         .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxLong()))),
                 () -> assertThat(dto.getInnerDto().getADouble(), both(
-                        greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minValue()))
-                        .and(lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble()))
+                        .and(lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
                 () -> assertThat(dto.getInnerDto().getLocalDateTime(), notNullValue()),
                 () -> assertThat(dto.getInnerDto().getClientType(), notNullValue()),
                 () -> assertThat(dto.getInnerDto().getListOfString().size(), equalTo(1)),

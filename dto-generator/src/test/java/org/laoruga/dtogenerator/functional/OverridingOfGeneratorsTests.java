@@ -13,7 +13,7 @@ import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
-import org.laoruga.dtogenerator.api.rules.DoubleRule;
+import org.laoruga.dtogenerator.api.rules.DecimalRule;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
@@ -455,7 +455,7 @@ class OverridingOfGeneratorsTests {
         @NumberRule(group = GROUP_2)
         Set<Long> setOfLong;
 
-        @DoubleRule(group = GROUP_2)
+        @DecimalRule(group = GROUP_2)
         double aDouble;
     }
 

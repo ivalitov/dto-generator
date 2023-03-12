@@ -2,19 +2,19 @@ package org.laoruga.dtogenerator.generator.builder.builders;
 
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.generator.DoubleGenerator;
+import org.laoruga.dtogenerator.generator.NumberDecimalGenerator;
 import org.laoruga.dtogenerator.generator.configs.ConfigDto;
-import org.laoruga.dtogenerator.generator.configs.DoubleConfigDto;
+import org.laoruga.dtogenerator.generator.configs.DecimalConfigDto;
 
 /**
  * @author Il'dar Valitov
  * Created on 19.02.2023
  */
-public final class DoubleGeneratorBuilder implements IGeneratorBuilderConfigurable<Double> {
-    private final DoubleConfigDto configDto;
+public final class DoubleGeneratorBuilder implements IGeneratorBuilderConfigurable<Number> {
+    private final DecimalConfigDto configDto;
 
     public DoubleGeneratorBuilder() {
-        this.configDto = new DoubleConfigDto();
+        this.configDto = new DecimalConfigDto();
     }
 
     public DoubleGeneratorBuilder maxValue(double maxValue) {
@@ -37,19 +37,19 @@ public final class DoubleGeneratorBuilder implements IGeneratorBuilderConfigurab
         return this;
     }
 
-    public DoubleGenerator build(ConfigDto configDto, boolean merge) {
+    public NumberDecimalGenerator build(ConfigDto configDto, boolean merge) {
         if (merge) {
             configDto.merge(this.configDto);
         }
-        DoubleConfigDto doubleConfigDto = (DoubleConfigDto) configDto;
-        return new DoubleGenerator(
-                doubleConfigDto.getMaxValue(),
-                doubleConfigDto.getMinValue(),
-                doubleConfigDto.getPrecision(),
-                doubleConfigDto.getRuleRemark());
+        DecimalConfigDto decimalConfigDto = (DecimalConfigDto) configDto;
+        return new NumberDecimalGenerator(
+                decimalConfigDto.getMaxValue(),
+                decimalConfigDto.getMinValue(),
+                decimalConfigDto.getPrecision(),
+                decimalConfigDto.getRuleRemark());
     }
 
-    public DoubleGenerator build() {
+    public NumberDecimalGenerator build() {
         return build(configDto, false);
     }
 }

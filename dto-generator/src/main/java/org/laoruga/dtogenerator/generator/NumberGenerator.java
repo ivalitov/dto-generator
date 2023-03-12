@@ -20,7 +20,6 @@ public class NumberGenerator implements IGenerator<Number> {
     private final Number minValue;
     private final IRuleRemark ruleRemark;
 
-
     @Override
     public Number generate() {
 

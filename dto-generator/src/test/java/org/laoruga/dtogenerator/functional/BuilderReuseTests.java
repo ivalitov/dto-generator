@@ -134,8 +134,8 @@ class BuilderReuseTests {
                         greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minLong())).and(
                         lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxLong()))),
                 () -> assertThat(dto.getADouble(), both(
-                        greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minValue())).and(
-                        lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble())).and(
+                        lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
                 () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), both(
                         sameOrAfter(now.minusDays(RulesInstance.LOCAL_DATE_TIME_RULE.leftShiftDays()))).and(
                         sameOrBefore(now.plusDays(RulesInstance.LOCAL_DATE_TIME_RULE.rightShiftDays())))),
@@ -169,8 +169,8 @@ class BuilderReuseTests {
                         greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minLong())).and(
                         lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxLong()))),
                 () -> assertThat(dto.getADouble(), both(
-                        greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minValue())).and(
-                        lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble())).and(
+                        lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
                 () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), both(
                         sameOrAfter(now.minusDays(RulesInstance.LOCAL_DATE_TIME_RULE.leftShiftDays()))).and(
                         sameOrBefore(now.plusDays(RulesInstance.LOCAL_DATE_TIME_RULE.rightShiftDays())))),

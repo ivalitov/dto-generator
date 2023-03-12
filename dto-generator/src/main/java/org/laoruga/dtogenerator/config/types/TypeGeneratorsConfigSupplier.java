@@ -14,7 +14,7 @@ public interface TypeGeneratorsConfigSupplier {
 
     NumberCommonConfigDto getNumberConfig();
 
-    DoubleConfigDto getDoubleConfig();
+    DecimalConfigDto getDoubleConfig();
 
     LocalDateTimeConfigDto getLocalDateTimeConfig();
 

@@ -5,9 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.random.RandomDataGenerator;
+import org.apache.commons.math3.util.Precision;
 import org.apache.commons.text.RandomStringGenerator;
 import org.laoruga.dtogenerator.constants.CharSet;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
@@ -29,10 +32,14 @@ public final class RandomUtils {
 
     private static final RandomDataGenerator RANDOM_DATA_GENERATOR = new RandomDataGenerator();
 
-    public static Double nextDouble(int minNumber, int maxNumber) {
-        double floatPart = random.nextDouble();
-        int integerPart = nextInt(minNumber, maxNumber);
-        return integerPart == maxNumber ? maxNumber : integerPart + floatPart;
+    public static double nextDouble(double minValue, double maxValue, int precision) {
+        double generated = minValue + RandomUtils.getRandom().nextDouble() * (maxValue - minValue);
+        return Precision.round(generated, precision);
+    }
+
+    public static float nextFloat(float minValue, float maxValue, int precision) {
+        float generated = minValue + RandomUtils.getRandom().nextFloat() * (maxValue - minValue);
+        return new BigDecimal(generated).setScale(precision, RoundingMode.HALF_UP).floatValue();
     }
 
     /**
@@ -113,19 +120,45 @@ public final class RandomUtils {
         if (minNumber.equals(maxNumber)) {
             return minNumber;
         } else {
-            if (minNumber.getClass() == Integer.class) {
+            if (minNumber.getClass() == Integer.class &&
+                    maxNumber.getClass() == Integer.class) {
                 return nextInt((Integer) minNumber, (Integer) maxNumber);
             }
-            if (minNumber.getClass() == Long.class) {
+            if (minNumber.getClass() == Long.class &&
+                    maxNumber.getClass() == Long.class) {
                 return nextLong((Long) minNumber, (Long) maxNumber);
             }
-            if (minNumber.getClass() == Short.class) {
+            if (minNumber.getClass() == Short.class &&
+                    maxNumber.getClass() == Short.class) {
                 return nextShort((Short) minNumber, (Short) maxNumber);
             }
-            if (minNumber.getClass() == Byte.class) {
+            if (minNumber.getClass() == Byte.class &&
+                    maxNumber.getClass() == Byte.class) {
                 return nextByte((Byte) minNumber, (Byte) maxNumber);
             }
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Unexpected number instances of classes: " +
+                    "'" + minNumber.getClass() + "' and '" + maxNumber.getClass() + "'");
+        }
+    }
+
+    public static Number nextNumberDecimal(Number minNumber, Number maxNumber, int precision) {
+        if (minNumber.equals(maxNumber)) {
+            return minNumber;
+        } else {
+            if (minNumber.getClass() == Double.class &&
+                    maxNumber.getClass() == Double.class) {
+                return nextDouble((Double) minNumber, (Double) maxNumber, precision);
+            }
+            if (minNumber.getClass() == Float.class &&
+                    maxNumber.getClass() == Float.class) {
+                return nextFloat((Float) minNumber, (Float) maxNumber, precision);
+            }
+            if (minNumber.getClass() == BigDecimal.class &&
+                    maxNumber.getClass() == BigDecimal.class) {
+                return nextBigDecimal((BigDecimal) minNumber, (BigDecimal) maxNumber, precision);
+            }
+            throw new IllegalArgumentException("Unexpected decimal number instances of classes: " +
+                    "'" + minNumber.getClass() + "' and '" + maxNumber.getClass() + "'");
         }
     }
 
@@ -137,6 +170,13 @@ public final class RandomUtils {
 
     public static String nextString(int length) {
         return DEFAULT_STRING_GENERATOR.generate(length);
+    }
+
+    public static BigDecimal nextBigDecimal(BigDecimal minValue, BigDecimal maxValue, int precision) {
+        BigDecimal randomBigDecimal = minValue.add(
+                BigDecimal.valueOf(Math.random()).multiply(maxValue.subtract(minValue))
+        );
+        return randomBigDecimal.setScale(precision, RoundingMode.HALF_UP);
     }
 
 }
