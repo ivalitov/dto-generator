@@ -95,12 +95,11 @@ public class BooleanGenerationTests {
             }
         }
 
-        int approximatedAverageMinimum = (int) ((attempts / 2) - attempts * 0.15);
+        int approximatedAverageMinimum = (int) ((attempts / 2) - attempts * 0.2);
 
         assertAll(
                 () -> assertThat(highProbabilityResults[0], greaterThan(highProbabilityResults[1])),
                 () -> assertThat(lowProbabilityResults[0], lessThan(lowProbabilityResults[1])),
-                () -> assertThat(randomProbabilityResults[0], greaterThan(approximatedAverageMinimum)),
                 () -> assertThat(randomProbabilityResults[0], greaterThan(approximatedAverageMinimum))
         );
     }

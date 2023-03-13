@@ -17,14 +17,16 @@ import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
+import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientDto;
 import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
 import org.laoruga.dtogenerator.generator.configs.StringConfigDto;
-import org.laoruga.dtogenerator.constants.RulesInstance;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -59,6 +61,10 @@ class ListGenerationTests {
         @CollectionRule(collectionClass = LinkedList.class)
         @StringRule
         private LinkedList<String> linkedListOfStringsImplicit;
+
+        @CollectionRule
+        @NumberRule
+        private List<AtomicInteger> listOfAtomicInteger;
     }
 
     @Test
@@ -139,6 +145,10 @@ class ListGenerationTests {
         @BooleanRule(trueProbability = 1)
         private List<Boolean> listOfBoolean;
 
+        @CollectionRule(minSize = 2, maxSize = 2)
+        @NumberRule(minInt = 777, maxInt = 777)
+        private List<AtomicInteger> listOfAtomicInteger;
+
     }
 
     @Test
@@ -148,7 +158,10 @@ class ListGenerationTests {
         DtoVariousTypes dto = DtoGenerator.builder(new DtoVariousTypes()).build().generateDto();
 
         assertAll(
-                () -> assertThat(dto.getListOfBoolean().stream().filter(i -> i).count(), equalTo(10L))
+                () -> assertThat(dto.getListOfBoolean().stream().filter(i -> i).count(), equalTo(10L)),
+                () -> assertThat(
+                        dto.getListOfAtomicInteger().stream().map(AtomicInteger::get).collect(Collectors.toList()),
+                        everyItem(equalTo(777)))
         );
 
     }
@@ -159,13 +172,14 @@ class ListGenerationTests {
 
         DtoGeneratorBuilder<DtoList> builder = DtoGenerator.builder(DtoList.class);
 
-        builder.setTypeGeneratorConfig("linkedListOfStrings", CollectionConfigDto.builder().maxSize(2).minSize(2).build());
-        builder.setTypeGeneratorConfig("linkedListOfStrings", StringConfigDto.builder().words(new String[]{"PEACE"}).build());
-        builder.setTypeGeneratorConfig("vectorOfStrings", StringConfigDto.builder().words(new String[]{"LIFE"}).build());
-        builder.setTypeGeneratorConfig("linkedListOfStringsImplicit", CollectionConfigDto.builder().maxSize(3).minSize(3).build());
+        builder.setTypeGeneratorConfig("linkedListOfStrings", CollectionConfigDto.builder().maxSize(2).minSize(2).build())
+                .setTypeGeneratorConfig("linkedListOfStrings", StringConfigDto.builder().words(new String[]{"PEACE"}).build())
+                .setTypeGeneratorConfig("vectorOfStrings", StringConfigDto.builder().words(new String[]{"LIFE"}).build())
+                .setTypeGeneratorConfig("linkedListOfStringsImplicit", CollectionConfigDto.builder().maxSize(3).minSize(3).build());
 
         builder.getTypeGeneratorConfig().getCollectionConfig(List.class).setMinSize(1);
         DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getCollectionConfig(List.class).setMaxSize(1);
+        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getNumberConfig().setMaxIntValue(1).setMinIntValue(1);
 
         DtoList dto = builder.build().generateDto();
 
@@ -175,7 +189,10 @@ class ListGenerationTests {
                 () -> assertThat(dto.vectorOfStrings, hasSize(1)),
                 () -> assertThat(dto.vectorOfStrings, everyItem(equalTo("LIFE"))),
                 () -> assertThat(dto.arrayListOfStringsImplicit, hasSize(1)),
-                () -> assertThat(dto.linkedListOfStringsImplicit, hasSize(3))
+                () -> assertThat(dto.linkedListOfStringsImplicit, hasSize(3)),
+                () -> assertThat(dto.listOfAtomicInteger, hasSize(1)),
+                () -> assertThat(dto.listOfAtomicInteger.get(0).get(), equalTo(1))
+
         );
 
     }
