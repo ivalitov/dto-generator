@@ -48,7 +48,7 @@ public final class GeneratorBuildersHolderGeneral {
                 GeneratorBuilderInfo.createInstances(
                         DecimalRule.class,
                         DecimalRule.GENERATED_TYPES,
-                        NumberDecimalGenerator::builder));
+                        DecimalGenerator::builder));
 
         generatorBuildersHolder.addBuilders(
                 GeneratorBuilderInfo.createInstances(

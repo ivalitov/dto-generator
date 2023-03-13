@@ -7,6 +7,7 @@ import org.laoruga.dtogenerator.constants.RuleRemark;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.TYPE_USE;
@@ -18,7 +19,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(NumberRules.class)
 public @interface NumberRule {
 
-    Class<?>[] GENERATED_TYPES = new Class<?>[]{Byte.class, Short.class, Integer.class, Long.class};
+    Class<?>[] GENERATED_TYPES = new Class<?>[]{Byte.class, Short.class, Integer.class, Long.class, AtomicInteger.class};
 
     long maxLong() default Long.MAX_VALUE;
 

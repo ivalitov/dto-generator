@@ -133,9 +133,9 @@ class OverridingOfGeneratorsTests {
         gensConfig.getNumberConfig().setMaxIntValue(1);
         gensConfig.getNumberConfig().setRuleRemark(MAX_VALUE);
 
-        gensConfig.getDoubleConfig().setMinValue(2D);
-        gensConfig.getDoubleConfig().setMaxValue(100D);
-        gensConfig.getDoubleConfig().setRuleRemark(MIN_VALUE);
+        gensConfig.getDecimalConfig().setMinValue(2D);
+        gensConfig.getDecimalConfig().setMaxValue(100D);
+        gensConfig.getDecimalConfig().setRuleRemark(MIN_VALUE);
 
         gensConfig.getNumberConfig().setMinLongValue(-100L);
         gensConfig.getNumberConfig().setMaxLongValue(3L);
@@ -176,9 +176,9 @@ class OverridingOfGeneratorsTests {
         gensConfig.getNumberConfig().setMaxIntValue(1);
         gensConfig.getNumberConfig().setRuleRemark(MAX_VALUE);
 
-        gensConfig.getDoubleConfig().setMinValue(2D);
-        gensConfig.getDoubleConfig().setMaxValue(100D);
-        gensConfig.getDoubleConfig().setRuleRemark(MIN_VALUE);
+        gensConfig.getDecimalConfig().setMinValue(2D);
+        gensConfig.getDecimalConfig().setMaxValue(100D);
+        gensConfig.getDecimalConfig().setRuleRemark(MIN_VALUE);
 
         gensConfig.getNumberConfig().setMinLongValue(-100L);
         gensConfig.getNumberConfig().setMaxLongValue(3L);
@@ -464,8 +464,8 @@ class OverridingOfGeneratorsTests {
     @DisplayName("With Grouping")
     void withGrouping() {
         TypeGeneratorsConfigLazy gensConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
-        gensConfig.getDoubleConfig().setMaxValue(1D);
-        gensConfig.getDoubleConfig().setMinValue(1D);
+        gensConfig.getDecimalConfig().setMaxValue(1D);
+        gensConfig.getDecimalConfig().setMinValue(1D);
 
         DtoWithGroup dto_1 = DtoGenerator.builder(DtoWithGroup.class)
                 .includeGroups(DEFAULT, GROUP_2)

@@ -3,7 +3,6 @@ package org.laoruga.dtogenerator.config.types;
 import com.google.common.primitives.Primitives;
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.builders.*;
@@ -55,7 +54,6 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
 
     public StringConfigDto getStringConfig() {
         return (StringConfigDto) getConfigLazy(
-                StringGeneratorBuilder.class,
                 StringRule.GENERATED_TYPES,
                 StringConfigDto::new
         );
@@ -63,15 +61,13 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
 
     public NumberCommonConfigDto getNumberConfig() {
         return (NumberCommonConfigDto) getConfigLazy(
-                NumberGeneratorBuilder.class,
                 NumberRule.GENERATED_TYPES,
                 NumberCommonConfigDto::new
         );
     }
 
-    public DecimalConfigDto getDoubleConfig() {
+    public DecimalConfigDto getDecimalConfig() {
         return (DecimalConfigDto) getConfigLazy(
-                DoubleGeneratorBuilder.class,
                 DecimalRule.GENERATED_TYPES,
                 DecimalConfigDto::new
         );
@@ -79,7 +75,6 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
 
     public LocalDateTimeConfigDto getLocalDateTimeConfig() {
         return (LocalDateTimeConfigDto) getConfigLazy(
-                LocalDateTimeGeneratorBuilder.class,
                 LocalDateTimeRule.GENERATED_TYPES,
                 LocalDateTimeConfigDto::new
         );
@@ -87,7 +82,6 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
 
     public EnumConfigDto getEnumConfig() {
         return (EnumConfigDto) getConfigLazy(
-                EnumGeneratorBuilder.class,
                 EnumRule.GENERATED_TYPES,
                 EnumConfigDto::new
         );
@@ -95,21 +89,16 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
 
     public CollectionConfigDto getCollectionConfig(Class<? extends Collection> generatedType) {
         return (CollectionConfigDto) getConfigLazy(
-                CollectionGeneratorBuilder.class,
                 new Class[]{generatedType},
                 CollectionConfigDto::new
         );
     }
 
-    private ConfigDto getConfigLazy(Class<? extends IGeneratorBuilder<?>> genBuilderClass,
-                                    Class<?>[] generatedTypes,
+    private ConfigDto getConfigLazy(Class<?>[] generatedTypes,
                                     Supplier<ConfigDto> configSupplier) {
-        ConfigDto configDto = null;
+        ConfigDto configDto = configSupplier.get();
         for (Class<?> generatedType : generatedTypes) {
             if (!configMap.containsKey(generatedType)) {
-                if (configDto == null) {
-                    configDto = configSupplier.get();
-                }
                 configMap.putIfAbsent(generatedType, configDto);
             }
         }

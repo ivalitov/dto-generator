@@ -53,6 +53,7 @@ public final class NumberGeneratorBuilder implements IGeneratorBuilderConfigurab
         return new NumberGenerator(
                 integerConfigDto.getMaxValue(),
                 integerConfigDto.getMinValue(),
+                integerConfigDto.isAtomic(),
                 integerConfigDto.getRuleRemark()
         );
     }

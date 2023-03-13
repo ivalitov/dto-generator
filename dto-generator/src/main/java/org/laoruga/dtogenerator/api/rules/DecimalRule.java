@@ -1,6 +1,5 @@
 package org.laoruga.dtogenerator.api.rules;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.constants.Bounds;
 import org.laoruga.dtogenerator.constants.Group;
@@ -20,7 +19,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(DecimalRules.class)
 public @interface DecimalRule {
 
-    Class<?>[] GENERATED_TYPES = new Class<?>[]{Double.class, Float.class, BigDecimal.class, AtomicDouble.class};
+    Class<?>[] GENERATED_TYPES = new Class<?>[]{Double.class, Float.class, BigDecimal.class};
+
+    int precision() default 2;
 
     double maxDouble() default Double.MAX_VALUE;
 
@@ -31,9 +32,8 @@ public @interface DecimalRule {
     float minFloat() default Float.MIN_VALUE;
 
     String maxBigDecimal() default Bounds.BIG_DECIMAL_MAX_VALUE;
-    String minBigDecimal() default Bounds.BIG_DECIMAL_MIN_VALUE;
 
-    int precision() default 2;
+    String minBigDecimal() default Bounds.BIG_DECIMAL_MIN_VALUE;
 
     RuleRemark ruleRemark() default RuleRemark.RANDOM_VALUE;
 

@@ -6,6 +6,8 @@ import lombok.experimental.Accessors;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author Il'dar Valitov
  * Created on 19.02.2023
@@ -24,15 +26,18 @@ public class NumberConfigDto implements ConfigDto {
     @Getter(AccessLevel.PRIVATE)
     @Setter(AccessLevel.PRIVATE)
     private Class<? extends Number> fieldType;
+
+    private boolean isAtomic;
     private IRuleRemark ruleRemark;
 
     public NumberConfigDto(NumberRule rules, Class<? extends Number> fieldType) {
         fieldType = Primitives.wrap(fieldType);
 
+        this.isAtomic = fieldType == AtomicInteger.class;
         this.fieldType = fieldType;
         this.ruleRemark = rules.ruleRemark();
 
-        if (fieldType == Integer.class) {
+        if (fieldType == Integer.class || isAtomic) {
             minValue = rules.minInt();
             maxValue = rules.maxInt();
         } else if (fieldType == Long.class) {

@@ -11,6 +11,8 @@ import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.generator.configs.NumberCommonConfigDto;
 import org.laoruga.dtogenerator.generator.configs.NumberConfigDto;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -50,6 +52,9 @@ public class NumberTests {
         @NumberRule(maxByte = 10)
         byte bytePrimitive;
 
+        @NumberRule(minInt = 1, maxInt = 1)
+        AtomicInteger atomicInteger;
+
     }
 
     @Test
@@ -67,7 +72,8 @@ public class NumberTests {
                 () -> assertThat(dto.shortObject, notNullValue()),
                 () -> assertThat(dto.shortPrimitive, equalTo((short) -5)),
                 () -> assertThat(dto.byteObject, notNullValue()),
-                () -> assertThat(dto.bytePrimitive, lessThanOrEqualTo((byte) 10))
+                () -> assertThat(dto.bytePrimitive, lessThanOrEqualTo((byte) 10)),
+                () -> assertThat(dto.atomicInteger.get(), equalTo(1))
         );
 
     }
@@ -99,7 +105,8 @@ public class NumberTests {
                 () -> assertThat(dto.shortObject, equalTo((short) 77)),
                 () -> assertThat(dto.shortPrimitive, equalTo((short) 77)),
                 () -> assertThat(dto.byteObject, equalTo((byte) 126)),
-                () -> assertThat(dto.bytePrimitive, equalTo((byte) 126))
+                () -> assertThat(dto.bytePrimitive, equalTo((byte) 126)),
+                () -> assertThat(dto.atomicInteger.get(), equalTo(-99))
         );
 
     }
@@ -110,16 +117,15 @@ public class NumberTests {
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
         NumberCommonConfigDto numberConfig = builder.getTypeGeneratorConfig().getNumberConfig();
 
-        numberConfig.setMinIntValue(-99);
-        numberConfig.setMaxIntValue(0);
-        numberConfig.setMinLongValue(new Long(9_999_999_999L));
-        numberConfig.setMaxLongValue(99_999_999_999L);
-        numberConfig.setMaxShortValue((short) 100);
-        numberConfig.setMinShortValue((short) 77);
-        numberConfig.setMinByteValue((byte) 126);
-        numberConfig.setMaxByteValue(Byte.MAX_VALUE);
-        numberConfig.setRuleRemark(MAX_VALUE);
-
+        numberConfig.setMinIntValue(-99)
+                .setMaxIntValue(0)
+                .setMinLongValue(new Long(9_999_999_999L))
+                .setMaxLongValue(99_999_999_999L)
+                .setMaxShortValue((short) 100)
+                .setMinShortValue((short) 77)
+                .setMinByteValue((byte) 126)
+                .setMaxByteValue(Byte.MAX_VALUE)
+                .setRuleRemark(MAX_VALUE);
 
         Dto dto = builder.build().generateDto();
 
@@ -131,7 +137,8 @@ public class NumberTests {
                 () -> assertThat(dto.shortObject, equalTo((short) 100)),
                 () -> assertThat(dto.shortPrimitive, equalTo((short) 100)),
                 () -> assertThat(dto.byteObject, equalTo(Byte.MAX_VALUE)),
-                () -> assertThat(dto.bytePrimitive, equalTo(Byte.MAX_VALUE))
+                () -> assertThat(dto.bytePrimitive, equalTo(Byte.MAX_VALUE)),
+                () -> assertThat(dto.atomicInteger.get(), equalTo(0))
         );
 
     }
@@ -157,7 +164,9 @@ public class NumberTests {
                 .setTypeGeneratorConfig("byteObject",
                         NumberConfigDto.builder().minValue(new Byte("-12")).maxValue((byte) -11).ruleRemark(MIN_VALUE).build())
                 .setTypeGeneratorConfig("bytePrimitive",
-                        NumberConfigDto.builder().minValue((byte) 11).maxValue(new Byte("12")).ruleRemark(MAX_VALUE).build());
+                        NumberConfigDto.builder().minValue((byte) 11).maxValue(new Byte("12")).ruleRemark(MAX_VALUE).build())
+                .setTypeGeneratorConfig("atomicInteger",
+                        NumberConfigDto.builder().minValue(2).maxValue(new Integer("2")).ruleRemark(RANDOM_VALUE).build());
 
 
         Dto dto = builder.build().generateDto();
@@ -170,7 +179,8 @@ public class NumberTests {
                 () -> assertThat(dto.shortObject, equalTo((short) 111)),
                 () -> assertThat(dto.shortPrimitive, equalTo((short) 0)),
                 () -> assertThat(dto.byteObject, equalTo((byte) -12)),
-                () -> assertThat(dto.bytePrimitive, equalTo((byte) 12))
+                () -> assertThat(dto.bytePrimitive, equalTo((byte) 12)),
+                () -> assertThat(dto.atomicInteger.get(), equalTo(2))
         );
 
     }
@@ -222,14 +232,15 @@ public class NumberTests {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
-        builder.setGenerator("intObject", () -> new Integer("1"));
-        builder.setGenerator("intPrimitive", () -> 2);
-        builder.setGenerator("longObject", () -> 3L);
-        builder.setGenerator("longPrimitive", () -> new Long("4"));
-        builder.setGenerator("shortObject", () -> new Short("5"));
-        builder.setGenerator("shortPrimitive", () -> (short) 6);
-        builder.setGenerator("byteObject", () -> (byte) 7);
-        builder.setGenerator("bytePrimitive", () -> (byte) 8);
+        builder.setGenerator("intObject", () -> new Integer("1"))
+                .setGenerator("intPrimitive", () -> 2)
+                .setGenerator("longObject", () -> 3L)
+                .setGenerator("longPrimitive", () -> new Long("4"))
+                .setGenerator("shortObject", () -> new Short("5"))
+                .setGenerator("shortPrimitive", () -> (short) 6)
+                .setGenerator("byteObject", () -> (byte) 7)
+                .setGenerator("bytePrimitive", () -> (byte) 8)
+                .setGenerator("atomicInteger", () -> new AtomicInteger(33));
 
         Dto dto = builder.build().generateDto();
 
@@ -241,7 +252,8 @@ public class NumberTests {
                 () -> assertThat(dto.shortObject, equalTo((short) 5)),
                 () -> assertThat(dto.shortPrimitive, equalTo((short) 6)),
                 () -> assertThat(dto.byteObject, equalTo((byte) 7)),
-                () -> assertThat(dto.bytePrimitive, equalTo((byte) 8))
+                () -> assertThat(dto.bytePrimitive, equalTo((byte) 8)),
+                () -> assertThat(dto.atomicInteger.get(), equalTo(33))
         );
 
     }
@@ -266,7 +278,8 @@ public class NumberTests {
                 () -> assertThat(dto.shortObject, equalTo((short) 3)),
                 () -> assertThat(dto.shortPrimitive, equalTo((short) 3)),
                 () -> assertThat(dto.byteObject, equalTo((byte) 4)),
-                () -> assertThat(dto.bytePrimitive, equalTo((byte) 4))
+                () -> assertThat(dto.bytePrimitive, equalTo((byte) 4)),
+                () -> assertThat(dto.atomicInteger.get(), equalTo(1))
         );
 
     }
@@ -296,7 +309,9 @@ public class NumberTests {
                 () -> assertThat(dto.shortObject, equalTo((short) 3)),
                 () -> assertThat(dto.shortPrimitive, equalTo((short) 33)),
                 () -> assertThat(dto.byteObject, equalTo((byte) 44)),
-                () -> assertThat(dto.bytePrimitive, equalTo((byte) 4))
+                () -> assertThat(dto.bytePrimitive, equalTo((byte) 4)),
+                () -> assertThat(dto.atomicInteger.get(), equalTo(1))
+
         );
 
     }
@@ -311,6 +326,8 @@ public class NumberTests {
         short shortPrimitive;
         Byte byteObject;
         byte bytePrimitive;
+
+        AtomicInteger atomicInteger;
 
     }
 
@@ -332,7 +349,8 @@ public class NumberTests {
                 () -> assertThat(dto.shortObject, equalTo(Short.MAX_VALUE)),
                 () -> assertThat(dto.shortPrimitive, equalTo(Short.MAX_VALUE)),
                 () -> assertThat(dto.byteObject, equalTo(Byte.MAX_VALUE)),
-                () -> assertThat(dto.bytePrimitive, equalTo(Byte.MAX_VALUE))
+                () -> assertThat(dto.bytePrimitive, equalTo(Byte.MAX_VALUE)),
+                () -> assertThat(dto.atomicInteger.get(), equalTo(Integer.MAX_VALUE))
         );
 
     }
@@ -349,18 +367,18 @@ public class NumberTests {
         NumberCommonConfigDto numberConfig = builder.getTypeGeneratorConfig().getNumberConfig();
 
         // next line overrides MAX_VALUE from static config
-        numberConfig.setRuleRemark(MIN_VALUE);
-        numberConfig.setMinIntValue(1);
-        numberConfig.setMinLongValue(2L);
-        numberConfig.setMaxLongValue(22_222_222_222L);
-        numberConfig.setMinShortValue((short) 3);
-        numberConfig.setMinByteValue((byte) 4);
+        numberConfig.setRuleRemark(MIN_VALUE)
+                .setMinIntValue(1)
+                .setMinLongValue(2L)
+                .setMaxLongValue(22_222_222_222L)
+                .setMinShortValue((short) 3)
+                .setMinByteValue((byte) 4);
 
         // next lines override parts of previous configs
-        builder.setTypeGeneratorConfig("intPrimitive", NumberConfigDto.builder().minValue(-1).build());
-        builder.setTypeGeneratorConfig("longObject", NumberConfigDto.builder().ruleRemark(MAX_VALUE).build());
-        builder.setTypeGeneratorConfig("shortPrimitive", NumberConfigDto.builder().minValue((short) -3).build());
-        builder.setTypeGeneratorConfig("byteObject", NumberConfigDto.builder().minValue(new Byte("-4")).build());
+        builder.setTypeGeneratorConfig("intPrimitive", NumberConfigDto.builder().minValue(-1).build())
+                .setTypeGeneratorConfig("longObject", NumberConfigDto.builder().ruleRemark(MAX_VALUE).build())
+                .setTypeGeneratorConfig("shortPrimitive", NumberConfigDto.builder().minValue((short) -3).build())
+                .setTypeGeneratorConfig("byteObject", NumberConfigDto.builder().minValue(new Byte("-4")).build());
 
         Dto_2 dto = builder.build().generateDto();
 
@@ -372,7 +390,8 @@ public class NumberTests {
                 () -> assertThat(dto.shortObject, equalTo((short) 3)),
                 () -> assertThat(dto.shortPrimitive, equalTo((short) -3)),
                 () -> assertThat(dto.byteObject, equalTo((byte) -4)),
-                () -> assertThat(dto.bytePrimitive, equalTo((byte) 4))
+                () -> assertThat(dto.bytePrimitive, equalTo((byte) 4)),
+                () -> assertThat(dto.atomicInteger.get(), equalTo(1))
         );
 
     }

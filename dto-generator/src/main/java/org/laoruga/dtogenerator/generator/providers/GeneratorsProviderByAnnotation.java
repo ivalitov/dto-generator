@@ -19,7 +19,7 @@ import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.BooleanGenerator;
 import org.laoruga.dtogenerator.generator.CustomGenerator;
-import org.laoruga.dtogenerator.generator.NumberDecimalGenerator;
+import org.laoruga.dtogenerator.generator.DecimalGenerator;
 import org.laoruga.dtogenerator.generator.NumberGenerator;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolderGeneral;
@@ -136,7 +136,7 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
                         fieldName);
 
             } else if (DecimalRule.class == rulesClass
-                    && generatorBuilder instanceof DoubleGeneratorBuilder) {
+                    && generatorBuilder instanceof DecimalGeneratorBuilder) {
 
                 if (Number.class.isAssignableFrom(Primitives.wrap(fieldType))) {
 
@@ -256,7 +256,7 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
         return (config, builder) -> {
             if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
                 reportPrimitiveCannotBeNull(fieldName);
-                return NumberDecimalGenerator.builder()
+                return DecimalGenerator.builder()
                         .minValue(0D)
                         .maxValue(0D)
                         .ruleRemark(MIN_VALUE).build();

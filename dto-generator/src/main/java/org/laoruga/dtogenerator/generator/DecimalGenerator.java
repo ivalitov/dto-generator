@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.generator.builder.builders.DoubleGeneratorBuilder;
+import org.laoruga.dtogenerator.generator.builder.builders.DecimalGeneratorBuilder;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 /**
@@ -13,7 +13,7 @@ import org.laoruga.dtogenerator.util.RandomUtils;
  */
 
 @AllArgsConstructor
-public class NumberDecimalGenerator implements IGenerator<Number> {
+public class DecimalGenerator implements IGenerator<Number> {
 
     private final Number maxValue;
     private final Number minValue;
@@ -34,8 +34,8 @@ public class NumberDecimalGenerator implements IGenerator<Number> {
         throw new IllegalStateException("Unexpected value " + ruleRemark);
     }
 
-    public static DoubleGeneratorBuilder builder() {
-        return new DoubleGeneratorBuilder();
+    public static DecimalGeneratorBuilder builder() {
+        return new DecimalGeneratorBuilder();
     }
 
 }

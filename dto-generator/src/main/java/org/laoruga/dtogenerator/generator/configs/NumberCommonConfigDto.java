@@ -9,6 +9,7 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Il'dar Valitov
@@ -25,65 +26,87 @@ public class NumberCommonConfigDto implements ConfigDto {
     private IRuleRemark ruleRemark;
 
     public NumberCommonConfigDto setMaxIntValue(int maxIntValue) {
-        map.putIfAbsent(Integer.class, new NumberConfigDto());
+        if (!map.containsKey(Integer.class)) {
+            NumberConfigDto configDto = new NumberConfigDto();
+            map.putIfAbsent(Integer.class, configDto);
+            map.putIfAbsent(AtomicInteger.class, configDto);
+        }
         map.get(Integer.class).setMaxValue(maxIntValue);
         return this;
     }
 
     public NumberCommonConfigDto setMinIntValue(int minIntValue) {
-        map.putIfAbsent(Integer.class, new NumberConfigDto());
+        if (!map.containsKey(Integer.class)) {
+            NumberConfigDto configDto = new NumberConfigDto();
+            map.putIfAbsent(Integer.class, configDto);
+            map.putIfAbsent(AtomicInteger.class, configDto);
+        }
         map.get(Integer.class).setMinValue(minIntValue);
         return this;
     }
 
-    public void setRuleRemarkInt(IRuleRemark ruleRemark) {
-        map.putIfAbsent(Integer.class, new NumberConfigDto());
+    public NumberCommonConfigDto setRuleRemarkInt(IRuleRemark ruleRemark) {
+        if (!map.containsKey(Integer.class)) {
+            NumberConfigDto configDto = new NumberConfigDto();
+            map.putIfAbsent(Integer.class, configDto);
+            map.putIfAbsent(AtomicInteger.class, configDto);
+        }
         map.get(Integer.class).setRuleRemark(ruleRemark);
+        return this;
     }
 
-    public void setMaxLongValue(long maxLongValue) {
+    public NumberCommonConfigDto setMaxLongValue(long maxLongValue) {
         map.putIfAbsent(Long.class, new NumberConfigDto());
         map.get(Long.class).setMaxValue(maxLongValue);
+        return this;
     }
 
-    public void setMinLongValue(long minLongValue) {
+    public NumberCommonConfigDto setMinLongValue(long minLongValue) {
         map.putIfAbsent(Long.class, new NumberConfigDto());
         map.get(Long.class).setMinValue(minLongValue);
+        return this;
     }
 
-    public void setRuleRemarkLong(IRuleRemark ruleRemark) {
+    public NumberCommonConfigDto setRuleRemarkLong(IRuleRemark ruleRemark) {
         map.putIfAbsent(Long.class, new NumberConfigDto());
         map.get(Long.class).setRuleRemark(ruleRemark);
+        return this;
     }
 
-    public void setMaxShortValue(short maxShortValue) {
+    public NumberCommonConfigDto setMaxShortValue(short maxShortValue) {
         map.putIfAbsent(Short.class, new NumberConfigDto());
         map.get(Short.class).setMaxValue(maxShortValue);
+        return this;
     }
 
-    public void setMinShortValue(short minShortValue) {
+    public NumberCommonConfigDto setMinShortValue(short minShortValue) {
         map.putIfAbsent(Short.class, new NumberConfigDto());
         map.get(Short.class).setMinValue(minShortValue);
+        return this;
     }
 
-    public void setRuleRemarkShort(IRuleRemark ruleRemark) {
+    public NumberCommonConfigDto setRuleRemarkShort(IRuleRemark ruleRemark) {
         map.putIfAbsent(Short.class, new NumberConfigDto());
         map.get(Short.class).setRuleRemark(ruleRemark);
+        return this;
     }
 
-    public void setMaxByteValue(byte maxByteValue) {
+    public NumberCommonConfigDto setMaxByteValue(byte maxByteValue) {
         map.putIfAbsent(Byte.class, new NumberConfigDto());
         map.get(Byte.class).setMaxValue(maxByteValue);
+        return this;
     }
 
-    public void setMinByteValue(byte minByteValue) {
+    public NumberCommonConfigDto setMinByteValue(byte minByteValue) {
         map.putIfAbsent(Byte.class, new NumberConfigDto());
         map.get(Byte.class).setMinValue(minByteValue);
+        return this;
     }
 
-    public void setRuleRemarkByte(IRuleRemark ruleRemark) {
+    public NumberCommonConfigDto setRuleRemarkByte(IRuleRemark ruleRemark) {
         map.putIfAbsent(Byte.class, new NumberConfigDto());
         map.get(Byte.class).setRuleRemark(ruleRemark);
+        return this;
     }
 
     NumberConfigDto getConfigOrNull(Class<? extends Number> generateType) {
