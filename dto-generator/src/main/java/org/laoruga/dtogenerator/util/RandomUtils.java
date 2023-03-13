@@ -10,6 +10,7 @@ import org.apache.commons.text.RandomStringGenerator;
 import org.laoruga.dtogenerator.constants.CharSet;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Iterator;
@@ -136,6 +137,10 @@ public final class RandomUtils {
                     maxNumber.getClass() == Byte.class) {
                 return nextByte((Byte) minNumber, (Byte) maxNumber);
             }
+            if (minNumber.getClass() == BigInteger.class &&
+                    maxNumber.getClass() == BigInteger.class) {
+                return nextBigInteger((BigInteger) minNumber, (BigInteger) maxNumber);
+            }
             throw new IllegalArgumentException("Unexpected number instances of classes: " +
                     "'" + minNumber.getClass() + "' and '" + maxNumber.getClass() + "'");
         }
@@ -177,6 +182,10 @@ public final class RandomUtils {
                 BigDecimal.valueOf(Math.random()).multiply(maxValue.subtract(minValue))
         );
         return randomBigDecimal.setScale(precision, RoundingMode.HALF_UP);
+    }
+
+    public static BigInteger nextBigInteger(BigInteger minValue, BigInteger maxValue) {
+        return nextBigDecimal(new BigDecimal(minValue), new BigDecimal(maxValue), 0).toBigInteger();
     }
 
 }

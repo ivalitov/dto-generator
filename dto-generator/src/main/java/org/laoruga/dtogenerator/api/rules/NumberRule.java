@@ -1,12 +1,14 @@
 package org.laoruga.dtogenerator.api.rules;
 
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
+import org.laoruga.dtogenerator.constants.Bounds;
 import org.laoruga.dtogenerator.constants.Group;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -19,7 +21,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(NumberRules.class)
 public @interface NumberRule {
 
-    Class<?>[] GENERATED_TYPES = new Class<?>[]{Byte.class, Short.class, Integer.class, Long.class, AtomicInteger.class};
+    Class<?>[] GENERATED_TYPES = new Class<?>[]
+            {Byte.class, Short.class, Integer.class, Long.class, BigInteger.class, AtomicInteger.class};
 
     long maxLong() default Long.MAX_VALUE;
 
@@ -36,6 +39,10 @@ public @interface NumberRule {
     byte maxByte() default Byte.MAX_VALUE;
 
     byte minByte() default Byte.MIN_VALUE;
+
+    String maxBigInt() default Bounds.BIG_INTEGER_MAX_VALUE;
+
+    String minBigInt() default Bounds.BIG_INTEGER_MIN_VALUE;
 
     RuleRemark ruleRemark() default RuleRemark.RANDOM_VALUE;
 

@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.NotImplementedException;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,6 +25,10 @@ public class NumberCommonConfigDto implements ConfigDto {
     @Setter
     @Accessors(chain = true)
     private IRuleRemark ruleRemark;
+
+    /*
+     * Integer
+     */
 
     public NumberCommonConfigDto setMaxIntValue(int maxIntValue) {
         if (!map.containsKey(Integer.class)) {
@@ -55,64 +60,114 @@ public class NumberCommonConfigDto implements ConfigDto {
         return this;
     }
 
-    public NumberCommonConfigDto setMaxLongValue(long maxLongValue) {
-        map.putIfAbsent(Long.class, new NumberConfigDto());
-        map.get(Long.class).setMaxValue(maxLongValue);
+    /*
+     * Long
+     */
+
+    public NumberCommonConfigDto setMaxLongValue(long value) {
+        return setMaxValue(Long.class, value);
+
+    }
+
+    public NumberCommonConfigDto setMinLongValue(long value) {
+        return setMinValue(Long.class, value);
+    }
+
+    public NumberCommonConfigDto setRuleRemarkLong(IRuleRemark value) {
+        return setRuleRemark(Long.class, value);
+    }
+
+    /*
+     * Short
+     */
+
+    public NumberCommonConfigDto setMaxShortValue(short value) {
+        return setMaxValue(Short.class, value);
+
+    }
+
+    public NumberCommonConfigDto setMinShortValue(short value) {
+        return setMinValue(Short.class, value);
+    }
+
+    public NumberCommonConfigDto setRuleRemarkShort(IRuleRemark value) {
+        return setRuleRemark(Short.class, value);
+    }
+
+    /*
+     * Byte
+     */
+
+    public NumberCommonConfigDto setMaxByteValue(byte value) {
+        return setMaxValue(Byte.class, value);
+    }
+
+    public NumberCommonConfigDto setMinByteValue(byte value) {
+        return setMinValue(Byte.class, value);
+    }
+
+    public NumberCommonConfigDto setRuleRemarkByte(IRuleRemark value) {
+        return setRuleRemark(Byte.class, value);
+    }
+
+    /*
+     * BigInteger
+     */
+
+    public NumberCommonConfigDto setMaxBigIntValue(BigInteger value) {
+        return setMaxValue(BigInteger.class, value);
+    }
+
+    public NumberCommonConfigDto setMaxBigIntValue(String value) {
+        return setMaxBigIntValue(new BigInteger(value));
+    }
+
+    public NumberCommonConfigDto setMinBigIntValue(BigInteger value) {
+        return setMinValue(BigInteger.class, value);
+    }
+
+    public NumberCommonConfigDto setMinBigIntValue(String value) {
+        return setMinBigIntValue(new BigInteger(value));
+    }
+
+    public NumberCommonConfigDto setRuleRemarkBigInteger(IRuleRemark value) {
+        return setRuleRemark(BigInteger.class, value);
+    }
+
+    /*
+     * Common setters
+     */
+
+    private NumberCommonConfigDto setMaxValue(Class<?> type, Number maxValue) {
+        map.putIfAbsent(type, new NumberConfigDto());
+        map.get(type).setMaxValue(maxValue);
         return this;
     }
 
-    public NumberCommonConfigDto setMinLongValue(long minLongValue) {
-        map.putIfAbsent(Long.class, new NumberConfigDto());
-        map.get(Long.class).setMinValue(minLongValue);
+    private NumberCommonConfigDto setMinValue(Class<?> type, Number minValue) {
+        map.putIfAbsent(type, new NumberConfigDto());
+        map.get(type).setMinValue(minValue);
         return this;
     }
 
-    public NumberCommonConfigDto setRuleRemarkLong(IRuleRemark ruleRemark) {
-        map.putIfAbsent(Long.class, new NumberConfigDto());
-        map.get(Long.class).setRuleRemark(ruleRemark);
+    private NumberCommonConfigDto setRuleRemark(Class<?> type, IRuleRemark ruleRemark) {
+        map.putIfAbsent(type, new NumberConfigDto());
+        map.get(type).setRuleRemark(ruleRemark);
         return this;
     }
 
-    public NumberCommonConfigDto setMaxShortValue(short maxShortValue) {
-        map.putIfAbsent(Short.class, new NumberConfigDto());
-        map.get(Short.class).setMaxValue(maxShortValue);
-        return this;
-    }
-
-    public NumberCommonConfigDto setMinShortValue(short minShortValue) {
-        map.putIfAbsent(Short.class, new NumberConfigDto());
-        map.get(Short.class).setMinValue(minShortValue);
-        return this;
-    }
-
-    public NumberCommonConfigDto setRuleRemarkShort(IRuleRemark ruleRemark) {
-        map.putIfAbsent(Short.class, new NumberConfigDto());
-        map.get(Short.class).setRuleRemark(ruleRemark);
-        return this;
-    }
-
-    public NumberCommonConfigDto setMaxByteValue(byte maxByteValue) {
-        map.putIfAbsent(Byte.class, new NumberConfigDto());
-        map.get(Byte.class).setMaxValue(maxByteValue);
-        return this;
-    }
-
-    public NumberCommonConfigDto setMinByteValue(byte minByteValue) {
-        map.putIfAbsent(Byte.class, new NumberConfigDto());
-        map.get(Byte.class).setMinValue(minByteValue);
-        return this;
-    }
-
-    public NumberCommonConfigDto setRuleRemarkByte(IRuleRemark ruleRemark) {
-        map.putIfAbsent(Byte.class, new NumberConfigDto());
-        map.get(Byte.class).setRuleRemark(ruleRemark);
-        return this;
-    }
+    /*
+     * Getter
+     */
 
     NumberConfigDto getConfigOrNull(Class<? extends Number> generateType) {
         return map.get(generateType);
     }
 
+    /**
+     * Not supposed to be in use, this class is just syntax sugar.
+     */
+    @Deprecated
     public void merge(ConfigDto configDto) {
         throw new NotImplementedException("Not supposed to be in use.");
     }

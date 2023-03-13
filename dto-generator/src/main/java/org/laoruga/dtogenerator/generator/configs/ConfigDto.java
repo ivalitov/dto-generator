@@ -9,7 +9,7 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 public interface ConfigDto {
 
     /**
-     * @param configDto - non null values from that object replaces current (this) values
+     * @param configDto - non-null values from that object replaces current (this) values
      */
     void merge(ConfigDto configDto);
     ConfigDto setRuleRemark(IRuleRemark ruleRemark);

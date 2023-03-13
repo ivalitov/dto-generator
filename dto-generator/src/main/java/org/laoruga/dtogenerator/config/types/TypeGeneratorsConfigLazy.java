@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.builder.builders.*;
 import org.laoruga.dtogenerator.generator.configs.*;
 
 import java.util.Collection;

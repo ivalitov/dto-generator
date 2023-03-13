@@ -18,8 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  * Created on 13.03.2023
  */
 
+//TODO improve coverage
 @ExtendWith(Extensions.RestoreStaticConfig.class)
-public class NumberDecimalTests {
+public class DecimalTests {
 
     static class Dto {
 

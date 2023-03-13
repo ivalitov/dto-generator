@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 
+import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -49,6 +50,9 @@ public class NumberConfigDto implements ConfigDto {
         } else if (fieldType == Byte.class) {
             minValue = rules.minByte();
             maxValue = rules.maxByte();
+        } else if (fieldType == BigInteger.class) {
+            minValue = new BigInteger(rules.minBigInt());
+            maxValue = new BigInteger(rules.maxBigInt());
         } else {
             throw new IllegalStateException("Unexpected field type: '" + fieldType + "'");
         }
