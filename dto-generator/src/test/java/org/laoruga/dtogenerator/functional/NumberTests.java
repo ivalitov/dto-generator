@@ -88,18 +88,19 @@ public class NumberTests {
     @Tag(RESTORE_STATIC_CONFIG)
     public void staticConfig() {
 
-        NumberCommonConfigDto numberConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getNumberConfig();
-        numberConfig.setMinIntValue(-99);
-        numberConfig.setMaxIntValue(0);
-        numberConfig.setMinLongValue(9_999_999_999L);
-        numberConfig.setMaxLongValue(99_999_999_999L);
-        numberConfig.setMaxShortValue((short) 100);
-        numberConfig.setMinShortValue(new Short("77"));
-        numberConfig.setMinByteValue((byte) 126);
-        numberConfig.setMaxBigIntValue("888888");
-        numberConfig.setMinBigIntValue("-9999999999999999999");
-        numberConfig.setMaxByteValue(Byte.MAX_VALUE);
-        numberConfig.setRuleRemark(MIN_VALUE);
+        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getNumberConfig()
+                .setMinIntValue(-99)
+                .setMaxIntValue(0)
+                .setMinLongValue(9_999_999_999L)
+                .setMaxLongValue(99_999_999_999L)
+                .setRuleRemarkLong(MAX_VALUE)
+                .setMaxShortValue((short) 100)
+                .setMinShortValue(new Short("77"))
+                .setMinByteValue((byte) 126)
+                .setMaxBigIntValue("888888")
+                .setMinBigIntValue("-9999999999999999999")
+                .setMaxByteValue(Byte.MAX_VALUE)
+                .setRuleRemark(MIN_VALUE);
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -108,8 +109,8 @@ public class NumberTests {
         assertAll(
                 () -> assertThat(dto.intObject, equalTo(-99)),
                 () -> assertThat(dto.intPrimitive, equalTo(-99)),
-                () -> assertThat(dto.longObject, equalTo(9_999_999_999L)),
-                () -> assertThat(dto.longPrimitive, equalTo(9_999_999_999L)),
+                () -> assertThat(dto.longObject, equalTo(99_999_999_999L)),
+                () -> assertThat(dto.longPrimitive, equalTo(99_999_999_999L)),
                 () -> assertThat(dto.shortObject, equalTo((short) 77)),
                 () -> assertThat(dto.shortPrimitive, equalTo((short) 77)),
                 () -> assertThat(dto.byteObject, equalTo((byte) 126)),
@@ -125,10 +126,10 @@ public class NumberTests {
     public void instanceConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
-        NumberCommonConfigDto numberConfig = builder.getTypeGeneratorConfig().getNumberConfig();
-
-        numberConfig.setMinIntValue(-99)
+        builder.getTypeGeneratorConfig().getNumberConfig()
+                .setMinIntValue(-99)
                 .setMaxIntValue(0)
+                .setRuleRemarkInt(MIN_VALUE)
                 .setMinLongValue(new Long(9_999_999_999L))
                 .setMaxLongValue(99_999_999_999L)
                 .setMaxShortValue((short) 100)
@@ -141,15 +142,15 @@ public class NumberTests {
         Dto dto = builder.build().generateDto();
 
         assertAll(
-                () -> assertThat(dto.intObject, equalTo(0)),
-                () -> assertThat(dto.intPrimitive, equalTo(0)),
+                () -> assertThat(dto.intObject, equalTo(-99)),
+                () -> assertThat(dto.intPrimitive, equalTo(-99)),
                 () -> assertThat(dto.longObject, equalTo(99_999_999_999L)),
                 () -> assertThat(dto.longPrimitive, equalTo(99_999_999_999L)),
                 () -> assertThat(dto.shortObject, equalTo((short) 100)),
                 () -> assertThat(dto.shortPrimitive, equalTo((short) 100)),
                 () -> assertThat(dto.byteObject, equalTo(Byte.MAX_VALUE)),
                 () -> assertThat(dto.bytePrimitive, equalTo(Byte.MAX_VALUE)),
-                () -> assertThat(dto.atomicInteger.get(), equalTo(0)),
+                () -> assertThat(dto.atomicInteger.get(), equalTo(-99)),
                 () -> assertThat(dto.bigInteger, equalTo(new BigInteger("911")))
         );
 

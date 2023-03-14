@@ -129,29 +129,33 @@ class OverridingOfGeneratorsTests {
                 .setRuleRemark(MIN_VALUE)
                 .setChars("x");
 
-        gensConfig.getNumberConfig().setMinIntValue(-100);
-        gensConfig.getNumberConfig().setMaxIntValue(1);
-        gensConfig.getNumberConfig().setRuleRemark(MAX_VALUE);
+        gensConfig.getNumberConfig()
+                .setMinIntValue(-100)
+                .setMaxIntValue(1)
+                .setRuleRemark(MAX_VALUE);
 
-        gensConfig.getDecimalConfig().setMinValue(2D);
-        gensConfig.getDecimalConfig().setMaxValue(100D);
-        gensConfig.getDecimalConfig().setRuleRemark(MIN_VALUE);
+        gensConfig.getDecimalConfig()
+                .setMinDoubleValue(2D)
+                .setMaxDoubleValue(100D)
+                .setRuleRemarkDouble(MIN_VALUE);
 
-        gensConfig.getNumberConfig().setMinLongValue(-100L);
-        gensConfig.getNumberConfig().setMaxLongValue(3L);
-        gensConfig.getNumberConfig().setRuleRemark(MAX_VALUE);
+        gensConfig.getNumberConfig()
+                .setMinLongValue(-100L)
+                .setMaxLongValue(3L)
+                .setRuleRemark(MAX_VALUE);
 
-        gensConfig.getLocalDateTimeConfig().setLeftShiftDays(-1);
-        gensConfig.getLocalDateTimeConfig().setRightShiftDays(100);
-        gensConfig.getLocalDateTimeConfig().setRuleRemark(MIN_VALUE);
+        gensConfig.getLocalDateTimeConfig()
+                .setLeftShiftDays(-1)
+                .setRightShiftDays(100)
+                .setRuleRemark(MIN_VALUE);
 
         gensConfig.getEnumConfig().setRuleRemark(MIN_VALUE);
 
-        gensConfig.getCollectionConfig(List.class).setCollectionInstanceSupplier(LinkedList::new);
-
-        gensConfig.getCollectionConfig(List.class).setMinSize(0);
-        gensConfig.getCollectionConfig(List.class).setMaxSize(1);
-        gensConfig.getCollectionConfig(List.class).setRuleRemark(MAX_VALUE);
+        gensConfig.getCollectionConfig(List.class)
+                .setCollectionInstanceSupplier(LinkedList::new)
+                .setMinSize(0)
+                .setMaxSize(1)
+                .setRuleRemark(MAX_VALUE);
 
         DtoAllKnownTypes dto = builder.build().generateDto();
 
@@ -167,34 +171,39 @@ class OverridingOfGeneratorsTests {
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
         TypeGeneratorsConfigLazy gensConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
 
-        gensConfig.getStringConfig().setMinLength(1);
-        gensConfig.getStringConfig().setMaxLength(100);
-        gensConfig.getStringConfig().setRuleRemark(MIN_VALUE);
-        gensConfig.getStringConfig().setChars("x");
+        gensConfig.getStringConfig()
+                .setMinLength(1)
+                .setMaxLength(100)
+                .setRuleRemark(MIN_VALUE)
+                .setChars("x");
 
-        gensConfig.getNumberConfig().setMinIntValue(-100);
-        gensConfig.getNumberConfig().setMaxIntValue(1);
-        gensConfig.getNumberConfig().setRuleRemark(MAX_VALUE);
+        gensConfig.getNumberConfig()
+                .setMinIntValue(-100)
+                .setMaxIntValue(1)
+                .setRuleRemark(MAX_VALUE);
 
-        gensConfig.getDecimalConfig().setMinValue(2D);
-        gensConfig.getDecimalConfig().setMaxValue(100D);
-        gensConfig.getDecimalConfig().setRuleRemark(MIN_VALUE);
+        gensConfig.getDecimalConfig()
+                .setMinDoubleValue(2D)
+                .setMaxDoubleValue(100D)
+                .setRuleRemark(MIN_VALUE);
 
-        gensConfig.getNumberConfig().setMinLongValue(-100L);
-        gensConfig.getNumberConfig().setMaxLongValue(3L);
-        gensConfig.getNumberConfig().setRuleRemark(MAX_VALUE);
+        gensConfig.getNumberConfig()
+                .setMinLongValue(-100L)
+                .setMaxLongValue(3L)
+                .setRuleRemark(MAX_VALUE);
 
-        gensConfig.getLocalDateTimeConfig().setLeftShiftDays(-1);
-        gensConfig.getLocalDateTimeConfig().setRightShiftDays(100);
-        gensConfig.getLocalDateTimeConfig().setRuleRemark(MIN_VALUE);
+        gensConfig.getLocalDateTimeConfig()
+                .setLeftShiftDays(-1)
+                .setRightShiftDays(100)
+                .setRuleRemark(MIN_VALUE);
 
         gensConfig.getEnumConfig().setRuleRemark(MIN_VALUE);
 
-        gensConfig.getCollectionConfig(List.class).setCollectionInstanceSupplier(LinkedList::new);
-
-        gensConfig.getCollectionConfig(List.class).setMinSize(0);
-        gensConfig.getCollectionConfig(List.class).setMaxSize(1);
-        gensConfig.getCollectionConfig(List.class).setRuleRemark(MAX_VALUE);
+        gensConfig.getCollectionConfig(List.class)
+                .setCollectionInstanceSupplier(LinkedList::new)
+                .setMinSize(0)
+                .setMaxSize(1)
+                .setRuleRemark(MAX_VALUE);
 
         DtoAllKnownTypes dto = builder.build().generateDto();
 
@@ -464,8 +473,8 @@ class OverridingOfGeneratorsTests {
     @DisplayName("With Grouping")
     void withGrouping() {
         TypeGeneratorsConfigLazy gensConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
-        gensConfig.getDecimalConfig().setMaxValue(1D);
-        gensConfig.getDecimalConfig().setMinValue(1D);
+        gensConfig.getDecimalConfig().setMaxDoubleValue(1D);
+        gensConfig.getDecimalConfig().setMinDoubleValue(1D);
 
         DtoWithGroup dto_1 = DtoGenerator.builder(DtoWithGroup.class)
                 .includeGroups(DEFAULT, GROUP_2)

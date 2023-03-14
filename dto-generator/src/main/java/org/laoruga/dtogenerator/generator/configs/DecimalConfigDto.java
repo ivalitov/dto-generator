@@ -1,10 +1,7 @@
 package org.laoruga.dtogenerator.generator.configs;
 
 import com.google.common.primitives.Primitives;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.DecimalRule;
@@ -15,6 +12,7 @@ import java.math.BigDecimal;
  * @author Il'dar Valitov
  * Created on 19.02.2023
  */
+@Builder
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -49,10 +47,23 @@ public class DecimalConfigDto implements ConfigDto {
     }
 
     public void merge(ConfigDto configDto) {
-        DecimalConfigDto fromConfigDto = (DecimalConfigDto) configDto;
-        if (fromConfigDto.getMaxValue() != null) this.maxValue = fromConfigDto.getMaxValue();
-        if (fromConfigDto.getMinValue() != null) this.minValue = fromConfigDto.getMinValue();
-        if (fromConfigDto.getPrecision() != null) this.precision = fromConfigDto.getPrecision();
-        if (fromConfigDto.getRuleRemark() != null) this.ruleRemark = fromConfigDto.getRuleRemark();
+
+        boolean commonConfig = configDto.getClass() == DecimalCommonConfigDto.class;
+
+        DecimalConfigDto configFrom = commonConfig
+                ? ((DecimalCommonConfigDto) configDto).getConfigOrNull(fieldType)
+                : (DecimalConfigDto) configDto;
+
+        if (commonConfig) {
+            if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();
+        }
+
+        if (configFrom != null) {
+            if (configFrom.getMaxValue() != null) this.maxValue = configFrom.getMaxValue();
+            if (configFrom.getMinValue() != null) this.minValue = configFrom.getMinValue();
+            if (configFrom.getPrecision() != null) this.minValue = configFrom.getPrecision();
+            if (configFrom.getRuleRemark() != null) this.ruleRemark = configFrom.getRuleRemark();
+        }
     }
+
 }

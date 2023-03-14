@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.NotImplementedException;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -25,48 +26,90 @@ public class DecimalCommonConfigDto implements ConfigDto {
 
     private final Map<Class<?>, DecimalConfigDto> map = new HashMap<>();
 
-    public DecimalCommonConfigDto setMaxDoubleValue(double maxDoubleValue) {
-        map.putIfAbsent(Double.class, new DecimalConfigDto());
-        map.get(Double.class).setMaxValue(maxDoubleValue);
+    /*
+     * Double
+     */
+
+    public DecimalCommonConfigDto setMaxDoubleValue(double value) {
+        return setMaxValue(Double.class, value);
+    }
+
+    public DecimalCommonConfigDto setMinDoubleValue(double value) {
+        return setMinValue(Double.class, value);
+    }
+
+    public DecimalCommonConfigDto setRuleRemarkDouble(IRuleRemark value) {
+        return setRuleRemark(Double.class, value);
+    }
+
+    /*
+     * Float
+     */
+
+    public DecimalCommonConfigDto setMaxFloatValue(float value) {
+        return setMaxValue(Float.class, value);
+    }
+
+    public DecimalCommonConfigDto setMinFloatValue(float value) {
+        return setMinValue(Float.class, value);
+    }
+
+    public DecimalCommonConfigDto setRuleRemarkFloat(IRuleRemark value) {
+        return setRuleRemark(Float.class, value);
+    }
+
+    /*
+     * BigDecimal
+     */
+
+    public DecimalCommonConfigDto setMaxBigDecimalValue(BigDecimal value) {
+        return setMaxValue(BigDecimal.class, value);
+    }
+
+    public DecimalCommonConfigDto setMinBigDecimalValue(BigDecimal value) {
+        return setMinValue(BigDecimal.class, value);
+    }
+
+    public DecimalCommonConfigDto setMaxBigDecimalValue(String value) {
+        try {
+            return setMaxBigDecimalValue(new BigDecimal(value));
+        } catch (NumberFormatException e) {
+            throw new DtoGeneratorException("Invalid big integer number: '" + value + "'", e);
+        }
+    }
+
+    public DecimalCommonConfigDto setMinBigDecimalValue(String value) {
+        try {
+            return setMinBigDecimalValue(new BigDecimal(value));
+        } catch (NumberFormatException e) {
+            throw new DtoGeneratorException("Invalid big integer number: '" + value + "'", e);
+        }
+    }
+
+    public DecimalCommonConfigDto setRuleRemarkBigDecimal(IRuleRemark value) {
+        return setRuleRemark(BigDecimal.class, value);
+    }
+
+    /*
+     * Common setters
+     */
+
+    private DecimalCommonConfigDto setMaxValue(Class<?> type, Number maxValue) {
+        map.putIfAbsent(type, new DecimalConfigDto());
+        map.get(type).setMaxValue(maxValue);
         return this;
     }
 
-    public DecimalCommonConfigDto setMinDoubleValue(double minDoubleValue) {
-        map.putIfAbsent(Double.class, new DecimalConfigDto());
-        map.get(Double.class).setMinValue(minDoubleValue);
+    private DecimalCommonConfigDto setMinValue(Class<?> type, Number minValue) {
+        map.putIfAbsent(type, new DecimalConfigDto());
+        map.get(type).setMinValue(minValue);
         return this;
     }
 
-    public DecimalCommonConfigDto setMaxFloatValue(float maxFloatValue) {
-        map.putIfAbsent(Float.class, new DecimalConfigDto());
-        map.get(Float.class).setMaxValue(maxFloatValue);
+    private DecimalCommonConfigDto setRuleRemark(Class<?> type, IRuleRemark ruleRemark) {
+        map.putIfAbsent(type, new DecimalConfigDto());
+        map.get(type).setRuleRemark(ruleRemark);
         return this;
-    }
-
-    public DecimalCommonConfigDto setMinFloatValue(float minFloatValue) {
-        map.putIfAbsent(Float.class, new DecimalConfigDto());
-        map.get(Float.class).setMinValue(minFloatValue);
-        return this;
-    }
-
-    public DecimalCommonConfigDto setMaxBigDecimalValue(BigDecimal maxBigDecimalValue) {
-        map.putIfAbsent(BigDecimal.class, new DecimalConfigDto());
-        map.get(BigDecimal.class).setMaxValue(maxBigDecimalValue);
-        return this;
-    }
-
-    public DecimalCommonConfigDto setMinBigDecimalValue(BigDecimal minBigDecimalValue) {
-        map.putIfAbsent(BigDecimal.class, new DecimalConfigDto());
-        map.get(BigDecimal.class).setMinValue(minBigDecimalValue);
-        return this;
-    }
-
-    public DecimalCommonConfigDto setMaxBigDecimalValue(String maxBigDecimalValue) {
-        return setMaxBigDecimalValue(new BigDecimal(maxBigDecimalValue));
-    }
-
-    public DecimalCommonConfigDto setMinBigDecimalValue(String minBigDecimalValue) {
-        return setMinBigDecimalValue(new BigDecimal(minBigDecimalValue));
     }
 
     DecimalConfigDto getConfigOrNull(Class<? extends Number> generateType) {

@@ -65,10 +65,10 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
-    public DecimalConfigDto getDecimalConfig() {
-        return (DecimalConfigDto) getConfigLazy(
+    public DecimalCommonConfigDto getDecimalConfig() {
+        return (DecimalCommonConfigDto) getConfigLazy(
                 DecimalRule.GENERATED_TYPES,
-                DecimalConfigDto::new
+                DecimalCommonConfigDto::new
         );
     }
 

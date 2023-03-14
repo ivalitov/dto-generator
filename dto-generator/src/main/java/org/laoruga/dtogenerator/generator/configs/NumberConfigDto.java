@@ -74,15 +74,15 @@ public class NumberConfigDto implements ConfigDto {
                 ? ((NumberCommonConfigDto) configDto).getConfigOrNull(fieldType)
                 : (NumberConfigDto) configDto;
 
+        if (commonConfig) {
+            if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();
+        }
+
         if (configFrom != null) {
             if (configFrom.getMaxValue() != null) this.maxValue = configFrom.getMaxValue();
             if (configFrom.getMinValue() != null) this.minValue = configFrom.getMinValue();
             if (configFrom.getRuleRemark() != null) this.ruleRemark = configFrom.getRuleRemark();
         }
-
-        if (commonConfig) {
-            if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();
-        }
-
     }
+
 }

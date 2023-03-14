@@ -225,11 +225,7 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
             }
 
         } catch (Exception e) {
-            if (e.getClass() == ClassCastException.class) {
-                log.debug("Probably unknown builder, trying to build generator as is.");
-                return generatorBuilder.build();
-            }
-            throw e;
+            throw new DtoGeneratorException("Unexpected error.", e);
         }
 
 
