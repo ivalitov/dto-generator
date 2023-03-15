@@ -175,4 +175,14 @@ public final class ReflectionUtils {
             throw new DtoGeneratorException("Error while extracting first of repeatable annotation", e);
         }
     }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T callStaticMethod(String methodName, Class<?> sourceClass, Class<T> returnType) {
+        try {
+            return (T) sourceClass.getMethod(methodName).invoke(sourceClass);
+        } catch (Exception e) {
+            throw new DtoGeneratorException("Error while static method invocation", e);
+        }
+    }
+
 }

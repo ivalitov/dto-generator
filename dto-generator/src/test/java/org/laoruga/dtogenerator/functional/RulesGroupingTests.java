@@ -11,11 +11,14 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.api.rules.datetime.ChronoUnitShift;
+import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.constants.Group;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -163,7 +166,7 @@ class RulesGroupingTests {
                 () -> assertThat(dtoDefault.getString(), matchesRegex("[a-zA-Z]*")),
                 () -> assertThat(dtoDefault.getSet(), equalTo(new HashSet<>(Arrays.asList(2, 3)))),
                 () -> assertThat(dtoDefault.getALong(), equalTo(2L)),
-                () -> assertThat(dtoDefault.getLocalDateTime().toLocalDate(), equalTo(LocalDate.now().plusDays(1))),
+                () -> assertThat(dtoDefault.getLocalDateTime().toLocalDate(), equalTo(LocalDate.now().minusDays(1))),
                 () -> assertThat(dtoDefault.getList(), equalTo(Arrays.asList(2D, 2D))),
                 () -> assertThat(dtoDefault.getInteger(), equalTo(2)),
                 () -> assertThat(dtoDefault.getADouble(), equalTo(2D)),
@@ -190,8 +193,8 @@ class RulesGroupingTests {
         @NumberRule(minLong = 2, maxLong = 2)
         private Long aLong;
 
-        @LocalDateTimeRule(group = GROUP_1, leftShiftDays = 0, rightShiftDays = 0)
-        @LocalDateTimeRule(leftShiftDays = -1, rightShiftDays = 1)
+        @DateTimeRule(group = GROUP_1)
+        @DateTimeRule(chronoUnitShift = @ChronoUnitShift(unit = ChronoUnit.DAYS, leftBound = -1, rightBound = -1))
         private LocalDateTime localDateTime;
 
         @CollectionRule(group = GROUP_1, minSize = 1, maxSize = 1)

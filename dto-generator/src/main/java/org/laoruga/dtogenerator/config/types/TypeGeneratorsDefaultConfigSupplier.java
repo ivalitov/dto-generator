@@ -3,6 +3,7 @@ package org.laoruga.dtogenerator.config.types;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.generator.configs.*;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
@@ -47,9 +48,10 @@ public final class TypeGeneratorsDefaultConfigSupplier {
                 true);
 
         add(configSupplier,
-                LocalDateTimeRule.GENERATED_TYPES,
-                RulesInstance.LOCAL_DATE_TIME_RULE,
-                LocalDateTimeConfigDto.class);
+                DateTimeRule.GENERATED_TYPES,
+                RulesInstance.DATE_TIME_RULE,
+                DateTimeConfigDto.class,
+                true);
 
         add(configSupplier,
                 EnumRule.GENERATED_TYPES,

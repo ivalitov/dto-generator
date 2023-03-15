@@ -16,7 +16,7 @@ public interface TypeGeneratorsConfigSupplier {
 
     DecimalCommonConfigDto getDecimalConfig();
 
-    LocalDateTimeConfigDto getLocalDateTimeConfig();
+    DateTimeConfigDto getDateTimeConfig();
 
     EnumConfigDto getEnumConfig();
 

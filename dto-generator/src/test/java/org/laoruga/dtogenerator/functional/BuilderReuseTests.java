@@ -20,8 +20,6 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.exparity.hamcrest.date.LocalDateMatchers.sameOrAfter;
-import static org.exparity.hamcrest.date.LocalDateMatchers.sameOrBefore;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -136,9 +134,7 @@ class BuilderReuseTests {
                 () -> assertThat(dto.getADouble(), both(
                         greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble())).and(
                         lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
-                () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), both(
-                        sameOrAfter(now.minusDays(RulesInstance.LOCAL_DATE_TIME_RULE.leftShiftDays()))).and(
-                        sameOrBefore(now.plusDays(RulesInstance.LOCAL_DATE_TIME_RULE.rightShiftDays())))),
+                () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), equalTo(now)),
                 () -> assertThat(dto.getClientType(), notNullValue()),
 
                 () -> assertThat(dto.getListOfString().size(), both(
@@ -171,9 +167,7 @@ class BuilderReuseTests {
                 () -> assertThat(dto.getADouble(), both(
                         greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble())).and(
                         lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
-                () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), both(
-                        sameOrAfter(now.minusDays(RulesInstance.LOCAL_DATE_TIME_RULE.leftShiftDays()))).and(
-                        sameOrBefore(now.plusDays(RulesInstance.LOCAL_DATE_TIME_RULE.rightShiftDays())))),
+                () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), equalTo(now)),
                 () -> assertThat(dto.getClientType(), notNullValue()),
 
                 () -> assertThat(dto.getListOfString().size(), both(

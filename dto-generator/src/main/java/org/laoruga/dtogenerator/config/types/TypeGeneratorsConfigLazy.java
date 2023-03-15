@@ -3,7 +3,11 @@ package org.laoruga.dtogenerator.config.types;
 import com.google.common.primitives.Primitives;
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.api.rules.DecimalRule;
+import org.laoruga.dtogenerator.api.rules.EnumRule;
+import org.laoruga.dtogenerator.api.rules.NumberRule;
+import org.laoruga.dtogenerator.api.rules.StringRule;
+import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.configs.*;
 
@@ -72,10 +76,11 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
-    public LocalDateTimeConfigDto getLocalDateTimeConfig() {
-        return (LocalDateTimeConfigDto) getConfigLazy(
-                LocalDateTimeRule.GENERATED_TYPES,
-                LocalDateTimeConfigDto::new
+    public DateTimeConfigDto getDateTimeConfig() {
+        return (DateTimeConfigDto) getConfigLazy(
+                DateTimeRule.GENERATED_TYPES,
+                DateTimeConfigDto::new,
+                false
         );
     }
 
@@ -95,11 +100,23 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
 
     private ConfigDto getConfigLazy(Class<?>[] generatedTypes,
                                     Supplier<ConfigDto> configSupplier) {
-        ConfigDto configDto = configSupplier.get();
+        return getConfigLazy(generatedTypes, configSupplier, true);
+    }
+
+    private ConfigDto getConfigLazy(Class<?>[] generatedTypes,
+                                    Supplier<ConfigDto> configSupplier,
+                                    boolean sameConfigInstance) {
+        ConfigDto configDto = null;
+
         for (Class<?> generatedType : generatedTypes) {
+
             if (!configMap.containsKey(generatedType)) {
+                if (!sameConfigInstance || configDto == null) {
+                    configDto = configSupplier.get();
+                }
                 configMap.putIfAbsent(generatedType, configDto);
             }
+
         }
         return configMap.putIfAbsent(generatedTypes[0], configDto);
     }

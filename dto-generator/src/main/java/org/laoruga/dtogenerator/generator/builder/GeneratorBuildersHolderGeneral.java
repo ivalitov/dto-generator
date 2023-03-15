@@ -3,6 +3,7 @@ package org.laoruga.dtogenerator.generator.builder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.generator.*;
 
 /**
@@ -58,9 +59,9 @@ public final class GeneratorBuildersHolderGeneral {
 
         generatorBuildersHolder.addBuilders(
                 GeneratorBuilderInfo.createInstances(
-                        LocalDateTimeRule.class,
-                        LocalDateTimeRule.GENERATED_TYPES,
-                        LocalDateTimeGenerator::builder));
+                        DateTimeRule.class,
+                        DateTimeRule.GENERATED_TYPES,
+                        DateTimeGenerator::builder));
 
         // collection
 

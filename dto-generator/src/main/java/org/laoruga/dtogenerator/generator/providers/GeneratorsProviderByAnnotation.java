@@ -13,6 +13,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkableArgs;
 import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsDefaultConfigSupplier;
 import org.laoruga.dtogenerator.constants.RuleType;
@@ -29,6 +30,7 @@ import org.laoruga.dtogenerator.rule.IRuleInfo;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.time.temporal.Temporal;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -187,13 +189,22 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
 
                 throw new IllegalArgumentException("Unexpected state. Field type '" + fieldType + "' is not Enum");
 
-            } else if (LocalDateTimeRule.class == rulesClass && generatorBuilder instanceof LocalDateTimeGeneratorBuilder) {
-                return getGenerator(
-                        () -> new LocalDateTimeConfigDto((LocalDateTimeRule) rules),
-                        () -> (IGeneratorBuilderConfigurable<?>) generatorBuilder,
-                        (config, builder) -> builder.build(config, true),
-                        fieldType,
-                        fieldName);
+            } else if (DateTimeRule.class == rulesClass && generatorBuilder instanceof DateTimeGeneratorBuilder) {
+
+                if (Temporal.class.isAssignableFrom(fieldType)) {
+
+                    @SuppressWarnings("unchecked")
+                    Class<? extends Temporal> fieldTypeTemporal = (Class<? extends Temporal>) fieldType;
+
+                    return getGenerator(
+                            () -> new DateTimeConfigDto((DateTimeRule) rules, fieldTypeTemporal),
+                            () -> (IGeneratorBuilderConfigurable<?>) generatorBuilder,
+                            (config, builder) -> builder.build(config, true),
+                            fieldType,
+                            fieldName);
+                }
+
+                throw new IllegalArgumentException("Unexpected state. Field type '" + fieldType + "' is not Temporal");
 
             } else if (CustomRule.class == rulesClass && generatorBuilder instanceof CustomGeneratorBuilder) {
                 return ((CustomGeneratorBuilder) generatorBuilder)

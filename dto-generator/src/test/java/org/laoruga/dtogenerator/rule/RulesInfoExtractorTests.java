@@ -8,7 +8,11 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.UtilsRoot;
-import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.api.rules.CollectionRule;
+import org.laoruga.dtogenerator.api.rules.DecimalRule;
+import org.laoruga.dtogenerator.api.rules.NumberRule;
+import org.laoruga.dtogenerator.api.rules.StringRule;
+import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.constants.CharSet;
 import org.laoruga.dtogenerator.constants.Group;
 import org.laoruga.dtogenerator.constants.RuleType;
@@ -45,11 +49,11 @@ class RulesInfoExtractorTests {
         Double decimal;
         @NumberRule
         long loong;
-        @LocalDateTimeRule
+        @DateTimeRule
         LocalDateTime localDateTime;
 
         @CollectionRule
-        @LocalDateTimeRule
+        @DateTimeRule
         List<LocalDateTime> listOfDates;
         @CollectionRule
         @NumberRule
@@ -74,7 +78,7 @@ class RulesInfoExtractorTests {
                 Arguments.of(Dto.class, "integer", NumberRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
                 Arguments.of(Dto.class, "decimal", DecimalRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
                 Arguments.of(Dto.class, "loong", NumberRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
-                Arguments.of(Dto.class, "localDateTime", LocalDateTimeRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
+                Arguments.of(Dto.class, "localDateTime", DateTimeRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
                 Arguments.of(Dto.class, "stringMultipleRules", StringRule.class, Group.GROUP_3, true, UtilsRoot.getExtractorInstance(Group.GROUP_3))
         );
     }
@@ -106,7 +110,7 @@ class RulesInfoExtractorTests {
 
     static Stream<Arguments> collectionRulesDataSet() {
         return Stream.of(
-                Arguments.of(Dto.class, "listOfDates", CollectionRule.class, LocalDateTimeRule.class,
+                Arguments.of(Dto.class, "listOfDates", CollectionRule.class, DateTimeRule.class,
                         UtilsRoot.getExtractorInstance(),
                         Group.DEFAULT,
                         false),

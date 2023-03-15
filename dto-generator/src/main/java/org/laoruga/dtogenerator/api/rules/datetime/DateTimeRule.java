@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.api.rules;
+package org.laoruga.dtogenerator.api.rules.datetime;
 
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.constants.Group;
@@ -7,7 +7,7 @@ import org.laoruga.dtogenerator.constants.RuleRemark;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.time.LocalDateTime;
+import java.time.*;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -15,14 +15,15 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(FIELD)
 @Rule
-@Repeatable(LocalDateTimeRules.class)
-public @interface LocalDateTimeRule {
+@Repeatable(DateTimeRules.class)
+public @interface DateTimeRule {
 
-    Class<?>[] GENERATED_TYPES = new Class<?>[]{LocalDateTime.class};
+    Class<?>[] GENERATED_TYPES = new Class<?>[]
+            {LocalDateTime.class, LocalDate.class, LocalTime.class, Year.class, YearMonth.class, Instant.class};
 
-    int leftShiftDays() default 365 * 5;
+    ChronoUnitShift[] chronoUnitShift() default {};
 
-    int rightShiftDays() default 365 * 5;
+    ChronoFieldShift[] chronoFieldShift() default {};
 
     RuleRemark ruleRemark() default RuleRemark.RANDOM_VALUE;
 

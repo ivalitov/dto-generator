@@ -2,6 +2,7 @@ package org.laoruga.dtogenerator.constants;
 
 import com.google.common.collect.ImmutableMap;
 import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
@@ -23,7 +24,7 @@ public class GeneratedTypes {
         add(generatedTypes, StringRule.class);
         add(generatedTypes, NumberRule.class);
         add(generatedTypes, DecimalRule.class);
-        add(generatedTypes, LocalDateTimeRule.class);
+        add(generatedTypes, DateTimeRule.class);
         add(generatedTypes, EnumRule.class);
         add(generatedTypes, CollectionRule.class);
         add(generatedTypes, BooleanRule.class);

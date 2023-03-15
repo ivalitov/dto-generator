@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.api.rules;
+package org.laoruga.dtogenerator.api.rules.datetime;
 
 import org.laoruga.dtogenerator.api.rules.meta.Rules;
 
@@ -11,7 +11,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(FIELD)
 @Rules
-public @interface LocalDateTimeRules {
+public @interface DateTimeRules {
 
-    LocalDateTimeRule[] value();
+    DateTimeRule[] value();
 }

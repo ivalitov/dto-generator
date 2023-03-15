@@ -7,9 +7,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
-import org.laoruga.dtogenerator.api.rules.LocalDateTimeRule;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
+import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,7 +40,7 @@ class InheritedDtoTests {
         @CollectionRule
         @StringRule
         private List<String> superList;
-        @LocalDateTimeRule
+        @DateTimeRule
         private LocalDateTime superDateTime;
     }
 

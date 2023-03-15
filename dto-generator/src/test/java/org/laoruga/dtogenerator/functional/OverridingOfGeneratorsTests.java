@@ -21,9 +21,11 @@ import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.functional.data.dto.DtoAllKnownTypes;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
+import org.laoruga.dtogenerator.generator.configs.DateTimeConfigDto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -144,9 +146,9 @@ class OverridingOfGeneratorsTests {
                 .setMaxLongValue(3L)
                 .setRuleRemark(MAX_VALUE);
 
-        gensConfig.getLocalDateTimeConfig()
-                .setLeftShiftDays(-1)
-                .setRightShiftDays(100)
+        gensConfig.getDateTimeConfig()
+                .addChronoConfig(
+                        new DateTimeConfigDto.ChronoUnitConfig(-1, 100, ChronoUnit.DAYS))
                 .setRuleRemark(MIN_VALUE);
 
         gensConfig.getEnumConfig().setRuleRemark(MIN_VALUE);
@@ -192,9 +194,9 @@ class OverridingOfGeneratorsTests {
                 .setMaxLongValue(3L)
                 .setRuleRemark(MAX_VALUE);
 
-        gensConfig.getLocalDateTimeConfig()
-                .setLeftShiftDays(-1)
-                .setRightShiftDays(100)
+        gensConfig.getDateTimeConfig()
+                .addChronoConfig(
+                        new DateTimeConfigDto.ChronoUnitConfig(-1, 100, ChronoUnit.DAYS))
                 .setRuleRemark(MIN_VALUE);
 
         gensConfig.getEnumConfig().setRuleRemark(MIN_VALUE);
@@ -218,7 +220,7 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto.getInteger(), equalTo(1)),
                 () -> assertThat(dto.getADouble(), equalTo(2D)),
                 () -> assertThat(dto.getALong(), equalTo(3L)),
-                () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now().plusDays(1))),
+                () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now().minusDays(1))),
                 () -> assertThat(dto.getClientType(), equalTo(ClientType.ORG)),
 
                 () -> assertThat(dto.getListOfString(), equalTo(new LinkedList<>(Arrays.asList("x")))),
@@ -237,7 +239,7 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto.getInnerDto().getInteger(), equalTo(1)),
                 () -> assertThat(dto.getInnerDto().getADouble(), equalTo(2D)),
                 () -> assertThat(dto.getInnerDto().getALong(), equalTo(3L)),
-                () -> assertThat(dto.getInnerDto().getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now().plusDays(1))),
+                () -> assertThat(dto.getInnerDto().getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now().minusDays(1))),
                 () -> assertThat(dto.getInnerDto().getClientType(), equalTo(ClientType.ORG)),
 
                 () -> assertThat(dto.getInnerDto().getListOfDouble(), equalTo(new LinkedList<>(Arrays.asList(2D)))),
