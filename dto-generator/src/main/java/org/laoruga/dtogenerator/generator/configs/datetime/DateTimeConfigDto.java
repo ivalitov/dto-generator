@@ -84,4 +84,22 @@ public class DateTimeConfigDto implements ConfigDto {
         if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();
     }
 
+    public static class DateTimeConfigDtoBuilder {
+
+        private List<ChronoConfig> chronoUnitConfigList;
+
+        public DateTimeConfigDtoBuilder addChronoConfig(ChronoUnitConfig config) {
+            chronoUnitConfigList = chronoUnitConfigList == null ? new LinkedList<>() : chronoUnitConfigList;
+            chronoUnitConfigList.add(config);
+            return this;
+        }
+
+        public DateTimeConfigDtoBuilder addChronoConfig(ChronoFieldConfig config) {
+            chronoUnitConfigList = chronoUnitConfigList == null ? new LinkedList<>() : chronoUnitConfigList;
+            chronoUnitConfigList.add(config);
+            return this;
+        }
+
+    }
+
 }

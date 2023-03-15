@@ -20,4 +20,10 @@ public class Bounds {
 
     public static final String BIG_DECIMAL_MIN_VALUE = "-" + BIG_DECIMAL_MAX_VALUE;
 
+    public static final long CHRONO_FIELD_SHIFT_LEFT = 1;
+    public static final long CHRONO_FIELD_SHIFT_RIGHT = 7;
+
+    public static final long CHRONO_UNIT_SHIFT_LEFT = -365;
+    public static final long CHRONO_UNIT_SHIFT_RIGHT = 365;
+
 }

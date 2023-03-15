@@ -1,7 +1,6 @@
 package org.laoruga.dtogenerator.config;
 
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorConfig;
-import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 
 /**

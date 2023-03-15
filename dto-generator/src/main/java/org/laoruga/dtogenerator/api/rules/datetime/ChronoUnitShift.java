@@ -5,6 +5,8 @@ import java.lang.annotation.Target;
 import java.time.temporal.ChronoUnit;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.laoruga.dtogenerator.constants.Bounds.CHRONO_UNIT_SHIFT_LEFT;
+import static org.laoruga.dtogenerator.constants.Bounds.CHRONO_UNIT_SHIFT_RIGHT;
 
 /**
  * @author Il'dar Valitov
@@ -16,9 +18,9 @@ public @interface ChronoUnitShift {
 
     long shift() default 0;
 
-    long leftBound() default -365;
+    long leftBound() default CHRONO_UNIT_SHIFT_LEFT;
 
-    long rightBound() default 365;
+    long rightBound() default CHRONO_UNIT_SHIFT_RIGHT;
 
     ChronoUnit unit();
 }

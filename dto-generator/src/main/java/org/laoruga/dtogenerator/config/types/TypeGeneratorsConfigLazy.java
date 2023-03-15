@@ -13,10 +13,7 @@ import org.laoruga.dtogenerator.generator.configs.*;
 import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
 
 import java.time.temporal.Temporal;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -110,8 +107,13 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
     private ConfigDto getConfigLazy(Class<?> dateTimeType,
                                     Class<?>[] generatedTypes,
                                     Supplier<ConfigDto> configSupplier) {
-        initConfig(generatedTypes, false, configSupplier);
-        return Objects.requireNonNull(configMap.get(dateTimeType));
+        if (Arrays.stream(generatedTypes).noneMatch(it -> it == dateTimeType)) {
+            throw new DtoGeneratorException("Unknown generated type: '" + dateTimeType + "'");
+        }
+        if (!configMap.containsKey(dateTimeType)) {
+            configMap.put(dateTimeType, configSupplier.get());
+        }
+        return configMap.get(dateTimeType);
     }
 
     private void initConfig(Class<?>[] generatedTypes, boolean sameConfigInstance, Supplier<ConfigDto> configSupplier) {
