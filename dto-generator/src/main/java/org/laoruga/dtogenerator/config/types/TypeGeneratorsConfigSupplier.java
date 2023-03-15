@@ -1,7 +1,9 @@
 package org.laoruga.dtogenerator.config.types;
 
 import org.laoruga.dtogenerator.generator.configs.*;
+import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
 
+import java.time.temporal.Temporal;
 import java.util.Collection;
 
 /**
@@ -16,7 +18,7 @@ public interface TypeGeneratorsConfigSupplier {
 
     DecimalCommonConfigDto getDecimalConfig();
 
-    DateTimeConfigDto getDateTimeConfig();
+    DateTimeConfigDto getDateTimeConfig(Class<? extends Temporal> dateTimeType);
 
     EnumConfigDto getEnumConfig();
 

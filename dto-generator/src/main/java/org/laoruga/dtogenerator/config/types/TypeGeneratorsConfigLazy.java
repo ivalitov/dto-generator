@@ -10,10 +10,13 @@ import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.configs.*;
+import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
 
+import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -76,11 +79,11 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
-    public DateTimeConfigDto getDateTimeConfig() {
+    public DateTimeConfigDto getDateTimeConfig(Class<? extends Temporal> dateTimeType) {
         return (DateTimeConfigDto) getConfigLazy(
+                dateTimeType,
                 DateTimeRule.GENERATED_TYPES,
-                DateTimeConfigDto::new,
-                false
+                DateTimeConfigDto::new
         );
     }
 
@@ -100,25 +103,28 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
 
     private ConfigDto getConfigLazy(Class<?>[] generatedTypes,
                                     Supplier<ConfigDto> configSupplier) {
-        return getConfigLazy(generatedTypes, configSupplier, true);
+        initConfig(generatedTypes, true, configSupplier);
+        return Objects.requireNonNull(configMap.get(generatedTypes[0]));
     }
 
-    private ConfigDto getConfigLazy(Class<?>[] generatedTypes,
-                                    Supplier<ConfigDto> configSupplier,
-                                    boolean sameConfigInstance) {
+    private ConfigDto getConfigLazy(Class<?> dateTimeType,
+                                    Class<?>[] generatedTypes,
+                                    Supplier<ConfigDto> configSupplier) {
+        initConfig(generatedTypes, false, configSupplier);
+        return Objects.requireNonNull(configMap.get(dateTimeType));
+    }
+
+    private void initConfig(Class<?>[] generatedTypes, boolean sameConfigInstance, Supplier<ConfigDto> configSupplier) {
         ConfigDto configDto = null;
 
         for (Class<?> generatedType : generatedTypes) {
-
             if (!configMap.containsKey(generatedType)) {
                 if (!sameConfigInstance || configDto == null) {
                     configDto = configSupplier.get();
                 }
                 configMap.putIfAbsent(generatedType, configDto);
             }
-
         }
-        return configMap.putIfAbsent(generatedTypes[0], configDto);
     }
 
     public void setGeneratorConfigForType(Class<?> generatedType, ConfigDto generatorConfig) {

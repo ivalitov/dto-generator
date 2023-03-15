@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.generator.builder.builders.DateTimeGeneratorBuilder;
-import org.laoruga.dtogenerator.generator.configs.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.configs.datetime.ChronoConfig;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.time.temporal.Temporal;
@@ -18,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class DateTimeGenerator implements IGenerator<Temporal> {
 
-    private final List<DateTimeConfigDto.ChronoConfig> chronoUnitConfigList;
+    private final List<ChronoConfig> chronoUnitConfigList;
     private final IRuleRemark ruleRemark;
     private final Class<? extends Temporal> generatedType;
 
@@ -27,7 +27,7 @@ public class DateTimeGenerator implements IGenerator<Temporal> {
         Temporal now = ReflectionUtils.callStaticMethod("now", generatedType, Temporal.class);
 
         if (chronoUnitConfigList != null) {
-            for (DateTimeConfigDto.ChronoConfig chronoUnitConfig : chronoUnitConfigList) {
+            for (ChronoConfig chronoUnitConfig : chronoUnitConfigList) {
                 now = chronoUnitConfig.adjust(now, ruleRemark);
             }
         }

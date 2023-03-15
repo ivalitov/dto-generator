@@ -21,7 +21,7 @@ import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.functional.data.dto.DtoAllKnownTypes;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
-import org.laoruga.dtogenerator.generator.configs.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.configs.datetime.ChronoUnitConfig;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -146,9 +146,9 @@ class OverridingOfGeneratorsTests {
                 .setMaxLongValue(3L)
                 .setRuleRemark(MAX_VALUE);
 
-        gensConfig.getDateTimeConfig()
+        gensConfig.getDateTimeConfig(LocalDateTime.class)
                 .addChronoConfig(
-                        new DateTimeConfigDto.ChronoUnitConfig(-1, 100, ChronoUnit.DAYS))
+                        ChronoUnitConfig.newBounds(-1, 100, ChronoUnit.DAYS))
                 .setRuleRemark(MIN_VALUE);
 
         gensConfig.getEnumConfig().setRuleRemark(MIN_VALUE);
@@ -194,9 +194,9 @@ class OverridingOfGeneratorsTests {
                 .setMaxLongValue(3L)
                 .setRuleRemark(MAX_VALUE);
 
-        gensConfig.getDateTimeConfig()
+        gensConfig.getDateTimeConfig(LocalDateTime.class)
                 .addChronoConfig(
-                        new DateTimeConfigDto.ChronoUnitConfig(-1, 100, ChronoUnit.DAYS))
+                        ChronoUnitConfig.newBounds(-1, 100, ChronoUnit.DAYS))
                 .setRuleRemark(MIN_VALUE);
 
         gensConfig.getEnumConfig().setRuleRemark(MIN_VALUE);

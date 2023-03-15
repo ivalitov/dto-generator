@@ -4,7 +4,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.generator.DateTimeGenerator;
 import org.laoruga.dtogenerator.generator.configs.ConfigDto;
-import org.laoruga.dtogenerator.generator.configs.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
 
 import java.time.temporal.Temporal;
 

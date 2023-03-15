@@ -26,6 +26,7 @@ import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolderGeneral;
 import org.laoruga.dtogenerator.generator.builder.builders.*;
 import org.laoruga.dtogenerator.generator.configs.*;
+import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
 import org.laoruga.dtogenerator.rule.IRuleInfo;
 
 import java.lang.annotation.Annotation;
