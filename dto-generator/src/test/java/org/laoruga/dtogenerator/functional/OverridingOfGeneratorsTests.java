@@ -171,7 +171,7 @@ class OverridingOfGeneratorsTests {
     @DisplayName("Overridden static config of known type generators")
     void overriddenStaticConfig() {
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
-        TypeGeneratorsConfigLazy gensConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
+        TypeGeneratorsConfigSupplier gensConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
 
         gensConfig.getStringConfig()
                 .setMinLength(1)
@@ -341,7 +341,7 @@ class OverridingOfGeneratorsTests {
         DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
         DtoGeneratorBuilder<DtoDifferent> builder = DtoGenerator.builder(DtoDifferent.class);
 
-        TypeGeneratorsConfigLazy staticConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
+        TypeGeneratorsConfigSupplier staticConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
         TypeGeneratorsConfigSupplier userConfig = builder.getTypeGeneratorConfig();
 
         builder.setGenerator(String.class, () -> "o");
@@ -474,7 +474,7 @@ class OverridingOfGeneratorsTests {
     @Tag(RESTORE_STATIC_CONFIG)
     @DisplayName("With Grouping")
     void withGrouping() {
-        TypeGeneratorsConfigLazy gensConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
+        TypeGeneratorsConfigSupplier gensConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
         gensConfig.getDecimalConfig().setMaxDoubleValue(1D);
         gensConfig.getDecimalConfig().setMinDoubleValue(1D);
 

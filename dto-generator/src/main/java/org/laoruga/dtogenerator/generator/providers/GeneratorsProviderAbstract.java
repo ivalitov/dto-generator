@@ -8,6 +8,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
+import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.builders.EnumGeneratorBuilder;
 import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
@@ -51,7 +52,7 @@ public abstract class GeneratorsProviderAbstract {
 
         ConfigDto config = configDtoSupplier.get();
 
-        ConfigDto staticConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig()
+        ConfigDto staticConfig = ((TypeGeneratorsConfigLazy) DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig())
                 .getOrNull(fieldType);
 
         ConfigDto instanceConfig = getConfiguration().getTypeGeneratorsConfig()

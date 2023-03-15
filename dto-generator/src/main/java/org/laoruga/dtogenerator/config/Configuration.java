@@ -2,6 +2,7 @@ package org.laoruga.dtogenerator.config;
 
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
+import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 
 /**
  * @author Il'dar Valitov
@@ -11,6 +12,6 @@ public interface Configuration {
 
     DtoGeneratorConfig getDtoGeneratorConfig();
 
-    TypeGeneratorsConfigLazy getTypeGeneratorsConfig();
+    TypeGeneratorsConfigSupplier getTypeGeneratorsConfig();
 
 }
