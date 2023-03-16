@@ -16,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(CustomRules.class)
 public @interface CustomRule {
 
-    Class<?>[] GENERATED_TYPES = new Class<?>[]{Object.class};
+    Class<?> GENERATED_TYPE = Object.class;
 
     Class<?> generatorClass();
 

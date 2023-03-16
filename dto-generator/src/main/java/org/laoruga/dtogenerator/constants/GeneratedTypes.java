@@ -1,9 +1,9 @@
 package org.laoruga.dtogenerator.constants;
 
 import com.google.common.collect.ImmutableMap;
+import org.checkerframework.checker.units.qual.C;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
-import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -21,25 +21,17 @@ public class GeneratedTypes {
     static {
         Map<Class<? extends Annotation>, Class<?>[]> generatedTypes = new HashMap<>();
 
-        add(generatedTypes, StringRule.class);
-        add(generatedTypes, NumberRule.class);
-        add(generatedTypes, DecimalRule.class);
-        add(generatedTypes, DateTimeRule.class);
-        add(generatedTypes, EnumRule.class);
-        add(generatedTypes, CollectionRule.class);
-        add(generatedTypes, BooleanRule.class);
-        add(generatedTypes, CustomRule.class);
-        add(generatedTypes, NestedDtoRule.class);
+        generatedTypes.put(StringRule.class, new Class[]{StringRule.GENERATED_TYPE});
+        generatedTypes.put(NumberRule.class, NumberRule.GENERATED_TYPES);
+        generatedTypes.put(DecimalRule.class, DecimalRule.GENERATED_TYPES);
+        generatedTypes.put(DateTimeRule.class, new Class[]{DateTimeRule.GENERATED_TYPE});
+        generatedTypes.put(EnumRule.class, new Class[]{EnumRule.GENERATED_TYPE});
+        generatedTypes.put(CollectionRule.class, new Class[]{CollectionRule.GENERATED_TYPE});
+        generatedTypes.put(BooleanRule.class, new Class[]{BooleanRule.GENERATED_TYPE});
+        generatedTypes.put(CustomRule.class, new Class[]{CustomRule.GENERATED_TYPE});
+        generatedTypes.put(NestedDtoRule.class, new Class[]{NestedDtoRule.GENERATED_TYPE});
 
         GENERATED_TYPES = ImmutableMap.copyOf(generatedTypes);
-    }
-
-    private static void add(Map<Class<? extends Annotation>, Class<?>[]> generatedTypes,
-                            Class<? extends Annotation> rulesAnnotationClass) {
-        generatedTypes.put(
-                rulesAnnotationClass,
-                ReflectionUtils.getStaticFieldValueArray(rulesAnnotationClass, "GENERATED_TYPES", Class.class)
-        );
     }
 
     public static Class<?>[] get(Class<? extends Annotation> rules) {

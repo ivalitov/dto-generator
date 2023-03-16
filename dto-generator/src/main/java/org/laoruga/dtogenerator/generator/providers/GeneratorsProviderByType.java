@@ -16,6 +16,7 @@ import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -87,11 +88,14 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
 
             Class<?> elementType = ReflectionUtils.getSingleGenericType(field);
             Optional<IGenerator<?>> maybeElementGenerator = getGenerator(field, elementType);
-            generatorSupplier = collectionGeneratorSupplier(
+            generatorSupplier = getCollectionGeneratorSupplier(
                     (Class<? extends Collection<?>>) getConcreteCollectionClass(generatedTypeCollection),
                     maybeElementGenerator.orElseThrow(
                             () -> new DtoGeneratorException("Collection element generator not found, for type: " +
                                     "'" + elementType + "'")));
+        } else if (Temporal.class.isAssignableFrom(generatedType)) {
+
+            generatorSupplier = getTemporalGeneratorSupplier((Class<Temporal>) generatedType);
 
         } else if (genBuilder instanceof EnumGeneratorBuilder) {
 

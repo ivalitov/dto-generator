@@ -7,7 +7,11 @@ import org.laoruga.dtogenerator.constants.RuleRemark;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.Temporal;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -18,8 +22,19 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(DateTimeRules.class)
 public @interface DateTimeRule {
 
-    Class<?>[] GENERATED_TYPES = new Class<?>[]
-            {LocalDateTime.class, LocalDate.class, LocalTime.class, Year.class, YearMonth.class, Instant.class};
+    /**
+     * Types that implement {@link Temporal} interface
+     * and have a static instantiation method {@code now()} are supported.
+     * For example, some popular types:
+     * <ul>
+     * <li>{@link LocalDateTime}
+     * <li>{@link LocalDate}
+     * <li>{@link LocalTime}
+     * <li>{@link Instant}
+     * <li>and others
+     * </ul>
+     */
+    Class<?> GENERATED_TYPE = Temporal.class;
 
     ChronoUnitShift[] chronoUnitShift() default {};
 

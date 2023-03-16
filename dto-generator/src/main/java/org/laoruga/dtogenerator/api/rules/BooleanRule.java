@@ -18,7 +18,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(BooleanRules.class)
 public @interface BooleanRule {
 
-    Class<?>[] GENERATED_TYPES = {Boolean.class};
+    Class<?> GENERATED_TYPE = Boolean.class;
 
     double trueProbability() default 0.5D;
 

@@ -29,6 +29,10 @@ public class DateTimeConfigDto implements ConfigDto {
     private IRuleRemark ruleRemark;
     private Class<? extends Temporal> generatedType;
 
+    public DateTimeConfigDto(DateTimeRule rule) {
+        this(rule, null);
+    }
+
     public DateTimeConfigDto(DateTimeRule rule, Class<? extends Temporal> fieldType) {
 
         ChronoUnitShift[] chronoUnitShifts = rule.chronoUnitShift();

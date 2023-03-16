@@ -5,6 +5,7 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
+import java.time.temporal.Temporal;
 import java.util.*;
 
 /**
@@ -41,6 +42,10 @@ public final class GeneratorBuildersHolder {
 
         if (foundInfo == null && Collection.class.isAssignableFrom(generatedType)) {
             foundInfo = buildersInfoMapByGeneratedType.get(Collection.class);
+        }
+
+        if (foundInfo == null && Temporal.class.isAssignableFrom(generatedType)) {
+            foundInfo = buildersInfoMapByGeneratedType.get(Temporal.class);
         }
 
         if (foundInfo == null) {

@@ -14,8 +14,10 @@ import org.laoruga.dtogenerator.generator.builder.builders.EnumGeneratorBuilder;
 import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
 import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.generator.configs.EnumConfigDto;
+import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
 
 import java.lang.reflect.Modifier;
+import java.time.temporal.Temporal;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -80,6 +82,7 @@ public abstract class GeneratorsProviderAbstract {
         return generatorSupplier.apply(config, genBuilder);
     }
 
+    @SuppressWarnings("unchecked")
     protected BiFunction<
             ConfigDto,
             IGeneratorBuilderConfigurable<?>,
@@ -98,8 +101,18 @@ public abstract class GeneratorsProviderAbstract {
         };
     }
 
+    protected BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>, IGenerator<?>>
+    getTemporalGeneratorSupplier(Class<? extends Temporal> generatedType) {
+        return (config, builder) -> {
+            DateTimeConfigDto dateTimeConfig = (DateTimeConfigDto) config;
+            dateTimeConfig.setGeneratedType(generatedType);
+            return builder.build(config, true);
+        };
+    }
+
     protected BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>,
-            IGenerator<?>> collectionGeneratorSupplier(Class<? extends Collection<?>> generatedType, IGenerator<?> elementGenerator) {
+            IGenerator<?>> getCollectionGeneratorSupplier(Class<? extends Collection<?>> generatedType,
+                                                          IGenerator<?> elementGenerator) {
         return (config, builder) -> {
             CollectionConfigDto collectionConfig = (CollectionConfigDto) config;
             if (collectionConfig.getCollectionInstanceSupplier() == null) {

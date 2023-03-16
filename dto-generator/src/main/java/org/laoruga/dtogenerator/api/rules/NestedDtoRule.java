@@ -16,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(NestedDtoRules.class)
 public @interface NestedDtoRule {
 
-    Class<?>[] GENERATED_TYPES = new Class<?>[]{Object.class};
+    Class<?> GENERATED_TYPE = Object.class;
 
     String group() default Group.DEFAULT;
 

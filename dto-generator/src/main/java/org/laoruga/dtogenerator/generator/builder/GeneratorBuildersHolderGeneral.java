@@ -26,16 +26,16 @@ public final class GeneratorBuildersHolderGeneral {
         GeneratorBuildersHolder generatorBuildersHolder = new GeneratorBuildersHolder();
 
         // general
-        generatorBuildersHolder.addBuilders(
-                GeneratorBuilderInfo.createInstances(
+        generatorBuildersHolder.addBuilder(
+                GeneratorBuilderInfo.createInstance(
                         BooleanRule.class,
-                        BooleanRule.GENERATED_TYPES,
+                        BooleanRule.GENERATED_TYPE,
                         BooleanGenerator::builder));
 
-        generatorBuildersHolder.addBuilders(
-                GeneratorBuilderInfo.createInstances(
+        generatorBuildersHolder.addBuilder(
+                GeneratorBuilderInfo.createInstance(
                         StringRule.class,
-                        StringRule.GENERATED_TYPES,
+                        StringRule.GENERATED_TYPE,
                         StringGenerator::builder));
 
         generatorBuildersHolder.addBuilders(
@@ -51,37 +51,37 @@ public final class GeneratorBuildersHolderGeneral {
                         DecimalRule.GENERATED_TYPES,
                         DecimalGenerator::builder));
 
-        generatorBuildersHolder.addBuilders(
-                GeneratorBuilderInfo.createInstances(
+        generatorBuildersHolder.addBuilder(
+                GeneratorBuilderInfo.createInstance(
                         EnumRule.class,
-                        EnumRule.GENERATED_TYPES,
+                        EnumRule.GENERATED_TYPE,
                         EnumGenerator::builder));
 
-        generatorBuildersHolder.addBuilders(
-                GeneratorBuilderInfo.createInstances(
+        generatorBuildersHolder.addBuilder(
+                GeneratorBuilderInfo.createInstance(
                         DateTimeRule.class,
-                        DateTimeRule.GENERATED_TYPES,
+                        DateTimeRule.GENERATED_TYPE,
                         DateTimeGenerator::builder));
 
         // collection
 
-        generatorBuildersHolder.addBuilders(
-                GeneratorBuilderInfo.createInstances(
+        generatorBuildersHolder.addBuilder(
+                GeneratorBuilderInfo.createInstance(
                         CollectionRule.class,
-                        CollectionRule.GENERATED_TYPES,
+                        CollectionRule.GENERATED_TYPE,
                         CollectionGenerator::builder));
 
         // extended
-        generatorBuildersHolder.addBuilders(
-                GeneratorBuilderInfo.createInstances(
+        generatorBuildersHolder.addBuilder(
+                GeneratorBuilderInfo.createInstance(
                         CustomRule.class,
-                        CustomRule.GENERATED_TYPES,
+                        CustomRule.GENERATED_TYPE,
                         CustomGenerator::builder));
 
-        generatorBuildersHolder.addBuilders(
-                GeneratorBuilderInfo.createInstances(
+        generatorBuildersHolder.addBuilder(
+                GeneratorBuilderInfo.createInstance(
                         NestedDtoRule.class,
-                        NestedDtoRule.GENERATED_TYPES,
+                        NestedDtoRule.GENERATED_TYPE,
                         NestedDtoGenerator::builder));
 
         return generatorBuildersHolder;

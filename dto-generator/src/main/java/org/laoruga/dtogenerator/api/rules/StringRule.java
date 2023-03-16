@@ -18,7 +18,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(StringRules.class)
 public @interface StringRule {
 
-    Class<?>[] GENERATED_TYPES = new Class<?>[]{String.class};
+    Class<?> GENERATED_TYPE = String.class;
 
     String DEFAULT_REGEXP = "";
 
@@ -36,5 +36,4 @@ public @interface StringRule {
 
     String regexp() default DEFAULT_REGEXP;
 
-    Class<?> generatedType() default String.class;
 }

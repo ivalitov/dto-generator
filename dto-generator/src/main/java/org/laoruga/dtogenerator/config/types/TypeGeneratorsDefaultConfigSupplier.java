@@ -27,14 +27,16 @@ public final class TypeGeneratorsDefaultConfigSupplier {
         Map<Class<?>, Supplier<ConfigDto>> configSupplier = new HashMap<>(10);
 
         add(configSupplier,
-                BooleanRule.GENERATED_TYPES,
+                BooleanRule.GENERATED_TYPE,
                 RulesInstance.BOOLEAN_RULE,
-                BooleanConfigDto.class);
+                BooleanConfigDto.class,
+                false);
 
         add(configSupplier,
-                StringRule.GENERATED_TYPES,
+                new Class[]{StringRule.GENERATED_TYPE},
                 RulesInstance.STRING_RULE,
-                StringConfigDto.class);
+                StringConfigDto.class,
+                false);
 
         add(configSupplier,
                 NumberRule.GENERATED_TYPES,
@@ -49,20 +51,22 @@ public final class TypeGeneratorsDefaultConfigSupplier {
                 true);
 
         add(configSupplier,
-                DateTimeRule.GENERATED_TYPES,
+                DateTimeRule.GENERATED_TYPE,
                 RulesInstance.DATE_TIME_RULE,
                 DateTimeConfigDto.class,
-                true);
+                false);
 
         add(configSupplier,
-                EnumRule.GENERATED_TYPES,
+                EnumRule.GENERATED_TYPE,
                 RulesInstance.ENUM_RULE,
-                EnumConfigDto.class);
+                EnumConfigDto.class,
+                false);
 
         add(configSupplier,
-                CollectionRule.GENERATED_TYPES,
+                CollectionRule.GENERATED_TYPE,
                 RulesInstance.COLLECTION_RULE,
-                CollectionConfigDto.class);
+                CollectionConfigDto.class,
+                false);
 
         GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER = ImmutableMap.copyOf(configSupplier);
     }
@@ -86,20 +90,6 @@ public final class TypeGeneratorsDefaultConfigSupplier {
         return GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER.get(generatedType);
     }
 
-
-    private static void add(
-            Map<Class<?>, Supplier<ConfigDto>> generatedTypeToConfigSupplier,
-            Class<?>[] generatedTypes,
-            Annotation rule,
-            Class<? extends ConfigDto> configClass
-    ) {
-        add(generatedTypeToConfigSupplier,
-                generatedTypes,
-                rule,
-                configClass,
-                false);
-    }
-
     private static void add(
             Map<Class<?>, Supplier<ConfigDto>> generatedTypeToConfigSupplier,
             Class<?>[] generatedTypes,
@@ -108,13 +98,25 @@ public final class TypeGeneratorsDefaultConfigSupplier {
             boolean typeAsArgument
     ) {
         for (Class<?> generatedType : generatedTypes) {
-            if (typeAsArgument) {
-                generatedTypeToConfigSupplier.put(generatedType,
-                        () -> ReflectionUtils.createInstance(configClass, rule, generatedType));
-            } else {
-                generatedTypeToConfigSupplier.put(generatedType,
-                        () -> ReflectionUtils.createInstance(configClass, rule));
-            }
+            add(generatedTypeToConfigSupplier,
+                    generatedType,
+                    rule,
+                    configClass,
+                    typeAsArgument);
+        }
+    }
+
+    private static void add(Map<Class<?>, Supplier<ConfigDto>> generatedTypeToConfigSupplier,
+                            Class<?> generatedType,
+                            Annotation rule,
+                            Class<? extends ConfigDto> configClass,
+                            boolean typeAsArgument) {
+        if (typeAsArgument) {
+            generatedTypeToConfigSupplier.put(generatedType,
+                    () -> ReflectionUtils.createInstance(configClass, rule, generatedType));
+        } else {
+            generatedTypeToConfigSupplier.put(generatedType,
+                    () -> ReflectionUtils.createInstance(configClass, rule));
         }
     }
 

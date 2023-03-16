@@ -7,7 +7,6 @@ import org.laoruga.dtogenerator.api.rules.DecimalRule;
 import org.laoruga.dtogenerator.api.rules.EnumRule;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.configs.*;
 import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
@@ -57,7 +56,7 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
 
     public StringConfigDto getStringConfig() {
         return (StringConfigDto) getConfigLazy(
-                StringRule.GENERATED_TYPES,
+                StringRule.GENERATED_TYPE,
                 StringConfigDto::new
         );
     }
@@ -76,57 +75,47 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
-    public DateTimeConfigDto getDateTimeConfig(Class<? extends Temporal> dateTimeType) {
-        return (DateTimeConfigDto) getConfigLazy(
-                dateTimeType,
-                DateTimeRule.GENERATED_TYPES,
-                DateTimeConfigDto::new
+    public EnumConfigDto getEnumConfig() {
+        return (EnumConfigDto) getConfigLazy(
+                EnumRule.GENERATED_TYPE,
+                EnumConfigDto::new
         );
     }
 
-    public EnumConfigDto getEnumConfig() {
-        return (EnumConfigDto) getConfigLazy(
-                EnumRule.GENERATED_TYPES,
-                EnumConfigDto::new
+    public DateTimeConfigDto getDateTimeConfig(Class<? extends Temporal> dateTimeType) {
+        return (DateTimeConfigDto) getConfigLazy(
+                dateTimeType,
+                DateTimeConfigDto::new
         );
     }
 
     public CollectionConfigDto getCollectionConfig(Class<? extends Collection> generatedType) {
         return (CollectionConfigDto) getConfigLazy(
-                new Class[]{generatedType},
+                generatedType,
                 CollectionConfigDto::new
         );
     }
 
+    private ConfigDto getConfigLazy(Class<?> generatedType,
+                                    Supplier<ConfigDto> configSupplier) {
+        if (!configMap.containsKey(generatedType)) {
+            configMap.put(generatedType, configSupplier.get());
+        }
+
+        return configMap.get(generatedType);
+    }
+
     private ConfigDto getConfigLazy(Class<?>[] generatedTypes,
                                     Supplier<ConfigDto> configSupplier) {
-        initConfig(generatedTypes, true, configSupplier);
-        return Objects.requireNonNull(configMap.get(generatedTypes[0]));
-    }
-
-    private ConfigDto getConfigLazy(Class<?> dateTimeType,
-                                    Class<?>[] generatedTypes,
-                                    Supplier<ConfigDto> configSupplier) {
-        if (Arrays.stream(generatedTypes).noneMatch(it -> it == dateTimeType)) {
-            throw new DtoGeneratorException("Unknown generated type: '" + dateTimeType + "'");
-        }
-        if (!configMap.containsKey(dateTimeType)) {
-            configMap.put(dateTimeType, configSupplier.get());
-        }
-        return configMap.get(dateTimeType);
-    }
-
-    private void initConfig(Class<?>[] generatedTypes, boolean sameConfigInstance, Supplier<ConfigDto> configSupplier) {
-        ConfigDto configDto = null;
+        ConfigDto configDto = configSupplier.get();
 
         for (Class<?> generatedType : generatedTypes) {
             if (!configMap.containsKey(generatedType)) {
-                if (!sameConfigInstance || configDto == null) {
-                    configDto = configSupplier.get();
-                }
                 configMap.putIfAbsent(generatedType, configDto);
             }
         }
+
+        return Objects.requireNonNull(configMap.get(generatedTypes[0]));
     }
 
     public void setGeneratorConfigForType(Class<?> generatedType, ConfigDto generatorConfig) {

@@ -18,9 +18,9 @@ public interface TypeGeneratorsConfigSupplier {
 
     DecimalCommonConfigDto getDecimalConfig();
 
-    DateTimeConfigDto getDateTimeConfig(Class<? extends Temporal> dateTimeType);
-
     EnumConfigDto getEnumConfig();
+
+    DateTimeConfigDto getDateTimeConfig(Class<? extends Temporal> dateTimeType);
 
     CollectionConfigDto getCollectionConfig(Class<? extends Collection> collectionType);
 

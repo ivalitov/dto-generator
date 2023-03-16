@@ -27,38 +27,21 @@ class GeneratorBuilderInfo {
     public static GeneratorBuilderInfo createInstance(Class<? extends Annotation> rules,
                                                       Class<?> generatedType,
                                                       Supplier<IGeneratorBuilder<?>> builderSupplier) {
-        return createInstance(rules, generatedType, null, builderSupplier);
-    }
-
-    public static GeneratorBuilderInfo createInstance(Class<? extends Annotation> rules,
-                                                      Class<?> generatedType,
-                                                      Class<?> generatedTypePrimitive,
-                                                      Supplier<IGeneratorBuilder<?>> builderSupplier) {
         GeneratorBuilderInfo genBuilderInfo = new GeneratorBuilderInfo();
         genBuilderInfo.rules = rules;
         genBuilderInfo.generatedType = generatedType;
-        genBuilderInfo.generatedTypePrimitive = generatedTypePrimitive;
+        genBuilderInfo.generatedTypePrimitive = Primitives.unwrap(generatedType);
         genBuilderInfo.builderSupplier = builderSupplier;
         return genBuilderInfo;
     }
 
     public static List<GeneratorBuilderInfo> createInstances(Class<? extends Annotation> rules,
-                                                             Class<?>[] generatedType,
+                                                             Class<?>[] generatedTypes,
                                                              Supplier<IGeneratorBuilder<?>> builderSupplier) {
 
-        return Arrays.stream(generatedType)
-                .map(
-                        type -> {
-                            GeneratorBuilderInfo genBuilderInfo = new GeneratorBuilderInfo();
-                            genBuilderInfo.rules = rules;
-                            genBuilderInfo.generatedType = type;
-                            genBuilderInfo.generatedTypePrimitive = Primitives.unwrap(type);
-                            genBuilderInfo.builderSupplier = builderSupplier;
-                            return genBuilderInfo;
-                        }
-                )
+        return Arrays.stream(generatedTypes)
+                .map(type -> createInstance(rules, type, builderSupplier))
                 .collect(Collectors.toList());
     }
-
 
 }

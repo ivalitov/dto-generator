@@ -5,8 +5,10 @@ import org.exparity.hamcrest.date.LocalDateTimeMatchers;
 import org.exparity.hamcrest.date.LocalTimeMatchers;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
+import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.api.rules.datetime.ChronoFieldShift;
 import org.laoruga.dtogenerator.api.rules.datetime.ChronoUnitShift;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
@@ -33,6 +35,7 @@ import static org.laoruga.dtogenerator.constants.RuleRemark.*;
  * @author Il'dar Valitov
  * Created on 15.03.2023
  */
+@ExtendWith(Extensions.RestoreStaticConfig.class)
 public class DateTimeTests {
 
     static class Dto {
@@ -56,11 +59,11 @@ public class DateTimeTests {
         Instant instant;
     }
 
-    static final Instant NOW_INSTANT = Instant.now();
-    static final LocalDateTime NOW = LocalDateTime.now();
-
     @Test
     public void annotationConfig() {
+
+        final Instant NOW_INSTANT = Instant.now();
+        final LocalDateTime NOW = LocalDateTime.now();
 
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
 
@@ -101,6 +104,8 @@ public class DateTimeTests {
     @Test
     @Tag(RESTORE_STATIC_CONFIG)
     public void staticConfig() {
+
+        final LocalDateTime NOW = LocalDateTime.now();
 
         TypeGeneratorsConfigSupplier staticConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
 
@@ -155,6 +160,8 @@ public class DateTimeTests {
 
     @Test
     public void instanceConfig() {
+
+        final LocalDateTime NOW = LocalDateTime.now();
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -212,6 +219,8 @@ public class DateTimeTests {
     @Test
     public void fieldConfig() {
 
+        final LocalDateTime NOW = LocalDateTime.now();
+
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         builder
@@ -265,6 +274,9 @@ public class DateTimeTests {
     @Test
     public void overrideGeneratorByField() {
 
+        final LocalDateTime NOW = LocalDateTime.now();
+        final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
+
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         builder.setGenerator("localDateTime", () -> NOW.plusDays(1));
@@ -276,11 +288,14 @@ public class DateTimeTests {
 
         Dto dto = builder.build().generateDto();
 
-        commonAssert(dto);
+        commonAssert(dto, NOW);
     }
 
     @Test
     public void overrideGeneratorByType() {
+
+        final LocalDateTime NOW = LocalDateTime.now();
+        final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -293,11 +308,14 @@ public class DateTimeTests {
 
         Dto dto = builder.build().generateDto();
 
-        commonAssert(dto);
+        commonAssert(dto, NOW);
     }
 
     @Test
     public void overrideGeneratorByTypeAndField() {
+
+        final LocalDateTime NOW = LocalDateTime.now();
+        final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -317,30 +335,32 @@ public class DateTimeTests {
 
         Dto dto = builder.build().generateDto();
 
-        commonAssert(dto);
+        commonAssert(dto, NOW);
     }
 
-    private static void commonAssert(Dto dto) {
+    private static void commonAssert(Dto dto, final LocalDateTime now) {
+        final Instant NOW_INSTANT = now.atZone(ZoneId.systemDefault()).toInstant();
+
         assertAll(
                 () -> assertThat(dto.localDateTime,
                         equalTo(
-                                NOW.plusDays(1)
+                                now.plusDays(1)
                         )),
                 () -> assertThat(dto.localDate,
                         equalTo(
-                                NOW.toLocalDate().plusDays(2)
+                                now.toLocalDate().plusDays(2)
                         )),
                 () -> assertThat(dto.localTime,
                         equalTo(
-                                NOW.toLocalTime().plusHours(3)
+                                now.toLocalTime().plusHours(3)
                         )),
                 () -> assertThat(dto.year,
                         equalTo(
-                                Year.of(NOW.getYear() + 4)
+                                Year.of(now.getYear() + 4)
                         )),
                 () -> assertThat(dto.yearMonth,
                         equalTo(
-                                YearMonth.of(NOW.getYear(), 5)
+                                YearMonth.of(now.getYear(), 5)
                         )),
                 () -> assertThat(dto.instant,
                         equalTo(NOW_INSTANT)));
@@ -358,6 +378,9 @@ public class DateTimeTests {
 
     @Test
     public void withoutAnnotations() {
+
+        final LocalDateTime NOW = LocalDateTime.now();
+        final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
         builder.getConfig().setGenerateAllKnownTypes(true);
@@ -399,6 +422,9 @@ public class DateTimeTests {
     @Tag(RESTORE_STATIC_CONFIG)
     public void withoutAnnotationsWithOverriddenConfig() {
 
+        final LocalDateTime NOW = LocalDateTime.now();
+        final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
+
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
         builder.getConfig().setGenerateAllKnownTypes(true);
 
@@ -412,8 +438,7 @@ public class DateTimeTests {
                 .setRuleRemark(RANDOM_VALUE);
         staticConfig.getDateTimeConfig(Year.class)
                 // obviously incorrect param
-                .addChronoConfig(ChronoFieldConfig.newAbsolute( 5, ChronoField.SECOND_OF_DAY));
-
+                .addChronoConfig(ChronoFieldConfig.newAbsolute(5, ChronoField.SECOND_OF_DAY));
 
 
         // instance
@@ -427,14 +452,14 @@ public class DateTimeTests {
                 .setRuleRemark(MIN_VALUE);
         builder.getTypeGeneratorConfig().getDateTimeConfig(Year.class)
                 // obviously incorrect param
-                .addChronoConfig(ChronoUnitConfig.newAbsolute( 5, SECONDS));
+                .addChronoConfig(ChronoUnitConfig.newAbsolute(5, SECONDS));
 
 
         // field
         builder.setTypeGeneratorConfig("localDate", DateTimeConfigDto.builder().ruleRemark(MIN_VALUE).build());
         builder.setTypeGeneratorConfig("localTime", DateTimeConfigDto.builder().ruleRemark(MAX_VALUE).build());
         builder.setTypeGeneratorConfig("year", DateTimeConfigDto.builder().addChronoConfig(
-                ChronoUnitConfig.newAbsolute( 3, YEARS)).build()
+                ChronoUnitConfig.newAbsolute(3, YEARS)).build()
         );
 
 

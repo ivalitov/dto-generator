@@ -19,7 +19,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(CollectionRules.class)
 public @interface CollectionRule {
 
-    Class<?>[] GENERATED_TYPES = new Class<?>[]{Collection.class};
+    Class<?> GENERATED_TYPE = Collection.class;
 
     Class<? extends Collection> collectionClass() default DummyCollectionClass.class;
 

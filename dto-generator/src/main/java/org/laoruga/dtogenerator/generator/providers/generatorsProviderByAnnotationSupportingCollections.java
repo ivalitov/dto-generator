@@ -148,7 +148,7 @@ public class generatorsProviderByAnnotationSupportingCollections extends Generat
                 return getGenerator(
                         () -> configDto,
                         () -> (IGeneratorBuilderConfigurable<?>) collectionGenBuilder,
-                        collectionGeneratorSupplier(collectionClass, elementGenerator),
+                        getCollectionGeneratorSupplier(collectionClass, elementGenerator),
                         fieldType,
                         fieldName);
 
