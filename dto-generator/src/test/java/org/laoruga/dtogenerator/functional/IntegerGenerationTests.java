@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 
 @DisplayName("Integer Generation Tests")
-@Epic("INTEGER_RULES")
+@Epic("NUMBER_RULES")
 class IntegerGenerationTests {
 
     final static int minValueLeftBound = 99999999;

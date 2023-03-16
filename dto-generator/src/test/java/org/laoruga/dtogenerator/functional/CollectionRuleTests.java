@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  * Created on 17.03.2023
  */
 @ExtendWith(Extensions.RestoreStaticConfig.class)
-@Epic("DATE_TIME_RULES")
+@Epic("COLLECTION_RULES")
 public class CollectionRuleTests {
 
     enum Planets {EARTH, SATURN, PLUTO, URANUS, MARS}
