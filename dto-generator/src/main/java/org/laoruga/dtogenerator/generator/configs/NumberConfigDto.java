@@ -8,6 +8,7 @@ import org.laoruga.dtogenerator.api.rules.NumberRule;
 
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Il'dar Valitov
@@ -34,14 +35,14 @@ public class NumberConfigDto implements ConfigDto {
     public NumberConfigDto(NumberRule rules, Class<? extends Number> fieldType) {
         fieldType = Primitives.wrap(fieldType);
 
-        this.isAtomic = fieldType == AtomicInteger.class;
+        this.isAtomic = fieldType == AtomicInteger.class || fieldType == AtomicLong.class;
         this.fieldType = fieldType;
         this.ruleRemark = rules.ruleRemark();
 
-        if (fieldType == Integer.class || isAtomic) {
+        if (fieldType == Integer.class || fieldType == AtomicInteger.class) {
             minValue = rules.minInt();
             maxValue = rules.maxInt();
-        } else if (fieldType == Long.class) {
+        } else if (fieldType == Long.class || fieldType == AtomicLong.class) {
             minValue = rules.minLong();
             maxValue = rules.maxLong();
         } else if (fieldType == Short.class) {

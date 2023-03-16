@@ -9,6 +9,7 @@ import org.laoruga.dtogenerator.generator.configs.NumberConfigDto;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Il'dar Valitov
@@ -41,7 +42,13 @@ public class NumberGenerator implements IGenerator<Number> {
         }
 
         if (isAtomic) {
-            return new AtomicInteger((Integer) result);
+            if (result.getClass() == Long.class) {
+                return new AtomicLong((long) result);
+            }
+            if (result.getClass() == Integer.class) {
+                return new AtomicInteger((int) result);
+            }
+            throw new IllegalStateException("Unexpected type: '" + result.getClass() + "'");
         }
 
         return result;

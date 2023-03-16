@@ -10,6 +10,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.TYPE_USE;
@@ -22,7 +23,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface NumberRule {
 
     Class<?>[] GENERATED_TYPES = new Class<?>[]
-            {Byte.class, Short.class, Integer.class, Long.class, BigInteger.class, AtomicInteger.class};
+            {Byte.class, Short.class, Integer.class, Long.class, BigInteger.class, AtomicInteger.class, AtomicLong.class};
 
     long maxLong() default Long.MAX_VALUE;
 

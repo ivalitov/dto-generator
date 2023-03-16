@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Il'dar Valitov
@@ -30,34 +31,16 @@ public class NumberCommonConfigDto implements ConfigDto {
      * Integer
      */
 
-    public NumberCommonConfigDto setMaxIntValue(int maxIntValue) {
-        if (!map.containsKey(Integer.class)) {
-            NumberConfigDto configDto = new NumberConfigDto();
-            map.putIfAbsent(Integer.class, configDto);
-            map.putIfAbsent(AtomicInteger.class, configDto);
-        }
-        map.get(Integer.class).setMaxValue(maxIntValue);
-        return this;
+    public NumberCommonConfigDto setMaxIntValue(int value) {
+        return setMaxValue(Integer.class, AtomicInteger.class, value);
     }
 
-    public NumberCommonConfigDto setMinIntValue(int minIntValue) {
-        if (!map.containsKey(Integer.class)) {
-            NumberConfigDto configDto = new NumberConfigDto();
-            map.putIfAbsent(Integer.class, configDto);
-            map.putIfAbsent(AtomicInteger.class, configDto);
-        }
-        map.get(Integer.class).setMinValue(minIntValue);
-        return this;
+    public NumberCommonConfigDto setMinIntValue(int value) {
+        return setMinValue(Integer.class, AtomicInteger.class, value);
     }
 
-    public NumberCommonConfigDto setRuleRemarkInt(IRuleRemark ruleRemark) {
-        if (!map.containsKey(Integer.class)) {
-            NumberConfigDto configDto = new NumberConfigDto();
-            map.putIfAbsent(Integer.class, configDto);
-            map.putIfAbsent(AtomicInteger.class, configDto);
-        }
-        map.get(Integer.class).setRuleRemark(ruleRemark);
-        return this;
+    public NumberCommonConfigDto setRuleRemarkInt(IRuleRemark value) {
+        return setRuleRemark(Integer.class, AtomicInteger.class, value);
     }
 
     /*
@@ -65,16 +48,15 @@ public class NumberCommonConfigDto implements ConfigDto {
      */
 
     public NumberCommonConfigDto setMaxLongValue(long value) {
-        return setMaxValue(Long.class, value);
-
+        return setMaxValue(Long.class, AtomicLong.class, value);
     }
 
     public NumberCommonConfigDto setMinLongValue(long value) {
-        return setMinValue(Long.class, value);
+        return setMinValue(Long.class, AtomicLong.class, value);
     }
 
     public NumberCommonConfigDto setRuleRemarkLong(IRuleRemark value) {
-        return setRuleRemark(Long.class, value);
+        return setRuleRemark(Long.class, AtomicLong.class, value);
     }
 
     /*
@@ -135,7 +117,7 @@ public class NumberCommonConfigDto implements ConfigDto {
     }
 
     /*
-     * Common setters
+     * Common setters one type
      */
 
     private NumberCommonConfigDto setMaxValue(Class<?> type, Number maxValue) {
@@ -152,6 +134,40 @@ public class NumberCommonConfigDto implements ConfigDto {
 
     private NumberCommonConfigDto setRuleRemark(Class<?> type, IRuleRemark ruleRemark) {
         map.putIfAbsent(type, new NumberConfigDto());
+        map.get(type).setRuleRemark(ruleRemark);
+        return this;
+    }
+
+    /*
+     * Common setters two types
+     */
+
+    public NumberCommonConfigDto setMaxValue(Class<?> type, Class<?> secondType, Number maxIntValue) {
+        if (!map.containsKey(type)) {
+            NumberConfigDto configDto = new NumberConfigDto();
+            map.putIfAbsent(type, configDto);
+            map.putIfAbsent(secondType, configDto);
+        }
+        map.get(type).setMaxValue(maxIntValue);
+        return this;
+    }
+
+    public NumberCommonConfigDto setMinValue(Class<?> type, Class<?> secondType, Number minIntValue) {
+        if (!map.containsKey(type)) {
+            NumberConfigDto configDto = new NumberConfigDto();
+            map.putIfAbsent(type, configDto);
+            map.putIfAbsent(secondType, configDto);
+        }
+        map.get(type).setMinValue(minIntValue);
+        return this;
+    }
+
+    public NumberCommonConfigDto setRuleRemark(Class<?> type, Class<?> secondType, IRuleRemark ruleRemark) {
+        if (!map.containsKey(type)) {
+            NumberConfigDto configDto = new NumberConfigDto();
+            map.putIfAbsent(type, configDto);
+            map.putIfAbsent(secondType, configDto);
+        }
         map.get(type).setRuleRemark(ruleRemark);
         return this;
     }

@@ -14,6 +14,7 @@ import org.laoruga.dtogenerator.generator.configs.NumberConfigDto;
 
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -57,6 +58,9 @@ public class NumberTests {
         @NumberRule(minInt = 1, maxInt = 1)
         AtomicInteger atomicInteger;
 
+        @NumberRule(minLong = 2, maxLong = 2)
+        AtomicLong atomicLong;
+
         @NumberRule(minBigInt = "9999999999999999999", maxBigInt = "9999999999999999999")
         BigInteger bigInteger;
 
@@ -79,6 +83,7 @@ public class NumberTests {
                 () -> assertThat(dto.byteObject, notNullValue()),
                 () -> assertThat(dto.bytePrimitive, lessThanOrEqualTo((byte) 10)),
                 () -> assertThat(dto.atomicInteger.get(), equalTo(1)),
+                () -> assertThat(dto.atomicLong.get(), equalTo(2L)),
                 () -> assertThat(dto.bigInteger, equalTo(new BigInteger("9999999999999999999")))
         );
 
@@ -116,6 +121,7 @@ public class NumberTests {
                 () -> assertThat(dto.byteObject, equalTo((byte) 126)),
                 () -> assertThat(dto.bytePrimitive, equalTo((byte) 126)),
                 () -> assertThat(dto.atomicInteger.get(), equalTo(-99)),
+                () -> assertThat(dto.atomicLong.get(), equalTo(99_999_999_999L)),
                 () -> assertThat(dto.bigInteger, equalTo(new BigInteger("-9999999999999999999")))
 
         );
@@ -151,6 +157,7 @@ public class NumberTests {
                 () -> assertThat(dto.byteObject, equalTo(Byte.MAX_VALUE)),
                 () -> assertThat(dto.bytePrimitive, equalTo(Byte.MAX_VALUE)),
                 () -> assertThat(dto.atomicInteger.get(), equalTo(-99)),
+                () -> assertThat(dto.atomicLong.get(), equalTo(99_999_999_999L)),
                 () -> assertThat(dto.bigInteger, equalTo(new BigInteger("911")))
         );
 
@@ -180,6 +187,8 @@ public class NumberTests {
                         NumberConfigDto.builder().minValue((byte) 11).maxValue(new Byte("12")).ruleRemark(MAX_VALUE).build())
                 .setTypeGeneratorConfig("atomicInteger",
                         NumberConfigDto.builder().minValue(2).maxValue(new Integer("2")).ruleRemark(RANDOM_VALUE).build())
+                .setTypeGeneratorConfig("atomicLong",
+                        NumberConfigDto.builder().minValue(3L).maxValue(new Long("3")).ruleRemark(RANDOM_VALUE).build())
                 .setTypeGeneratorConfig("bigInteger",
                         NumberConfigDto.builder().minValue(new BigInteger("0")).maxValue(new BigInteger("0")).ruleRemark(MIN_VALUE).build());
 
@@ -196,8 +205,8 @@ public class NumberTests {
                 () -> assertThat(dto.byteObject, equalTo((byte) -12)),
                 () -> assertThat(dto.bytePrimitive, equalTo((byte) 12)),
                 () -> assertThat(dto.atomicInteger.get(), equalTo(2)),
+                () -> assertThat(dto.atomicLong.get(), equalTo(3L)),
                 () -> assertThat(dto.bigInteger, equalTo(new BigInteger("0")))
-
         );
 
     }
@@ -258,6 +267,7 @@ public class NumberTests {
                 .setGenerator("byteObject", () -> (byte) 7)
                 .setGenerator("bytePrimitive", () -> (byte) 8)
                 .setGenerator("atomicInteger", () -> new AtomicInteger(9))
+                .setGenerator("atomicLong", () -> new AtomicLong(99L))
                 .setGenerator("bigInteger", () -> new BigInteger("10"));
 
         Dto dto = builder.build().generateDto();
@@ -272,6 +282,7 @@ public class NumberTests {
                 () -> assertThat(dto.byteObject, equalTo((byte) 7)),
                 () -> assertThat(dto.bytePrimitive, equalTo((byte) 8)),
                 () -> assertThat(dto.atomicInteger.get(), equalTo(9)),
+                () -> assertThat(dto.atomicLong.get(), equalTo(99L)),
                 () -> assertThat(dto.bigInteger, equalTo(new BigInteger("10")))
         );
 
@@ -300,6 +311,7 @@ public class NumberTests {
                 () -> assertThat(dto.byteObject, equalTo((byte) 4)),
                 () -> assertThat(dto.bytePrimitive, equalTo((byte) 4)),
                 () -> assertThat(dto.atomicInteger.get(), equalTo(1)),
+                () -> assertThat(dto.atomicLong.get(), equalTo(2L)),
                 () -> assertThat(dto.bigInteger, equalTo(new BigInteger("5")))
         );
 
@@ -335,6 +347,7 @@ public class NumberTests {
                 () -> assertThat(dto.byteObject, equalTo((byte) 44)),
                 () -> assertThat(dto.bytePrimitive, equalTo((byte) 4)),
                 () -> assertThat(dto.atomicInteger.get(), equalTo(1)),
+                () -> assertThat(dto.atomicLong.get(), equalTo(2L)),
                 () -> assertThat(dto.bigInteger, equalTo(new BigInteger("55")))
         );
 
@@ -352,6 +365,7 @@ public class NumberTests {
         byte bytePrimitive;
 
         AtomicInteger atomicInteger;
+        AtomicLong atomicLong;
         BigInteger bigInteger;
 
     }
@@ -376,6 +390,7 @@ public class NumberTests {
                 () -> assertThat(dto.byteObject, equalTo(Byte.MAX_VALUE)),
                 () -> assertThat(dto.bytePrimitive, equalTo(Byte.MAX_VALUE)),
                 () -> assertThat(dto.atomicInteger.get(), equalTo(Integer.MAX_VALUE)),
+                () -> assertThat(dto.atomicLong.get(), equalTo(Long.MAX_VALUE)),
                 () -> assertThat(dto.bigInteger, equalTo(new BigInteger(Bounds.BIG_INTEGER_MAX_VALUE)))
 
         );
@@ -421,6 +436,7 @@ public class NumberTests {
                 () -> assertThat(dto.byteObject, equalTo((byte) -4)),
                 () -> assertThat(dto.bytePrimitive, equalTo((byte) 4)),
                 () -> assertThat(dto.atomicInteger.get(), equalTo(1)),
+                () -> assertThat(dto.atomicLong.get(), equalTo(2L)),
                 () -> assertThat(dto.bigInteger, equalTo(new BigInteger("-5")))
         );
 
