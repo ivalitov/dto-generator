@@ -1,5 +1,6 @@
 package org.laoruga.dtogenerator.functional;
 
+import io.qameta.allure.Epic;
 import org.exparity.hamcrest.date.InstantMatchers;
 import org.exparity.hamcrest.date.LocalDateTimeMatchers;
 import org.exparity.hamcrest.date.LocalTimeMatchers;
@@ -36,6 +37,7 @@ import static org.laoruga.dtogenerator.constants.RuleRemark.*;
  * Created on 15.03.2023
  */
 @ExtendWith(Extensions.RestoreStaticConfig.class)
+@Epic("DATE_TIME_RULES")
 public class DateTimeTests {
 
     static class Dto {

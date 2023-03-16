@@ -21,8 +21,8 @@ import static java.util.stream.Collectors.joining;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReflectionUtils {
-    private static final String TYPE_WITH_SINGLE_GENERIC_TYPE_REGEXP = "[a-zA-Z0-9_.]*<[a-zA-Z0-9_.]*>";
-    private static final Pattern SINGLE_GENERIC_TYPE_REGEXP = Pattern.compile("<([a-zA-Z0-9_.]*)>");
+    private static final String TYPE_WITH_SINGLE_GENERIC_TYPE_REGEXP = "[a-zA-Z0-9_.]*<[$a-zA-Z0-9_.]*>";
+    private static final Pattern SINGLE_GENERIC_TYPE_REGEXP = Pattern.compile("<([$a-zA-Z0-9_.]*)>");
 
     public static Object extractSingeGenericType(String typeName) {
 

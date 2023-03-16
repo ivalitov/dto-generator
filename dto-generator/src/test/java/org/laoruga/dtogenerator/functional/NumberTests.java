@@ -1,5 +1,6 @@
 package org.laoruga.dtogenerator.functional;
 
+import io.qameta.allure.Epic;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,7 @@ import static org.laoruga.dtogenerator.constants.RuleRemark.*;
  * Created on 27.02.2023
  */
 @ExtendWith(Extensions.RestoreStaticConfig.class)
+@Epic("NUMBER_RULES")
 public class NumberTests {
 
     static class Dto {
