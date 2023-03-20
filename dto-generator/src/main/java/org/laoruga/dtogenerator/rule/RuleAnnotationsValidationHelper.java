@@ -219,7 +219,6 @@ public class RuleAnnotationsValidationHelper {
         private int rulesNumber = 0;
         private int rulesNumberRepeatable = 0;
         public int rulesNumberWithinRepeatable = 0;
-
         private int collectionRulesNumber = 0;
 
         public StringBuilder getErrorsDescription() {

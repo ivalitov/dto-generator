@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Pair;
 import org.laoruga.dtogenerator.FieldFilter;
+import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.api.rules.meta.Rules;
@@ -59,23 +60,30 @@ public class RulesInfoExtractor {
                 case RULE:
                 case NESTED_DTO_RULE:
                 case CUSTOM_RULE:
-                    extractRuleInfo(annotation);
-                    break;
-
-                case RULE_FOR_MAP:
-                    extractMapRuleInfo((MapRule) annotation);
-                    break;
-
-                case RULE_FOR_COLLECTION:
-                    extractCollectionRuleInfo(annotation);
+                    extractRuleInfo(annotation, false);
                     break;
 
                 case RULES:
-                    extractRuleInfoFromMultipleRules(annotation);
+                    selectRuleByGroup(annotation).ifPresent(groupAndRule ->
+                            extractRuleInfo(groupAndRule.getSecond(), true));
+                    break;
+
+                case RULE_FOR_COLLECTION:
+                    extractCollectionRuleInfo((CollectionRule) annotation, false);
                     break;
 
                 case RULES_FOR_COLLECTION:
-                    extractCollectionRuleInfoFromMultipleRules(annotation);
+                    selectRuleByGroup(annotation).ifPresent(groupAndRule ->
+                            extractCollectionRuleInfo((CollectionRule) groupAndRule.getSecond(), true));
+                    break;
+
+                case RULE_FOR_MAP:
+                    extractMapRuleInfo((MapRule) annotation, false);
+                    break;
+
+                case RULES_FOR_MAP:
+                    selectRuleByGroup(annotation).ifPresent(groupAndRule ->
+                            extractMapRuleInfo((MapRule) groupAndRule.getSecond(), true));
                     break;
 
                 case UNKNOWN:
@@ -97,47 +105,22 @@ public class RulesInfoExtractor {
         return Optional.of(ruleInfoBuilder.build());
     }
 
-    private void extractMapRuleInfo(MapRule mapRule) {
-        String groupName = getGroupNameFromRuleAnnotation(mapRule);
-
-        if (!skipByGroup(groupName)) {
-
-            RuleInfoBuilder mapKeyBuilder = RuleInfo.builder();
-            extractRuleInfo(ReflectionUtils.getRuleOrNull(mapRule.key()), mapKeyBuilder);
-
-            RuleInfoBuilder mapValueBuilder = RuleInfo.builder();
-            extractRuleInfo(ReflectionUtils.getRuleOrNull(mapRule.value()), mapValueBuilder);
-
-            RuleInfoBuilder mapBuilder = RuleInfo.builder()
-                    .rule(mapRule)
-                    .ruleType(RuleType.getType(mapRule))
-                    .multipleRules(false)
-                    .groupName(groupName);
-
-            ruleInfoBuilder
-                    .mapRuleInfoBuilder(mapBuilder)
-                    .mapKeyRuleInfoBuilder(mapKeyBuilder)
-                    .mapValueRuleInfoBuilder(mapValueBuilder);
-        }
-
+    private void extractRuleInfo(Annotation rule, boolean isMultipleRules) {
+        extractRuleInfo(rule, ruleInfoBuilder, isMultipleRules);
     }
 
-    private void extractRuleInfo(Annotation rule) {
-        extractRuleInfo(rule, ruleInfoBuilder);
-    }
-
-    private void extractRuleInfo(Annotation rule, RuleInfoBuilder ruleInfoBuilder) {
+    private void extractRuleInfo(Annotation rule, RuleInfoBuilder ruleInfoBuilder, boolean isMultipleRules) {
         String groupName = getGroupNameFromRuleAnnotation(rule);
         if (!skipByGroup(groupName)) {
             ruleInfoBuilder
                     .rule(rule)
                     .ruleType(RuleType.getType(rule))
-                    .multipleRules(false)
+                    .multipleRules(isMultipleRules)
                     .groupName(groupName);
         }
     }
 
-    private void extractCollectionRuleInfo(Annotation rule) {
+    private void extractCollectionRuleInfo(CollectionRule rule, boolean isMultipleRules) {
         String groupName = getGroupNameFromRuleAnnotation(rule);
         if (!skipByGroup(groupName)) {
             RuleInfoBuilder collectionRuleInfo = RuleInfo.builder();
@@ -146,30 +129,34 @@ public class RulesInfoExtractor {
                             collectionRuleInfo
                                     .rule(rule)
                                     .ruleType(RuleType.getType(rule))
-                                    .multipleRules(false)
+                                    .multipleRules(isMultipleRules)
                                     .groupName(groupName));
         }
     }
 
-    private void extractRuleInfoFromMultipleRules(Annotation multipleRules) {
-        selectRuleByGroup(multipleRules).ifPresent(groupAndRule ->
-                ruleInfoBuilder
-                        .rule(groupAndRule.getSecond())
-                        .ruleType(RuleType.getType(groupAndRule.getSecond()))
-                        .groupName(groupAndRule.getFirst())
-                        .multipleRules(true)
-        );
-    }
+    private void extractMapRuleInfo(MapRule mapRule, boolean isMultipleRules) {
+        String groupName = getGroupNameFromRuleAnnotation(mapRule);
 
-    private void extractCollectionRuleInfoFromMultipleRules(Annotation multipleRules) {
-        selectRuleByGroup(multipleRules).ifPresent(groupAndRule ->
-                ruleInfoBuilder.collectionRuleInfoBuilder(
-                        RuleInfo.builder()
-                                .rule(groupAndRule.getSecond())
-                                .ruleType(RuleType.getType(groupAndRule.getSecond()))
-                                .groupName(groupAndRule.getFirst())
-                                .multipleRules(true))
-        );
+        if (!skipByGroup(groupName)) {
+
+            RuleInfoBuilder mapKeyBuilder = RuleInfo.builder();
+            extractRuleInfo(ReflectionUtils.getRuleOrNull(mapRule.key()), mapKeyBuilder, false);
+
+            RuleInfoBuilder mapValueBuilder = RuleInfo.builder();
+            extractRuleInfo(ReflectionUtils.getRuleOrNull(mapRule.value()), mapValueBuilder, false);
+
+            RuleInfoBuilder mapBuilder = RuleInfo.builder()
+                    .rule(mapRule)
+                    .ruleType(RuleType.getType(mapRule))
+                    .multipleRules(isMultipleRules)
+                    .groupName(groupName);
+
+            ruleInfoBuilder
+                    .mapRuleInfoBuilder(mapBuilder)
+                    .mapKeyRuleInfoBuilder(mapKeyBuilder)
+                    .mapValueRuleInfoBuilder(mapValueBuilder);
+        }
+
     }
 
     private boolean skipByGroup(String groupName) {

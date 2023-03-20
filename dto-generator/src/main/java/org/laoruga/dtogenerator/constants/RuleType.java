@@ -27,6 +27,7 @@ public enum RuleType {
                 return COLLECTION;
 
             case RULE_FOR_MAP:
+            case RULES_FOR_MAP:
                 return MAP;
 
             case CUSTOM_RULE:

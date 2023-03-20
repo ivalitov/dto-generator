@@ -33,12 +33,12 @@ public final class RulesInfoHelper {
 
         if (rule != null) {
 
-            if (rule.value() == RuleType.MAP) {
-                return RULE_FOR_MAP;
-            }
-
             if (rule.value() == RuleType.COLLECTION) {
                 return RULE_FOR_COLLECTION;
+            }
+
+            if (rule.value() == RuleType.MAP) {
+                return RULE_FOR_MAP;
             }
 
             return RULE;
@@ -47,8 +47,13 @@ public final class RulesInfoHelper {
         Rules rules = ruleAnnotation.annotationType().getDeclaredAnnotation(Rules.class);
 
         if (rules != null) {
+
             if (rules.value() == RuleType.COLLECTION) {
                 return RULES_FOR_COLLECTION;
+            }
+
+            if (rules.value() == RuleType.MAP) {
+                return RULES_FOR_MAP;
             }
 
             return RULES;
@@ -63,6 +68,7 @@ public final class RulesInfoHelper {
         RULE_FOR_COLLECTION,
         RULES,
         RULES_FOR_COLLECTION,
+        RULES_FOR_MAP,
         CUSTOM_RULE,
         NESTED_DTO_RULE,
         UNKNOWN
