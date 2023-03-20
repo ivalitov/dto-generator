@@ -71,6 +71,14 @@ public final class GeneratorBuildersHolderGeneral {
                         CollectionRule.GENERATED_TYPE,
                         CollectionGenerator::builder));
 
+        // map
+
+        generatorBuildersHolder.addBuilder(
+                GeneratorBuilderInfo.createInstance(
+                        MapRule.class,
+                        MapRule.GENERATED_TYPE,
+                        MapGenerator::builder));
+
         // extended
         generatorBuildersHolder.addBuilder(
                 GeneratorBuilderInfo.createInstance(

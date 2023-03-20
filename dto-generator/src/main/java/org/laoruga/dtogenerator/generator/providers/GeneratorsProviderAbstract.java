@@ -14,15 +14,17 @@ import org.laoruga.dtogenerator.generator.builder.builders.EnumGeneratorBuilder;
 import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
 import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.generator.configs.EnumConfigDto;
+import org.laoruga.dtogenerator.generator.configs.MapConfigDto;
 import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
 
-import java.lang.reflect.Modifier;
 import java.time.temporal.Temporal;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-import static org.laoruga.dtogenerator.util.ReflectionUtils.createCollectionInstance;
+import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstanceOfConcreteClass;
+import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstanceOfConcreteClassAsObject;
 
 /**
  * @author Il'dar Valitov
@@ -117,7 +119,7 @@ public abstract class GeneratorsProviderAbstract {
             CollectionConfigDto collectionConfig = (CollectionConfigDto) config;
             if (collectionConfig.getCollectionInstanceSupplier() == null) {
                 collectionConfig.setCollectionInstanceSupplier(
-                        () -> createCollectionInstance(generatedType)
+                        () -> createInstanceOfConcreteClass(generatedType)
                 );
             }
             ((CollectionConfigDto) config).setElementGenerator(elementGenerator);
@@ -125,23 +127,26 @@ public abstract class GeneratorsProviderAbstract {
         };
     }
 
-    public static Class<?> getConcreteCollectionClass(Class<? extends Collection<?>> fieldType) {
-
-        if (!Modifier.isInterface(fieldType.getModifiers()) && !Modifier.isAbstract(fieldType.getModifiers())) {
-            return fieldType;
-        }
-
-        if (List.class.isAssignableFrom(fieldType)) {
-            return ArrayList.class;
-        } else if (Set.class.isAssignableFrom(fieldType)) {
-            return HashSet.class;
-        } else if (Queue.class.isAssignableFrom(fieldType)) {
-            return PriorityQueue.class;
-        } else if (Collection.class.isAssignableFrom(fieldType)) {
-            return ArrayList.class;
-        } else {
-            throw new DtoGeneratorException("Unsupported collection type: '" + fieldType.getTypeName() + "'");
-        }
-
+    @SuppressWarnings("unchecked")
+    protected BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>, IGenerator<?>>
+    getMapGeneratorSupplier(Class<? extends Map<?, ?>> generatedType,
+                            IGenerator<?> keyGenerator,
+                            IGenerator<?> valueGenerator) {
+        return (config, builder) -> {
+            MapConfigDto mapConfigDto = (MapConfigDto) config;
+            if (mapConfigDto.getMapInstanceSupplier() == null) {
+                mapConfigDto.setMapInstanceSupplier(
+                        () -> (Map<Object, Object>) createInstanceOfConcreteClassAsObject(generatedType)
+                );
+            }
+            if (mapConfigDto.getKeyGenerator() == null) {
+                mapConfigDto.setKeyGenerator((IGenerator<Object>) keyGenerator);
+            }
+            if (mapConfigDto.getValueGenerator() == null) {
+                mapConfigDto.setValueGenerator((IGenerator<Object>) valueGenerator);
+            }
+            return builder.build(config, true);
+        };
     }
+
 }

@@ -21,9 +21,12 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
     private Boolean multipleRules;
     private String groupName;
     private RuleInfoBuilder collectionBuilder;
+    private RuleInfoBuilder mapBuilder;
+    private RuleInfoBuilder mapKeyBuilder;
+    private RuleInfoBuilder mapValueBuilder;
 
     public boolean isEmpty() {
-        return rule == null && collectionBuilder == null;
+        return rule == null && collectionBuilder == null && mapBuilder == null;
     }
 
     public RuleInfoBuilder rule(Annotation rule) {
@@ -39,6 +42,30 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
             throwCollectionException();
         }
         this.collectionBuilder = collectionBuilder;
+        return this;
+    }
+
+    public RuleInfoBuilder mapRuleInfoBuilder(RuleInfoBuilder mapRuleInfoBuilder) {
+        if (this.mapBuilder != null) {
+            throwCollectionException();
+        }
+        this.mapBuilder = mapRuleInfoBuilder;
+        return this;
+    }
+
+    public RuleInfoBuilder mapKeyRuleInfoBuilder(RuleInfoBuilder mapKeyBuilder) {
+        if (this.mapKeyBuilder != null) {
+            throwCollectionException();
+        }
+        this.mapKeyBuilder = mapKeyBuilder;
+        return this;
+    }
+
+    public RuleInfoBuilder mapValueRuleInfoBuilder(RuleInfoBuilder mapValueBuilder) {
+        if (this.mapValueBuilder != null) {
+            throwCollectionException();
+        }
+        this.mapValueBuilder = mapValueBuilder;
         return this;
     }
 
@@ -68,11 +95,24 @@ class RuleInfoBuilder implements IRuleInfoBuilder {
 
     @Override
     public IRuleInfo build() {
-        if (collectionBuilder == null) {
-            return buildUnit();
-        } else {
+        if (collectionBuilder != null) {
             return buildCollection();
+        } else if (mapBuilder != null) {
+            return buildMap();
+        } else {
+            return buildUnit();
         }
+    }
+
+    private IRuleInfo buildMap() {
+//        asserCollectionParams();
+//        checkCollectionGroup();
+        RuleInfoMap ruleInfo = new RuleInfoMap();
+        ruleInfo.setMapRule(mapBuilder.buildUnit());
+        ruleInfo.setKeyRule(mapKeyBuilder.buildUnit());
+        ruleInfo.setValueRule(mapValueBuilder.buildUnit());
+        ruleInfo.setGroup(groupName);
+        return ruleInfo;
     }
 
     private IRuleInfo buildCollection() {

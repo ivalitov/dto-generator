@@ -33,7 +33,7 @@ public class GeneratorsProviderByField extends GeneratorsProviderAbstract {
     }
 
     @SuppressWarnings("unchecked")
-    public IGenerator<?> getGenerator(Field field) {
+    IGenerator<?> getGenerator(Field field) {
 
         IGeneratorBuilder<?> genBuilder = overriddenBuildersForFields.get(field.getName());
 

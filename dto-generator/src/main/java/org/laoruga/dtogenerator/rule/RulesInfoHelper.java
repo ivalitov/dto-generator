@@ -8,6 +8,7 @@ import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.api.rules.meta.RuleForCollection;
 import org.laoruga.dtogenerator.api.rules.meta.Rules;
 import org.laoruga.dtogenerator.api.rules.meta.RulesForCollection;
+import org.laoruga.dtogenerator.constants.RuleType;
 
 import java.lang.annotation.Annotation;
 
@@ -30,7 +31,13 @@ public final class RulesInfoHelper {
             return NESTED_DTO_RULE;
         }
 
-        if (ruleAnnotation.annotationType().getDeclaredAnnotation(Rule.class) != null) {
+        Rule rule = ruleAnnotation.annotationType().getDeclaredAnnotation(Rule.class);
+
+        if (rule != null && rule.value() == RuleType.MAP) {
+            return RULE_FOR_MAP;
+        }
+
+        if (rule != null) {
             return RULE;
         }
 
@@ -46,16 +53,13 @@ public final class RulesInfoHelper {
             return RULES_FOR_COLLECTION;
         }
 
-
-
-
-
         return UNKNOWN;
 
     }
 
     public enum RuleTypeHelper {
         RULE,
+        RULE_FOR_MAP,
         RULE_FOR_COLLECTION,
         RULES,
         RULES_FOR_COLLECTION,

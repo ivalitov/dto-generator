@@ -68,6 +68,13 @@ public final class TypeGeneratorsDefaultConfigSupplier {
                 CollectionConfigDto.class,
                 false);
 
+        add(configSupplier,
+                MapRule.GENERATED_TYPE,
+                RulesInstance.MAP_RULE,
+                MapConfigDto.class,
+                false);
+
+
         GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER = ImmutableMap.copyOf(configSupplier);
     }
 

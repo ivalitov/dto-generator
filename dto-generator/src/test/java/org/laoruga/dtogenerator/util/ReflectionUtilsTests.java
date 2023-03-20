@@ -31,19 +31,19 @@ class ReflectionUtilsTests {
         return Stream.of(
                 DynamicTest.dynamicTest("Create list instance",
                         () -> assertEquals(ArrayList.class,
-                                ReflectionUtils.createCollectionInstance(ArrayList.class).getClass())),
+                                ReflectionUtils.createInstanceOfConcreteClass(ArrayList.class).getClass())),
 
                 DynamicTest.dynamicTest("Create set instance",
                         () -> assertEquals(HashSet.class,
-                                ReflectionUtils.createCollectionInstance(HashSet.class).getClass())),
+                                ReflectionUtils.createInstanceOfConcreteClass(HashSet.class).getClass())),
 
                 DynamicTest.dynamicTest("Error when interface passed",
                         () -> assertThrows(DtoGeneratorException.class,
-                                () -> ReflectionUtils.createCollectionInstance(Set.class))),
+                                () -> ReflectionUtils.createInstanceOfConcreteClass(Set.class))),
 
                 DynamicTest.dynamicTest("Error when abstract passed",
                         () -> assertThrows(DtoGeneratorException.class,
-                                () -> ReflectionUtils.createCollectionInstance(AbstractList.class)))
+                                () -> ReflectionUtils.createInstanceOfConcreteClass(AbstractList.class)))
         );
     }
 

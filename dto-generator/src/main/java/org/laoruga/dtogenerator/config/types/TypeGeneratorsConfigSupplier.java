@@ -5,6 +5,7 @@ import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
 
 import java.time.temporal.Temporal;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author Il'dar Valitov
@@ -24,4 +25,5 @@ public interface TypeGeneratorsConfigSupplier {
 
     CollectionConfigDto getCollectionConfig(Class<? extends Collection> collectionType);
 
+    MapConfigDto getMapConfig(Class<? extends Map> mapType);
 }

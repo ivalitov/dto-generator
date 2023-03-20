@@ -1,7 +1,6 @@
 package org.laoruga.dtogenerator.constants;
 
 import com.google.common.collect.ImmutableMap;
-import org.checkerframework.checker.units.qual.C;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 
@@ -27,6 +26,7 @@ public class GeneratedTypes {
         generatedTypes.put(DateTimeRule.class, new Class[]{DateTimeRule.GENERATED_TYPE});
         generatedTypes.put(EnumRule.class, new Class[]{EnumRule.GENERATED_TYPE});
         generatedTypes.put(CollectionRule.class, new Class[]{CollectionRule.GENERATED_TYPE});
+        generatedTypes.put(MapRule.class, new Class[]{MapRule.GENERATED_TYPE});
         generatedTypes.put(BooleanRule.class, new Class[]{BooleanRule.GENERATED_TYPE});
         generatedTypes.put(CustomRule.class, new Class[]{CustomRule.GENERATED_TYPE});
         generatedTypes.put(NestedDtoRule.class, new Class[]{NestedDtoRule.GENERATED_TYPE});

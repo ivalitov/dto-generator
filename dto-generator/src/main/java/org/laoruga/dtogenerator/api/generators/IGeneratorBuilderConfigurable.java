@@ -9,5 +9,5 @@ import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 
 public interface IGeneratorBuilderConfigurable<T> extends IGeneratorBuilder<T> {
 
-    IGenerator<? extends T> build(ConfigDto configDto, boolean merge);
+    IGenerator<T> build(ConfigDto configDto, boolean merge);
 }

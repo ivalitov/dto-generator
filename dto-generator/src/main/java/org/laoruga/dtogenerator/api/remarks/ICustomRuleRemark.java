@@ -2,6 +2,7 @@ package org.laoruga.dtogenerator.api.remarks;
 
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
+import org.laoruga.dtogenerator.util.dummy.DummyCustomGenerator;
 
 /**
  * The interface is designed to create remarks for custom generation rules.
@@ -20,7 +21,7 @@ public interface ICustomRuleRemark extends IRuleRemark {
      * @return - class of custom generator for which is intended this 'remark'
      */
     default Class<? extends ICustomGenerator<?>> getGeneratorClass() {
-        return CustomGeneratorStub.class;
+        return DummyCustomGenerator.class;
     }
 
 }

@@ -12,7 +12,10 @@ import org.laoruga.dtogenerator.generator.configs.*;
 import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
 
 import java.time.temporal.Temporal;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -93,6 +96,14 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         return (CollectionConfigDto) getConfigLazy(
                 generatedType,
                 CollectionConfigDto::new
+        );
+    }
+
+    @Override
+    public MapConfigDto getMapConfig(Class<? extends Map> generatedType) {
+        return (MapConfigDto) getConfigLazy(
+                generatedType,
+                MapConfigDto::new
         );
     }
 

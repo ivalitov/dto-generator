@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.api.remarks;
+package org.laoruga.dtogenerator.util.dummy;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -9,7 +9,7 @@ import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
  * Created on 08.02.2023
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CustomGeneratorStub implements ICustomGenerator<Object> {
+public class DummyCustomGenerator implements ICustomGenerator<Object> {
 
     @Override
     public Object generate() {

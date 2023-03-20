@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Pair;
 import org.laoruga.dtogenerator.FieldFilter;
+import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.api.rules.meta.Rules;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorValidationException;
+import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -60,6 +62,10 @@ public class RulesInfoExtractor {
                     extractRuleInfo(annotation);
                     break;
 
+                case RULE_FOR_MAP:
+                    extractMapRuleInfo((MapRule) annotation);
+                    break;
+
                 case RULE_FOR_COLLECTION:
                     extractCollectionRuleInfo(annotation);
                     break;
@@ -91,7 +97,36 @@ public class RulesInfoExtractor {
         return Optional.of(ruleInfoBuilder.build());
     }
 
+    private void extractMapRuleInfo(MapRule mapRule) {
+        String groupName = getGroupNameFromRuleAnnotation(mapRule);
+
+        if (!skipByGroup(groupName)) {
+
+            RuleInfoBuilder mapKeyBuilder = RuleInfo.builder();
+            extractRuleInfo(ReflectionUtils.getRuleOrNull(mapRule.key()), mapKeyBuilder);
+
+            RuleInfoBuilder mapValueBuilder = RuleInfo.builder();
+            extractRuleInfo(ReflectionUtils.getRuleOrNull(mapRule.value()), mapValueBuilder);
+
+            RuleInfoBuilder mapBuilder = RuleInfo.builder()
+                    .rule(mapRule)
+                    .ruleType(RuleType.getType(mapRule))
+                    .multipleRules(false)
+                    .groupName(groupName);
+
+            ruleInfoBuilder
+                    .mapRuleInfoBuilder(mapBuilder)
+                    .mapKeyRuleInfoBuilder(mapKeyBuilder)
+                    .mapValueRuleInfoBuilder(mapValueBuilder);
+        }
+
+    }
+
     private void extractRuleInfo(Annotation rule) {
+        extractRuleInfo(rule, ruleInfoBuilder);
+    }
+
+    private void extractRuleInfo(Annotation rule, RuleInfoBuilder ruleInfoBuilder) {
         String groupName = getGroupNameFromRuleAnnotation(rule);
         if (!skipByGroup(groupName)) {
             ruleInfoBuilder

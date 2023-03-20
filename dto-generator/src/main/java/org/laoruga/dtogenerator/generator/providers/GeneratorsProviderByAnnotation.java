@@ -1,8 +1,6 @@
 package org.laoruga.dtogenerator.generator.providers;
 
 import com.google.common.primitives.Primitives;
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.RemarksHolder;
@@ -18,10 +16,7 @@ import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsDefaultConfigSupplier;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.BooleanGenerator;
-import org.laoruga.dtogenerator.generator.CustomGenerator;
-import org.laoruga.dtogenerator.generator.DecimalGenerator;
-import org.laoruga.dtogenerator.generator.NumberGenerator;
+import org.laoruga.dtogenerator.generator.*;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolderGeneral;
 import org.laoruga.dtogenerator.generator.builder.builders.*;
@@ -45,7 +40,6 @@ import static org.laoruga.dtogenerator.constants.RulesInstance.NUMBER_RULE_ZEROS
  * Created on 24.11.2022
  */
 @Slf4j
-@Getter(AccessLevel.PROTECTED)
 public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
 
     private final GeneratorsProviderByType generatorsProviderByType;
@@ -66,25 +60,33 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
                                          IRuleInfo ruleInfo,
                                          Supplier<?> dtoInstanceSupplier,
                                          Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
+        return getGenerator(
+                ruleInfo,
+                field.getType(),
+                field.getName(),
+                dtoInstanceSupplier,
+                nestedDtoGeneratorSupplier
+        );
+    }
 
-        final Class<?> fieldType = field.getType();
-        final String fieldName = field.getName();
+    IGenerator<?> getGenerator(IRuleInfo ruleInfo,
+                               Class<?> generatedType,
+                               String fieldName,
+                               Supplier<?> dtoInstanceSupplier,
+                               Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
 
-        Optional<IGeneratorBuilder<?>> maybeUsersGenBuilder = getUsersGenBuilder(
-                ruleInfo.getRule(),
-                fieldType);
+        Optional<IGeneratorBuilder<?>> maybeUsersKeyGenBuilder = getUsersGenBuilder(generatedType);
 
-        boolean isUserBuilder = maybeUsersGenBuilder.isPresent();
-        IGeneratorBuilder<?> genBuilder = isUserBuilder ?
-                maybeUsersGenBuilder.get() :
-                getDefaultGenBuilder(
-                        ruleInfo.getRule(),
-                        fieldType);
+        boolean isUserBuilder = maybeUsersKeyGenBuilder.isPresent();
+
+        IGeneratorBuilder<?> generatorBuilder = isUserBuilder ?
+                maybeUsersKeyGenBuilder.get() :
+                getDefaultGenBuilder(ruleInfo.getRule(), generatedType);
 
         return buildGenerator(
                 ruleInfo.getRule(),
-                genBuilder,
-                fieldType,
+                generatorBuilder,
+                generatedType,
                 fieldName,
                 dtoInstanceSupplier,
                 nestedDtoGeneratorSupplier);
@@ -105,7 +107,7 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
                 + rules.annotationType().getName() + "', Genrated type: '" + generatedType.getName() + "'"));
     }
 
-    protected Optional<IGeneratorBuilder<?>> getUsersGenBuilder(Annotation rules, Class<?> generatedType) {
+    protected Optional<IGeneratorBuilder<?>> getUsersGenBuilder(Class<?> generatedType) {
         return userGeneratorBuildersHolder.getBuilder(generatedType);
     }
 
@@ -239,9 +241,64 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
         } catch (Exception e) {
             throw new DtoGeneratorException("Unexpected error.", e);
         }
+    }
 
+    protected void prepareCustomRemarks(IGenerator<?> generator, String fieldName) {
+        if (generator instanceof CustomGenerator) {
+            IGenerator<?> usersGeneratorInstance = ((CustomGenerator) generator).getUsersGeneratorInstance();
+            if (usersGeneratorInstance instanceof ICollectionGenerator) {
+
+                prepareCustomRemarks(
+                        ((ICollectionGenerator<?>) usersGeneratorInstance).getElementGenerator(),
+                        fieldName
+                );
+
+            } else if (usersGeneratorInstance instanceof MapGenerator) {
+
+                prepareCustomRemarks(
+                        ((MapGenerator) usersGeneratorInstance).getKeyGenerator(),
+                        fieldName
+                );
+
+                prepareCustomRemarks(
+                        ((MapGenerator) usersGeneratorInstance).getValueGenerator(),
+                        fieldName
+                );
+
+            } else if (usersGeneratorInstance instanceof ICustomGeneratorRemarkableArgs) {
+
+                ((ICustomGeneratorRemarkableArgs<?>) usersGeneratorInstance).setRuleRemarks(
+                        getRemarksHolder()
+                                .getCustomRemarks()
+                                .getRemarksWithArgs(fieldName, usersGeneratorInstance.getClass()));
+
+            } else if (usersGeneratorInstance instanceof ICustomGeneratorRemarkable) {
+
+                ((ICustomGeneratorRemarkable<?>) usersGeneratorInstance).setRuleRemarks(
+                        getRemarksHolder()
+                                .getCustomRemarks()
+                                .getRemarks(fieldName, usersGeneratorInstance.getClass())
+                );
+
+            }
+        }
 
     }
+
+    IGenerator<?> getGeneratorByType(Field field, Class<?> generatedType) {
+        Optional<IGenerator<?>> generatorByType = generatorsProviderByType.getGenerator(field, generatedType);
+
+        if (!generatorByType.isPresent()) {
+            throw new DtoGeneratorException("Generator wasn't found by type: '" + generatedType + "'" +
+                    " for field: '" + field.getType() + " " + field.getName() + "'");
+        }
+
+        return generatorByType.get();
+    }
+
+    /*
+     * Implementation of functional interfaces for code readability
+     */
 
     @SuppressWarnings("unchecked")
     BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>, IGenerator<?>> integerGeneratorSupplier(Class<?> fieldType,
@@ -284,33 +341,6 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
             }
             return builder.build(config, true);
         };
-    }
-
-    protected void prepareCustomRemarks(IGenerator<?> generator, String fieldName) {
-        if (generator instanceof CustomGenerator) {
-            IGenerator<?> usersGeneratorInstance = ((CustomGenerator) generator).getUsersGeneratorInstance();
-            if (usersGeneratorInstance instanceof ICollectionGenerator) {
-
-                prepareCustomRemarks(((ICollectionGenerator) usersGeneratorInstance)
-                        .getElementGenerator(), fieldName);
-
-            } else if (usersGeneratorInstance instanceof ICustomGeneratorRemarkableArgs) {
-
-                ((ICustomGeneratorRemarkableArgs<?>) usersGeneratorInstance).setRuleRemarks(
-                        getRemarksHolder()
-                                .getCustomRemarks()
-                                .getRemarksWithArgs(fieldName, usersGeneratorInstance.getClass()));
-
-            } else if (usersGeneratorInstance instanceof ICustomGeneratorRemarkable) {
-
-                ((ICustomGeneratorRemarkable<?>) usersGeneratorInstance).setRuleRemarks(
-                        getRemarksHolder()
-                                .getCustomRemarks()
-                                .getRemarks(fieldName, usersGeneratorInstance.getClass()));
-
-            }
-        }
-
     }
 
     /*

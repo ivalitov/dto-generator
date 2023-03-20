@@ -2,9 +2,9 @@ package org.laoruga.dtogenerator;
 
 import lombok.NonNull;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
-import org.laoruga.dtogenerator.api.remarks.CustomGeneratorStub;
 import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
 import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemarkArgs;
+import org.laoruga.dtogenerator.util.dummy.DummyCustomGenerator;
 
 import java.util.*;
 
@@ -65,7 +65,7 @@ public class RemarksHolderCustom {
                 isCustomRuleRemarkExists(remarkableGeneratorClass) ? getRemarks(remarkableGeneratorClass) : null;
 
         Set<ICustomRuleRemark> mappedByAnyGenerator =
-                isCustomRuleRemarkExists(CustomGeneratorStub.class) ? getRemarks(CustomGeneratorStub.class) : null;
+                isCustomRuleRemarkExists(DummyCustomGenerator.class) ? getRemarks(DummyCustomGenerator.class) : null;
 
         if (mappedByAnyGenerator != null) {
             if (mappedByGenerator == null) {
@@ -99,7 +99,7 @@ public class RemarksHolderCustom {
                 isCustomRuleRemarkExists(remarkableGeneratorClass) ? getRemarks(remarkableGeneratorClass) : null;
 
         Set<ICustomRuleRemark> mappedByAnyGenerator =
-                isCustomRuleRemarkExists(CustomGeneratorStub.class) ? getRemarks(CustomGeneratorStub.class) : null;
+                isCustomRuleRemarkExists(DummyCustomGenerator.class) ? getRemarks(DummyCustomGenerator.class) : null;
 
         if (mappedByAnyGenerator != null) {
             if (mappedByGenerator == null) {

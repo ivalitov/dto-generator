@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  * @author Il'dar Valitov
  * Created on 19.02.2023
  */
-public class CollectionGeneratorBuilder implements IGeneratorBuilderConfigurable<Collection> {
+public class CollectionGeneratorBuilder implements IGeneratorBuilderConfigurable<Collection<?>> {
     protected final CollectionConfigDto configDto;
 
     public CollectionGeneratorBuilder() {

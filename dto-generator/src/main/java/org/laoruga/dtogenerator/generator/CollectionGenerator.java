@@ -61,7 +61,7 @@ public class CollectionGenerator<T> implements ICollectionGenerator<T> {
                 if (ineffectiveAttempts == maxAttempts) {
                     throw new DtoGeneratorException("Expected size: '" + size + "' of collection: '"
                             + collectionInstance.getClass() + "' can't be reached. After '" + ineffectiveAttempts
-                            + "' attempts collection size is: '"
+                            + "' attempts collection has size: '"
                             + collectionInstance.size() + "'");
                 }
             }

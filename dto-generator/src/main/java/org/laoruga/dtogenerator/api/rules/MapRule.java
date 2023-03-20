@@ -1,27 +1,36 @@
 package org.laoruga.dtogenerator.api.rules;
 
-import org.laoruga.dtogenerator.api.rules.meta.RuleForCollection;
+import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.constants.Group;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.util.dummy.DummyCollectionClass;
+import org.laoruga.dtogenerator.constants.RuleType;
+import org.laoruga.dtogenerator.util.dummy.DummyMapClass;
 
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.util.Collection;
+import java.util.Map;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * @author Il'dar Valitov
+ * Created on 17.03.2023
+ */
 @Retention(RUNTIME)
 @Target(FIELD)
-@RuleForCollection
-@Repeatable(CollectionRules.class)
-public @interface CollectionRule {
+@Rule(RuleType.MAP)
+@Repeatable(MapRules.class)
+public @interface MapRule {
 
-    Class<?> GENERATED_TYPE = Collection.class;
+    Class<?> GENERATED_TYPE = Map.class;
 
-    Class<? extends Collection> collectionClass() default DummyCollectionClass.class;
+    Entry key();
+
+    Entry value();
+
+    Class<? extends Map> mapClass() default DummyMapClass.class;
 
     int maxSize() default 10;
 

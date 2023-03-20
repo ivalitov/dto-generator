@@ -3,6 +3,7 @@ package org.laoruga.dtogenerator.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.laoruga.dtogenerator.api.rules.Entry;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
@@ -22,9 +23,11 @@ import static java.util.stream.Collectors.joining;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReflectionUtils {
     private static final String TYPE_WITH_SINGLE_GENERIC_TYPE_REGEXP = "[a-zA-Z0-9_.]*<[$a-zA-Z0-9_.]*>";
+    private static final String TYPE_WITH_PAIRED_GENERIC_TYPE_REGEXP = "[a-zA-Z0-9_.]*<[$a-zA-Z0-9_.]*, [$a-zA-Z0-9_.]*>";
     private static final Pattern SINGLE_GENERIC_TYPE_REGEXP = Pattern.compile("<([$a-zA-Z0-9_.]*)>");
+    private static final Pattern PAIRED_GENERIC_TYPE_REGEXP = Pattern.compile("<([$a-zA-Z0-9_.]*), ([$a-zA-Z0-9_.]*)>");
 
-    public static Object extractSingeGenericType(String typeName) {
+    public static Class<?> extractSingeGenericType(String typeName) {
 
         if (!typeName.matches(TYPE_WITH_SINGLE_GENERIC_TYPE_REGEXP)) {
             throw new DtoGeneratorException("Next type must have single generic type: '" + typeName + "'");
@@ -39,8 +42,27 @@ public final class ReflectionUtils {
         return getClass(matcher.group(1), typeName);
     }
 
+    public static Class<?>[] extractPairedGenericType(String typeName) {
+
+        if (!typeName.matches(TYPE_WITH_PAIRED_GENERIC_TYPE_REGEXP)) {
+            throw new DtoGeneratorException("Next type must have pair of generic type: '" + typeName + "'");
+        }
+
+        Matcher matcher = PAIRED_GENERIC_TYPE_REGEXP.matcher(typeName);
+
+        if (!matcher.find()) {
+            throw new DtoGeneratorException("Cannot find pair of generic types using next regex pattern: "
+                    + PAIRED_GENERIC_TYPE_REGEXP.pattern() + " in type: '" + typeName + "'");
+        }
+        return new Class[]{getClass(matcher.group(1), typeName), getClass(matcher.group(2), typeName)};
+    }
+
     public static Class<?> getSingleGenericType(Field field) throws DtoGeneratorException {
-        return (Class<?>) extractSingeGenericType(field.getGenericType().getTypeName());
+        return extractSingeGenericType(field.getGenericType().getTypeName());
+    }
+
+    public static Class<?>[] getPairedGenericType(Field field) throws DtoGeneratorException {
+        return extractPairedGenericType(field.getGenericType().getTypeName());
     }
 
     private static Class<?> getClass(String className, String typeName) {
@@ -89,6 +111,35 @@ public final class ReflectionUtils {
         }
     }
 
+    // TODO merge with previous method?
+
+    /**
+     * 1. Filed type should be assignable from required concreateClass
+     * 2. CollectionClass should not be an interface or abstract
+     *
+     * @param concreteClass - class of collection
+     * @param <T>            - collection element type
+     * @return - new collection instance
+     */
+    public static <T> T createInstanceOfConcreteClass(Class<T> concreteClass) {
+        if (concreteClass.isInterface() || Modifier.isAbstract(concreteClass.getModifiers())) {
+            throw new DtoGeneratorException("Can't create instance of '" + concreteClass + "' because" +
+                    " it is interface or abstract.");
+        }
+        T instance;
+        try {
+            instance = concreteClass.newInstance();
+        } catch (Exception e) {
+            log.error("Exception while creating instance ", e);
+            throw new DtoGeneratorException(e);
+        }
+        return instance;
+    }
+
+    public static Object createInstanceOfConcreteClassAsObject(Class<?> concreteClass) {
+        return createInstanceOfConcreteClass(concreteClass);
+    }
+
     private static boolean isTypesAssignableFromObjects(Class<?>[] types, Object[] objects) {
 
         if (types.length != objects.length) {
@@ -102,30 +153,6 @@ public final class ReflectionUtils {
         }
 
         return true;
-    }
-
-
-    /**
-     * 1. Filed type should be assignable from required collectionClass
-     * 2. CollectionClass should not be an interface or abstract
-     *
-     * @param collectionClass - class of collection
-     * @param <T>             - collection element type
-     * @return - new collection instance
-     */
-    public static <T> T createCollectionInstance(Class<T> collectionClass) {
-        if (collectionClass.isInterface() || Modifier.isAbstract(collectionClass.getModifiers())) {
-            throw new DtoGeneratorException("Can't create instance of '" + collectionClass + "' because" +
-                    " it is interface or abstract.");
-        }
-        T collectionInstance;
-        try {
-            collectionInstance = collectionClass.newInstance();
-        } catch (Exception e) {
-            log.error("Exception while creating Collection instance ", e);
-            throw new DtoGeneratorException(e);
-        }
-        return collectionInstance;
     }
 
     /**
@@ -161,6 +188,15 @@ public final class ReflectionUtils {
         }
     }
 
+    public static <T> T[] invokeMethodReturningArray(Object sourceClass, String fieldName, Class<T> returnedType) {
+        try {
+            Method method = sourceClass.getClass().getMethod(fieldName);
+            return (T[]) method.invoke(sourceClass);
+        } catch (Exception e) {
+            throw new DtoGeneratorException("Unable to get value of the field: '" + fieldName + "'", e);
+        }
+    }
+
     public static Annotation[] getRepeatableAnnotations(Annotation repeatableAnnotationSource) {
         try {
             Method value = repeatableAnnotationSource.annotationType().getMethod("value");
@@ -181,8 +217,26 @@ public final class ReflectionUtils {
         try {
             return (T) sourceClass.getMethod(methodName).invoke(sourceClass);
         } catch (Exception e) {
-            throw new DtoGeneratorException("Error while static method invocation", e);
+            throw new DtoGeneratorException("Error during invocation of static method: '" + methodName + "'" +
+                    " of class: '" + sourceClass.getName() + "" , e);
         }
     }
 
+    public static Annotation getRuleOrNull(Entry mapRule) {
+        Class<? extends Annotation> clazz = mapRule.annotationType();
+        Annotation found = null;
+        for (Method method : clazz.getMethods()) {
+            if (method.getName().endsWith("Rule")) {
+                Annotation[] values =
+                        invokeMethodReturningArray(mapRule, method.getName(), Annotation.class);
+                if (values.length >= 1) {
+                    if (values.length > 1 || found != null) {
+                        log.error("More than one annotation found in: " + mapRule);
+                    }
+                    found = values[0];
+                }
+            }
+        }
+        return found;
+    }
 }

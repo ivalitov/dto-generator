@@ -2,11 +2,17 @@ package org.laoruga.dtogenerator.generator.builder;
 
 import com.google.common.primitives.Primitives;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
+import org.laoruga.dtogenerator.api.rules.CollectionRule;
+import org.laoruga.dtogenerator.api.rules.EnumRule;
+import org.laoruga.dtogenerator.api.rules.MapRule;
+import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
-import java.time.temporal.Temporal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * An instance contain all the possible to use generator providers.
@@ -37,15 +43,19 @@ public final class GeneratorBuildersHolder {
         GeneratorBuilderInfo foundInfo = buildersInfoMapByGeneratedType.get(generatedType);
 
         if (foundInfo == null && generatedType.isEnum()) {
-            foundInfo = buildersInfoMapByGeneratedType.get(Enum.class);
+            foundInfo = buildersInfoMapByGeneratedType.get(EnumRule.GENERATED_TYPE);
         }
 
-        if (foundInfo == null && Collection.class.isAssignableFrom(generatedType)) {
-            foundInfo = buildersInfoMapByGeneratedType.get(Collection.class);
+        if (foundInfo == null && CollectionRule.GENERATED_TYPE.isAssignableFrom(generatedType)) {
+            foundInfo = buildersInfoMapByGeneratedType.get(CollectionRule.GENERATED_TYPE);
         }
 
-        if (foundInfo == null && Temporal.class.isAssignableFrom(generatedType)) {
-            foundInfo = buildersInfoMapByGeneratedType.get(Temporal.class);
+        if (foundInfo == null && DateTimeRule.GENERATED_TYPE.isAssignableFrom(generatedType)) {
+            foundInfo = buildersInfoMapByGeneratedType.get(DateTimeRule.GENERATED_TYPE);
+        }
+
+        if (foundInfo == null && MapRule.GENERATED_TYPE.isAssignableFrom(generatedType)) {
+            foundInfo = buildersInfoMapByGeneratedType.get(MapRule.GENERATED_TYPE);
         }
 
         if (foundInfo == null) {

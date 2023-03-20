@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.util;
+package org.laoruga.dtogenerator.util.dummy;
 
 import java.util.Collection;
 import java.util.Iterator;
