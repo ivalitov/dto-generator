@@ -8,9 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
-import org.laoruga.dtogenerator.api.rules.meta.RuleForCollection;
 import org.laoruga.dtogenerator.api.rules.meta.Rules;
-import org.laoruga.dtogenerator.api.rules.meta.RulesForCollection;
 import org.laoruga.dtogenerator.constants.GeneratedTypes;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorValidationException;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
@@ -28,9 +26,7 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.getRepeatableAnnotat
  * Validates that array of annotations contains:
  * - no more than one {@link Rule} annotation
  * - no more than one {@link Rules} annotation
- * - no more than one {@link RuleForCollection} annotation
- * - no more than one {@link RulesForCollection} annotation
- * - if there is RuleForCollection(-s) exists, then Rule(-s) also has to be (to providing collection item rules)
+ * - if there is Rules(-s) exists, then Rule(-s) also has to be (to providing collection item rules)
  *
  * @author Il'dar Valitov
  * Created on 11.11.2022

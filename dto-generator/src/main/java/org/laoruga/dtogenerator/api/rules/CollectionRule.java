@@ -1,8 +1,9 @@
 package org.laoruga.dtogenerator.api.rules;
 
-import org.laoruga.dtogenerator.api.rules.meta.RuleForCollection;
+import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.constants.Group;
 import org.laoruga.dtogenerator.constants.RuleRemark;
+import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.util.dummy.DummyCollectionClass;
 
 import java.lang.annotation.Repeatable;
@@ -15,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(FIELD)
-@RuleForCollection
+@Rule(RuleType.COLLECTION)
 @Repeatable(CollectionRules.class)
 public @interface CollectionRule {
 

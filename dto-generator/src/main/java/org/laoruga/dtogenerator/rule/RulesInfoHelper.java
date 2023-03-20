@@ -5,9 +5,7 @@ import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
-import org.laoruga.dtogenerator.api.rules.meta.RuleForCollection;
 import org.laoruga.dtogenerator.api.rules.meta.Rules;
-import org.laoruga.dtogenerator.api.rules.meta.RulesForCollection;
 import org.laoruga.dtogenerator.constants.RuleType;
 
 import java.lang.annotation.Annotation;
@@ -33,28 +31,30 @@ public final class RulesInfoHelper {
 
         Rule rule = ruleAnnotation.annotationType().getDeclaredAnnotation(Rule.class);
 
-        if (rule != null && rule.value() == RuleType.MAP) {
-            return RULE_FOR_MAP;
-        }
-
         if (rule != null) {
+
+            if (rule.value() == RuleType.MAP) {
+                return RULE_FOR_MAP;
+            }
+
+            if (rule.value() == RuleType.COLLECTION) {
+                return RULE_FOR_COLLECTION;
+            }
+
             return RULE;
         }
 
-        if (ruleAnnotation.annotationType().getDeclaredAnnotation(RuleForCollection.class) != null) {
-            return RULE_FOR_COLLECTION;
-        }
+        Rules rules = ruleAnnotation.annotationType().getDeclaredAnnotation(Rules.class);
 
-        if (ruleAnnotation.annotationType().getDeclaredAnnotation(Rules.class) != null) {
+        if (rules != null) {
+            if (rules.value() == RuleType.COLLECTION) {
+                return RULES_FOR_COLLECTION;
+            }
+
             return RULES;
         }
 
-        if (ruleAnnotation.annotationType().getDeclaredAnnotation(RulesForCollection.class) != null) {
-            return RULES_FOR_COLLECTION;
-        }
-
         return UNKNOWN;
-
     }
 
     public enum RuleTypeHelper {

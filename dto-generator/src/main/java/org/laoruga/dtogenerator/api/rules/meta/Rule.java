@@ -10,7 +10,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Retention(RUNTIME)
 @Target(ANNOTATION_TYPE)
-@Rule
 public @interface Rule {
 
     RuleType value() default RuleType.BASIC;
