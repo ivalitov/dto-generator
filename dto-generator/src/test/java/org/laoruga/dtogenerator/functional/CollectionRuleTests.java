@@ -29,22 +29,22 @@ public class CollectionRuleTests {
 
     static class Dto {
 
-        @CollectionRule @StringRule
+        @CollectionRule(element = @Entry(stringRule = @StringRule))
         List<String> listOfString;
 
-        @CollectionRule @NumberRule
+        @CollectionRule(element = @Entry(numberRule = @NumberRule))
         Set<Integer> setOfInteger;
 
-        @CollectionRule @DateTimeRule
+        @CollectionRule(element = @Entry(dateTimeRule = @DateTimeRule))
         Queue<Year> queueOfYear;
 
-        @CollectionRule @DecimalRule
+        @CollectionRule(element = @Entry(decimalRule = @DecimalRule))
         LinkedList<Double> linkedListOfDouble;
 
-        @CollectionRule @NumberRule
+        @CollectionRule(element = @Entry(numberRule = @NumberRule))
         LinkedHashSet<AtomicInteger> linkedHashSetOfAtomicInteger;
 
-        @CollectionRule @EnumRule
+        @CollectionRule(element = @Entry(enumRule = @EnumRule))
         ArrayDeque<Planets> arrayDequeOfEnum;
 
     }

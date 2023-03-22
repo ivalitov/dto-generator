@@ -1,14 +1,20 @@
 package org.laoruga.dtogenerator.rule;
 
+import com.google.common.primitives.Primitives;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.api.rules.meta.Rules;
+import org.laoruga.dtogenerator.constants.GeneratedTypes;
 import org.laoruga.dtogenerator.constants.RuleType;
+import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.exceptions.DtoGeneratorValidationException;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
 import static org.laoruga.dtogenerator.rule.RulesInfoHelper.RuleTypeHelper.*;
 
@@ -60,6 +66,56 @@ public final class RulesInfoHelper {
         }
 
         return UNKNOWN;
+    }
+
+    public static void validateType(Class<?> generatedType, Annotation rulesAnnotation) {
+        generatedType = Primitives.wrap(generatedType);
+
+        Class<?>[] possibleGeneratedTypes = GeneratedTypes.get(rulesAnnotation.annotationType());
+
+        boolean match = false;
+        for (Class<?> knownElementType : possibleGeneratedTypes) {
+            if (knownElementType.isAssignableFrom(generatedType)) {
+                match = true;
+                break;
+            }
+        }
+
+        if (!match) {
+            throw new DtoGeneratorException("Field type or generic type: '" + generatedType + "'"
+                    + " does not match to rules annotation: '@" + rulesAnnotation.annotationType().getSimpleName() + "'"
+                    + " Expected types of the field:\n" + Arrays.asList(possibleGeneratedTypes) + "\n");
+        }
+    }
+
+    public static Annotation getSingleRulesOrNull(Annotation[] annotations) {
+
+        Annotation selected = null;
+
+        for (Annotation annotation : annotations) {
+
+            RuleTypeHelper helperType = getHelperType(annotation);
+            if (helperType != UNKNOWN) {
+                if (selected != null) {
+                    throw new DtoGeneratorValidationException(
+                            "Found @Rule annotations at least for 2 different types: " +
+                                    "'" + selected.annotationType().getSimpleName() + "'" +
+                                    "'" + annotation.annotationType().getSimpleName() + "'");
+                }
+                selected = annotation;
+            }
+
+        }
+
+        return selected;
+    }
+
+    static String getGroupNameFromRuleAnnotation(Annotation rule) {
+        try {
+            return (String) rule.annotationType().getMethod("group").invoke(rule);
+        } catch (IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
+            throw new DtoGeneratorException("Unexpected exception. Can't get 'group' from rules annotation", e);
+        }
     }
 
     public enum RuleTypeHelper {

@@ -52,7 +52,7 @@ public class GeneratorsProviderByAnnotationForCollection {
 
         IGenerator<?> elementGenerator = collectionRuleInfo.isElementRulesExist() ?
                 generatorsProvider.getGenerator(
-                        collectionRuleInfo.getElementRule(),
+                        collectionRuleInfo.getElementRuleInfo(),
                         collectionElementType,
                         fieldName,
                         dtoInstanceSupplier,

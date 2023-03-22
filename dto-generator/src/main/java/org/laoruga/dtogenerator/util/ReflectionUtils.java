@@ -5,9 +5,13 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.rules.Entry;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.exceptions.DtoGeneratorValidationException;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -118,7 +122,7 @@ public final class ReflectionUtils {
      * 2. CollectionClass should not be an interface or abstract
      *
      * @param concreteClass - class of collection
-     * @param <T>            - collection element type
+     * @param <T>           - collection element type
      * @return - new collection instance
      */
     public static <T> T createInstanceOfConcreteClass(Class<T> concreteClass) {
@@ -166,28 +170,8 @@ public final class ReflectionUtils {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> T getDefaultMethodValue(Class<? extends Annotation> annotationClass,
-                                              String methodName,
-                                              Class<T> valueType) throws NoSuchMethodException {
-        Method declaredMethod = annotationClass.getDeclaredMethod(methodName);
-        Object defaultValue = declaredMethod.getDefaultValue();
-        if (defaultValue.getClass() == valueType) {
-            return (T) defaultValue;
-        }
-        throw new ClassCastException("Field");
-    }
 
     @SuppressWarnings("unchecked")
-    public static <T> T[] getStaticFieldValueArray(Class<?> sourceClass, String fieldName, Class<T> fieldType) {
-        try {
-            Field field = sourceClass.getField(fieldName);
-            return (T[]) field.get(sourceClass);
-        } catch (Exception e) {
-            throw new DtoGeneratorException("Unable to get value of the field: '" + fieldName + "'", e);
-        }
-    }
-
     public static <T> T[] invokeMethodReturningArray(Object sourceClass, String fieldName, Class<T> returnedType) {
         try {
             Method method = sourceClass.getClass().getMethod(fieldName);
@@ -197,32 +181,17 @@ public final class ReflectionUtils {
         }
     }
 
-    public static Annotation[] getRepeatableAnnotations(Annotation repeatableAnnotationSource) {
-        try {
-            Method value = repeatableAnnotationSource.annotationType().getMethod("value");
-            Object arr = value.invoke(repeatableAnnotationSource);
-            Annotation[] copy = new Annotation[Array.getLength(arr)];
-            Array.getLength(arr);
-            for (int i = 0; i < copy.length; i++) {
-                copy[i] = (Annotation) Array.get(arr, 0);
-            }
-            return copy;
-        } catch (Exception e) {
-            throw new DtoGeneratorException("Error while extracting first of repeatable annotation", e);
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public static <T> T callStaticMethod(String methodName, Class<?> sourceClass, Class<T> returnType) {
         try {
             return (T) sourceClass.getMethod(methodName).invoke(sourceClass);
         } catch (Exception e) {
             throw new DtoGeneratorException("Error during invocation of static method: '" + methodName + "'" +
-                    " of class: '" + sourceClass.getName() + "" , e);
+                    " of class: '" + sourceClass.getName() + "", e);
         }
     }
 
-    public static Annotation getRuleOrNull(Entry mapRule) {
+    public static Annotation getSingleRuleFromEntry(Entry mapRule) throws DtoGeneratorValidationException {
         Class<? extends Annotation> clazz = mapRule.annotationType();
         Annotation found = null;
         for (Method method : clazz.getMethods()) {
@@ -231,11 +200,14 @@ public final class ReflectionUtils {
                         invokeMethodReturningArray(mapRule, method.getName(), Annotation.class);
                 if (values.length >= 1) {
                     if (values.length > 1 || found != null) {
-                        log.error("More than one annotation found in: " + mapRule);
+                        throw new DtoGeneratorValidationException("More than one annotation found in: '" + mapRule + "'");
                     }
                     found = values[0];
                 }
             }
+        }
+        if (found == null) {
+            throw new DtoGeneratorValidationException("Empty '" + Entry.class.getName() + "' annotation.");
         }
         return found;
     }

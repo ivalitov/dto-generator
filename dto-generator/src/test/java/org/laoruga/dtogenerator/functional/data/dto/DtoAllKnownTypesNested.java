@@ -42,16 +42,13 @@ public class DtoAllKnownTypesNested {
     @EnumRule
     ClientType clientType;
 
-    @CollectionRule
-    @DecimalRule
+    @CollectionRule(element = @Entry(decimalRule = @DecimalRule))
     List<Double> listOfDouble;
 
-    @CollectionRule
-    @NumberRule
+    @CollectionRule(element = @Entry(numberRule = @NumberRule))
     Set<Integer> setOfInteger;
 
-    @CollectionRule
-    @EnumRule
+    @CollectionRule(element = @Entry(enumRule = @EnumRule))
     LinkedList<ClientType> linkedListOfEnum;
 
     Map<String, Integer> stringIntegerMap;

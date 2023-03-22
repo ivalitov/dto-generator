@@ -1,6 +1,7 @@
 package org.laoruga.dtogenerator.rule;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.laoruga.dtogenerator.constants.RuleType;
@@ -15,6 +16,7 @@ import java.util.Objects;
  */
 @Setter(AccessLevel.PACKAGE)
 @Getter
+@Builder
 public class RuleInfoMap implements IRuleInfo {
     private IRuleInfo mapRule;
     private IRuleInfo keyRule;

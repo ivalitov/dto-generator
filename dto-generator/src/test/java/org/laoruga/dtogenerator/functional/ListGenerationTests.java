@@ -12,10 +12,7 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.UtilsRoot;
-import org.laoruga.dtogenerator.api.rules.BooleanRule;
-import org.laoruga.dtogenerator.api.rules.CollectionRule;
-import org.laoruga.dtogenerator.api.rules.NumberRule;
-import org.laoruga.dtogenerator.api.rules.StringRule;
+import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
@@ -46,24 +43,25 @@ class ListGenerationTests {
     @NoArgsConstructor
     static class DtoList {
 
-        @CollectionRule(collectionClass = LinkedList.class)
-        @StringRule
+        @CollectionRule(
+                collectionClass = LinkedList.class,
+                element = @Entry(stringRule = @StringRule))
         private List<String> linkedListOfStrings;
 
-        @CollectionRule(collectionClass = Vector.class)
-        @StringRule
+        @CollectionRule(
+                collectionClass = Vector.class,
+                element = @Entry(stringRule = @StringRule))
         private List<String> vectorOfStrings;
 
-        @CollectionRule
-        @StringRule
+        @CollectionRule(element = @Entry(stringRule = @StringRule))
         private ArrayList<String> arrayListOfStringsImplicit;
 
-        @CollectionRule(collectionClass = LinkedList.class)
-        @StringRule
+        @CollectionRule(
+                collectionClass = LinkedList.class,
+                element = @Entry(stringRule = @StringRule))
         private LinkedList<String> linkedListOfStringsImplicit;
 
-        @CollectionRule
-        @NumberRule
+        @CollectionRule(element = @Entry(numberRule = @NumberRule))
         private List<AtomicInteger> listOfAtomicInteger;
     }
 
@@ -141,12 +139,15 @@ class ListGenerationTests {
     @Getter
     static class DtoVariousTypes {
 
-        @CollectionRule(minSize = 10)
-        @BooleanRule(trueProbability = 1)
+        @CollectionRule(
+                minSize = 10,
+                element = @Entry(booleanRule = @BooleanRule(trueProbability = 1)))
         private List<Boolean> listOfBoolean;
 
-        @CollectionRule(minSize = 2, maxSize = 2)
-        @NumberRule(minInt = 777, maxInt = 777)
+        @CollectionRule(
+                minSize = 2,
+                maxSize = 2,
+                element = @Entry(numberRule = @NumberRule(minInt = 777, maxInt = 777)))
         private List<AtomicInteger> listOfAtomicInteger;
 
     }
@@ -199,25 +200,29 @@ class ListGenerationTests {
 
     @Getter
     static class DtoWithWildcardList {
-        @CollectionRule
-        @StringRule
+        @CollectionRule(
+                collectionClass = Vector.class,
+                element = @Entry(stringRule = @StringRule))
         List<?> wildCardList;
     }
 
     @Getter
     static class DtoWithRawList {
-        @CollectionRule
-        @NumberRule
+        @CollectionRule(
+                collectionClass = Vector.class,
+                element = @Entry(numberRule = @NumberRule))
         List rawList;
     }
 
     @Getter
     static class DtoWithListOfCollections {
-        @CollectionRule()
-        @CollectionRule()
+        @CollectionRule(element = @Entry)
+        @CollectionRule(element = @Entry)
         List<Set<String>> listOfSet;
 
-        @CollectionRule(collectionClass = LinkedList.class)
+        @CollectionRule(
+                collectionClass = LinkedList.class,
+                element = @Entry)
         List<String> listOfString;
     }
 
@@ -265,17 +270,15 @@ class ListGenerationTests {
         assertEquals(2, errorsMap.size());
         assertTrue(errorsMap.containsKey("listOfSet"));
         assertThat(errorsMap.get("listOfSet").getCause().getMessage(),
-                containsString(ERROR_MSG_PART));
+                containsString("is repeating for field"));
         assertTrue(errorsMap.containsKey("listOfString"));
         assertThat(errorsMap.get("listOfString").getCause().getMessage(),
-                containsString(ERROR_MSG_PART));
-
+                containsString("Empty '" + Entry.class.getName() + "' annotation."));
     }
 
     static class Dto3 {
 
-        @CollectionRule
-        @NumberRule
+        @CollectionRule(element = @Entry(numberRule = @NumberRule))
         List<String> some;
 
     }
@@ -293,26 +296,28 @@ class ListGenerationTests {
 
         assertThat(errorsMap.size(), equalTo(1));
         assertThat(errorsMap.get("some").getCause().getMessage(),
-                stringContainsInOrder("Wrong collection element type"));
+                stringContainsInOrder("'class java.lang.String' does not match to rules annotation: '@NumberRule'"));
     }
 
     @Getter
     @NoArgsConstructor
     static class DtoSet {
-        @CollectionRule
-        @NumberRule
+
+
+        @CollectionRule(element = @Entry(numberRule = @NumberRule))
         Set<Integer> numbers;
 
-        @CollectionRule(collectionClass = LinkedHashSet.class)
-        @NumberRule
+        @CollectionRule(
+                collectionClass = LinkedHashSet.class,
+                element = @Entry(numberRule = @NumberRule))
         Set<Integer> linkedHashSet;
 
-        @CollectionRule(collectionClass = TreeSet.class)
-        @NumberRule
+        @CollectionRule(
+                collectionClass = TreeSet.class,
+                element = @Entry(numberRule = @NumberRule))
         TreeSet<Integer> treeSet;
 
-        @CollectionRule
-        @NumberRule
+        @CollectionRule(element = @Entry(numberRule = @NumberRule))
         HashSet<Integer> hashSet;
     }
 

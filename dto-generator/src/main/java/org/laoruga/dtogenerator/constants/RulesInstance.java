@@ -23,11 +23,8 @@ public final class RulesInstance {
     @DecimalRule
     @EnumRule
     @DateTimeRule
-    @CollectionRule
-    @MapRule(
-            key = @Entry,
-            value = @Entry
-    )
+    @CollectionRule(element = @Entry)
+    @MapRule(key = @Entry, value = @Entry)
     @CustomRule(generatorClass = Object.class)
     @NestedDtoRule
     private static final Object ANNOTATIONS = null;
@@ -76,7 +73,7 @@ public final class RulesInstance {
 
     private static <T extends Annotation> T getAnnotationInstance(Field field, Class<T> annotationClass) {
         return Objects.requireNonNull(field.getDeclaredAnnotation(annotationClass),
-                "Annotation instance was not set for class: '" + annotationClass + "'");
+                "Annotation instance not set for an annotation class: '" + annotationClass + "'");
     }
 
 }

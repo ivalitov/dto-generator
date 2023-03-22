@@ -35,7 +35,7 @@ class BuilderReuseTests {
 
     @Test
     @DisplayName("Generating of two DTO instances")
-    void generateToDtoInstances() {
+    void generateTwoDtoInstances() {
 
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
         builder.getTypeGeneratorConfig().getCollectionConfig(List.class).setCollectionInstanceSupplier(LinkedList::new);
@@ -86,6 +86,7 @@ class BuilderReuseTests {
         );
     }
 
+    // TODO flaky test
     @Test
     @DisplayName("Concurrent Execution")
     @SneakyThrows

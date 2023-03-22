@@ -22,6 +22,8 @@ public @interface CollectionRule {
 
     Class<?> GENERATED_TYPE = Collection.class;
 
+    Entry element();
+
     Class<? extends Collection> collectionClass() default DummyCollectionClass.class;
 
     int maxSize() default 10;

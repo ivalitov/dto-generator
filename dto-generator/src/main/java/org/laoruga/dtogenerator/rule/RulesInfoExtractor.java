@@ -22,8 +22,11 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.laoruga.dtogenerator.rule.RulesInfoHelper.validateType;
 
 /**
+ * Extracts information of generation rules and validates, for further processing.
+ *
  * @author Il'dar Valitov
  * Created on 21.07.2022
  */
@@ -33,134 +36,175 @@ import java.util.Set;
 public class RulesInfoExtractor {
 
     private final FieldFilter fieldsGroupFilter;
-    private RuleInfoBuilder ruleInfoBuilder;
+
+    private Field field;
 
     /**
-     * Extracts rules information from {@link Rule} and {@link Rules} annotations of the field
-     * considering the group {@link FieldFilter}.
+     * Extracts information from {@link Rule} and {@link Rules} annotations of the field
+     * considering the filtering group {@link FieldFilter}.
      * <p>
-     * This method validates if {@link Rule} annotations represented in the correct quantity.
-     * But doesn't validate whether {@link Rule} annotations matched to the type of the field or not.
+     * Method validates:
+     * - if {@link Rule} annotations are represented in the correct quantity;
+     * - if {@link Rule} annotations matched to the type of the field.
+     * <p>
+     * Method is synchronized, it works with {@link RulesInfoExtractor#field}.
      *
-     * @param field - field containing {@link Rule} and/or {@link Rules} annotations
+     * @param fieldToInspect - field containing {@link Rule} and/or {@link Rules} annotations
      * @return - an empty Optional if Rules excluded by group filter {@link FieldFilter},
      * otherwise {@link IRuleInfo} object containing rules information.
      * @throws DtoGeneratorValidationException - if rules annotations quantity check failed.
      */
-    synchronized public Optional<IRuleInfo> extractRulesInfo(Field field) throws DtoGeneratorValidationException {
+    synchronized public Optional<IRuleInfo> extractRulesInfo(Field fieldToInspect) throws DtoGeneratorValidationException {
 
-        RuleAnnotationsValidationHelper.validate(field);
+        this.field = fieldToInspect;
 
-        ruleInfoBuilder = new RuleInfoBuilder();
+        Annotation annotation = RulesInfoHelper.getSingleRulesOrNull(field.getAnnotations());
 
-        for (Annotation annotation : field.getDeclaredAnnotations()) {
-
-            switch (RulesInfoHelper.getHelperType(annotation)) {
-
-                case RULE:
-                case NESTED_DTO_RULE:
-                case CUSTOM_RULE:
-                    extractRuleInfo(annotation, false);
-                    break;
-
-                case RULES:
-                    selectRuleByGroup(annotation).ifPresent(groupAndRule ->
-                            extractRuleInfo(groupAndRule.getSecond(), true));
-                    break;
-
-                case RULE_FOR_COLLECTION:
-                    extractCollectionRuleInfo((CollectionRule) annotation, false);
-                    break;
-
-                case RULES_FOR_COLLECTION:
-                    selectRuleByGroup(annotation).ifPresent(groupAndRule ->
-                            extractCollectionRuleInfo((CollectionRule) groupAndRule.getSecond(), true));
-                    break;
-
-                case RULE_FOR_MAP:
-                    extractMapRuleInfo((MapRule) annotation, false);
-                    break;
-
-                case RULES_FOR_MAP:
-                    selectRuleByGroup(annotation).ifPresent(groupAndRule ->
-                            extractMapRuleInfo((MapRule) groupAndRule.getSecond(), true));
-                    break;
-
-                case UNKNOWN:
-                    log.debug("Unknown annotation: '" + annotation.annotationType().getName()
-                            + "' of field: '" + field.getType() + " " + field.getName() + "'");
-                    break;
-
-                default:
-                    throw new IllegalArgumentException("Unexpected helper rule type: "
-                            + RulesInfoHelper.getHelperType(annotation));
-            }
-
-        }
-
-        if (ruleInfoBuilder.isEmpty()) {
+        if (annotation == null) {
+            log.debug("No rule annotations found on the field: '" + field);
             return Optional.empty();
         }
 
-        return Optional.of(ruleInfoBuilder.build());
-    }
+        IRuleInfo ruleInfo = null;
+        
+        switch (RulesInfoHelper.getHelperType(annotation)) {
 
-    private void extractRuleInfo(Annotation rule, boolean isMultipleRules) {
-        extractRuleInfo(rule, ruleInfoBuilder, isMultipleRules);
-    }
+            case RULE:
+            case NESTED_DTO_RULE:
+            case CUSTOM_RULE:
+                String groupName = RulesInfoHelper.getGroupNameFromRuleAnnotation(annotation);
+                if (!skipByGroup(groupName)) {
+                    ruleInfo = buildRuleInfo(annotation, field.getType(), groupName, false);
+                }
+                break;
 
-    private void extractRuleInfo(Annotation rule, RuleInfoBuilder ruleInfoBuilder, boolean isMultipleRules) {
-        String groupName = getGroupNameFromRuleAnnotation(rule);
-        if (!skipByGroup(groupName)) {
-            ruleInfoBuilder
-                    .rule(rule)
-                    .ruleType(RuleType.getType(rule))
-                    .multipleRules(isMultipleRules)
-                    .groupName(groupName);
+            case RULE_FOR_COLLECTION:
+                groupName = RulesInfoHelper.getGroupNameFromRuleAnnotation(annotation);
+                if (!skipByGroup(groupName)) {
+                    ruleInfo = buildCollectionRuleInfo(
+                            (CollectionRule) annotation, groupName, false);
+                }
+                break;
+
+            case RULE_FOR_MAP:
+                groupName = RulesInfoHelper.getGroupNameFromRuleAnnotation(annotation);
+                ruleInfo = buildMapRuleInfo(
+                        (MapRule) annotation, groupName, false);
+                break;
+
+            case RULES:
+                Optional<Pair<String, Annotation>> maybeGroupAndRules = selectRuleByGroup(annotation);
+                if (maybeGroupAndRules.isPresent()) {
+                    Pair<String, Annotation> groupAndRule = maybeGroupAndRules.get();
+                    ruleInfo = buildRuleInfo(
+                            groupAndRule.getSecond(), field.getType(), groupAndRule.getFirst(), true);
+                }
+                break;
+
+            case RULES_FOR_COLLECTION:
+                maybeGroupAndRules = selectRuleByGroup(annotation);
+                if (maybeGroupAndRules.isPresent()) {
+                    Pair<String, Annotation> groupAndRule = maybeGroupAndRules.get();
+                    ruleInfo = buildCollectionRuleInfo(
+                            (CollectionRule) groupAndRule.getSecond(), groupAndRule.getFirst(), true);
+                }
+                break;
+
+            case RULES_FOR_MAP:
+                maybeGroupAndRules = selectRuleByGroup(annotation);
+                if (maybeGroupAndRules.isPresent()) {
+                    Pair<String, Annotation> groupAndRule = maybeGroupAndRules.get();
+                    ruleInfo = buildMapRuleInfo(
+                            (MapRule) groupAndRule.getSecond(), groupAndRule.getFirst(), true);
+                }
+                break;
+
+            case UNKNOWN:
+                log.debug("Unknown annotation: '" + annotation.annotationType().getName()
+                        + "' of field: '" + field.getType() + " " + field.getName() + "'");
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unexpected helper rule type: "
+                        + RulesInfoHelper.getHelperType(annotation));
         }
+
+        return Optional.ofNullable(ruleInfo);
     }
 
-    private void extractCollectionRuleInfo(CollectionRule rule, boolean isMultipleRules) {
-        String groupName = getGroupNameFromRuleAnnotation(rule);
-        if (!skipByGroup(groupName)) {
-            RuleInfoBuilder collectionRuleInfo = RuleInfo.builder();
-            ruleInfoBuilder
-                    .collectionRuleInfoBuilder(
-                            collectionRuleInfo
-                                    .rule(rule)
-                                    .ruleType(RuleType.getType(rule))
-                                    .multipleRules(isMultipleRules)
-                                    .groupName(groupName));
-        }
+    private RuleInfo buildRuleInfo(Annotation rule, Class<?> requiredType, String groupName, boolean isMultipleRules) {
+
+        validateType(requiredType, rule);
+
+        return RuleInfo.builder()
+                .rule(rule)
+                .ruleType(RuleType.getType(rule))
+                .multipleRules(isMultipleRules)
+                .group(groupName)
+                .build();
     }
 
-    private void extractMapRuleInfo(MapRule mapRule, boolean isMultipleRules) {
-        String groupName = getGroupNameFromRuleAnnotation(mapRule);
+    private RuleInfoCollection buildCollectionRuleInfo(CollectionRule collectionRule,
+                                                       String groupName,
+                                                       boolean isMultipleRules) {
 
-        if (!skipByGroup(groupName)) {
+        Class<?> elementType = ReflectionUtils.getSingleGenericType(field);
+        Annotation elementRule = ReflectionUtils.getSingleRuleFromEntry(collectionRule.element());
 
-            RuleInfoBuilder mapKeyBuilder = RuleInfo.builder();
-            extractRuleInfo(ReflectionUtils.getRuleOrNull(mapRule.key()), mapKeyBuilder, false);
+        validateType(elementType, elementRule);
+        validateType(field.getType(), collectionRule);
 
-            RuleInfoBuilder mapValueBuilder = RuleInfo.builder();
-            extractRuleInfo(ReflectionUtils.getRuleOrNull(mapRule.value()), mapValueBuilder, false);
+        RuleInfo collectionElementInfo = buildRuleInfo(elementRule, elementType, groupName, false);
 
-            RuleInfoBuilder mapBuilder = RuleInfo.builder()
-                    .rule(mapRule)
-                    .ruleType(RuleType.getType(mapRule))
-                    .multipleRules(isMultipleRules)
-                    .groupName(groupName);
+        RuleInfo collectionInfo = RuleInfo.builder()
+                .rule(collectionRule)
+                .ruleType(RuleType.getType(collectionRule))
+                .multipleRules(isMultipleRules)
+                .group(groupName)
+                .build();
 
-            ruleInfoBuilder
-                    .mapRuleInfoBuilder(mapBuilder)
-                    .mapKeyRuleInfoBuilder(mapKeyBuilder)
-                    .mapValueRuleInfoBuilder(mapValueBuilder);
-        }
+        return RuleInfoCollection.builder()
+                .collectionRuleInfo(collectionInfo)
+                .elementRuleInfo(collectionElementInfo)
+                .group(groupName)
+                .build();
 
+    }
+
+    private RuleInfoMap buildMapRuleInfo(MapRule mapRule, String groupName, boolean isMultipleRules) {
+
+        Class<?>[] keyValueTypes = ReflectionUtils.getPairedGenericType(field);
+
+        Annotation keyRule = ReflectionUtils.getSingleRuleFromEntry(mapRule.key());
+        Annotation valueRule = ReflectionUtils.getSingleRuleFromEntry(mapRule.value());
+
+        validateType(field.getType(), mapRule);
+        validateType(keyValueTypes[0], keyRule);
+        validateType(keyValueTypes[1], valueRule);
+
+        RuleInfo mapKeyRuleInfo =
+                buildRuleInfo(keyRule, keyValueTypes[0], groupName, false);
+
+        RuleInfo mapValueRuleInfo =
+                buildRuleInfo(valueRule, keyValueTypes[1], groupName, false);
+
+        RuleInfo mapRuleInfo = RuleInfo.builder()
+                .rule(mapRule)
+                .ruleType(RuleType.getType(mapRule))
+                .multipleRules(isMultipleRules)
+                .group(groupName)
+                .build();
+
+        return RuleInfoMap.builder()
+                .mapRule(mapRuleInfo)
+                .keyRule(mapKeyRuleInfo)
+                .valueRule(mapValueRuleInfo)
+                .group(groupName)
+                .build();
     }
 
     private boolean skipByGroup(String groupName) {
-        return !getFieldsGroupFilter().isContainsIncludeGroup(groupName);
+        return !fieldsGroupFilter.isContainsIncludeGroup(groupName);
     }
 
     private Optional<Pair<String, Annotation>> selectRuleByGroup(Annotation rules) {
@@ -171,7 +215,7 @@ public class RulesInfoExtractor {
             Optional<Pair<String, Annotation>> matched = Optional.empty();
             for (int i = 0; i < Array.getLength(ruleAnnotationsArray); i++) {
                 Annotation rule = (Annotation) Array.get(ruleAnnotationsArray, i);
-                String checkedGroup = getGroupNameFromRuleAnnotation(rule);
+                String checkedGroup = RulesInfoHelper.getGroupNameFromRuleAnnotation(rule);
                 if (uniqueGroups.contains(rule)) {
                     throw new DtoGeneratorException("Rule group '" + checkedGroup + "' is repeating for field.");
                 } else {
@@ -191,14 +235,5 @@ public class RulesInfoExtractor {
             throw new DtoGeneratorException("Unexpected exception. Can't get 'group' from rules annotation", e);
         }
     }
-
-    private static String getGroupNameFromRuleAnnotation(Annotation rule) {
-        try {
-            return (String) rule.annotationType().getMethod("group").invoke(rule);
-        } catch (IllegalAccessException | ClassCastException | NoSuchMethodException | InvocationTargetException e) {
-            throw new DtoGeneratorException("Unexpected exception. Can't get 'group' from rules annotation", e);
-        }
-    }
-
 
 }

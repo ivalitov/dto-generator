@@ -38,8 +38,7 @@ public class DtoAllKnownTypes {
     @DecimalRule
     Double aDouble;
 
-    @BooleanRule
-    Boolean aBoolean;
+    @BooleanRule Boolean aBoolean;
 
     @DateTimeRule
     LocalDateTime localDateTime;
@@ -47,16 +46,13 @@ public class DtoAllKnownTypes {
     @EnumRule
     ClientType clientType;
 
-    @CollectionRule
-    @StringRule
+    @CollectionRule(element = @Entry(stringRule = @StringRule))
     List<String> listOfString;
 
-    @CollectionRule
-    @NumberRule
+    @CollectionRule(element = @Entry(numberRule = @NumberRule))
     Set<Long> setOfLong;
 
-    @CollectionRule
-    @EnumRule
+    @CollectionRule(element = @Entry(enumRule = @EnumRule))
     LinkedList<ClientType> linkedListOfEnum;
 
     @NestedDtoRule
@@ -68,7 +64,7 @@ public class DtoAllKnownTypes {
     Map<String, Integer> stringIntegerMap;
 
     public String getLocalDateTime() {
-         return localDateTime.toString();
+        return localDateTime.toString();
     }
 
     @Transient

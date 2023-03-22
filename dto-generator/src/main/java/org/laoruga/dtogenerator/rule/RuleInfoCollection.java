@@ -1,6 +1,7 @@
 package org.laoruga.dtogenerator.rule;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.laoruga.dtogenerator.constants.RuleType;
@@ -15,25 +16,26 @@ import java.util.Objects;
  */
 @Setter(AccessLevel.PACKAGE)
 @Getter
+@Builder
 public class RuleInfoCollection implements IRuleInfo {
-    private IRuleInfo collectionRule;
-    private IRuleInfo elementRule;
+    private IRuleInfo collectionRuleInfo;
+    private IRuleInfo elementRuleInfo;
     private String group;
 
-    public IRuleInfo getElementRule() {
-        return Objects.requireNonNull(elementRule, "Item rule wasn't set.");
+    public IRuleInfo getElementRuleInfo() {
+        return Objects.requireNonNull(elementRuleInfo, "Element rule wasn't set.");
     }
 
     @Override
     public Annotation getRule() {
-        return collectionRule.getRule();
+        return collectionRuleInfo.getRule();
     }
 
     public boolean isTypesEqual(RuleType type) {
-        return collectionRule.isTypesEqual(type);
+        return collectionRuleInfo.isTypesEqual(type);
     }
 
     public boolean isElementRulesExist() {
-        return elementRule != null;
+        return elementRuleInfo != null;
     }
 }

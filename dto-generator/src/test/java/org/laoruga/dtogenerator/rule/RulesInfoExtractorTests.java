@@ -8,10 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.UtilsRoot;
-import org.laoruga.dtogenerator.api.rules.CollectionRule;
-import org.laoruga.dtogenerator.api.rules.DecimalRule;
-import org.laoruga.dtogenerator.api.rules.NumberRule;
-import org.laoruga.dtogenerator.api.rules.StringRule;
+import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.constants.CharSet;
 import org.laoruga.dtogenerator.constants.Group;
@@ -52,17 +49,17 @@ class RulesInfoExtractorTests {
         @DateTimeRule
         LocalDateTime localDateTime;
 
-        @CollectionRule
-        @DateTimeRule
+        @CollectionRule(element = @Entry(dateTimeRule = @DateTimeRule))
         List<LocalDateTime> listOfDates;
-        @CollectionRule
-        @NumberRule
+
+        @CollectionRule(element = @Entry(numberRule = @NumberRule))
         Set<Integer> setOfInts;
 
-        @CollectionRule(group = GROUP_1)
-        @StringRule(group = GROUP_1)
-        @CollectionRule
-        @StringRule
+        @CollectionRule(
+                group = GROUP_1,
+                element = @Entry(stringRule = @StringRule(group = GROUP_1)))
+        @CollectionRule(
+                element = @Entry(stringRule = @StringRule))
         List<String> listOfStringMultipleRules;
 
         @StringRule(group = Group.GROUP_3)
@@ -145,12 +142,12 @@ class RulesInfoExtractorTests {
 
         assertAll(
                 () -> assertThat(ruleInfo.getRule().annotationType(), equalTo(collectionRuleClass)),
-                () -> assertThat(ruleInfo.getCollectionRule().getClass(), equalTo(RuleInfo.class)),
-                () -> assertThat(ruleInfo.getElementRule().getClass(), equalTo(RuleInfo.class)),
+                () -> assertThat(ruleInfo.getCollectionRuleInfo().getClass(), equalTo(RuleInfo.class)),
+                () -> assertThat(ruleInfo.getElementRuleInfo().getClass(), equalTo(RuleInfo.class)),
                 () -> assertThat(ruleInfo.getGroup(), equalTo(group))
         );
 
-        RuleInfo collectionRuleInfo = (RuleInfo) ruleInfo.getCollectionRule();
+        RuleInfo collectionRuleInfo = (RuleInfo) ruleInfo.getCollectionRuleInfo();
 
         assertAll(
                 () -> assertThat(collectionRuleInfo.getRule().annotationType(), equalTo(collectionRuleClass)),
@@ -159,13 +156,13 @@ class RulesInfoExtractorTests {
                 () -> assertThat(collectionRuleInfo.getGroup(), equalTo(group))
         );
 
-        RuleInfo itemRuleInfo = (RuleInfo) ruleInfo.getElementRule();
+        RuleInfo elementRuleInfo = (RuleInfo) ruleInfo.getElementRuleInfo();
 
         assertAll(
-                () -> assertThat(itemRuleInfo.getRule().annotationType(), equalTo(itemRuleClass)),
-                () -> assertThat(itemRuleInfo.getRuleType(), equalTo(RuleType.BASIC)),
-                () -> assertThat(itemRuleInfo.isMultipleRules(), equalTo(multipleRules)),
-                () -> assertThat(itemRuleInfo.getGroup(), equalTo(group))
+                () -> assertThat(elementRuleInfo.getRule().annotationType(), equalTo(itemRuleClass)),
+                () -> assertThat(elementRuleInfo.getRuleType(), equalTo(RuleType.BASIC)),
+                () -> assertThat(elementRuleInfo.isMultipleRules(), equalTo(false)),
+                () -> assertThat(elementRuleInfo.getGroup(), equalTo(group))
         );
     }
 
@@ -184,13 +181,13 @@ class RulesInfoExtractorTests {
     }
 
     static class DtoNegative5 {
-        @CollectionRule
+        @CollectionRule(element = @Entry)
         List<String> list;
     }
 
     static class DtoNegative6 {
-        @CollectionRule
-        @CollectionRule(group = GROUP_1)
+        @CollectionRule(element = @Entry)
+        @CollectionRule(group = GROUP_1, element = @Entry)
         List<String> list;
     }
 
@@ -202,12 +199,14 @@ class RulesInfoExtractorTests {
     }
 
     static Stream<Arguments> unappropriatedDataSet() {
+        final String DIFFERENT_TYPES = "Found @Rule annotations at least for 2 different types";
+        String EMPTY = "Empty '" + Entry.class.getName() + "' annotation.";
         return Stream.of(
-                Arguments.of("loong", DtoNegative3.class, "Found @Rule annotations for '2' different types"),
-                Arguments.of("loong", DtoNegative4.class, "Found repeatable @Rule annotations for '2' different types"),
-                Arguments.of("list", DtoNegative5.class, "Missed @Rule annotation for collection element"),
-                Arguments.of("list", DtoNegative6.class, "Missed @Rule annotation for collection element"),
-                Arguments.of("string", DtoNegative7.class, "Found @Rule annotations for '2' different types (one repeatable)")
+                Arguments.of("loong", DtoNegative3.class, DIFFERENT_TYPES),
+                Arguments.of("loong", DtoNegative4.class, DIFFERENT_TYPES),
+                Arguments.of("list", DtoNegative5.class, EMPTY),
+                Arguments.of("list", DtoNegative6.class, EMPTY),
+                Arguments.of("string", DtoNegative7.class, DIFFERENT_TYPES)
         );
     }
 

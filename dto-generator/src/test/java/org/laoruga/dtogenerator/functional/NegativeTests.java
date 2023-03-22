@@ -41,10 +41,10 @@ public class NegativeTests {
         return Stream.of(
                 Arguments.of("string",
                         NegativeTests.DtoNegative1.class,
-                        "Wrong field type: 'class java.lang.String'"),
+                        "'class java.lang.String' does not match to rules annotation: '@NumberRule'"),
                 Arguments.of("loong",
                         NegativeTests.DtoNegative2.class,
-                        "Wrong field type: 'class java.lang.Long'"));
+                        "'class java.lang.Long' does not match to rules annotation: '@StringRule'"));
     }
 
     @ParameterizedTest

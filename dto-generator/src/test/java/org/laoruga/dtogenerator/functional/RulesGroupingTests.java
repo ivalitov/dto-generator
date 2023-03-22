@@ -63,18 +63,22 @@ class RulesGroupingTests {
     static class DtoList {
 
         //GR_1
-        @CollectionRule(group = GROUP_1, minSize = 1, maxSize = 1)
-        @NumberRule(group = GROUP_1, ruleRemark = MAX_VALUE)
+        @CollectionRule(
+                group = GROUP_1, minSize = 1, maxSize = 1,
+                element = @Entry(numberRule = @NumberRule(group = GROUP_1, ruleRemark = MAX_VALUE)))
         //GR_2
-        @CollectionRule(group = GROUP_2, minSize = 2, maxSize = 2)
-        @NumberRule(group = GROUP_2, ruleRemark = MIN_VALUE)
+        @CollectionRule(
+                group = GROUP_2, minSize = 2, maxSize = 2,
+                element = @Entry(numberRule = @NumberRule(group = GROUP_2, ruleRemark = MIN_VALUE)))
         //DEFAULT
-        @CollectionRule(minSize = 3, maxSize = 3)
-        @NumberRule(minInt = 10, maxInt = 10)
+        @CollectionRule(
+                minSize = 3, maxSize = 3,
+                element = @Entry(numberRule = @NumberRule(minInt = 10, maxInt = 10)))
         private List<Integer> intList;
 
-        @CollectionRule(minSize = 6, maxSize = 6)
-        @NumberRule
+        @CollectionRule(
+                minSize = 6, maxSize = 6,
+                element = @Entry(numberRule = @NumberRule))
         private List<Integer> intListDefault;
     }
 
@@ -183,10 +187,14 @@ class RulesGroupingTests {
         @StringRule(chars = ENG)
         private String string;
 
-        @CollectionRule(group = GROUP_1, minSize = 1, maxSize = 1)
-        @NumberRule(group = GROUP_1, minInt = 1, maxInt = 1)
-        @CollectionRule(minSize = 2, maxSize = 2)
-        @NumberRule(minInt = 2, maxInt = 3)
+        @CollectionRule(
+                group = GROUP_1, minSize = 1, maxSize = 1,
+                element = @Entry(numberRule = @NumberRule(group = GROUP_1, minInt = 1, maxInt = 1)))
+
+
+        @CollectionRule(
+                minSize = 2, maxSize = 2,
+                element = @Entry(numberRule = @NumberRule(minInt = 2, maxInt = 3)))
         private Set<Integer> set;
 
         @NumberRule(group = GROUP_1, minLong = 1, maxLong = 1)
@@ -197,10 +205,13 @@ class RulesGroupingTests {
         @DateTimeRule(chronoUnitShift = @ChronoUnitShift(unit = ChronoUnit.DAYS, leftBound = -1, rightBound = -1))
         private LocalDateTime localDateTime;
 
-        @CollectionRule(group = GROUP_1, minSize = 1, maxSize = 1)
-        @DecimalRule(group = GROUP_1, minDouble = 1, maxDouble = 1)
-        @CollectionRule(minSize = 2, maxSize = 2)
-        @DecimalRule(minDouble = 2, maxDouble = 2)
+        @CollectionRule(
+                group = GROUP_1, minSize = 1, maxSize = 1,
+                element = @Entry(decimalRule = @DecimalRule(group = GROUP_1, minDouble = 1, maxDouble = 1)))
+
+        @CollectionRule(
+                minSize = 2, maxSize = 2,
+                element = @Entry(decimalRule = @DecimalRule(minDouble = 2, maxDouble = 2)))
         private List<Double> list;
 
         @NumberRule(group = GROUP_1, minInt = 1, maxInt = 1)

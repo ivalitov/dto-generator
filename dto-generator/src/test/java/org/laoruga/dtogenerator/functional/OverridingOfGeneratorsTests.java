@@ -12,10 +12,7 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.UtilsRoot;
-import org.laoruga.dtogenerator.api.rules.CollectionRule;
-import org.laoruga.dtogenerator.api.rules.DecimalRule;
-import org.laoruga.dtogenerator.api.rules.NumberRule;
-import org.laoruga.dtogenerator.api.rules.StringRule;
+import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.functional.data.dto.DtoAllKnownTypes;
@@ -324,12 +321,12 @@ class OverridingOfGeneratorsTests {
         @NumberRule
         Integer integerWithEmptyRule;
 
-        @CollectionRule
-        @StringRule
+        @CollectionRule(element = @Entry(stringRule = @StringRule))
         List<String> listOfStringWithEmptyRule;
 
-        @CollectionRule(minSize = 1, maxSize = 20)
-        @StringRule
+        @CollectionRule(
+                minSize = 1, maxSize = 20,
+                element = @Entry(stringRule = @StringRule))
         Set<String> setOfStringWithEmptyRule;
     }
 
@@ -457,12 +454,14 @@ class OverridingOfGeneratorsTests {
         @NumberRule(group = GROUP_1)
         Long aLong;
 
-        @CollectionRule(minSize = 1, maxSize = 1)
-        @StringRule
+        @CollectionRule(
+                minSize = 1, maxSize = 1,
+                element = @Entry(stringRule = @StringRule))
         List<String> listOfString;
 
-        @CollectionRule(group = GROUP_2, minSize = 2, maxSize = 2)
-        @NumberRule(group = GROUP_2)
+        @CollectionRule(
+                group = GROUP_2, minSize = 2, maxSize = 2,
+                element = @Entry(numberRule = @NumberRule(group = GROUP_2)))
         Set<Long> setOfLong;
 
         @DecimalRule(group = GROUP_2)
