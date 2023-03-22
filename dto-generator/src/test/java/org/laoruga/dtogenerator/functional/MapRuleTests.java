@@ -91,29 +91,29 @@ public class MapRuleTests {
                 () -> assertThat(dto.yearBooleanMap.size(), greaterThanOrEqualTo(1)),
                 () -> assertThat(dto.yearBooleanMap.values(), everyItem(notNullValue()))
         );
-
     }
 
     @Test
     @Tag(RESTORE_STATIC_CONFIG)
     public void staticConfig() {
 
-        Configuration staticConfig = DtoGeneratorStaticConfig.getInstance();
+        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
-        // TODO add static config to builder
-        staticConfig.getTypeGeneratorsConfig().getMapConfig(Map.class)
+        TypeGeneratorsConfigSupplier staticConfig = builder.getStaticConfig().getTypeGeneratorsConfig();
+        
+        staticConfig.getMapConfig(Map.class)
                 .setMapInstanceSupplier(LinkedHashMap::new)
                 .setMinSize(1)
                 .setMaxSize(1);
 
-        staticConfig.getTypeGeneratorsConfig().getMapConfig(HashMap.class)
+        staticConfig.getMapConfig(HashMap.class)
                 .setMinSize(2)
                 .setMaxSize(2);
 
-        staticConfig.getTypeGeneratorsConfig().getMapConfig(TreeMap.class)
+        staticConfig.getMapConfig(TreeMap.class)
                 .setRuleRemark(MAX_VALUE);
 
-        Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
+        Dto dto = builder.build().generateDto();
 
         assertAll(
                 () -> assertThat(dto.stringIntegerMap.getClass(), equalTo(LinkedHashMap.class)),
@@ -133,19 +133,18 @@ public class MapRuleTests {
 
         // Map.class config - the same
 
-        staticConfig.getTypeGeneratorsConfig().getMapConfig(HashMap.class)
+        staticConfig.getMapConfig(HashMap.class)
                 .setKeyGenerator(() -> ORG)
                 .setMinSize(1)
                 .setMaxSize(1);
 
         LocalDateTime LOCAL_DATE_TIME = LocalDateTime.now().minusYears(1000);
-        staticConfig.getTypeGeneratorsConfig().getMapConfig(TreeMap.class)
+        staticConfig.getMapConfig(TreeMap.class)
                 .setValueGenerator(() -> LOCAL_DATE_TIME)
                 .setRuleRemark(MAX_VALUE);
 
         // next dto instance
-        Dto dto2 = DtoGenerator.builder(Dto.class).build().generateDto();
-
+        Dto dto2 = builder.build().generateDto();
 
         assertAll(
                 () -> assertThat(dto2.stringIntegerMap.getClass(), equalTo(LinkedHashMap.class)),
@@ -170,7 +169,7 @@ public class MapRuleTests {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
-        TypeGeneratorsConfigSupplier instanceConfig = builder.getTypeGeneratorConfig();
+        TypeGeneratorsConfigSupplier instanceConfig = builder.getConfig().getTypeGeneratorsConfig();
 
         instanceConfig.getMapConfig(Map.class)
                 .setMapInstanceSupplier(LinkedHashMap::new)
@@ -278,7 +277,7 @@ public class MapRuleTests {
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         // static
-        Configuration staticConfig = DtoGeneratorStaticConfig.getInstance();
+        Configuration staticConfig = builder.getStaticConfig();
 
         staticConfig.getTypeGeneratorsConfig().getMapConfig(Map.class)
                 .setMinSize(0)
@@ -291,13 +290,13 @@ public class MapRuleTests {
                 .setRuleRemark(MAX_VALUE);
 
         // instance
-        builder.getTypeGeneratorConfig().getMapConfig(Map.class)
+        builder.getConfig().getTypeGeneratorsConfig().getMapConfig(Map.class)
                 .setRuleRemark(MAX_VALUE);
 
-        builder.getTypeGeneratorConfig().getMapConfig(HashMap.class)
+        builder.getConfig().getTypeGeneratorsConfig().getMapConfig(HashMap.class)
                 .setRuleRemark(MIN_VALUE);
 
-        builder.getTypeGeneratorConfig().getMapConfig(TreeMap.class)
+        builder.getConfig().getTypeGeneratorsConfig().getMapConfig(TreeMap.class)
                 .setKeyGenerator(() -> 1D);
 
 
@@ -394,7 +393,7 @@ public class MapRuleTests {
     public void withoutAnnotations() {
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
-        builder.getConfig().setGenerateAllKnownTypes(true);
+        builder.getConfig().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
 
         Dto_2 dto = builder.build().generateDto();
 
@@ -412,10 +411,10 @@ public class MapRuleTests {
 
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
-        builder.getConfig().setGenerateAllKnownTypes(true);
+        builder.getConfig().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
 
         // static
-        Configuration staticConfig = DtoGeneratorStaticConfig.getInstance();
+        Configuration staticConfig = builder.getStaticConfig();
 
         staticConfig.getTypeGeneratorsConfig().getMapConfig(Map.class)
                 .setMinSize(0)
@@ -431,13 +430,13 @@ public class MapRuleTests {
                         .addChronoConfig(ChronoUnitConfig.newBounds(-100, 100, YEARS));
 
         // instance
-        builder.getTypeGeneratorConfig().getMapConfig(Map.class)
+        builder.getConfig().getTypeGeneratorsConfig().getMapConfig(Map.class)
                 .setRuleRemark(MAX_VALUE);
 
-        builder.getTypeGeneratorConfig().getMapConfig(HashMap.class)
+        builder.getConfig().getTypeGeneratorsConfig().getMapConfig(HashMap.class)
                 .setRuleRemark(MIN_VALUE);
 
-        builder.getTypeGeneratorConfig().getMapConfig(TreeMap.class)
+        builder.getConfig().getTypeGeneratorsConfig().getMapConfig(TreeMap.class)
                 .setKeyGenerator(() -> 1D);
 
 

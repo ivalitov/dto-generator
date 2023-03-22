@@ -7,10 +7,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
+import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.TypeGeneratorsConfigForFiled;
-import org.laoruga.dtogenerator.config.dto.DtoGeneratorConfig;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorInstanceConfig;
+import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.constants.RuleRemark;
@@ -200,12 +201,12 @@ public class DtoGeneratorBuilder<T> {
      * Configuration
      */
 
-    public DtoGeneratorConfig getConfig() {
-        return configuration.getDtoGeneratorConfig();
+    public Configuration getConfig() {
+        return configuration;
     }
 
-    public TypeGeneratorsConfigSupplier getTypeGeneratorConfig() {
-        return configuration.getTypeGeneratorsConfig();
+    public Configuration getStaticConfig() {
+        return DtoGeneratorStaticConfig.getInstance();
     }
 
     public DtoGeneratorBuilder<T> setTypeGeneratorConfig(@NonNull String fieldName,
@@ -222,5 +223,6 @@ public class DtoGeneratorBuilder<T> {
         fieldGeneratorsProvider.setGeneratorConfigForType(generatedType, configDto);
         return this;
     }
+
 
 }

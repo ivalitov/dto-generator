@@ -108,8 +108,9 @@ public class DateTimeTests {
     public void staticConfig() {
 
         final LocalDateTime NOW = LocalDateTime.now();
+        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
-        TypeGeneratorsConfigSupplier staticConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
+        TypeGeneratorsConfigSupplier staticConfig = builder.getStaticConfig().getTypeGeneratorsConfig();
 
         staticConfig.getDateTimeConfig(LocalDateTime.class)
                 .addChronoConfig(ChronoUnitConfig.newAbsolute(1, DAYS));
@@ -130,7 +131,7 @@ public class DateTimeTests {
                 .addChronoConfig(ChronoFieldConfig.newBounds(-100, 6, ChronoField.INSTANT_SECONDS))
                 .setRuleRemark(MAX_VALUE);
 
-        Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
+        Dto dto = builder.build().generateDto();
 
         assertAll(
                 () -> assertThat(dto.localDateTime.toLocalDate(),
@@ -167,7 +168,7 @@ public class DateTimeTests {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
-        TypeGeneratorsConfigSupplier instanceConfig = builder.getTypeGeneratorConfig();
+        TypeGeneratorsConfigSupplier instanceConfig = builder.getConfig().getTypeGeneratorsConfig();
 
         instanceConfig.getDateTimeConfig(LocalDateTime.class)
                 .addChronoConfig(ChronoUnitConfig.newAbsolute(1, DAYS));
@@ -385,7 +386,7 @@ public class DateTimeTests {
         final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
-        builder.getConfig().setGenerateAllKnownTypes(true);
+        builder.getConfig().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
 
         Dto_2 dto = builder.build().generateDto();
 
@@ -428,9 +429,8 @@ public class DateTimeTests {
         final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
-        builder.getConfig().setGenerateAllKnownTypes(true);
 
-        TypeGeneratorsConfigSupplier staticConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
+        TypeGeneratorsConfigSupplier staticConfig = builder.getStaticConfig().getTypeGeneratorsConfig();
 
         // static
         staticConfig.getDateTimeConfig(LocalDateTime.class)
@@ -444,15 +444,18 @@ public class DateTimeTests {
 
 
         // instance
-        builder.getTypeGeneratorConfig().getDateTimeConfig(LocalDateTime.class)
+        builder.getConfig().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
+        TypeGeneratorsConfigSupplier instanceConfig = builder.getConfig().getTypeGeneratorsConfig();
+
+        instanceConfig.getDateTimeConfig(LocalDateTime.class)
                 .addChronoConfig(ChronoUnitConfig.newBounds(-100, 100, DAYS));
         builder.setTypeGeneratorConfig(
                 LocalDate.class,
                 DateTimeConfigDto.builder().addChronoConfig(ChronoUnitConfig.newBounds(-200, 200, DAYS)).build()
         );
-        builder.getTypeGeneratorConfig().getDateTimeConfig(LocalTime.class)
+        instanceConfig.getDateTimeConfig(LocalTime.class)
                 .setRuleRemark(MIN_VALUE);
-        builder.getTypeGeneratorConfig().getDateTimeConfig(Year.class)
+        instanceConfig.getDateTimeConfig(Year.class)
                 // obviously incorrect param
                 .addChronoConfig(ChronoUnitConfig.newAbsolute(5, SECONDS));
 

@@ -38,7 +38,7 @@ class BuilderReuseTests {
     void generateTwoDtoInstances() {
 
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
-        builder.getTypeGeneratorConfig().getCollectionConfig(List.class).setCollectionInstanceSupplier(LinkedList::new);
+        builder.getConfig().getTypeGeneratorsConfig().getCollectionConfig(List.class).setCollectionInstanceSupplier(LinkedList::new);
 
         DtoGenerator<DtoAllKnownTypes> dtoGenerator = builder.build();
         DtoAllKnownTypes dto_1 = dtoGenerator.generateDto();
@@ -65,7 +65,7 @@ class BuilderReuseTests {
         DtoAllKnownTypes dto = new DtoAllKnownTypes();
 
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(dto);
-        builder.getTypeGeneratorConfig().getCollectionConfig(List.class).setCollectionInstanceSupplier(LinkedList::new);
+        builder.getConfig().getTypeGeneratorsConfig().getCollectionConfig(List.class).setCollectionInstanceSupplier(LinkedList::new);
 
         DtoGenerator<DtoAllKnownTypes> dtoGenerator = builder.build();
         DtoAllKnownTypes dto_1 = dtoGenerator.generateDto();
@@ -93,7 +93,7 @@ class BuilderReuseTests {
     void concurrentExecution() {
 
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
-        builder.getTypeGeneratorConfig().getCollectionConfig(List.class).setCollectionInstanceSupplier(LinkedList::new);
+        builder.getConfig().getTypeGeneratorsConfig().getCollectionConfig(List.class).setCollectionInstanceSupplier(LinkedList::new);
 
         DtoGenerator<DtoAllKnownTypes> dtoGenerator = builder.build();
 

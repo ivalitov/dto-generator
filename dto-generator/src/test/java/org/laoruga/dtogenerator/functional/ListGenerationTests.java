@@ -173,14 +173,17 @@ class ListGenerationTests {
 
         DtoGeneratorBuilder<DtoList> builder = DtoGenerator.builder(DtoList.class);
 
+        // static
+        builder.getStaticConfig().getTypeGeneratorsConfig().getCollectionConfig(List.class).setMaxSize(1);
+        builder.getStaticConfig().getTypeGeneratorsConfig().getNumberConfig().setMaxIntValue(1).setMinIntValue(1);
+
+        // instance
         builder.setTypeGeneratorConfig("linkedListOfStrings", CollectionConfigDto.builder().maxSize(2).minSize(2).build())
                 .setTypeGeneratorConfig("linkedListOfStrings", StringConfigDto.builder().words(new String[]{"PEACE"}).build())
                 .setTypeGeneratorConfig("vectorOfStrings", StringConfigDto.builder().words(new String[]{"LIFE"}).build())
                 .setTypeGeneratorConfig("linkedListOfStringsImplicit", CollectionConfigDto.builder().maxSize(3).minSize(3).build());
 
-        builder.getTypeGeneratorConfig().getCollectionConfig(List.class).setMinSize(1);
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getCollectionConfig(List.class).setMaxSize(1);
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getNumberConfig().setMaxIntValue(1).setMinIntValue(1);
+        builder.getConfig().getTypeGeneratorsConfig().getCollectionConfig(List.class).setMinSize(1);
 
         DtoList dto = builder.build().generateDto();
 

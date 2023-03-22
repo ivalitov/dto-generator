@@ -69,7 +69,9 @@ public class DecimalTests {
     @Tag(RESTORE_STATIC_CONFIG)
     public void staticConfig() {
 
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getDecimalConfig()
+        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
+
+        builder.getStaticConfig().getTypeGeneratorsConfig().getDecimalConfig()
                 .setMinDoubleValue(1)
                 .setMaxDoubleValue(2)
                 .setMinFloatValue(3.3F)
@@ -79,7 +81,6 @@ public class DecimalTests {
                 .setMaxBigDecimalValue(new BigDecimal("7"))
                 .setRuleRemark(MIN_VALUE);
 
-        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         Dto dto = builder.build().generateDto();
 
@@ -96,7 +97,7 @@ public class DecimalTests {
     public void instanceConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
-        builder.getTypeGeneratorConfig().getDecimalConfig()
+        builder.getConfig().getTypeGeneratorsConfig().getDecimalConfig()
                 .setMinDoubleValue(1)
                 .setMaxDoubleValue(2)
                 .setMinFloatValue(3.3F)
@@ -172,14 +173,14 @@ public class DecimalTests {
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         // static
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getDecimalConfig()
+        builder.getStaticConfig().getTypeGeneratorsConfig().getDecimalConfig()
                 .setMaxDoubleValue(100D)
                 .setMinFloatValue(-321F)
                 .setMinBigDecimalValue((new BigDecimal(-111)))
                 .setRuleRemark(MIN_VALUE);
 
         // instance
-        builder.getTypeGeneratorConfig().getDecimalConfig()
+        builder.getConfig().getTypeGeneratorsConfig().getDecimalConfig()
                 .setMaxFloatValue(321F)
                 .setMinBigDecimalValue((new BigDecimal(-222)));
 
@@ -258,8 +259,8 @@ public class DecimalTests {
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
 
-        builder.getConfig().setGenerateAllKnownTypes(true);
-        builder.getTypeGeneratorConfig().getDecimalConfig().setRuleRemark(MAX_VALUE);
+        builder.getConfig().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
+        builder.getConfig().getTypeGeneratorsConfig().getDecimalConfig().setRuleRemark(MAX_VALUE);
 
         Dto_2 dto = builder.build().generateDto();
 
@@ -278,11 +279,11 @@ public class DecimalTests {
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
 
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getDecimalConfig().setRuleRemark(MAX_VALUE);
-        builder.getConfig().setGenerateAllKnownTypes(true);
+        builder.getStaticConfig().getTypeGeneratorsConfig().getDecimalConfig().setRuleRemark(MAX_VALUE);
+        builder.getConfig().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
 
 
-        builder.getTypeGeneratorConfig().getDecimalConfig()
+        builder.getConfig().getTypeGeneratorsConfig().getDecimalConfig()
                 // next line overrides MAX_VALUE from static config
                 .setRuleRemark(MIN_VALUE)
                 .setMinDoubleValue(1D)

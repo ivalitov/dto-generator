@@ -119,7 +119,7 @@ class OverridingOfGeneratorsTests {
     @DisplayName("Overridden instance configs of known type generators")
     void overriddenInstanceConfig() {
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
-        TypeGeneratorsConfigSupplier gensConfig = builder.getTypeGeneratorConfig();
+        TypeGeneratorsConfigSupplier gensConfig = builder.getConfig().getTypeGeneratorsConfig();
 
         gensConfig.getStringConfig()
                 .setMinLength(1)
@@ -167,7 +167,7 @@ class OverridingOfGeneratorsTests {
     @DisplayName("Overridden static config of known type generators")
     void overriddenStaticConfig() {
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
-        TypeGeneratorsConfigSupplier gensConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
+        TypeGeneratorsConfigSupplier gensConfig = builder.getStaticConfig().getTypeGeneratorsConfig();
 
         gensConfig.getStringConfig()
                 .setMinLength(1)
@@ -334,11 +334,11 @@ class OverridingOfGeneratorsTests {
     @Tag(RESTORE_STATIC_CONFIG)
     @DisplayName("Overridden builders and configs combinations")
     void overriddenBuildersAndConfigsCombination() {
-        DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
         DtoGeneratorBuilder<DtoDifferent> builder = DtoGenerator.builder(DtoDifferent.class);
+        builder.getStaticConfig().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
 
-        TypeGeneratorsConfigSupplier staticConfig = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig();
-        TypeGeneratorsConfigSupplier userConfig = builder.getTypeGeneratorConfig();
+        TypeGeneratorsConfigSupplier staticConfig = builder.getStaticConfig().getTypeGeneratorsConfig();
+        TypeGeneratorsConfigSupplier userConfig = builder.getConfig().getTypeGeneratorsConfig();
 
         builder.setGenerator(String.class, () -> "o");
 
@@ -378,7 +378,7 @@ class OverridingOfGeneratorsTests {
 
         DtoGeneratorBuilder<DtoDifferent> builder2 = DtoGenerator.builder(DtoDifferent.class);
 
-        TypeGeneratorsConfigSupplier userConfig2 = builder2.getTypeGeneratorConfig();
+        TypeGeneratorsConfigSupplier userConfig2 = builder2.getConfig().getTypeGeneratorsConfig();
         userConfig2.getNumberConfig().setMinIntValue(5);
         userConfig2.getNumberConfig().setMaxIntValue(5);
         userConfig2.getStringConfig().setChars("i");

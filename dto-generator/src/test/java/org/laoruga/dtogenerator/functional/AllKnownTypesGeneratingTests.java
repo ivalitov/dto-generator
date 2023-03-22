@@ -4,14 +4,15 @@ import io.qameta.allure.Epic;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.DtoGeneratorBuilder;
+import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
+import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
 
@@ -23,6 +24,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.laoruga.dtogenerator.Constants.RESTORE_STATIC_CONFIG;
 import static org.laoruga.dtogenerator.UtilsRoot.resetStaticConfig;
 
 /**
@@ -32,6 +34,7 @@ import static org.laoruga.dtogenerator.UtilsRoot.resetStaticConfig;
 @DisplayName("All Known Types Generating Tests")
 @Epic("ALL_KNOWN_TYPES_GENERATING")
 @Slf4j
+@ExtendWith(Extensions.RestoreStaticConfig.class)
 public class AllKnownTypesGeneratingTests {
 
     @NoArgsConstructor
@@ -80,16 +83,21 @@ public class AllKnownTypesGeneratingTests {
     }
 
     @Test
+    @Tag(RESTORE_STATIC_CONFIG)
     @DisplayName("Generation with implicit rules")
     void GenerationWithImplicitRules() {
 
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getCollectionConfig(List.class).setMinSize(1);
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getCollectionConfig(List.class).setMaxSize(1);
+        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getCollectionConfig(Set.class).setMinSize(1);
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getCollectionConfig(Set.class).setMaxSize(1);
+        TypeGeneratorsConfigSupplier staticConfig = builder.getStaticConfig().getTypeGeneratorsConfig();
 
-        Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
+        staticConfig.getCollectionConfig(List.class).setMinSize(1);
+        staticConfig.getCollectionConfig(List.class).setMaxSize(1);
+
+        staticConfig.getCollectionConfig(Set.class).setMinSize(1);
+        staticConfig.getCollectionConfig(Set.class).setMaxSize(1);
+
+        Dto dto = builder.build().generateDto();
 
         log.info(UtilsRoot.toJson(dto));
 
@@ -135,9 +143,4 @@ public class AllKnownTypesGeneratingTests {
         );
     }
 
-    @AfterEach
-    void after() {
-        DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().setGenerateAllKnownTypes(false);
-        resetStaticConfig();
-    }
 }

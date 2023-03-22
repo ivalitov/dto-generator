@@ -95,7 +95,9 @@ public class NumberTests {
     @Tag(RESTORE_STATIC_CONFIG)
     public void staticConfig() {
 
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getNumberConfig()
+        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
+
+        builder.getStaticConfig().getTypeGeneratorsConfig().getNumberConfig()
                 .setMinIntValue(-99)
                 .setMaxIntValue(0)
                 .setMinLongValue(9_999_999_999L)
@@ -109,7 +111,6 @@ public class NumberTests {
                 .setMaxByteValue(Byte.MAX_VALUE)
                 .setRuleRemark(MIN_VALUE);
 
-        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         Dto dto = builder.build().generateDto();
 
@@ -134,7 +135,7 @@ public class NumberTests {
     public void instanceConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
-        builder.getTypeGeneratorConfig().getNumberConfig()
+        builder.getConfig().getTypeGeneratorsConfig().getNumberConfig()
                 .setMinIntValue(-99)
                 .setMaxIntValue(0)
                 .setRuleRemarkInt(MIN_VALUE)
@@ -220,14 +221,14 @@ public class NumberTests {
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         // static
-        NumberCommonConfigDto numberConfigStatic = DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getNumberConfig();
+        NumberCommonConfigDto numberConfigStatic = builder.getStaticConfig().getTypeGeneratorsConfig().getNumberConfig();
         numberConfigStatic.setMaxIntValue(100);
         numberConfigStatic.setMinLongValue(-321L);
         numberConfigStatic.setMinShortValue((short) -111);
         numberConfigStatic.setRuleRemark(MIN_VALUE);
 
         // instance
-        NumberCommonConfigDto numberConfigInstance = builder.getTypeGeneratorConfig().getNumberConfig();
+        NumberCommonConfigDto numberConfigInstance = builder.getConfig().getTypeGeneratorsConfig().getNumberConfig();
         numberConfigInstance.setMaxLongValue(321L);
         numberConfigInstance.setMinShortValue((short) -222);
         numberConfigInstance.setMaxShortValue((short) 222);
@@ -377,8 +378,8 @@ public class NumberTests {
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
 
-        builder.getConfig().setGenerateAllKnownTypes(true);
-        builder.getTypeGeneratorConfig().getNumberConfig().setRuleRemark(MAX_VALUE);
+        builder.getConfig().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
+        builder.getConfig().getTypeGeneratorsConfig().getNumberConfig().setRuleRemark(MAX_VALUE);
 
         Dto_2 dto = builder.build().generateDto();
 
@@ -405,10 +406,12 @@ public class NumberTests {
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
 
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getNumberConfig().setRuleRemark(MAX_VALUE);
-        builder.getConfig().setGenerateAllKnownTypes(true);
+        // static
+        builder.getStaticConfig().getTypeGeneratorsConfig().getNumberConfig().setRuleRemark(MAX_VALUE);
 
-        NumberCommonConfigDto numberConfig = builder.getTypeGeneratorConfig().getNumberConfig();
+        // insatnce
+        builder.getConfig().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
+        NumberCommonConfigDto numberConfig = builder.getConfig().getTypeGeneratorsConfig().getNumberConfig();
 
         // next line overrides MAX_VALUE from static config
         numberConfig.setRuleRemark(MIN_VALUE)
