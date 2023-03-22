@@ -86,7 +86,6 @@ class BuilderReuseTests {
         );
     }
 
-    // TODO flaky test
     @Test
     @DisplayName("Concurrent Execution")
     @SneakyThrows
@@ -110,11 +109,13 @@ class BuilderReuseTests {
 
             assertNotSame(dto_1, dto_2);
 
+            // to check every field
             assertAll(
                     () -> assertNotEquals(dto_1, dto_2),
                     () -> assertNotEquals(dto_1.hashCode(), dto_2.hashCode()),
                     () -> assertNotEquals(dto_1.getString(), dto_2.getString()),
-                    () -> assertNotEquals(dto_1.getALong(), dto_2.getALong())
+                    () -> assertNotEquals(dto_1.getALong(), dto_2.getALong()),
+                    () -> assertNotEquals(dto_1.getADouble(), dto_2.getADouble())
             );
         }
 

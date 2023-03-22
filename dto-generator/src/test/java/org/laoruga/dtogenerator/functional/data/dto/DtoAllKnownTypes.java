@@ -26,7 +26,7 @@ import java.util.Set;
 @EqualsAndHashCode
 public class DtoAllKnownTypes {
 
-    @StringRule
+    @StringRule(minLength = 1)
     String string;
 
     @NumberRule

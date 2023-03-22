@@ -12,9 +12,11 @@ import org.laoruga.dtogenerator.constants.CharSet;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author Il'dar Valitov
@@ -28,18 +30,17 @@ public final class RandomUtils {
     private static final RandomStringGenerator DEFAULT_STRING_GENERATOR =
             new RandomStringGenerator.Builder().selectFrom(CharSet.DEFAULT_CHARSET.toCharArray()).build();
 
-    @Getter
-    private static final Random random = new Random();
+    public static final Random RANDOM = new Random();
 
     private static final RandomDataGenerator RANDOM_DATA_GENERATOR = new RandomDataGenerator();
 
     public static double nextDouble(double minValue, double maxValue, int precision) {
-        double generated = minValue + RandomUtils.getRandom().nextDouble() * (maxValue - minValue);
+        double generated = minValue + RANDOM.nextDouble() * (maxValue - minValue);
         return Precision.round(generated, precision);
     }
 
     public static float nextFloat(float minValue, float maxValue, int precision) {
-        float generated = minValue + RandomUtils.getRandom().nextFloat() * (maxValue - minValue);
+        float generated = minValue + RANDOM.nextFloat() * (maxValue - minValue);
         return new BigDecimal(generated).setScale(precision, RoundingMode.HALF_UP).floatValue();
     }
 
@@ -49,7 +50,7 @@ public final class RandomUtils {
      *                  must be greater than minNumber or equal
      * @return random int
      */
-    public static int nextInt(int minNumber, int maxNumber) {
+    public static synchronized int nextInt(int minNumber, int maxNumber) {
         if (minNumber == maxNumber) {
             return minNumber;
         }
@@ -74,7 +75,7 @@ public final class RandomUtils {
     }
 
     public static boolean nextBoolean() {
-        return random.nextInt(2) == 1;
+        return RANDOM.nextInt(2) == 1;
     }
 
     /*
@@ -110,7 +111,7 @@ public final class RandomUtils {
         return items[nextInt(0, items.length - 1)];
     }
 
-    public static long nextLong(long minNumber, long maxNumber) {
+    public static synchronized long nextLong(long minNumber, long maxNumber) {
         if (minNumber == maxNumber) {
             return minNumber;
         }

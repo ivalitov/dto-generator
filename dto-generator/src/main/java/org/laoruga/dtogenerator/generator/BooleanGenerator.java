@@ -27,7 +27,7 @@ public class BooleanGenerator implements IGenerator<Boolean> {
             return true;
         }
         if (ruleRemark == RuleRemark.RANDOM_VALUE) {
-            return RandomUtils.getRandom().nextDouble() < trueProbability;
+            return RandomUtils.RANDOM.nextDouble() < trueProbability;
         }
         if (ruleRemark == RuleRemark.NULL_VALUE) {
             return null;
