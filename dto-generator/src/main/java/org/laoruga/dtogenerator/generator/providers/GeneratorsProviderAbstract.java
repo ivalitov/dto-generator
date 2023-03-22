@@ -23,8 +23,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstanceOfConcreteClass;
-import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstanceOfConcreteClassAsObject;
+import static org.laoruga.dtogenerator.util.ReflectionUtils.*;
 
 /**
  * @author Il'dar Valitov
@@ -119,7 +118,7 @@ public abstract class GeneratorsProviderAbstract {
             CollectionConfigDto collectionConfig = (CollectionConfigDto) config;
             if (collectionConfig.getCollectionInstanceSupplier() == null) {
                 collectionConfig.setCollectionInstanceSupplier(
-                        () -> createInstanceOfConcreteClass(generatedType)
+                        () -> createInstance(generatedType)
                 );
             }
             ((CollectionConfigDto) config).setElementGenerator(elementGenerator);
@@ -136,7 +135,7 @@ public abstract class GeneratorsProviderAbstract {
             MapConfigDto mapConfigDto = (MapConfigDto) config;
             if (mapConfigDto.getMapInstanceSupplier() == null) {
                 mapConfigDto.setMapInstanceSupplier(
-                        () -> (Map<Object, Object>) createInstanceOfConcreteClassAsObject(generatedType)
+                        () -> (Map<Object, Object>) createInstance(generatedType)
                 );
             }
             if (mapConfigDto.getKeyGenerator() == null) {

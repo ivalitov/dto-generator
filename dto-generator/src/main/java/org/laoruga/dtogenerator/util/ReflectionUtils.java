@@ -87,6 +87,12 @@ public final class ReflectionUtils {
     @SuppressWarnings("unchecked")
 
     public static <T> T createInstance(Class<T> classToCreate, Object... constructorArgs) {
+
+        if (classToCreate.isInterface() || Modifier.isAbstract(classToCreate.getModifiers())) {
+            throw new DtoGeneratorException("Can't create instance of '" + classToCreate + "' because" +
+                    " it is interface or abstract.");
+        }
+
         Optional<Constructor<?>> suitableConstructor;
         try {
 
@@ -113,35 +119,6 @@ public final class ReflectionUtils {
         } catch (Exception e) {
             throw new DtoGeneratorException("Failed to instantiate class: '" + classToCreate + "'", e);
         }
-    }
-
-    // TODO merge with previous method?
-
-    /**
-     * 1. Filed type should be assignable from required concreateClass
-     * 2. CollectionClass should not be an interface or abstract
-     *
-     * @param concreteClass - class of collection
-     * @param <T>           - collection element type
-     * @return - new collection instance
-     */
-    public static <T> T createInstanceOfConcreteClass(Class<T> concreteClass) {
-        if (concreteClass.isInterface() || Modifier.isAbstract(concreteClass.getModifiers())) {
-            throw new DtoGeneratorException("Can't create instance of '" + concreteClass + "' because" +
-                    " it is interface or abstract.");
-        }
-        T instance;
-        try {
-            instance = concreteClass.newInstance();
-        } catch (Exception e) {
-            log.error("Exception while creating instance ", e);
-            throw new DtoGeneratorException(e);
-        }
-        return instance;
-    }
-
-    public static Object createInstanceOfConcreteClassAsObject(Class<?> concreteClass) {
-        return createInstanceOfConcreteClass(concreteClass);
     }
 
     private static boolean isTypesAssignableFromObjects(Class<?>[] types, Object[] objects) {

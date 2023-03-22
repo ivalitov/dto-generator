@@ -32,7 +32,7 @@ public class CollectionConfigDto implements ConfigDto {
         this.minSize = rule.minSize();
         this.maxSize = rule.maxSize();
         this.collectionInstanceSupplier = rule.collectionClass() != DummyCollectionClass.class
-                ? () -> ReflectionUtils.createInstanceOfConcreteClass(rule.collectionClass())
+                ? () -> ReflectionUtils.createInstance(rule.collectionClass())
                 : null;
         this.ruleRemark = rule.ruleRemark();
     }

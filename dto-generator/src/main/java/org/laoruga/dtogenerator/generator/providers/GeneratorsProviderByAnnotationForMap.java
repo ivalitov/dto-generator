@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstanceOfConcreteClassAsObject;
 
 /**
  * @author Il'dar Valitov
@@ -119,7 +118,7 @@ public class GeneratorsProviderByAnnotationForMap {
                         : (Class<? extends Map<?, ?>>) rule.mapClass();
 
                 configDto = new MapConfigDto(rule)
-                        .setMapInstanceSupplier(() -> (Map<Object, Object>) createInstanceOfConcreteClassAsObject(mapClass));
+                        .setMapInstanceSupplier(() -> (Map<Object, Object>) ReflectionUtils.createInstance(mapClass));
 
                 return generatorsProvider.getGenerator(
                         () -> configDto,

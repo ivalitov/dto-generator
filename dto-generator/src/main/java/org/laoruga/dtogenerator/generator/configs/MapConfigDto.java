@@ -33,7 +33,7 @@ public class MapConfigDto implements ConfigDto {
         this.minSize = rule.minSize();
         this.maxSize = rule.maxSize();
         this.mapInstanceSupplier = rule.mapClass() != DummyMapClass.class
-                ? () -> ReflectionUtils.createInstanceOfConcreteClass(rule.mapClass())
+                ? () -> ReflectionUtils.createInstance(rule.mapClass())
                 : null;
         this.ruleRemark = rule.ruleRemark();
     }

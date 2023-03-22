@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstanceOfConcreteClass;
 
 /**
  * @author Il'dar Valitov
@@ -103,7 +102,7 @@ public class GeneratorsProviderByAnnotationForCollection {
                         : (Class<? extends Collection<?>>) rule.collectionClass();
 
                 configDto = new CollectionConfigDto(rule)
-                        .setCollectionInstanceSupplier(() -> createInstanceOfConcreteClass(collectionClass));
+                        .setCollectionInstanceSupplier(() -> ReflectionUtils.createInstance(collectionClass));
 
                 return generatorsProvider.getGenerator(
                         () -> configDto,
