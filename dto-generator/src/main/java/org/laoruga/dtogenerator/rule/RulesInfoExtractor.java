@@ -67,7 +67,7 @@ public class RulesInfoExtractor {
         }
 
         IRuleInfo ruleInfo = null;
-        
+
         switch (RulesInfoHelper.getHelperType(annotation)) {
 
             case RULE:
@@ -116,6 +116,15 @@ public class RulesInfoExtractor {
                     Pair<String, Annotation> groupAndRule = maybeGroupAndRules.get();
                     ruleInfo = buildCollectionRuleInfo(
                             (CollectionRule) groupAndRule.getSecond(), groupAndRule.getFirst(), true);
+                }
+                break;
+
+            case RULES_FOR_ARRAY:
+                maybeGroupAndRules = selectRuleByGroup(annotation);
+                if (maybeGroupAndRules.isPresent()) {
+                    Pair<String, Annotation> groupAndRule = maybeGroupAndRules.get();
+                    ruleInfo = buildArrayRuleInfo(
+                            (ArrayRule) groupAndRule.getSecond(), groupAndRule.getFirst(), true);
                 }
                 break;
 
@@ -266,7 +275,7 @@ public class RulesInfoExtractor {
                         matched = Optional.of(Pair.create(checkedGroup, rule));
                     } else {
                         throw new DtoGeneratorException("Ambiguous grouping of the field." +
-                                " Check groups of generators and include filters.");
+                                " Check generators groups and include filters.");
                     }
                 }
             }

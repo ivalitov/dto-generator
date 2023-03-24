@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.*;
@@ -191,7 +192,6 @@ class RulesGroupingTests {
                 group = GROUP_1, minSize = 1, maxSize = 1,
                 element = @Entry(numberRule = @NumberRule(group = GROUP_1, minInt = 1, maxInt = 1)))
 
-
         @CollectionRule(
                 minSize = 2, maxSize = 2,
                 element = @Entry(numberRule = @NumberRule(minInt = 2, maxInt = 3)))
@@ -255,6 +255,70 @@ class RulesGroupingTests {
         public void setArgs(String[] args) {
             arg = args[0];
         }
+    }
+
+    static class ArraysDto {
+
+        @ArrayRule(minSize = 1, maxSize = 1,
+                element = @Entry(stringRule = @StringRule))
+        @ArrayRule(group = GROUP_1,
+                minSize = 2, maxSize = 2,
+                element = @Entry(stringRule = @StringRule))
+        String[] strings;
+
+        @ArrayRule(minSize = 1, maxSize = 1,
+                element = @Entry(numberRule = @NumberRule))
+        @ArrayRule(group = GROUP_2,
+                minSize = 2, maxSize = 2,
+                element = @Entry(numberRule = @NumberRule))
+        Integer[] integers;
+
+        @ArrayRule(minSize = 1, maxSize = 1,
+                element = @Entry(numberRule = @NumberRule))
+        @ArrayRule(group = GROUP_2,
+                minSize = 2, maxSize = 2,
+                element = @Entry(numberRule = @NumberRule))
+        @ArrayRule(group = GROUP_3,
+                minSize = 3, maxSize = 3,
+                element = @Entry(numberRule = @NumberRule))
+        long[] longs;
+
+    }
+
+    @Test
+    @DisplayName("Array rules grouping")
+    void arraysGrouping() {
+
+        DtoGeneratorBuilder<ArraysDto> builder = DtoGenerator.builder(ArraysDto.class);
+
+        ArraysDto dtoDefault;
+
+        // DEFAULT group
+        dtoDefault = builder.build().generateDto();
+        assertAll(
+                () -> assertThat(dtoDefault.strings.length, equalTo(1)),
+                () -> assertThat(dtoDefault.integers.length, equalTo(1)),
+                () -> assertThat(dtoDefault.longs.length, equalTo(1))
+        );
+
+        // GROUP_2
+        ArraysDto dtoGroup2 = builder.includeGroups(GROUP_2).build().generateDto();
+
+        assertAll(
+                () -> assertThat(dtoGroup2.strings, nullValue()),
+                () -> assertThat(dtoGroup2.integers.length, equalTo(2)),
+                () -> assertThat(dtoGroup2.longs.length, equalTo(2))
+        );
+
+        // GROUP_3
+        ArraysDto dtoGroup2and3 = DtoGenerator.builder(ArraysDto.class)
+                .includeGroups(GROUP_3).build().generateDto();
+
+        assertAll(
+                () -> assertThat(dtoGroup2and3.strings, nullValue()),
+                () -> assertThat(dtoGroup2and3.integers, nullValue()),
+                () -> assertThat(dtoGroup2and3.longs.length, equalTo(3))
+        );
     }
 
 }
