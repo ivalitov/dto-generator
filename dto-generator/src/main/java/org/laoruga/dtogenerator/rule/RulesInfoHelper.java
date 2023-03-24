@@ -39,11 +39,17 @@ public final class RulesInfoHelper {
 
         if (rule != null) {
 
-            if (rule.value() == RuleType.COLLECTION) {
+            RuleType type = rule.value();
+
+            if (type == RuleType.COLLECTION) {
                 return RULE_FOR_COLLECTION;
             }
 
-            if (rule.value() == RuleType.MAP) {
+            if (type == RuleType.ARRAY) {
+                return RULE_FOR_ARRAY;
+            }
+
+            if (type == RuleType.MAP) {
                 return RULE_FOR_MAP;
             }
 
@@ -54,11 +60,17 @@ public final class RulesInfoHelper {
 
         if (rules != null) {
 
-            if (rules.value() == RuleType.COLLECTION) {
+            RuleType type = rules.value();
+
+            if (type == RuleType.COLLECTION) {
                 return RULES_FOR_COLLECTION;
             }
 
-            if (rules.value() == RuleType.MAP) {
+            if (type == RuleType.ARRAY) {
+                return RULES_FOR_ARRAY;
+            }
+
+            if (type == RuleType.MAP) {
                 return RULES_FOR_MAP;
             }
 
@@ -74,6 +86,7 @@ public final class RulesInfoHelper {
         Class<?>[] possibleGeneratedTypes = GeneratedTypes.get(rulesAnnotation.annotationType());
 
         boolean match = false;
+
         for (Class<?> knownElementType : possibleGeneratedTypes) {
             if (knownElementType.isAssignableFrom(generatedType)) {
                 match = true;
@@ -84,7 +97,7 @@ public final class RulesInfoHelper {
         if (!match) {
             throw new DtoGeneratorException("Field type or generic type: '" + generatedType + "'"
                     + " does not match to rules annotation: '@" + rulesAnnotation.annotationType().getSimpleName() + "'"
-                    + " Expected types of the field:\n" + Arrays.asList(possibleGeneratedTypes) + "\n");
+                    + " Expected types of the field:\n" + Arrays.asList(possibleGeneratedTypes));
         }
     }
 
@@ -120,11 +133,13 @@ public final class RulesInfoHelper {
 
     public enum RuleTypeHelper {
         RULE,
-        RULE_FOR_MAP,
         RULE_FOR_COLLECTION,
+        RULE_FOR_MAP,
+        RULE_FOR_ARRAY,
         RULES,
         RULES_FOR_COLLECTION,
         RULES_FOR_MAP,
+        RULES_FOR_ARRAY,
         CUSTOM_RULE,
         NESTED_DTO_RULE,
         UNKNOWN

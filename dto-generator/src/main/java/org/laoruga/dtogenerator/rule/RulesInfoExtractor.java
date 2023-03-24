@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.util.Pair;
 import org.laoruga.dtogenerator.FieldFilter;
+import org.laoruga.dtogenerator.api.rules.ArrayRule;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
@@ -86,6 +87,14 @@ public class RulesInfoExtractor {
                 }
                 break;
 
+            case RULE_FOR_ARRAY:
+                groupName = RulesInfoHelper.getGroupNameFromRuleAnnotation(annotation);
+                if (!skipByGroup(groupName)) {
+                    ruleInfo = buildArrayRuleInfo(
+                            (ArrayRule) annotation, groupName, false);
+                }
+                break;
+
             case RULE_FOR_MAP:
                 groupName = RulesInfoHelper.getGroupNameFromRuleAnnotation(annotation);
                 ruleInfo = buildMapRuleInfo(
@@ -137,6 +146,8 @@ public class RulesInfoExtractor {
         validateType(requiredType, rule);
 
         return RuleInfo.builder()
+                .field(field)
+                .requiredType(requiredType)
                 .rule(rule)
                 .ruleType(RuleType.getType(rule))
                 .multipleRules(isMultipleRules)
@@ -166,9 +177,37 @@ public class RulesInfoExtractor {
         return RuleInfoCollection.builder()
                 .collectionRuleInfo(collectionInfo)
                 .elementRuleInfo(collectionElementInfo)
+                .field(field)
+                .elementType(elementType)
                 .group(groupName)
                 .build();
 
+    }
+
+    private IRuleInfo buildArrayRuleInfo(ArrayRule arrayRule, String groupName, boolean isMultipleRules) {
+
+        Class<?> elementType = ReflectionUtils.getArrayElementType(field.getType());
+        Annotation elementRule = ReflectionUtils.getSingleRuleFromEntry(arrayRule.element());
+
+        validateType(elementType, elementRule);
+        validateType(field.getType(), arrayRule);
+
+        RuleInfo arrayElementInfo = buildRuleInfo(elementRule, elementType, groupName, false);
+
+        RuleInfo arrayInfo = RuleInfo.builder()
+                .rule(arrayRule)
+                .ruleType(RuleType.getType(arrayRule))
+                .multipleRules(isMultipleRules)
+                .group(groupName)
+                .build();
+
+        return RuleInfoCollection.builder()
+                .collectionRuleInfo(arrayInfo)
+                .elementRuleInfo(arrayElementInfo)
+                .field(field)
+                .elementType(elementType)
+                .group(groupName)
+                .build();
     }
 
     private RuleInfoMap buildMapRuleInfo(MapRule mapRule, String groupName, boolean isMultipleRules) {
@@ -196,6 +235,7 @@ public class RulesInfoExtractor {
                 .build();
 
         return RuleInfoMap.builder()
+                .field(field)
                 .mapRule(mapRuleInfo)
                 .keyRule(mapKeyRuleInfo)
                 .valueRule(mapValueRuleInfo)

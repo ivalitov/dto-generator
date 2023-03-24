@@ -25,9 +25,10 @@ public class GeneratedTypes {
         generatedTypes.put(DecimalRule.class, DecimalRule.GENERATED_TYPES);
         generatedTypes.put(DateTimeRule.class, new Class[]{DateTimeRule.GENERATED_TYPE});
         generatedTypes.put(EnumRule.class, new Class[]{EnumRule.GENERATED_TYPE});
+        generatedTypes.put(BooleanRule.class, new Class[]{BooleanRule.GENERATED_TYPE});
         generatedTypes.put(CollectionRule.class, new Class[]{CollectionRule.GENERATED_TYPE});
         generatedTypes.put(MapRule.class, new Class[]{MapRule.GENERATED_TYPE});
-        generatedTypes.put(BooleanRule.class, new Class[]{BooleanRule.GENERATED_TYPE});
+        generatedTypes.put(ArrayRule.class, ArrayRule.GENERATED_TYPES);
         generatedTypes.put(CustomRule.class, new Class[]{CustomRule.GENERATED_TYPE});
         generatedTypes.put(NestedDtoRule.class, new Class[]{NestedDtoRule.GENERATED_TYPE});
 
@@ -39,4 +40,12 @@ public class GeneratedTypes {
                 "Generated types wasn't added for rule: '" + rules + "'");
     }
 
+    public static boolean isAssignableFrom(Class<?>[] possibleTypes, Class<?> generatedType) {
+        for (Class<?> possibleType : possibleTypes) {
+            if (possibleType.isAssignableFrom(generatedType)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -2,11 +2,12 @@ package org.laoruga.dtogenerator.generator.builder;
 
 import com.google.common.primitives.Primitives;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
+import org.laoruga.dtogenerator.api.rules.ArrayRule;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.EnumRule;
 import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
-import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.constants.GeneratedTypes;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -50,6 +51,10 @@ public final class GeneratorBuildersHolder {
             foundInfo = buildersInfoMapByGeneratedType.get(CollectionRule.GENERATED_TYPE);
         }
 
+        if (foundInfo == null && GeneratedTypes.isAssignableFrom(ArrayRule.GENERATED_TYPES, generatedType)) {
+            foundInfo = buildersInfoMapByGeneratedType.get(Object[].class);
+        }
+
         if (foundInfo == null && DateTimeRule.GENERATED_TYPE.isAssignableFrom(generatedType)) {
             foundInfo = buildersInfoMapByGeneratedType.get(DateTimeRule.GENERATED_TYPE);
         }
@@ -62,16 +67,7 @@ public final class GeneratorBuildersHolder {
             return Optional.empty();
         }
 
-        Class<?> buildersGeneratedType = foundInfo.getGeneratedType();
-
-        if (buildersGeneratedType.isAssignableFrom(generatedType)) {
-            return Optional.of(foundInfo.getBuilderSupplier().get());
-        }
-
-        throw new DtoGeneratorException("Unexpected error. " +
-                "Builder's generated type does not match to the field type:" +
-                "\n- Builder's generated type: '" + buildersGeneratedType.getName() + "'" +
-                "\n- Field type: " + generatedType + "'.");
+        return Optional.of(foundInfo.getBuilderSupplier().get());
     }
 
     public Optional<IGeneratorBuilder<?>> getBuilder(Annotation rulesAnnotation) {

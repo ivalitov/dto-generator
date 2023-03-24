@@ -26,7 +26,8 @@ public class GeneratorProvidersMediator {
     private final GeneratorsProviderByType generatorsProviderByType;
     private final GeneratorsProviderByAnnotation generatorsProviderByAnnotation;
     private final GeneratorsProviderByAnnotationForMap generatorsProviderByAnnotationForMap;
-    private final GeneratorsProviderByAnnotationForCollection generatorsProviderByAnnotationForCollection;
+    private final GeneratorsProviderByAnnotationForList generatorsProviderByAnnotationForCollection;
+    private final GeneratorsProviderByAnnotationForList generatorsProviderByAnnotationForArray;
 
     public GeneratorProvidersMediator(ConfigurationHolder configuration,
                                       GeneratorBuildersHolder userGenBuildersMapping,
@@ -47,7 +48,9 @@ public class GeneratorProvidersMediator {
         generatorsProviderByAnnotationForMap =
                 new GeneratorsProviderByAnnotationForMap(generatorsProviderByAnnotation);
         generatorsProviderByAnnotationForCollection =
-                new GeneratorsProviderByAnnotationForCollection(generatorsProviderByAnnotation);
+                new GeneratorsProviderByAnnotationForList(generatorsProviderByAnnotation);
+        generatorsProviderByAnnotationForArray =
+                new GeneratorsProviderByAnnotationForArray(generatorsProviderByAnnotation);
     }
 
     /*
@@ -80,24 +83,29 @@ public class GeneratorProvidersMediator {
      * By rules annotation
      */
 
-    public IGenerator<?> getGeneratorByAnnotation(Field field,
-                                                  IRuleInfo ruleInfo,
+    public IGenerator<?> getGeneratorByAnnotation(IRuleInfo ruleInfo,
                                                   Supplier<?> dtoInstanceSupplier,
                                                   Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
         IGenerator<?> generator;
 
         if (ruleInfo.isTypesEqual(RuleType.COLLECTION)) {
             generator = generatorsProviderByAnnotationForCollection
-                    .getCollectionGenerator(field, (RuleInfoCollection) ruleInfo, dtoInstanceSupplier, nestedDtoGeneratorSupplier);
+                    .getGenerator((RuleInfoCollection) ruleInfo, dtoInstanceSupplier, nestedDtoGeneratorSupplier);
+
+        } else if (ruleInfo.isTypesEqual(RuleType.ARRAY)) {
+            generator = generatorsProviderByAnnotationForArray
+                    .getGenerator((RuleInfoCollection) ruleInfo, dtoInstanceSupplier, nestedDtoGeneratorSupplier);
+
         } else if (ruleInfo.isTypesEqual(RuleType.MAP)) {
             generator = generatorsProviderByAnnotationForMap
-                    .getMapGenerator(field, (RuleInfoMap) ruleInfo, dtoInstanceSupplier, nestedDtoGeneratorSupplier);
+                    .getGenerator((RuleInfoMap) ruleInfo, dtoInstanceSupplier, nestedDtoGeneratorSupplier);
+
         } else {
             generator = generatorsProviderByAnnotation
-                    .getGenerator(field, ruleInfo, dtoInstanceSupplier, nestedDtoGeneratorSupplier);
+                    .getGenerator(ruleInfo, dtoInstanceSupplier, nestedDtoGeneratorSupplier);
         }
 
-        generatorsProviderByAnnotation.prepareCustomRemarks(generator, field.getName());
+        generatorsProviderByAnnotation.prepareCustomRemarks(generator, ruleInfo.getField().getName());
 
         return generator;
     }

@@ -8,7 +8,6 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
-import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.constants.Bounds;
 import org.laoruga.dtogenerator.generator.configs.NumberCommonConfigDto;
 import org.laoruga.dtogenerator.generator.configs.NumberConfigDto;
@@ -409,7 +408,7 @@ public class NumberTests {
         // static
         builder.getStaticConfig().getTypeGeneratorsConfig().getNumberConfig().setRuleRemark(MAX_VALUE);
 
-        // insatnce
+        // instance
         builder.getConfig().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
         NumberCommonConfigDto numberConfig = builder.getConfig().getTypeGeneratorsConfig().getNumberConfig();
 

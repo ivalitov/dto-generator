@@ -13,7 +13,6 @@ import org.laoruga.dtogenerator.config.TypeGeneratorsConfigForFiled;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
-import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.configs.ConfigDto;

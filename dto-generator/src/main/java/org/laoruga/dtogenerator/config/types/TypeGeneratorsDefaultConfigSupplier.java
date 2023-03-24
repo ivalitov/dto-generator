@@ -74,6 +74,11 @@ public final class TypeGeneratorsDefaultConfigSupplier {
                 MapConfigDto.class,
                 false);
 
+        add(configSupplier,
+                ArrayRule.GENERATED_TYPES,
+                RulesInstance.ARRAY_RULE,
+                ArrayConfigDto.class,
+                true);
 
         GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER = ImmutableMap.copyOf(configSupplier);
     }
@@ -91,7 +96,7 @@ public final class TypeGeneratorsDefaultConfigSupplier {
 
             }
 
-            throw new IllegalArgumentException("Unknown type: " + generatedType);
+            throw new IllegalArgumentException("Unable to get default config. Unknown type: " + generatedType);
         }
 
         return GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER.get(generatedType);

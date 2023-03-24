@@ -56,37 +56,25 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
         this.defaultGeneratorBuildersHolder = GeneratorBuildersHolderGeneral.getInstance();
     }
 
-    protected IGenerator<?> getGenerator(Field field,
-                                         IRuleInfo ruleInfo,
-                                         Supplier<?> dtoInstanceSupplier,
-                                         Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
-        return getGenerator(
-                ruleInfo,
-                field.getType(),
-                field.getName(),
-                dtoInstanceSupplier,
-                nestedDtoGeneratorSupplier
-        );
-    }
-
     IGenerator<?> getGenerator(IRuleInfo ruleInfo,
-                               Class<?> generatedType,
-                               String fieldName,
                                Supplier<?> dtoInstanceSupplier,
                                Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
 
-        Optional<IGeneratorBuilder<?>> maybeUsersKeyGenBuilder = getUsersGenBuilder(generatedType);
+        String fieldName = ruleInfo.getField().getName();
+        Class<?> requiredType = ruleInfo.getRequiredType();
+
+        Optional<IGeneratorBuilder<?>> maybeUsersKeyGenBuilder = getUsersGenBuilder(requiredType);
 
         boolean isUserBuilder = maybeUsersKeyGenBuilder.isPresent();
 
         IGeneratorBuilder<?> generatorBuilder = isUserBuilder ?
                 maybeUsersKeyGenBuilder.get() :
-                getDefaultGenBuilder(ruleInfo.getRule(), generatedType);
+                getDefaultGenBuilder(ruleInfo.getRule(), requiredType);
 
         return buildGenerator(
                 ruleInfo.getRule(),
                 generatorBuilder,
-                generatedType,
+                requiredType,
                 fieldName,
                 dtoInstanceSupplier,
                 nestedDtoGeneratorSupplier);
@@ -103,8 +91,10 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
                 maybeBuilder = defaultGeneratorBuildersHolder.getBuilder(generatedType);
         }
 
-        return maybeBuilder.orElseThrow(() -> new DtoGeneratorException("General generator builder not found. Rules: '"
-                + rules.annotationType().getName() + "', Genrated type: '" + generatedType.getName() + "'"));
+        return maybeBuilder.orElseThrow(() ->
+                new DtoGeneratorException("General generator builder not found. Rules: '"
+                        + rules.annotationType().getName() + "', Genrated type: '" + generatedType.getName() + "'")
+        );
     }
 
     protected Optional<IGeneratorBuilder<?>> getUsersGenBuilder(Class<?> generatedType) {
@@ -184,7 +174,7 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
                     return getGenerator(
                             () -> new EnumConfigDto((EnumRule) rules),
                             () -> (IGeneratorBuilderConfigurable<?>) generatorBuilder,
-                            enumGeneratorSupplier(fieldType),
+                            getEnumGeneratorSupplier(fieldType),
                             fieldType,
                             fieldName
                     );

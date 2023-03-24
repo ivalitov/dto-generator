@@ -120,6 +120,8 @@ public class BatchExecutor {
 
                 if (generatorExecutedSuccessfully) {
                     generatorsIterator.remove();
+                } else {
+                    attempt.incrementAndGet();
                 }
 
             }

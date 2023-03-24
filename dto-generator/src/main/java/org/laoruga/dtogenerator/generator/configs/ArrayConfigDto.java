@@ -4,11 +4,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.api.rules.CollectionRule;
-import org.laoruga.dtogenerator.util.ReflectionUtils;
-import org.laoruga.dtogenerator.util.dummy.DummyCollectionClass;
-
-import java.util.function.Supplier;
+import org.laoruga.dtogenerator.api.rules.ArrayRule;
 
 /**
  * @author Il'dar Valitov
@@ -20,37 +16,35 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CollectionConfigDto implements ConfigDto {
+public class ArrayConfigDto implements ConfigDto {
     private Integer minSize;
     private Integer maxSize;
-    private Supplier<?> collectionInstanceSupplier;
+    private Class<?> elementType;
     private IGenerator<?> elementGenerator;
     private IRuleRemark ruleRemark;
 
-    public CollectionConfigDto(CollectionRule rule) {
+    public ArrayConfigDto(ArrayRule rule, Class<?> elementType) {
         this.minSize = rule.minSize();
         this.maxSize = rule.maxSize();
-        this.collectionInstanceSupplier = rule.collectionClass() != DummyCollectionClass.class
-                ? () -> ReflectionUtils.createInstance(rule.collectionClass())
-                : null;
+        this.elementType = elementType;
         this.ruleRemark = rule.ruleRemark();
     }
 
-    public void merge(CollectionConfigDto from) {
+    public void merge(ArrayConfigDto from) {
         if (from.getMinSize() != null) this.minSize = from.getMinSize();
         if (from.getMaxSize() != null) this.maxSize = from.getMaxSize();
-        if (from.getCollectionInstanceSupplier() != null) this.collectionInstanceSupplier = from.getCollectionInstanceSupplier();
+        if (from.getElementType() != null) this.elementType = from.getElementType();
         if (from.getElementGenerator() != null) this.elementGenerator = from.getElementGenerator();
         if (from.getRuleRemark() != null) this.ruleRemark = from.getRuleRemark();
     }
 
     @Override
     public void merge(ConfigDto configDto) {
-        CollectionConfigDto fromConfig = (CollectionConfigDto) configDto;
+        ArrayConfigDto fromConfig = (ArrayConfigDto) configDto;
         if (fromConfig.getMinSize() != null) this.minSize = fromConfig.getMinSize();
         if (fromConfig.getMaxSize() != null) this.maxSize = fromConfig.getMaxSize();
-        if (fromConfig.getCollectionInstanceSupplier() != null)
-            this.collectionInstanceSupplier = fromConfig.getCollectionInstanceSupplier();
+        if (fromConfig.getElementType() != null)
+            this.elementType = fromConfig.getElementType();
         if (fromConfig.getElementGenerator() != null) this.elementGenerator = fromConfig.getElementGenerator();
         if (fromConfig.getRuleRemark() != null) this.ruleRemark = fromConfig.getRuleRemark();
     }

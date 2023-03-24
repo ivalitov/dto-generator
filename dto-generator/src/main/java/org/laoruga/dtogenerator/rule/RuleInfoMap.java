@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.laoruga.dtogenerator.constants.RuleType;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.Objects;
 
 
@@ -18,9 +19,11 @@ import java.util.Objects;
 @Getter
 @Builder
 public class RuleInfoMap implements IRuleInfo {
-    private IRuleInfo mapRule;
-    private IRuleInfo keyRule;
-    private IRuleInfo valueRule;
+    private RuleInfo mapRule;
+    private RuleInfo keyRule;
+    private RuleInfo valueRule;
+
+    private Field field;
     private String group;
 
     public IRuleInfo getValueRule() {
@@ -34,6 +37,11 @@ public class RuleInfoMap implements IRuleInfo {
     @Override
     public Annotation getRule() {
         return mapRule.getRule();
+    }
+
+    @Override
+    public Class<?> getRequiredType() {
+        return field.getType();
     }
 
     public boolean isTypesEqual(RuleType type) {

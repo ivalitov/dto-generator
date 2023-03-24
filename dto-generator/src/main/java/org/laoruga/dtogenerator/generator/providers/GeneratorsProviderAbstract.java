@@ -11,10 +11,7 @@ import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.builders.EnumGeneratorBuilder;
-import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
-import org.laoruga.dtogenerator.generator.configs.ConfigDto;
-import org.laoruga.dtogenerator.generator.configs.EnumConfigDto;
-import org.laoruga.dtogenerator.generator.configs.MapConfigDto;
+import org.laoruga.dtogenerator.generator.configs.*;
 import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
 
 import java.time.temporal.Temporal;
@@ -23,7 +20,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-import static org.laoruga.dtogenerator.util.ReflectionUtils.*;
+import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 
 /**
  * @author Il'dar Valitov
@@ -87,7 +84,7 @@ public abstract class GeneratorsProviderAbstract {
     protected BiFunction<
             ConfigDto,
             IGeneratorBuilderConfigurable<?>,
-            IGenerator<?>> enumGeneratorSupplier(Class<?> generatedType) {
+            IGenerator<?>> getEnumGeneratorSupplier(Class<?> generatedType) {
         return (config, builder) -> {
             EnumConfigDto enumConfig = (EnumConfigDto) config;
             if (enumConfig.getEnumClass() == null) {
@@ -121,7 +118,22 @@ public abstract class GeneratorsProviderAbstract {
                         () -> createInstance(generatedType)
                 );
             }
-            ((CollectionConfigDto) config).setElementGenerator(elementGenerator);
+            if (collectionConfig.getElementGenerator() == null) {
+                collectionConfig.setElementGenerator(elementGenerator);
+            }
+            return builder.build(config, true);
+        };
+    }
+
+    protected BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>,
+            IGenerator<?>> getArrayGeneratorSupplier(Class<?> elementType,
+                                                     IGenerator<?> elementGenerator) {
+        return (config, builder) -> {
+            ArrayConfigDto arrayConfigDto = (ArrayConfigDto) config;
+            arrayConfigDto.setElementType(elementType);
+            if (arrayConfigDto.getElementGenerator() == null) {
+                arrayConfigDto.setElementGenerator(elementGenerator);
+            }
             return builder.build(config, true);
         };
     }

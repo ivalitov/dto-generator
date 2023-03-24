@@ -99,6 +99,13 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
+    public ArrayConfigDto getArrayConfig(Class<?> arrayType) {
+        return (ArrayConfigDto) getConfigLazy(
+                arrayType,
+                ArrayConfigDto::new
+        );
+    }
+
     @Override
     public MapConfigDto getMapConfig(Class<? extends Map> generatedType) {
         return (MapConfigDto) getConfigLazy(

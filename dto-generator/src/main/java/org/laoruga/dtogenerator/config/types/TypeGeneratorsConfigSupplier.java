@@ -25,5 +25,7 @@ public interface TypeGeneratorsConfigSupplier {
 
     CollectionConfigDto getCollectionConfig(Class<? extends Collection> collectionType);
 
+    ArrayConfigDto getArrayConfig(Class<?> arrayType);
+
     MapConfigDto getMapConfig(Class<? extends Map> mapType);
 }

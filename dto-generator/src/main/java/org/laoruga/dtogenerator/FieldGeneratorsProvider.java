@@ -110,10 +110,10 @@ public class FieldGeneratorsProvider {
         if (maybeRulesInfo.isPresent()) {
             return Optional.of(
                     generatorProvidersMediator.getGeneratorByAnnotation(
-                            field,
                             maybeRulesInfo.get(),
                             getDtoInstanceSupplier(),
-                            createDtoGeneratorSupplier(field))
+                            createDtoGeneratorSupplier(field)
+                    )
             );
         }
 

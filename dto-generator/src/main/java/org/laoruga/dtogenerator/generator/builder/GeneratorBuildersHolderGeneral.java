@@ -79,6 +79,14 @@ public final class GeneratorBuildersHolderGeneral {
                         MapRule.GENERATED_TYPE,
                         MapGenerator::builder));
 
+        // array
+
+        generatorBuildersHolder.addBuilder(
+                GeneratorBuilderInfo.createInstance(
+                        ArrayRule.class,
+                        Object[].class,
+                        ArrayGenerator::builder));
+
         // extended
         generatorBuildersHolder.addBuilder(
                 GeneratorBuilderInfo.createInstance(

@@ -1,5 +1,6 @@
 package org.laoruga.dtogenerator.util;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,6 +33,22 @@ public final class ReflectionUtils {
     private static final String TYPE_WITH_PAIRED_GENERIC_TYPE_REGEXP = "[a-zA-Z0-9_.]*<[$a-zA-Z0-9_.]*, [$a-zA-Z0-9_.]*>";
     private static final Pattern SINGLE_GENERIC_TYPE_REGEXP = Pattern.compile("<([$a-zA-Z0-9_.]*)>");
     private static final Pattern PAIRED_GENERIC_TYPE_REGEXP = Pattern.compile("<([$a-zA-Z0-9_.]*), ([$a-zA-Z0-9_.]*)>");
+    private static final Pattern ARRAY_TYPE_REGEXP = Pattern.compile("\\[L([$a-zA-Z0-9_.]*);");
+
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_ARRAYS;
+
+    static {
+        Map<Class<?>, Class<?>> primitives = new HashMap<>();
+        primitives.put(byte[].class, Byte.TYPE);
+        primitives.put(short[].class, Short.TYPE);
+        primitives.put(char[].class, Character.TYPE);
+        primitives.put(int[].class, Integer.TYPE);
+        primitives.put(long[].class, Long.TYPE);
+        primitives.put(float[].class, Float.TYPE);
+        primitives.put(double[].class, Double.TYPE);
+        primitives.put(boolean[].class, Boolean.TYPE);
+        PRIMITIVE_ARRAYS = ImmutableMap.copyOf(primitives);
+    }
 
     public static Class<?> extractSingeGenericType(String typeName) {
 
@@ -67,6 +86,24 @@ public final class ReflectionUtils {
 
     public static Class<?>[] getPairedGenericType(Field field) throws DtoGeneratorException {
         return extractPairedGenericType(field.getGenericType().getTypeName());
+    }
+
+    public static Class<?> getArrayElementType(Class<?> arrayType) throws DtoGeneratorException {
+
+        if (PRIMITIVE_ARRAYS.containsKey(arrayType)) {
+            return PRIMITIVE_ARRAYS.get(arrayType);
+        }
+
+        String typeName = arrayType.getName();
+
+        Matcher matcher = ARRAY_TYPE_REGEXP.matcher(typeName);
+
+        if (!matcher.find()) {
+            throw new DtoGeneratorException("Cannot find array element type using next regex pattern: "
+                    + ARRAY_TYPE_REGEXP.pattern() + " in type: '" + typeName + "'");
+        }
+
+        return getClass(matcher.group(1), typeName);
     }
 
     private static Class<?> getClass(String className, String typeName) {

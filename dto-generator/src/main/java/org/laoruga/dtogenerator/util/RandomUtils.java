@@ -1,7 +1,6 @@
 package org.laoruga.dtogenerator.util;
 
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -12,11 +11,9 @@ import org.laoruga.dtogenerator.constants.CharSet;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Random;
 
 /**
  * @author Il'dar Valitov

@@ -29,31 +29,29 @@ import java.util.function.Supplier;
  */
 @Slf4j
 @Getter(AccessLevel.PRIVATE)
-public class GeneratorsProviderByAnnotationForCollection {
+public class GeneratorsProviderByAnnotationForList {
 
-    private final GeneratorsProviderByAnnotation generatorsProvider;
+    protected final GeneratorsProviderByAnnotation generatorsProvider;
 
-    public GeneratorsProviderByAnnotationForCollection(GeneratorsProviderByAnnotation generatorsProvider) {
+    public GeneratorsProviderByAnnotationForList(GeneratorsProviderByAnnotation generatorsProvider) {
         this.generatorsProvider = generatorsProvider;
     }
 
-    IGenerator<?> getCollectionGenerator(Field field,
-                                                   RuleInfoCollection collectionRuleInfo,
-                                                   Supplier<?> dtoInstanceSupplier,
-                                                   Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
+    IGenerator<?> getGenerator(RuleInfoCollection collectionRuleInfo,
+                               Supplier<?> dtoInstanceSupplier,
+                               Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
 
+        final Field field = collectionRuleInfo.getField();
         final Class<?> fieldType = field.getType();
         final String fieldName = field.getName();
 
-        Class<?> collectionElementType = ReflectionUtils.getSingleGenericType(field);
+        Class<?> collectionElementType = collectionRuleInfo.getElementType();
 
         // Collection element generator builder
 
         IGenerator<?> elementGenerator = collectionRuleInfo.isElementRulesExist() ?
                 generatorsProvider.getGenerator(
                         collectionRuleInfo.getElementRuleInfo(),
-                        collectionElementType,
-                        fieldName,
                         dtoInstanceSupplier,
                         nestedDtoGeneratorSupplier) :
                 generatorsProvider.getGeneratorByType(field, collectionElementType);
@@ -71,7 +69,7 @@ public class GeneratorsProviderByAnnotationForCollection {
 
         generatorsProvider.prepareCustomRemarks(elementGenerator, fieldName);
 
-        return buildCollectionGenerator(
+        return buildListGenerator(
                 collectionRuleInfo.getRule(),
                 collectionGenBuilder,
                 elementGenerator,
@@ -82,18 +80,18 @@ public class GeneratorsProviderByAnnotationForCollection {
     }
 
     @SuppressWarnings("unchecked")
-    private IGenerator<?> buildCollectionGenerator(Annotation collectionRule,
-                                                   IGeneratorBuilder<?> collectionGenBuilder,
-                                                   IGenerator<?> elementGenerator,
-                                                   Class<?> fieldType,
-                                                   String fieldName) {
+    protected IGenerator<?> buildListGenerator(Annotation collectionRule,
+                                               IGeneratorBuilder<?> collectionGenBuilder,
+                                               IGenerator<?> elementGenerator,
+                                               Class<?> fieldType,
+                                               String fieldName) {
         Class<? extends Annotation> rulesClass = collectionRule.annotationType();
 
         if (collectionGenBuilder instanceof CollectionGeneratorBuilder) {
 
             CollectionConfigDto configDto;
 
-            if (CollectionRule.class == rulesClass && Collection.class.isAssignableFrom(fieldType)) {
+            if (CollectionRule.class == rulesClass && CollectionRule.GENERATED_TYPE.isAssignableFrom(fieldType)) {
 
                 CollectionRule rule = (CollectionRule) collectionRule;
 

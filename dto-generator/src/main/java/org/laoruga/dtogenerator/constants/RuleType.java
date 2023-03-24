@@ -14,6 +14,7 @@ public enum RuleType {
     CUSTOM,
     NESTED,
     COLLECTION,
+    ARRAY,
     MAP;
 
     public static RuleType getType(Annotation rule) {
@@ -25,6 +26,9 @@ public enum RuleType {
             case RULE_FOR_COLLECTION:
             case RULES_FOR_COLLECTION:
                 return COLLECTION;
+
+            case RULE_FOR_ARRAY:
+                return ARRAY;
 
             case RULE_FOR_MAP:
             case RULES_FOR_MAP:

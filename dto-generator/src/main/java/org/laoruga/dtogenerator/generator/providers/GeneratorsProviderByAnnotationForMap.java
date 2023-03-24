@@ -11,6 +11,7 @@ import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.builders.MapGeneratorBuilder;
 import org.laoruga.dtogenerator.generator.configs.MapConfigDto;
+import org.laoruga.dtogenerator.rule.IRuleInfo;
 import org.laoruga.dtogenerator.rule.RuleInfoMap;
 import org.laoruga.dtogenerator.util.ConcreteClasses;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
@@ -37,11 +38,11 @@ public class GeneratorsProviderByAnnotationForMap {
         this.generatorsProvider = generatorsProvider;
     }
 
-    IGenerator<?> getMapGenerator(Field field,
-                                         RuleInfoMap mapRruleInfo,
-                                         Supplier<?> dtoInstanceSupplier,
-                                         Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
+    IGenerator<?> getGenerator(RuleInfoMap mapRruleInfo,
+                               Supplier<?> dtoInstanceSupplier,
+                               Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
 
+        final Field field = mapRruleInfo.getField();
         final Class<?> fieldType = field.getType();
         final String fieldName = field.getName();
 
@@ -50,37 +51,34 @@ public class GeneratorsProviderByAnnotationForMap {
         Optional<IGeneratorBuilder<?>> maybeUsersMapGenBuilder =
                 generatorsProvider.getUsersGenBuilder(fieldType);
 
-        boolean isUserMapBuilder = maybeUsersMapGenBuilder.isPresent();
-
-        IGeneratorBuilder<?> mapGenBuilder = isUserMapBuilder ?
+        IGeneratorBuilder<?> mapGenBuilder = maybeUsersMapGenBuilder.isPresent() ?
                 maybeUsersMapGenBuilder.get() :
                 generatorsProvider.getDefaultGenBuilder(
                         mapRruleInfo.getRule(),
-                        fieldType);
+                        fieldType
+                );
 
         Class<?>[] keyAndValueType = ReflectionUtils.getPairedGenericType(field);
 
         // Map key generator builder
 
-        Class<?> keyType = keyAndValueType[0];
+        IRuleInfo keyRule = mapRruleInfo.getKeyRule();
         IGenerator<?> keyGenerator = mapRruleInfo.isKeyRulesExist() ?
-                generatorsProvider.getGenerator(mapRruleInfo.getKeyRule(),
-                        keyType,
-                        fieldName,
+                generatorsProvider.getGenerator(
+                        keyRule,
                         dtoInstanceSupplier,
                         nestedDtoGeneratorSupplier) :
-                generatorsProvider.getGeneratorByType(field, keyType);
+                generatorsProvider.getGeneratorByType(field, keyRule.getRequiredType());
 
         // Map value generator builder
 
-        Class<?> valueType = keyAndValueType[1];
+        IRuleInfo valueRule = mapRruleInfo.getValueRule();
         IGenerator<?> valueGenerator = mapRruleInfo.isValueRulesExist() ?
-                generatorsProvider.getGenerator(mapRruleInfo.getValueRule(),
-                        valueType,
-                        fieldName,
+                generatorsProvider.getGenerator(
+                        valueRule,
                         dtoInstanceSupplier,
                         nestedDtoGeneratorSupplier) :
-                generatorsProvider.getGeneratorByType(field, valueType);
+                generatorsProvider.getGeneratorByType(field, valueRule.getRequiredType());
 
         generatorsProvider.prepareCustomRemarks(keyGenerator, fieldName);
         generatorsProvider.prepareCustomRemarks(valueGenerator, fieldName);
@@ -109,7 +107,7 @@ public class GeneratorsProviderByAnnotationForMap {
 
             MapConfigDto configDto;
 
-            if (MapRule.class == rulesClass && Map.class.isAssignableFrom(fieldType)) {
+            if (MapRule.class == rulesClass) {
 
                 MapRule rule = (MapRule) mapRule;
 

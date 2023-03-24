@@ -25,6 +25,7 @@ public final class RulesInstance {
     @DateTimeRule
     @CollectionRule(element = @Entry)
     @MapRule(key = @Entry, value = @Entry)
+    @ArrayRule(element = @Entry)
     @CustomRule(generatorClass = Object.class)
     @NestedDtoRule
     private static final Object ANNOTATIONS = null;
@@ -39,6 +40,7 @@ public final class RulesInstance {
     public static final DecimalRule DECIMAL_RULE;
     public static final DateTimeRule DATE_TIME_RULE;
     public static final CollectionRule COLLECTION_RULE;
+    public static final ArrayRule ARRAY_RULE;
     public static final MapRule MAP_RULE;
     public static final CustomRule CUSTOM_RULE;
     public static final NestedDtoRule NESTED_DTO_RULE;
@@ -63,6 +65,7 @@ public final class RulesInstance {
             DATE_TIME_RULE = getAnnotationInstance(annotations, DateTimeRule.class);
             COLLECTION_RULE = getAnnotationInstance(annotations, CollectionRule.class);
             MAP_RULE = getAnnotationInstance(annotations, MapRule.class);
+            ARRAY_RULE = getAnnotationInstance(annotations, ArrayRule.class);
             CUSTOM_RULE = getAnnotationInstance(annotations, CustomRule.class);
             NESTED_DTO_RULE = getAnnotationInstance(annotations, NestedDtoRule.class);
 

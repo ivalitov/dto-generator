@@ -6,11 +6,13 @@ import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
+import org.laoruga.dtogenerator.api.rules.ArrayRule;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsDefaultConfigSupplier;
+import org.laoruga.dtogenerator.constants.GeneratedTypes;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolderGeneral;
@@ -127,7 +129,20 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
 
         } else if (genBuilder instanceof EnumGeneratorBuilder) {
 
-            generatorSupplier = enumGeneratorSupplier(generatedType);
+            generatorSupplier = getEnumGeneratorSupplier(generatedType);
+
+        } else if (GeneratedTypes.isAssignableFrom(ArrayRule.GENERATED_TYPES, generatedType)) {
+
+            Class<?> elementType = ReflectionUtils.getArrayElementType(generatedType);
+            IGenerator<?> elementGenerator =
+                    getGenerator(field, elementType).orElseThrow(
+                            () -> new DtoGeneratorException(
+                                    "Array element generator not found, for type: " + "'" + elementType + "'"));
+
+            generatorSupplier = getArrayGeneratorSupplier(
+                    elementType,
+                    elementGenerator
+            );
 
         } else {
 
