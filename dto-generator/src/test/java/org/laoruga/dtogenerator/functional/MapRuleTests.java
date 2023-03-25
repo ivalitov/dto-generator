@@ -7,7 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
-import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.api.rules.Entry;
+import org.laoruga.dtogenerator.api.rules.MapRule;
+import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.api.rules.datetime.ChronoUnitShift;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.config.Configuration;
@@ -45,28 +47,18 @@ public class MapRuleTests {
 
         @MapRule(
                 key = @Entry(stringRule = @StringRule(maxLength = 10)),
-                value = @Entry(numberRule = @NumberRule),
                 minSize = 10
         )
         Map<String, Integer> stringIntegerMap;
 
-        @MapRule(
-                key = @Entry(enumRule = @EnumRule),
-                value = @Entry(numberRule = @NumberRule),
-                minSize = 3,
-                maxSize = 3
-        )
+        @MapRule(minSize = 3, maxSize = 3)
         HashMap<ClientType, Long> enumLongHashMap;
 
-        @MapRule(
-                key = @Entry(decimalRule = @DecimalRule),
-                value = @Entry(dateTimeRule = @DateTimeRule)
-        )
+        @MapRule
         TreeMap<Double, LocalDateTime> doubleLocalDateTimeTreeMap;
 
         @MapRule(
                 key = @Entry(dateTimeRule = @DateTimeRule(chronoUnitShift = @ChronoUnitShift(unit = YEARS, leftBound = -100))),
-                value = @Entry(booleanRule = @BooleanRule),
                 mapClass = ConcurrentHashMap.class
         )
         Map<Year, Boolean> yearBooleanMap;

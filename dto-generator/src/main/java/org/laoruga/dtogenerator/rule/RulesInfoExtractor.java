@@ -169,7 +169,7 @@ public class RulesInfoExtractor {
                                                        boolean isMultipleRules) {
 
         Class<?> elementType = ReflectionUtils.getSingleGenericType(field);
-        Annotation elementRule = ReflectionUtils.getSingleRuleFromEntry(collectionRule.element());
+        Annotation elementRule = ReflectionUtils.getSingleRuleFromEntry(collectionRule.element(), elementType);
 
         validateType(elementType, elementRule);
         validateType(field.getType(), collectionRule);
@@ -196,7 +196,7 @@ public class RulesInfoExtractor {
     private IRuleInfo buildArrayRuleInfo(ArrayRule arrayRule, String groupName, boolean isMultipleRules) {
 
         Class<?> elementType = ReflectionUtils.getArrayElementType(field.getType());
-        Annotation elementRule = ReflectionUtils.getSingleRuleFromEntry(arrayRule.element());
+        Annotation elementRule = ReflectionUtils.getSingleRuleFromEntry(arrayRule.element(), elementType);
 
         validateType(elementType, elementRule);
         validateType(field.getType(), arrayRule);
@@ -223,8 +223,8 @@ public class RulesInfoExtractor {
 
         Class<?>[] keyValueTypes = ReflectionUtils.getPairedGenericType(field);
 
-        Annotation keyRule = ReflectionUtils.getSingleRuleFromEntry(mapRule.key());
-        Annotation valueRule = ReflectionUtils.getSingleRuleFromEntry(mapRule.value());
+        Annotation keyRule = ReflectionUtils.getSingleRuleFromEntry(mapRule.key(), keyValueTypes[0]);
+        Annotation valueRule = ReflectionUtils.getSingleRuleFromEntry(mapRule.value(), keyValueTypes[1]);
 
         validateType(field.getType(), mapRule);
         validateType(keyValueTypes[0], keyRule);

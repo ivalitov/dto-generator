@@ -43,24 +43,21 @@ class ListGenerationTests {
     static class DtoList {
 
         @CollectionRule(
-                collectionClass = LinkedList.class,
-                element = @Entry(stringRule = @StringRule))
+                collectionClass = LinkedList.class)
         private List<String> linkedListOfStrings;
 
         @CollectionRule(
-                collectionClass = Vector.class,
-                element = @Entry(stringRule = @StringRule))
+                collectionClass = Vector.class)
         private List<String> vectorOfStrings;
 
-        @CollectionRule(element = @Entry(stringRule = @StringRule))
+        @CollectionRule
         private ArrayList<String> arrayListOfStringsImplicit;
 
         @CollectionRule(
-                collectionClass = LinkedList.class,
-                element = @Entry(stringRule = @StringRule))
+                collectionClass = LinkedList.class)
         private LinkedList<String> linkedListOfStringsImplicit;
 
-        @CollectionRule(element = @Entry(numberRule = @NumberRule))
+        @CollectionRule
         private List<AtomicInteger> listOfAtomicInteger;
     }
 
@@ -138,15 +135,12 @@ class ListGenerationTests {
     @Getter
     static class DtoVariousTypes {
 
-        @CollectionRule(
-                minSize = 10,
-                element = @Entry(booleanRule = @BooleanRule(trueProbability = 1)))
+        @CollectionRule(minSize = 10, element = @Entry(booleanRule =
+        @BooleanRule(trueProbability = 1)))
         private List<Boolean> listOfBoolean;
 
-        @CollectionRule(
-                minSize = 2,
-                maxSize = 2,
-                element = @Entry(numberRule = @NumberRule(minInt = 777, maxInt = 777)))
+        @CollectionRule(minSize = 2, maxSize = 2, element = @Entry(numberRule =
+        @NumberRule(minInt = 777, maxInt = 777)))
         private List<AtomicInteger> listOfAtomicInteger;
 
     }
@@ -211,21 +205,19 @@ class ListGenerationTests {
     @Getter
     static class DtoWithRawList {
         @CollectionRule(
-                collectionClass = Vector.class,
-                element = @Entry(numberRule = @NumberRule))
+                collectionClass = Vector.class)
         List rawList;
     }
 
     @Getter
     static class DtoWithListOfCollections {
-        @CollectionRule(element = @Entry)
-        @CollectionRule(element = @Entry)
+        @CollectionRule
+        @CollectionRule
         List<Set<String>> listOfSet;
 
         @CollectionRule(
-                collectionClass = LinkedList.class,
-                element = @Entry)
-        List<String> listOfString;
+                collectionClass = LinkedList.class)
+        List<System> listOfString;
     }
 
     @Test
@@ -267,20 +259,19 @@ class ListGenerationTests {
 
         Map<String, Exception> errorsMap = UtilsRoot.getErrorsMap(generator);
 
-        final String ERROR_MSG_PART = "Missed @Rule annotation for collection element";
-
         assertEquals(2, errorsMap.size());
         assertTrue(errorsMap.containsKey("listOfSet"));
         assertThat(errorsMap.get("listOfSet").getCause().getMessage(),
                 containsString("is repeating for field"));
         assertTrue(errorsMap.containsKey("listOfString"));
         assertThat(errorsMap.get("listOfString").getCause().getMessage(),
-                containsString("Empty '" + Entry.class.getName() + "' annotation."));
+                containsString("failed to select @Rules annotation by type"));
     }
 
     static class Dto3 {
 
-        @CollectionRule(element = @Entry(numberRule = @NumberRule))
+        @CollectionRule(element = @Entry(numberRule =
+        @NumberRule))
         List<String> some;
 
     }
@@ -306,20 +297,18 @@ class ListGenerationTests {
     static class DtoSet {
 
 
-        @CollectionRule(element = @Entry(numberRule = @NumberRule))
+        @CollectionRule
         Set<Integer> numbers;
 
         @CollectionRule(
-                collectionClass = LinkedHashSet.class,
-                element = @Entry(numberRule = @NumberRule))
+                collectionClass = LinkedHashSet.class)
         Set<Integer> linkedHashSet;
 
         @CollectionRule(
-                collectionClass = TreeSet.class,
-                element = @Entry(numberRule = @NumberRule))
+                collectionClass = TreeSet.class)
         TreeSet<Integer> treeSet;
 
-        @CollectionRule(element = @Entry(numberRule = @NumberRule))
+        @CollectionRule
         HashSet<Integer> hashSet;
     }
 

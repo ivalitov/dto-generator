@@ -26,9 +26,9 @@ public @interface MapRule {
 
     Class<?> GENERATED_TYPE = Map.class;
 
-    Entry key();
+    Entry key() default @Entry;
 
-    Entry value();
+    Entry value() default @Entry;
 
     Class<? extends Map> mapClass() default DummyMapClass.class;
 

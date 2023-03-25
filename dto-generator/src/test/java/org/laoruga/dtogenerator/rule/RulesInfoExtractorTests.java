@@ -180,17 +180,6 @@ class RulesInfoExtractorTests {
         Long loong;
     }
 
-    static class DtoNegative5 {
-        @CollectionRule(element = @Entry)
-        List<String> list;
-    }
-
-    static class DtoNegative6 {
-        @CollectionRule(element = @Entry)
-        @CollectionRule(group = GROUP_1, element = @Entry)
-        List<String> list;
-    }
-
     static class DtoNegative7 {
         @StringRule
         @StringRule
@@ -200,12 +189,9 @@ class RulesInfoExtractorTests {
 
     static Stream<Arguments> unappropriatedDataSet() {
         final String DIFFERENT_TYPES = "Found @Rule annotations at least for 2 different types";
-        String EMPTY = "Empty '" + Entry.class.getName() + "' annotation.";
         return Stream.of(
                 Arguments.of("loong", DtoNegative3.class, DIFFERENT_TYPES),
                 Arguments.of("loong", DtoNegative4.class, DIFFERENT_TYPES),
-                Arguments.of("list", DtoNegative5.class, EMPTY),
-                Arguments.of("list", DtoNegative6.class, EMPTY),
                 Arguments.of("string", DtoNegative7.class, DIFFERENT_TYPES)
         );
     }

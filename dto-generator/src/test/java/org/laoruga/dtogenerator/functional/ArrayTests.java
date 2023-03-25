@@ -7,7 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
-import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.api.rules.ArrayRule;
+import org.laoruga.dtogenerator.api.rules.Entry;
+import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
@@ -30,26 +32,23 @@ public class ArrayTests {
 
     static class Dto {
 
-        @ArrayRule(minSize = 2,
-                element = @Entry(stringRule = @StringRule))
+        @ArrayRule(minSize = 2)
         String[] strings;
 
-        @ArrayRule(ruleRemark = MIN_VALUE,
-                maxSize = 4,
-                element = @Entry(numberRule = @NumberRule))
+        @ArrayRule(ruleRemark = MIN_VALUE, maxSize = 4)
         Integer[] integers;
 
-        @ArrayRule(ruleRemark = RuleRemark.MAX_VALUE,
-                element = @Entry(numberRule = @NumberRule))
+        @ArrayRule(ruleRemark = RuleRemark.MAX_VALUE)
         int[] ints;
 
-        @ArrayRule(element = @Entry(numberRule = @NumberRule))
+        @ArrayRule
         Long[] longsObjects;
 
-        @ArrayRule(element = @Entry(numberRule = @NumberRule))
+        @ArrayRule(element = @Entry(numberRule =
+        @NumberRule(minLong = 1, maxLong = 10)))
         long[] longs;
 
-        @ArrayRule(element = @Entry(enumRule = @EnumRule))
+        @ArrayRule
         ClientType[] enums;
 
     }

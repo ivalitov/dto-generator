@@ -1,10 +1,13 @@
 package org.laoruga.dtogenerator.util;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.Primitives;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.rules.Entry;
+import org.laoruga.dtogenerator.constants.GeneratedTypes;
+import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorValidationException;
 
@@ -223,6 +226,35 @@ public final class ReflectionUtils {
         if (found == null) {
             throw new DtoGeneratorValidationException("Empty '" + Entry.class.getName() + "' annotation.");
         }
+        return found;
+    }
+
+    public static Annotation getSingleRuleFromEntry(Entry mapRule, Class<?> requiredType) throws DtoGeneratorValidationException {
+        Class<? extends Annotation> clazz = mapRule.annotationType();
+        Annotation found = null;
+        for (Method method : clazz.getMethods()) {
+            if (method.getName().endsWith("Rule")) {
+                Annotation[] values =
+                        invokeMethodReturningArray(mapRule, method.getName(), Annotation.class);
+                if (values.length >= 1) {
+                    if (values.length > 1 || found != null) {
+                        throw new DtoGeneratorValidationException("More than one annotation found in: '" + mapRule + "'");
+                    }
+                    found = values[0];
+                }
+            }
+        }
+
+        if (found == null) {
+            Optional<Class<? extends Annotation>> rulesClass = GeneratedTypes.getRulesClass(Primitives.wrap(requiredType));
+            if (rulesClass.isPresent() && RulesInstance.INSTANCES_MAP.containsKey(rulesClass.get())) {
+                found = RulesInstance.INSTANCES_MAP.get(rulesClass.get());
+            } else {
+                throw new DtoGeneratorValidationException("Empty '@" + Entry.class.getSimpleName() + "' annotation," +
+                        " but failed to select @Rules annotation by type: '" + requiredType + "'");
+            }
+        }
+
         return found;
     }
 }

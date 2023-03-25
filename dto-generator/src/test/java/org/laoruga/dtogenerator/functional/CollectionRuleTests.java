@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.Extensions;
-import org.laoruga.dtogenerator.api.rules.*;
-import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
+import org.laoruga.dtogenerator.api.rules.CollectionRule;
 
 import java.time.Year;
 import java.util.*;
@@ -29,22 +28,22 @@ public class CollectionRuleTests {
 
     static class Dto {
 
-        @CollectionRule(element = @Entry(stringRule = @StringRule))
+        @CollectionRule
         List<String> listOfString;
 
-        @CollectionRule(element = @Entry(numberRule = @NumberRule))
+        @CollectionRule
         Set<Integer> setOfInteger;
 
-        @CollectionRule(element = @Entry(dateTimeRule = @DateTimeRule))
+        @CollectionRule
         Queue<Year> queueOfYear;
 
-        @CollectionRule(element = @Entry(decimalRule = @DecimalRule))
+        @CollectionRule
         LinkedList<Double> linkedListOfDouble;
 
-        @CollectionRule(element = @Entry(numberRule = @NumberRule))
+        @CollectionRule
         LinkedHashSet<AtomicInteger> linkedHashSetOfAtomicInteger;
 
-        @CollectionRule(element = @Entry(enumRule = @EnumRule))
+        @CollectionRule
         ArrayDeque<Planets> arrayDequeOfEnum;
 
     }

@@ -21,7 +21,7 @@ public @interface ArrayRule {
     Class<?>[] GENERATED_TYPES = new Class<?>[]
             {Object[].class, byte[].class, short[].class, char[].class, int[].class, long[].class, boolean[].class};
 
-    Entry element();
+    Entry element() default @Entry;
 
     int maxSize() default 10;
 

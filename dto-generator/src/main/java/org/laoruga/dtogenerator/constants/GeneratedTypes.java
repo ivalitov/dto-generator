@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Il'dar Valitov
@@ -38,6 +39,14 @@ public class GeneratedTypes {
     public static Class<?>[] get(Class<? extends Annotation> rules) {
         return Objects.requireNonNull(GENERATED_TYPES.get(rules),
                 "Generated types wasn't added for rule: '" + rules + "'");
+    }
+
+    public static Optional<Class<? extends Annotation>> getRulesClass(final Class<?> requiredType) {
+        return GENERATED_TYPES.entrySet().stream()
+                .filter(e -> e.getKey() != CustomRule.class && e.getKey() != NestedDtoRule.class)
+                .filter(e -> isAssignableFrom(e.getValue(), requiredType))
+                .findFirst()
+                .map(Map.Entry::getKey);
     }
 
     public static boolean isAssignableFrom(Class<?>[] possibleTypes, Class<?> generatedType) {

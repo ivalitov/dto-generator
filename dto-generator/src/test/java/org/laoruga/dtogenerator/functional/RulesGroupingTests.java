@@ -66,11 +66,11 @@ class RulesGroupingTests {
         //GR_1
         @CollectionRule(
                 group = GROUP_1, minSize = 1, maxSize = 1,
-                element = @Entry(numberRule = @NumberRule(group = GROUP_1, ruleRemark = MAX_VALUE)))
+                element = @Entry(numberRule = @NumberRule(ruleRemark = MAX_VALUE)))
         //GR_2
         @CollectionRule(
                 group = GROUP_2, minSize = 2, maxSize = 2,
-                element = @Entry(numberRule = @NumberRule(group = GROUP_2, ruleRemark = MIN_VALUE)))
+                element = @Entry(numberRule = @NumberRule(ruleRemark = MIN_VALUE)))
         //DEFAULT
         @CollectionRule(
                 minSize = 3, maxSize = 3,
@@ -190,7 +190,7 @@ class RulesGroupingTests {
 
         @CollectionRule(
                 group = GROUP_1, minSize = 1, maxSize = 1,
-                element = @Entry(numberRule = @NumberRule(group = GROUP_1, minInt = 1, maxInt = 1)))
+                element = @Entry(numberRule = @NumberRule(minInt = 1, maxInt = 1)))
 
         @CollectionRule(
                 minSize = 2, maxSize = 2,

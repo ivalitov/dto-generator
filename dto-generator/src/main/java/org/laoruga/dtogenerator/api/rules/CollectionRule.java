@@ -22,7 +22,7 @@ public @interface CollectionRule {
 
     Class<?> GENERATED_TYPE = Collection.class;
 
-    Entry element();
+    Entry element() default @Entry;
 
     Class<? extends Collection> collectionClass() default DummyCollectionClass.class;
 

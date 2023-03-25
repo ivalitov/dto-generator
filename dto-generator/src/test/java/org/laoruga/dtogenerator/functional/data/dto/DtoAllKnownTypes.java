@@ -46,13 +46,13 @@ public class DtoAllKnownTypes {
     @EnumRule
     ClientType clientType;
 
-    @CollectionRule(element = @Entry(stringRule = @StringRule))
+    @CollectionRule
     List<String> listOfString;
 
-    @CollectionRule(element = @Entry(numberRule = @NumberRule))
+    @CollectionRule
     Set<Long> setOfLong;
 
-    @CollectionRule(element = @Entry(enumRule = @EnumRule))
+    @CollectionRule
     LinkedList<ClientType> linkedListOfEnum;
 
     @NestedDtoRule
