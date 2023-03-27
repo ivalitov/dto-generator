@@ -53,6 +53,10 @@ public class AllKnownTypesGeneratingTests {
         @NestedDtoRule
         InnerDto innerDto;
 
+        public InnerDto getInnerDto() {
+            return innerDto;
+        }
+
         public Integer getInteger() {
             return integer;
         }
