@@ -2,9 +2,8 @@ package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Epic;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
-import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
@@ -40,8 +38,8 @@ import static org.laoruga.dtogenerator.Constants.RESTORE_STATIC_CONFIG;
 @ExtendWith(Extensions.RestoreStaticConfig.class)
 public class AllKnownTypesGeneratingTests {
 
-    @NoArgsConstructor
     @Getter
+    @ToString
     static class Dto {
 
         String string;
@@ -61,8 +59,8 @@ public class AllKnownTypesGeneratingTests {
         }
     }
 
-    @NoArgsConstructor
     @Getter
+    @ToString
     static class InnerDto {
 
         String string;
@@ -102,11 +100,7 @@ public class AllKnownTypesGeneratingTests {
 
         Dto dto = builder.build().generateDto();
 
-        try {
-            log.info(UtilsRoot.toJson(dto));
-        } catch (Exception e) {
-            log.error(ExceptionUtils.getStackTrace(e));
-        }
+        log.info(dto.toString());
 
         assertNotNull(dto);
         assertAll(

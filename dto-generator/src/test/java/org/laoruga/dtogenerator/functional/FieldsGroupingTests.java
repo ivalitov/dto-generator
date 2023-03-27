@@ -2,12 +2,11 @@ package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Epic;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 import org.laoruga.dtogenerator.api.rules.*;
 
@@ -27,7 +26,7 @@ import static org.laoruga.dtogenerator.constants.Group.*;
 class FieldsGroupingTests {
 
     @Getter
-    @NoArgsConstructor
+    @ToString
     static class Dto {
 
         // this annotation do not mean anything
@@ -72,7 +71,7 @@ class FieldsGroupingTests {
     }
 
     @Getter
-    @NoArgsConstructor
+    @ToString
     static class DtoInner {
 
         @StringRule(group = REQUIRED)
@@ -114,7 +113,7 @@ class FieldsGroupingTests {
                 .includeGroups(REQUIRED)
                 .build().generateDto();
 
-        log.info(UtilsRoot.toJson(dto));
+        log.info(dto.toString());
 
         assertNotNull(dto);
         assertAll(
