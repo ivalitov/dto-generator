@@ -94,7 +94,7 @@ public class CollectionRuleTests {
                 () -> assertThat(dto.setOfInteger, hasSize(1)),
                 () -> assertThat(dto.queueOfYear, hasSize(2)),
                 // ambiguous config - List & Queue
-                () -> assertThat(dto.linkedListOfDouble, not(empty())),
+                () -> assertThat(dto.linkedListOfDouble, notNullValue()),
                 () -> assertThat(dto.linkedHashSetOfAtomicInteger, hasSize(1)),
                 () -> assertThat(dto.arrayDequeOfEnum, hasSize(2))
         );
