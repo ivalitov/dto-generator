@@ -57,7 +57,6 @@ public class AllKnownTypesGeneratingTests {
         }
     }
 
-    @Getter
     static class InnerDto {
 
         String string;
@@ -128,17 +127,17 @@ public class AllKnownTypesGeneratingTests {
                 () -> assertThat(innerDto.integer, both(
                         greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt()))
                         .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt()))),
-                () -> assertThat(innerDto.getALong(), both(
+                () -> assertThat(innerDto.aLong, both(
                         greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minLong()))
                         .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxLong()))),
-                () -> assertThat(innerDto.getADouble(), both(
+                () -> assertThat(innerDto.aDouble, both(
                         greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble()))
                         .and(lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
                 () -> assertThat(innerDto.getLocalDateTime(), notNullValue()),
-                () -> assertThat(innerDto.getClientType(), notNullValue()),
-                () -> assertThat(innerDto.getListOfString().size(), equalTo(1)),
-                () -> assertThat(innerDto.getSetOfLong().size(), equalTo(1)),
-                () -> assertThat(innerDto.getADouble(), notNullValue())
+                () -> assertThat(innerDto.clientType, notNullValue()),
+                () -> assertThat(innerDto.listOfString.size(), equalTo(1)),
+                () -> assertThat(innerDto.setOfLong.size(), equalTo(1)),
+                () -> assertThat(innerDto.aDouble, notNullValue())
         );
     }
 
