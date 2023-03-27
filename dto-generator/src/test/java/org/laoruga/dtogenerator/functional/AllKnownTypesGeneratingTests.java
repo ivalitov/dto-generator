@@ -51,10 +51,6 @@ public class AllKnownTypesGeneratingTests {
         Set<Long> setOfLong;
         @NestedDtoRule
         InnerDto innerDto;
-
-        public String getLocalDateTime() {
-            return localDateTime.toString();
-        }
     }
 
     static class InnerDto {
@@ -68,10 +64,6 @@ public class AllKnownTypesGeneratingTests {
         ClientType clientType;
         List<String> listOfString;
         Set<Long> setOfLong;
-
-        public String getLocalDateTime() {
-            return localDateTime.toString();
-        }
     }
 
     @BeforeEach
@@ -111,7 +103,7 @@ public class AllKnownTypesGeneratingTests {
                 () -> assertThat(dto.aDouble, both(
                         greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble()))
                         .and(lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
-                () -> assertThat(dto.getLocalDateTime(), notNullValue()),
+                () -> assertThat(dto.localDateTime, notNullValue()),
                 () -> assertThat(dto.clientType, notNullValue()),
                 () -> assertThat(dto.listOfString.size(), equalTo(1)),
                 () -> assertThat(dto.setOfLong.size(), equalTo(1)),
@@ -133,7 +125,7 @@ public class AllKnownTypesGeneratingTests {
                 () -> assertThat(innerDto.aDouble, both(
                         greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble()))
                         .and(lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
-                () -> assertThat(innerDto.getLocalDateTime(), notNullValue()),
+                () -> assertThat(innerDto.localDateTime, notNullValue()),
                 () -> assertThat(innerDto.clientType, notNullValue()),
                 () -> assertThat(innerDto.listOfString.size(), equalTo(1)),
                 () -> assertThat(innerDto.setOfLong.size(), equalTo(1)),
