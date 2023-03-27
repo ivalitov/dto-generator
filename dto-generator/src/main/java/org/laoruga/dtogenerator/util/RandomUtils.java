@@ -38,7 +38,9 @@ public final class RandomUtils {
 
     public static float nextFloat(float minValue, float maxValue, int precision) {
         float generated = minValue + RANDOM.nextFloat() * (maxValue - minValue);
-        return new BigDecimal(generated).setScale(precision, RoundingMode.HALF_UP).floatValue();
+        return BigDecimal.valueOf(generated)
+                .setScale(precision, RoundingMode.HALF_UP)
+                .floatValue();
     }
 
     /**
