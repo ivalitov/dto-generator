@@ -101,6 +101,17 @@ public class AllKnownTypesGeneratingTests {
         Dto dto = builder.build().generateDto();
 
         assertNotNull(dto);
+
+        // DEBUG
+        dto.getString().length();
+        dto.getInteger();
+        dto.getLocalDateTime();
+        dto.getClientType();
+        dto.getListOfString();
+        dto.getSetOfLong();
+        dto.getADouble();
+        // DEBUG
+
         assertAll(
                 () -> assertThat(dto.getString().length(), both(
                         greaterThanOrEqualTo(RulesInstance.STRING_RULE.minLength()))
