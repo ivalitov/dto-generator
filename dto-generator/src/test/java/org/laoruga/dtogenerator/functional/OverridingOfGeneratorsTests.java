@@ -356,8 +356,6 @@ class OverridingOfGeneratorsTests {
 
         DtoDifferent dto = builder.build().generateDto();
 
-        log.info(UtilsRoot.toJson(dto));
-
         /*
          * static config for String max = 2
          * static config for Integer max = 0

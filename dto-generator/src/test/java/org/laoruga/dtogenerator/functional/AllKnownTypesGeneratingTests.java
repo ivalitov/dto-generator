@@ -100,8 +100,6 @@ public class AllKnownTypesGeneratingTests {
 
         Dto dto = builder.build().generateDto();
 
-        log.info(dto.toString());
-
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getString().length(), both(
