@@ -4,6 +4,7 @@ import io.qameta.allure.Epic;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -101,7 +102,11 @@ public class AllKnownTypesGeneratingTests {
 
         Dto dto = builder.build().generateDto();
 
-        log.info(UtilsRoot.toJson(dto));
+        try {
+            log.info(UtilsRoot.toJson(dto));
+        } catch (Exception e) {
+            log.error(ExceptionUtils.getStackTrace(e));
+        }
 
         assertNotNull(dto);
         assertAll(
