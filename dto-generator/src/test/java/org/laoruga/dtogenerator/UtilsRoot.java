@@ -1,6 +1,6 @@
 package org.laoruga.dtogenerator;
 
-import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.config.Configuration;
