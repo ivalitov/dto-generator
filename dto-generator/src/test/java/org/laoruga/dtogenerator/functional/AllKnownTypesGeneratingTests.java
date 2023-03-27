@@ -38,7 +38,6 @@ import static org.laoruga.dtogenerator.Constants.RESTORE_STATIC_CONFIG;
 @ExtendWith(Extensions.RestoreStaticConfig.class)
 public class AllKnownTypesGeneratingTests {
 
-    @Getter
     static class Dto {
 
         String string;
@@ -52,14 +51,6 @@ public class AllKnownTypesGeneratingTests {
         Set<Long> setOfLong;
         @NestedDtoRule
         InnerDto innerDto;
-
-        public InnerDto getInnerDto() {
-            return innerDto;
-        }
-
-        public Integer getInteger() {
-            return integer;
-        }
 
         public String getLocalDateTime() {
             return localDateTime.toString();
@@ -108,56 +99,46 @@ public class AllKnownTypesGeneratingTests {
 
         assertNotNull(dto);
 
-        // DEBUG
-        log.info("DEBUG BEGIN");
-        dto.getString();
-        dto.getInteger();
-        dto.getLocalDateTime();
-        dto.getClientType();
-        dto.getListOfString();
-        dto.getSetOfLong();
-        dto.getADouble();
-        log.info("DEBUG END");
-        // DEBUG
-
         assertAll(
-                () -> assertThat(dto.getString().length(), both(
+                () -> assertThat(dto.string.length(), both(
                         greaterThanOrEqualTo(RulesInstance.STRING_RULE.minLength()))
                         .and(lessThanOrEqualTo(RulesInstance.STRING_RULE.maxLength()))),
-                () -> assertThat(dto.getInteger(), both(
+                () -> assertThat(dto.integer, both(
                         greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt()))
                         .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt()))),
-                () -> assertThat(dto.getALong(), both(
+                () -> assertThat(dto.aLong, both(
                         greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minLong()))
                         .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxLong()))),
-                () -> assertThat(dto.getADouble(), both(
+                () -> assertThat(dto.aDouble, both(
                         greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble()))
                         .and(lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
                 () -> assertThat(dto.getLocalDateTime(), notNullValue()),
-                () -> assertThat(dto.getClientType(), notNullValue()),
-                () -> assertThat(dto.getListOfString().size(), equalTo(1)),
-                () -> assertThat(dto.getSetOfLong().size(), equalTo(1)),
-                () -> assertThat(dto.getADouble(), notNullValue())
+                () -> assertThat(dto.clientType, notNullValue()),
+                () -> assertThat(dto.listOfString.size(), equalTo(1)),
+                () -> assertThat(dto.setOfLong.size(), equalTo(1)),
+                () -> assertThat(dto.aDouble, notNullValue())
         );
 
+        InnerDto innerDto = dto.innerDto;
+
         assertAll(
-                () -> assertThat(dto.getInnerDto().getString().length(), both(
+                () -> assertThat(innerDto.string.length(), both(
                         greaterThanOrEqualTo(RulesInstance.STRING_RULE.minLength()))
                         .and(lessThanOrEqualTo(RulesInstance.STRING_RULE.maxLength()))),
-                () -> assertThat(dto.getInnerDto().getInteger(), both(
+                () -> assertThat(innerDto.integer, both(
                         greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt()))
                         .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt()))),
-                () -> assertThat(dto.getInnerDto().getALong(), both(
+                () -> assertThat(innerDto.getALong(), both(
                         greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minLong()))
                         .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxLong()))),
-                () -> assertThat(dto.getInnerDto().getADouble(), both(
+                () -> assertThat(innerDto.getADouble(), both(
                         greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble()))
                         .and(lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
-                () -> assertThat(dto.getInnerDto().getLocalDateTime(), notNullValue()),
-                () -> assertThat(dto.getInnerDto().getClientType(), notNullValue()),
-                () -> assertThat(dto.getInnerDto().getListOfString().size(), equalTo(1)),
-                () -> assertThat(dto.getInnerDto().getSetOfLong().size(), equalTo(1)),
-                () -> assertThat(dto.getInnerDto().getADouble(), notNullValue())
+                () -> assertThat(innerDto.getLocalDateTime(), notNullValue()),
+                () -> assertThat(innerDto.getClientType(), notNullValue()),
+                () -> assertThat(innerDto.getListOfString().size(), equalTo(1)),
+                () -> assertThat(innerDto.getSetOfLong().size(), equalTo(1)),
+                () -> assertThat(innerDto.getADouble(), notNullValue())
         );
     }
 

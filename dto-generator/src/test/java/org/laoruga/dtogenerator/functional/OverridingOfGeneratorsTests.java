@@ -306,8 +306,6 @@ class OverridingOfGeneratorsTests {
         );
     }
 
-    @Getter
-    @NoArgsConstructor
     static class DtoDifferent {
 
         @StringRule
@@ -365,15 +363,15 @@ class OverridingOfGeneratorsTests {
          */
 
         assertAll(
-                () -> assertThat(dto.getStringWithEmptyRule(), equalTo("o")),
-                () -> assertThat(dto.getStringWithFullRule(), equalTo("o")),
-                () -> assertThat(dto.getStringWithoutRule(), equalTo("o")),
+                () -> assertThat(dto.stringWithEmptyRule, equalTo("o")),
+                () -> assertThat(dto.stringWithFullRule, equalTo("o")),
+                () -> assertThat(dto.stringWithoutRule, equalTo("o")),
 
-                () -> assertThat(dto.getIntegerWithRule(), equalTo(2)),
-                () -> assertThat(dto.getIntegerWithEmptyRule(), equalTo(0)),
+                () -> assertThat(dto.integerWithRule, equalTo(2)),
+                () -> assertThat(dto.integerWithEmptyRule, equalTo(0)),
 
-                () -> assertThat(dto.getListOfStringWithEmptyRule(), equalTo(Arrays.asList("o"))),
-                () -> assertThat(dto.getSetOfStringWithEmptyRule(), equalTo(new HashSet<>(Arrays.asList("o"))))
+                () -> assertThat(dto.listOfStringWithEmptyRule, equalTo(Arrays.asList("o"))),
+                () -> assertThat(dto.setOfStringWithEmptyRule, equalTo(new HashSet<>(Arrays.asList("o"))))
         );
 
         DtoGeneratorBuilder<DtoDifferent> builder2 = DtoGenerator.builder(DtoDifferent.class);
@@ -387,8 +385,6 @@ class OverridingOfGeneratorsTests {
         builder2.setGenerator(List.class, ArrayList::new);
 
         DtoDifferent dto2 = builder2.build().generateDto();
-
-        log.info(UtilsRoot.toJson(dto2));
 
         /*
          * static config did not change
@@ -404,35 +400,35 @@ class OverridingOfGeneratorsTests {
 
         assertAll(
                 // static max = 2; default min = 0; default remark = RANDOM
-                () -> assertThat(dto2.getStringWithEmptyRule().length(),
+                () -> assertThat(dto2.stringWithEmptyRule.length(),
                         both(greaterThanOrEqualTo(0))
                                 .and(lessThanOrEqualTo(2))),
 
                 // annotated min = 3; annotated max = 3; annotated remark = MIN
-                () -> assertThat(dto2.getStringWithFullRule().length(), equalTo(3)),
+                () -> assertThat(dto2.stringWithFullRule.length(), equalTo(3)),
 
                 // default min = 0; static max = 2; default remark = RANDOM
-                () -> assertThat(dto2.getStringWithoutRule(),
+                () -> assertThat(dto2.stringWithoutRule,
                         either(equalTo(""))
                                 .or(equalTo("i"))
                                 .or(equalTo("ii"))),
 
                 // instance min = 5; instance max = 5;
-                () -> assertThat(dto2.getIntegerWithRule(), equalTo(5)),
-                () -> assertThat(dto2.getIntegerWithEmptyRule(), equalTo(5)),
+                () -> assertThat(dto2.integerWithRule, equalTo(5)),
+                () -> assertThat(dto2.integerWithEmptyRule, equalTo(5)),
 
                 // String: static max = 2; default min = 0; default remark = RANDOM
                 // List  : generator builder config min = max = 1
-                () -> assertThat(dto2.getListOfStringWithEmptyRule().getClass(), equalTo(ArrayList.class)),
-                () -> assertThat(dto2.getListOfStringWithEmptyRule().toString(),
+                () -> assertThat(dto2.listOfStringWithEmptyRule.getClass(), equalTo(ArrayList.class)),
+                () -> assertThat(dto2.listOfStringWithEmptyRule.toString(),
                         either(equalTo(Arrays.asList("").toString()))
                                 .or(equalTo(Arrays.asList("i").toString()))
                                 .or(equalTo(Arrays.asList("ii").toString()))),
 
                 // String: static max = 2; default min = 0; default remark = RANDOM
                 // Set   : instance config min = max = 1
-                () -> assertThat(dto2.getSetOfStringWithEmptyRule().getClass(), equalTo(HashSet.class)),
-                () -> assertThat(dto2.getSetOfStringWithEmptyRule().toString(),
+                () -> assertThat(dto2.setOfStringWithEmptyRule.getClass(), equalTo(HashSet.class)),
+                () -> assertThat(dto2.setOfStringWithEmptyRule.toString(),
                         either(equalTo(Arrays.asList("").toString()))
                                 .or(equalTo(Arrays.asList("i").toString()))
                                 .or(equalTo(Arrays.asList("ii").toString())))
