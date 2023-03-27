@@ -13,7 +13,9 @@ public enum RuleType {
     BASIC,
     CUSTOM,
     NESTED,
-    COLLECTION;
+    COLLECTION,
+    ARRAY,
+    MAP;
 
     public static RuleType getType(Annotation rule) {
         switch (RulesInfoHelper.getHelperType(rule)) {
@@ -24,6 +26,13 @@ public enum RuleType {
             case RULE_FOR_COLLECTION:
             case RULES_FOR_COLLECTION:
                 return COLLECTION;
+
+            case RULE_FOR_ARRAY:
+                return ARRAY;
+
+            case RULE_FOR_MAP:
+            case RULES_FOR_MAP:
+                return MAP;
 
             case CUSTOM_RULE:
                 return CUSTOM;

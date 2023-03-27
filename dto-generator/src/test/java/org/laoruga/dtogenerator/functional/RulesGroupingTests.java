@@ -6,14 +6,20 @@ import lombok.NoArgsConstructor;
 import lombok.Value;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.DtoGeneratorBuilder;
+import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.api.rules.datetime.ChronoUnitShift;
+import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.constants.Group;
-import org.laoruga.dtogenerator.rule.RulesInstance;
+import org.laoruga.dtogenerator.constants.RulesInstance;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -33,22 +39,23 @@ import static org.laoruga.dtogenerator.constants.RuleRemark.*;
  */
 @DisplayName("Rule Grouping Tests")
 @Epic("RULES_GROUPING")
+@ExtendWith(Extensions.RestoreStaticConfig.class)
 class RulesGroupingTests {
 
     @Getter
     @NoArgsConstructor
     static class Dto {
 
-        @IntegerRule(group = GROUP_1, ruleRemark = MAX_VALUE)
-        @IntegerRule(group = GROUP_2, ruleRemark = MIN_VALUE)
-        @IntegerRule(ruleRemark = RANDOM_VALUE, minValue = 10, maxValue = 10)
+        @NumberRule(group = GROUP_1, ruleRemark = MAX_VALUE)
+        @NumberRule(group = GROUP_2, ruleRemark = MIN_VALUE)
+        @NumberRule(ruleRemark = RANDOM_VALUE, minInt = 10, maxInt = 10)
         private Integer intFirst;
 
-        @IntegerRule(group = GROUP_1, ruleRemark = MIN_VALUE)
-        @IntegerRule(group = Group.GROUP_3, minValue = 99, maxValue = 99)
+        @NumberRule(group = GROUP_1, ruleRemark = MIN_VALUE)
+        @NumberRule(group = Group.GROUP_3, minInt = 99, maxInt = 99)
         private Integer intSecond;
 
-        @IntegerRule(minValue = 0, maxValue = 0)
+        @NumberRule(minInt = 0, maxInt = 0)
         private Integer defaultGroup;
     }
 
@@ -57,18 +64,22 @@ class RulesGroupingTests {
     static class DtoList {
 
         //GR_1
-        @ListRule(group = GROUP_1, minSize = 1, maxSize = 1)
-        @IntegerRule(group = GROUP_1, ruleRemark = MAX_VALUE)
+        @CollectionRule(
+                group = GROUP_1, minSize = 1, maxSize = 1,
+                element = @Entry(numberRule = @NumberRule(ruleRemark = MAX_VALUE)))
         //GR_2
-        @ListRule(group = GROUP_2, minSize = 2, maxSize = 2)
-        @IntegerRule(group = GROUP_2, ruleRemark = MIN_VALUE)
+        @CollectionRule(
+                group = GROUP_2, minSize = 2, maxSize = 2,
+                element = @Entry(numberRule = @NumberRule(ruleRemark = MIN_VALUE)))
         //DEFAULT
-        @ListRule(minSize = 3, maxSize = 3)
-        @IntegerRule(minValue = 10, maxValue = 10)
+        @CollectionRule(
+                minSize = 3, maxSize = 3,
+                element = @Entry(numberRule = @NumberRule(minInt = 10, maxInt = 10)))
         private List<Integer> intList;
 
-        @ListRule(minSize = 6, maxSize = 6)
-        @IntegerRule
+        @CollectionRule(
+                minSize = 6, maxSize = 6,
+                element = @Entry(numberRule = @NumberRule))
         private List<Integer> intListDefault;
     }
 
@@ -91,8 +102,8 @@ class RulesGroupingTests {
                 .build()
                 .generateDto();
         assertAll(
-                () -> assertThat(dto.getIntFirst(), equalTo(RulesInstance.integerRule.maxValue())),
-                () -> assertThat(dto.getIntSecond(), equalTo(RulesInstance.integerRule.minValue())),
+                () -> assertThat(dto.getIntFirst(), equalTo(RulesInstance.NUMBER_RULE.maxInt())),
+                () -> assertThat(dto.getIntSecond(), equalTo(RulesInstance.NUMBER_RULE.minInt())),
                 () -> assertThat(dto.getDefaultGroup(), nullValue())
         );
     }
@@ -105,7 +116,7 @@ class RulesGroupingTests {
                 .build()
                 .generateDto();
         assertAll(
-                () -> assertThat(dto.getIntFirst(), equalTo(RulesInstance.integerRule.minValue())),
+                () -> assertThat(dto.getIntFirst(), equalTo(RulesInstance.NUMBER_RULE.minInt())),
                 () -> assertThat(dto.getIntSecond(), equalTo(99)),
                 () -> assertThat(dto.getDefaultGroup(), nullValue())
         );
@@ -120,9 +131,13 @@ class RulesGroupingTests {
         assertAll(
                 () -> assertThat(dto.getIntList(), both(hasSize(3))
                         .and(everyItem(equalTo(10)))),
-                () -> assertThat(dto.getIntListDefault(), hasSize(6)),
-                () -> assertThat(dto.getIntListDefault(), everyItem(both(
-                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue())))));
+                () -> assertThat(dto.getIntListDefault(), hasSize(6))
+        );
+        for (Integer integer : dto.getIntListDefault()) {
+            assertThat(integer,
+                    both(greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt()))
+                            .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt())));
+        }
     }
 
     /*
@@ -156,7 +171,7 @@ class RulesGroupingTests {
                 () -> assertThat(dtoDefault.getString(), matchesRegex("[a-zA-Z]*")),
                 () -> assertThat(dtoDefault.getSet(), equalTo(new HashSet<>(Arrays.asList(2, 3)))),
                 () -> assertThat(dtoDefault.getALong(), equalTo(2L)),
-                () -> assertThat(dtoDefault.getLocalDateTime().toLocalDate(), equalTo(LocalDate.now().plusDays(1))),
+                () -> assertThat(dtoDefault.getLocalDateTime().toLocalDate(), equalTo(LocalDate.now().minusDays(1))),
                 () -> assertThat(dtoDefault.getList(), equalTo(Arrays.asList(2D, 2D))),
                 () -> assertThat(dtoDefault.getInteger(), equalTo(2)),
                 () -> assertThat(dtoDefault.getADouble(), equalTo(2D)),
@@ -173,32 +188,38 @@ class RulesGroupingTests {
         @StringRule(chars = ENG)
         private String string;
 
-        @SetRule(group = GROUP_1, minSize = 1, maxSize = 1)
-        @IntegerRule(group = GROUP_1, minValue = 1, maxValue = 1)
-        @SetRule(minSize = 2, maxSize = 2)
-        @IntegerRule(minValue = 2, maxValue = 3)
+        @CollectionRule(
+                group = GROUP_1, minSize = 1, maxSize = 1,
+                element = @Entry(numberRule = @NumberRule(minInt = 1, maxInt = 1)))
+
+        @CollectionRule(
+                minSize = 2, maxSize = 2,
+                element = @Entry(numberRule = @NumberRule(minInt = 2, maxInt = 3)))
         private Set<Integer> set;
 
-        @LongRule(group = GROUP_1, minValue = 1, maxValue = 1)
-        @LongRule(minValue = 2, maxValue = 2)
+        @NumberRule(group = GROUP_1, minLong = 1, maxLong = 1)
+        @NumberRule(minLong = 2, maxLong = 2)
         private Long aLong;
 
-        @LocalDateTimeRule(group = GROUP_1, leftShiftDays = 0, rightShiftDays = 0)
-        @LocalDateTimeRule(leftShiftDays = -1, rightShiftDays = 1)
+        @DateTimeRule(group = GROUP_1)
+        @DateTimeRule(chronoUnitShift = @ChronoUnitShift(unit = ChronoUnit.DAYS, leftBound = -1, rightBound = -1))
         private LocalDateTime localDateTime;
 
-        @ListRule(group = GROUP_1, minSize = 1, maxSize = 1)
-        @DoubleRule(group = GROUP_1, minValue = 1, maxValue = 1)
-        @ListRule(minSize = 2, maxSize = 2)
-        @DoubleRule(minValue = 2, maxValue = 2)
+        @CollectionRule(
+                group = GROUP_1, minSize = 1, maxSize = 1,
+                element = @Entry(decimalRule = @DecimalRule(group = GROUP_1, minDouble = 1, maxDouble = 1)))
+
+        @CollectionRule(
+                minSize = 2, maxSize = 2,
+                element = @Entry(decimalRule = @DecimalRule(minDouble = 2, maxDouble = 2)))
         private List<Double> list;
 
-        @IntegerRule(group = GROUP_1, minValue = 1, maxValue = 1)
-        @IntegerRule(minValue = 2, maxValue = 2)
+        @NumberRule(group = GROUP_1, minInt = 1, maxInt = 1)
+        @NumberRule(minInt = 2, maxInt = 2)
         private int integer;
 
-        @DoubleRule(group = GROUP_1, minValue = 1, maxValue = 1)
-        @DoubleRule(minValue = 2, maxValue = 2)
+        @DecimalRule(group = GROUP_1, minDouble = 1, maxDouble = 1)
+        @DecimalRule(minDouble = 2, maxDouble = 2)
         private Double aDouble;
 
         @EnumRule(group = GROUP_1, possibleEnumNames = "FOO")
@@ -234,6 +255,70 @@ class RulesGroupingTests {
         public void setArgs(String[] args) {
             arg = args[0];
         }
+    }
+
+    static class ArraysDto {
+
+        @ArrayRule(minSize = 1, maxSize = 1,
+                element = @Entry(stringRule = @StringRule))
+        @ArrayRule(group = GROUP_1,
+                minSize = 2, maxSize = 2,
+                element = @Entry(stringRule = @StringRule))
+        String[] strings;
+
+        @ArrayRule(minSize = 1, maxSize = 1,
+                element = @Entry(numberRule = @NumberRule))
+        @ArrayRule(group = GROUP_2,
+                minSize = 2, maxSize = 2,
+                element = @Entry(numberRule = @NumberRule))
+        Integer[] integers;
+
+        @ArrayRule(minSize = 1, maxSize = 1,
+                element = @Entry(numberRule = @NumberRule))
+        @ArrayRule(group = GROUP_2,
+                minSize = 2, maxSize = 2,
+                element = @Entry(numberRule = @NumberRule))
+        @ArrayRule(group = GROUP_3,
+                minSize = 3, maxSize = 3,
+                element = @Entry(numberRule = @NumberRule))
+        long[] longs;
+
+    }
+
+    @Test
+    @DisplayName("Array rules grouping")
+    void arraysGrouping() {
+
+        DtoGeneratorBuilder<ArraysDto> builder = DtoGenerator.builder(ArraysDto.class);
+
+        ArraysDto dtoDefault;
+
+        // DEFAULT group
+        dtoDefault = builder.build().generateDto();
+        assertAll(
+                () -> assertThat(dtoDefault.strings.length, equalTo(1)),
+                () -> assertThat(dtoDefault.integers.length, equalTo(1)),
+                () -> assertThat(dtoDefault.longs.length, equalTo(1))
+        );
+
+        // GROUP_2
+        ArraysDto dtoGroup2 = builder.includeGroups(GROUP_2).build().generateDto();
+
+        assertAll(
+                () -> assertThat(dtoGroup2.strings, nullValue()),
+                () -> assertThat(dtoGroup2.integers.length, equalTo(2)),
+                () -> assertThat(dtoGroup2.longs.length, equalTo(2))
+        );
+
+        // GROUP_3
+        ArraysDto dtoGroup2and3 = DtoGenerator.builder(ArraysDto.class)
+                .includeGroups(GROUP_3).build().generateDto();
+
+        assertAll(
+                () -> assertThat(dtoGroup2and3.strings, nullValue()),
+                () -> assertThat(dtoGroup2and3.integers, nullValue()),
+                () -> assertThat(dtoGroup2and3.longs.length, equalTo(3))
+        );
     }
 
 }

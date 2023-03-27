@@ -8,12 +8,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
+import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.constants.RuleRemark;
+import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.*;
-import org.laoruga.dtogenerator.rule.RulesInstance;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -35,7 +35,7 @@ class NestedDtoGenerationTests {
     @Getter
     @NoArgsConstructor
     static class Dto {
-        @IntegerRule()
+        @NumberRule()
         private Integer intDefaultRules;
         @NestedDtoRule()
         private IntegerGenerationTests.DtoInteger dtoNested;
@@ -44,7 +44,7 @@ class NestedDtoGenerationTests {
     @Getter
     @NoArgsConstructor
     static class DtoCustomNested {
-        @IntegerRule()
+        @NumberRule()
         private Integer intDefaultRules;
         @NestedDtoRule()
         private ClientDto clientDto;
@@ -53,7 +53,7 @@ class NestedDtoGenerationTests {
     @Getter
     @NoArgsConstructor
     static class DtoWithNestedLevels {
-        @IntegerRule()
+        @NumberRule()
         private Integer simpleInt;
         @NestedDtoRule()
         private Nested_1 nested_1;
@@ -65,7 +65,7 @@ class NestedDtoGenerationTests {
     @NoArgsConstructor
     static class Nested_1 {
 
-        @IntegerRule(minValue = 1, maxValue = 2)
+        @NumberRule(minInt = 1, maxInt = 2)
         private Integer oneTwo;
         @NestedDtoRule()
         private Nested_2 nested_2;
@@ -74,7 +74,7 @@ class NestedDtoGenerationTests {
     @Getter
     @NoArgsConstructor
     static class Nested_2 {
-        @IntegerRule()
+        @NumberRule()
         private Integer intDefaultRules;
         @StringRule()
         private String stringDefaultRules;
@@ -86,8 +86,8 @@ class NestedDtoGenerationTests {
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
-                greaterThanOrEqualTo(RulesInstance.integerRule.minValue()))
-                .and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue())));
+                greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt()))
+                .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt())));
         simpleIntegerGenerationAssertions(dto.getDtoNested());
     }
 
@@ -97,8 +97,8 @@ class NestedDtoGenerationTests {
         DtoCustomNested dto = DtoGenerator.builder(DtoCustomNested.class).build().generateDto();
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
-                greaterThanOrEqualTo(RulesInstance.integerRule.minValue()))
-                .and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue())));
+                greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt()))
+                .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt())));
 
         // Dto generated with custom generator
         ClientDto clientDto = dto.getClientDto();
@@ -142,12 +142,12 @@ class NestedDtoGenerationTests {
                 .build().generateDto();
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
-                greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue())));
+                greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt())).and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt())));
 
-        assertThat(dto.getDtoNested().getIntDefaultRules(), equalTo(RulesInstance.integerRule.minValue()));
+        assertThat(dto.getDtoNested().getIntDefaultRules(), equalTo(RulesInstance.NUMBER_RULE.minInt()));
         assertThat(dto.getDtoNested().getIntRightBound(), equalTo(maxValueRightBound));
         assertThat(dto.getDtoNested().getIntPrimitiveDefaultRules(), both(
-                greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue())));
+                greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt())).and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt())));
 
         simpleIntegerGenerationAssertions(dto.getDtoNested());
     }
@@ -165,9 +165,9 @@ class NestedDtoGenerationTests {
 
         assertAll(
                 () -> assertThat(dto.getSimpleInt(), both(
-                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt())).and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt()))),
                 () -> assertThat(nested_2.getIntDefaultRules(), both(
-                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt())).and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt()))),
                 () -> assertThat(nested_2.getStringDefaultRules(), notNullValue()),
                 () -> assertThat(nested_1.getOneTwo(), anyOf(equalTo(1), equalTo(2)))
         );
@@ -189,8 +189,8 @@ class NestedDtoGenerationTests {
         assertNotNull(nested_2);
 
         assertAll(
-                () -> assertThat(dto.getSimpleInt(), equalTo(RulesInstance.integerRule.minValue())),
-                () -> assertThat(nested_2.getIntDefaultRules(), equalTo(RulesInstance.integerRule.minValue())),
+                () -> assertThat(dto.getSimpleInt(), equalTo(RulesInstance.NUMBER_RULE.minInt())),
+                () -> assertThat(nested_2.getIntDefaultRules(), equalTo(RulesInstance.NUMBER_RULE.minInt())),
                 () -> assertThat(nested_2.getStringDefaultRules(), emptyString()),
                 () -> assertThat(nested_1.getOneTwo(), equalTo(1))
         );

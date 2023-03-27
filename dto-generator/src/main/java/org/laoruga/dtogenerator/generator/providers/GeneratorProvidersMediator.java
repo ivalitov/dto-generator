@@ -8,6 +8,8 @@ import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
 import org.laoruga.dtogenerator.rule.IRuleInfo;
+import org.laoruga.dtogenerator.rule.RuleInfoCollection;
+import org.laoruga.dtogenerator.rule.RuleInfoMap;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
@@ -22,7 +24,10 @@ public class GeneratorProvidersMediator {
 
     private final GeneratorsProviderByField generatorProviderOverriddenForField;
     private final GeneratorsProviderByType generatorsProviderByType;
-    private final generatorsProviderByAnnotationSupportingCollections generatorsProviderByAnnotation;
+    private final GeneratorsProviderByAnnotation generatorsProviderByAnnotation;
+    private final GeneratorsProviderByAnnotationForMap generatorsProviderByAnnotationForMap;
+    private final GeneratorsProviderByAnnotationForList generatorsProviderByAnnotationForCollection;
+    private final GeneratorsProviderByAnnotationForList generatorsProviderByAnnotationForArray;
 
     public GeneratorProvidersMediator(ConfigurationHolder configuration,
                                       GeneratorBuildersHolder userGenBuildersMapping,
@@ -35,11 +40,17 @@ public class GeneratorProvidersMediator {
                 configuration,
                 remarksHolder);
         generatorsProviderByAnnotation =
-                new generatorsProviderByAnnotationSupportingCollections(
+                new GeneratorsProviderByAnnotation(
                         configuration,
                         generatorsProviderByType,
                         remarksHolder,
                         userGenBuildersMapping);
+        generatorsProviderByAnnotationForMap =
+                new GeneratorsProviderByAnnotationForMap(generatorsProviderByAnnotation);
+        generatorsProviderByAnnotationForCollection =
+                new GeneratorsProviderByAnnotationForList(generatorsProviderByAnnotation);
+        generatorsProviderByAnnotationForArray =
+                new GeneratorsProviderByAnnotationForArray(generatorsProviderByAnnotation);
     }
 
     /*
@@ -50,7 +61,7 @@ public class GeneratorProvidersMediator {
         return generatorProviderOverriddenForField.isBuilderOverridden(fieldName);
     }
 
-    public void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder genBuilder) {
+    public void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder<?> genBuilder) {
         generatorProviderOverriddenForField.setGeneratorBuilderForField(fieldName, genBuilder);
     }
 
@@ -62,7 +73,7 @@ public class GeneratorProvidersMediator {
      * By type
      */
 
-    public Optional<IGenerator<?>> getGeneratorsByType(Field field, Class<?> generatedType) {
+    public Optional<IGenerator<?>> getGeneratorByType(Field field, Class<?> generatedType) {
         return generatorsProviderByType
                 .getGenerator(field, generatedType)
                 .map(Objects::requireNonNull);
@@ -72,24 +83,30 @@ public class GeneratorProvidersMediator {
      * By rules annotation
      */
 
-    public IGenerator<?> getGeneratorByAnnotation(Field field,
-                                                  IRuleInfo ruleInfo,
+    public IGenerator<?> getGeneratorByAnnotation(IRuleInfo ruleInfo,
                                                   Supplier<?> dtoInstanceSupplier,
                                                   Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
         IGenerator<?> generator;
 
         if (ruleInfo.isTypesEqual(RuleType.COLLECTION)) {
-            generator = generatorsProviderByAnnotation
-                    .getCollectionGenerator(field, ruleInfo, dtoInstanceSupplier, nestedDtoGeneratorSupplier);
+            generator = generatorsProviderByAnnotationForCollection
+                    .getGenerator((RuleInfoCollection) ruleInfo, dtoInstanceSupplier, nestedDtoGeneratorSupplier);
+
+        } else if (ruleInfo.isTypesEqual(RuleType.ARRAY)) {
+            generator = generatorsProviderByAnnotationForArray
+                    .getGenerator((RuleInfoCollection) ruleInfo, dtoInstanceSupplier, nestedDtoGeneratorSupplier);
+
+        } else if (ruleInfo.isTypesEqual(RuleType.MAP)) {
+            generator = generatorsProviderByAnnotationForMap
+                    .getGenerator((RuleInfoMap) ruleInfo, dtoInstanceSupplier, nestedDtoGeneratorSupplier);
+
         } else {
             generator = generatorsProviderByAnnotation
-                    .getGenerator(field, ruleInfo, dtoInstanceSupplier, nestedDtoGeneratorSupplier);
+                    .getGenerator(ruleInfo, dtoInstanceSupplier, nestedDtoGeneratorSupplier);
         }
 
-        generatorsProviderByAnnotation.prepareCustomRemarks(generator, field.getName());
+        generatorsProviderByAnnotation.prepareCustomRemarks(generator, ruleInfo.getField().getName());
 
         return generator;
     }
-
-
 }

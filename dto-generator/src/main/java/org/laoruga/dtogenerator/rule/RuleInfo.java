@@ -1,12 +1,10 @@
 package org.laoruga.dtogenerator.rule;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.laoruga.dtogenerator.constants.RuleType;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 
 /**
  * @author Il'dar Valitov
@@ -15,15 +13,15 @@ import java.lang.annotation.Annotation;
 @ToString
 @Setter(AccessLevel.PACKAGE)
 @Getter(AccessLevel.PUBLIC)
+@Builder
 class RuleInfo implements IRuleInfo {
     private Annotation rule;
     private RuleType ruleType;
     private boolean multipleRules;
     private String group;
+    private Field field;
+    private Class<?> requiredType;
 
-    public static RuleInfoBuilder builder(){
-        return new RuleInfoBuilder();
-    }
     public boolean isTypesEqual(RuleType type) {
         return ruleType == type;
     }

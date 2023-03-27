@@ -2,10 +2,8 @@ package org.laoruga.dtogenerator.generator.configs;
 
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.EnumRule;
-import org.laoruga.dtogenerator.generator.builder.builders.EnumGeneratorBuilder;
 
 /**
  * @author Il'dar Valitov
@@ -25,11 +23,6 @@ public class EnumConfigDto implements ConfigDto {
     public EnumConfigDto(EnumRule enumRule) {
         possibleEnumNames = enumRule.possibleEnumNames();
         ruleRemark = enumRule.ruleRemark();
-    }
-
-    @Override
-    public Class<? extends IGeneratorBuilder> getBuilderClass() {
-        return EnumGeneratorBuilder.class;
     }
 
     public void merge(ConfigDto from) {

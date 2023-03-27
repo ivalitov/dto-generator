@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.functional.data.customgenerator.CustomIntegerGenerator;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
 
@@ -25,34 +26,33 @@ import java.util.Set;
 @EqualsAndHashCode
 public class DtoAllKnownTypes {
 
-    @StringRule
+    @StringRule(minLength = 1)
     String string;
 
-    @IntegerRule
+    @NumberRule
     Integer integer;
 
-    @LongRule
+    @NumberRule
     Long aLong;
 
-    @DoubleRule
+    @DecimalRule
     Double aDouble;
 
-    @LocalDateTimeRule
+    @BooleanRule Boolean aBoolean;
+
+    @DateTimeRule
     LocalDateTime localDateTime;
 
     @EnumRule
     ClientType clientType;
 
-    @ListRule
-    @StringRule
+    @CollectionRule
     List<String> listOfString;
 
-    @SetRule
-    @LongRule
+    @CollectionRule
     Set<Long> setOfLong;
 
-    @ListRule
-    @EnumRule
+    @CollectionRule
     LinkedList<ClientType> linkedListOfEnum;
 
     @NestedDtoRule
@@ -64,7 +64,7 @@ public class DtoAllKnownTypes {
     Map<String, Integer> stringIntegerMap;
 
     public String getLocalDateTime() {
-         return localDateTime.toString();
+        return localDateTime.toString();
     }
 
     @Transient

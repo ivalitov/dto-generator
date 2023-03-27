@@ -1,5 +1,6 @@
 package org.laoruga.dtogenerator.generator.providers;
 
+import com.google.common.primitives.Primitives;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
@@ -23,7 +24,7 @@ import java.util.function.BiFunction;
 @Slf4j
 public class GeneratorsProviderByField extends GeneratorsProviderAbstract {
 
-    private final Map<String, IGeneratorBuilder> overriddenBuildersForFields;
+    private final Map<String, IGeneratorBuilder<?>> overriddenBuildersForFields;
 
     public GeneratorsProviderByField(ConfigurationHolder configuration,
                                      RemarksHolder remarksHolder) {
@@ -32,15 +33,15 @@ public class GeneratorsProviderByField extends GeneratorsProviderAbstract {
     }
 
     @SuppressWarnings("unchecked")
-    public IGenerator<?> getGenerator(Field field) {
+    IGenerator<?> getGenerator(Field field) {
 
-        IGeneratorBuilder genBuilder = overriddenBuildersForFields.get(field.getName());
+        IGeneratorBuilder<?> genBuilder = overriddenBuildersForFields.get(field.getName());
 
         if (genBuilder instanceof IGeneratorBuilderConfigurable) {
 
-            IGeneratorBuilderConfigurable genBuilderConfigurable = (IGeneratorBuilderConfigurable) genBuilder;
+            IGeneratorBuilderConfigurable<?> genBuilderConfigurable = (IGeneratorBuilderConfigurable<?>) genBuilder;
 
-            BiFunction<ConfigDto, IGeneratorBuilderConfigurable, IGenerator<?>> generatorSupplier =
+            BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>, IGenerator<?>> generatorSupplier =
                     (config, builder) -> {
                         if (config instanceof EnumConfigDto) {
                             if (field.getType().isEnum()) {
@@ -53,7 +54,9 @@ public class GeneratorsProviderByField extends GeneratorsProviderAbstract {
                     };
 
             return getGenerator(
-                    TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(field.getType()),
+                    TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(
+                            Primitives.wrap(field.getType())
+                    ),
                     () -> genBuilderConfigurable,
                     generatorSupplier,
                     field.getType(),
@@ -68,9 +71,10 @@ public class GeneratorsProviderByField extends GeneratorsProviderAbstract {
         return overriddenBuildersForFields.containsKey(fieldName);
     }
 
-    public void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder genBuilder) {
+    public void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder<?> genBuilder) {
         if (overriddenBuildersForFields.containsKey(fieldName)) {
-            throw new DtoGeneratorException("Generator already has been added explicitly for the field: '" + fieldName + "'");
+            throw new DtoGeneratorException(
+                    "Generator has already been added explicitly for the field: '" + fieldName + "'");
         }
         overriddenBuildersForFields.put(fieldName, genBuilder);
     }

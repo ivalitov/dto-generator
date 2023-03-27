@@ -3,6 +3,7 @@ package org.laoruga.dtogenerator.rule;
 import org.laoruga.dtogenerator.constants.RuleType;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 
 /**
  * @author Il'dar Valitov
@@ -11,5 +12,7 @@ import java.lang.annotation.Annotation;
 public interface IRuleInfo {
     Annotation getRule();
     String getGroup();
+    Field getField();
+    Class<?> getRequiredType();
     boolean isTypesEqual(RuleType ruleType);
 }

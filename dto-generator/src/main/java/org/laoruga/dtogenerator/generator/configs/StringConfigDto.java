@@ -1,14 +1,9 @@
 package org.laoruga.dtogenerator.generator.configs;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import org.laoruga.dtogenerator.generator.builder.builders.StringGeneratorBuilder;
 
 /**
  * @author Il'dar Valitov
@@ -19,6 +14,7 @@ import org.laoruga.dtogenerator.generator.builder.builders.StringGeneratorBuilde
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class StringConfigDto implements ConfigDto {
 
     private Integer maxLength;
@@ -35,11 +31,6 @@ public class StringConfigDto implements ConfigDto {
         this.chars = stringRule.chars();
         this.ruleRemark = stringRule.ruleRemark();
         this.regexp = stringRule.regexp();
-    }
-
-    @Override
-    public Class<? extends IGeneratorBuilder> getBuilderClass() {
-        return StringGeneratorBuilder.class;
     }
 
     public void merge(ConfigDto from) {

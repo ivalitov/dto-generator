@@ -38,9 +38,9 @@ public class ExecutorOfGenerator extends AbstractExecutor {
             field.setAccessible(true);
             field.set(dtoInstanceSupplier.get(), result);
         } catch (Exception e) {
-            throw new DtoGeneratorException("Error while setting generated value of type: '" +
+            throw new DtoGeneratorException("Unable to set generated value of type: '" +
                     (result != null ? result.getClass() : null) + "' to the field: " +
-                    "'" + field + "'", e);
+                    "'" + field.getName() + "'. field type: '" + field.getType() + "'", e);
         }
         return true;
     }

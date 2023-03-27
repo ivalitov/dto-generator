@@ -12,7 +12,7 @@ import java.util.Objects;
  * @author Il'dar Valitov
  * Created on 19.02.2023
  */
-public final class StringGeneratorBuilder implements IGeneratorBuilderConfigurable {
+public final class StringGeneratorBuilder implements IGeneratorBuilderConfigurable<String> {
 
     private final StringConfigDto configDto;
 

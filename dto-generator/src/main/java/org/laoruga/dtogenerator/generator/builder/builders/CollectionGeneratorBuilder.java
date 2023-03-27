@@ -15,36 +15,34 @@ import java.util.function.Supplier;
  * @author Il'dar Valitov
  * Created on 19.02.2023
  */
-public class CollectionGeneratorBuilder<V> implements IGeneratorBuilderConfigurable {
+public class CollectionGeneratorBuilder implements IGeneratorBuilderConfigurable<Collection<?>> {
     protected final CollectionConfigDto configDto;
 
     public CollectionGeneratorBuilder() {
         this.configDto = new CollectionConfigDto();
     }
 
-    public CollectionGeneratorBuilder<V> minSize(int minSize) {
+    public CollectionGeneratorBuilder minSize(int minSize) {
         configDto.setMinSize(minSize);
         return this;
     }
 
-    public CollectionGeneratorBuilder<V> maxSize(int maxSize) {
+    public CollectionGeneratorBuilder maxSize(int maxSize) {
         configDto.setMaxSize(maxSize);
         return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public CollectionGeneratorBuilder<?> collectionInstance(Supplier<Collection<Object>> listInstance) {
-        configDto.setCollectionInstance(listInstance);
+    public CollectionGeneratorBuilder collectionInstance(Supplier<Collection<?>> listInstance) {
+        configDto.setCollectionInstanceSupplier(listInstance);
         return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public CollectionGeneratorBuilder<?> elementGenerator(IGenerator<?> elementGenerator) {
-        configDto.setElementGenerator((IGenerator<Object>) elementGenerator);
+    public CollectionGeneratorBuilder elementGenerator(IGenerator<?> elementGenerator) {
+        configDto.setElementGenerator(elementGenerator);
         return this;
     }
 
-    public CollectionGeneratorBuilder<?> ruleRemark(IRuleRemark ruleRemark) {
+    public CollectionGeneratorBuilder ruleRemark(IRuleRemark ruleRemark) {
         configDto.setRuleRemark(ruleRemark);
         return this;
     }
@@ -63,7 +61,7 @@ public class CollectionGeneratorBuilder<V> implements IGeneratorBuilderConfigura
         return new CollectionGenerator(
                 collectionConfig.getMinSize(),
                 collectionConfig.getMaxSize(),
-                Objects.requireNonNull(collectionConfig.getCollectionInstance(), "Collection instance must be set."),
+                Objects.requireNonNull(collectionConfig.getCollectionInstanceSupplier(), "Collection instance must be set."),
                 Objects.requireNonNull(collectionConfig.getElementGenerator(), "Collection element generator must be set"),
                 Objects.requireNonNull(collectionConfig.getRuleRemark(), "Unexpected error, rule remark haven't set."));
     }

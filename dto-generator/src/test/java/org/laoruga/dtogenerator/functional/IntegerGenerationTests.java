@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.IntegerRule;
+import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.rule.RulesInstance;
+import org.laoruga.dtogenerator.constants.RulesInstance;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 
 @DisplayName("Integer Generation Tests")
-@Epic("INTEGER_RULES")
+@Epic("NUMBER_RULES")
 class IntegerGenerationTests {
 
     final static int minValueLeftBound = 99999999;
@@ -34,15 +34,15 @@ class IntegerGenerationTests {
     @Getter
     @NoArgsConstructor
     static class DtoInteger {
-        @IntegerRule()
+        @NumberRule
         private Integer intDefaultRules;
-        @IntegerRule()
+        @NumberRule
         private int intPrimitiveDefaultRules;
-        @IntegerRule(minValue = minValueLeftBound)
+        @NumberRule(minInt = minValueLeftBound)
         private Integer intLeftBound;
-        @IntegerRule(maxValue = maxValueRightBound)
+        @NumberRule(maxInt = maxValueRightBound)
         private int intRightBound;
-        @IntegerRule(minValue = minValueLeftAndRightBounds, maxValue = maxValueLeftAndRightBounds)
+        @NumberRule(minInt = minValueLeftAndRightBounds, maxInt = maxValueLeftAndRightBounds)
         private int intLeftAndRightBounds;
         private int intPrimitiveDefault;
         private int intPrimitive = intPrimitiveVal;
@@ -52,12 +52,12 @@ class IntegerGenerationTests {
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getIntDefaultRules(), both(
-                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt())).and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt()))),
                 () -> assertThat(dto.getIntPrimitiveDefaultRules(), both(
-                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(lessThanOrEqualTo(RulesInstance.integerRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt())).and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt()))),
                 () -> assertThat(dto.getIntLeftBound(), greaterThanOrEqualTo(minValueLeftBound)),
                 () -> assertThat(dto.getIntRightBound(), both(
-                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(lessThanOrEqualTo(maxValueRightBound))),
+                        greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt())).and(lessThanOrEqualTo(maxValueRightBound))),
                 () -> assertThat(dto.getIntLeftAndRightBounds(), both(
                         greaterThanOrEqualTo(minValueLeftAndRightBounds)).and(lessThanOrEqualTo(maxValueLeftAndRightBounds))),
                 () -> assertThat(dto.getIntPrimitiveDefault(), equalTo(0)),
@@ -80,10 +80,10 @@ class IntegerGenerationTests {
         DtoInteger dto = DtoGenerator.builder(DtoInteger.class).setRuleRemark(RuleRemark.MIN_VALUE).build().generateDto();
         assertNotNull(dto);
         assertAll(
-                () -> assertThat(dto.getIntDefaultRules(), equalTo(RulesInstance.integerRule.minValue())),
-                () -> assertThat(dto.getIntPrimitiveDefaultRules(), equalTo(RulesInstance.integerRule.minValue())),
+                () -> assertThat(dto.getIntDefaultRules(), equalTo(RulesInstance.NUMBER_RULE.minInt())),
+                () -> assertThat(dto.getIntPrimitiveDefaultRules(), equalTo(RulesInstance.NUMBER_RULE.minInt())),
                 () -> assertThat(dto.getIntLeftBound(), equalTo(minValueLeftBound)),
-                () -> assertThat(dto.getIntRightBound(), equalTo(RulesInstance.integerRule.minValue())),
+                () -> assertThat(dto.getIntRightBound(), equalTo(RulesInstance.NUMBER_RULE.minInt())),
                 () -> assertThat(dto.getIntLeftAndRightBounds(), equalTo(minValueLeftAndRightBounds)),
                 () -> assertThat(dto.getIntPrimitiveDefault(), equalTo(0)),
                 () -> assertThat(dto.getIntPrimitive(), equalTo(intPrimitiveVal))
@@ -97,9 +97,9 @@ class IntegerGenerationTests {
         DtoInteger dto = DtoGenerator.builder(DtoInteger.class).setRuleRemark(RuleRemark.MAX_VALUE).build().generateDto();
         assertNotNull(dto);
         assertAll(
-                () -> assertThat(dto.getIntDefaultRules(), equalTo(RulesInstance.integerRule.maxValue())),
-                () -> assertThat(dto.getIntPrimitiveDefaultRules(), equalTo(RulesInstance.integerRule.maxValue())),
-                () -> assertThat(dto.getIntLeftBound(), equalTo(RulesInstance.integerRule.maxValue())),
+                () -> assertThat(dto.getIntDefaultRules(), equalTo(RulesInstance.NUMBER_RULE.maxInt())),
+                () -> assertThat(dto.getIntPrimitiveDefaultRules(), equalTo(RulesInstance.NUMBER_RULE.maxInt())),
+                () -> assertThat(dto.getIntLeftBound(), equalTo(RulesInstance.NUMBER_RULE.maxInt())),
                 () -> assertThat(dto.getIntRightBound(), equalTo(maxValueRightBound)),
                 () -> assertThat(dto.getIntLeftAndRightBounds(), equalTo(maxValueLeftAndRightBounds)),
                 () -> assertThat(dto.getIntPrimitiveDefault(), equalTo(0)),
@@ -121,7 +121,7 @@ class IntegerGenerationTests {
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getIntDefaultRules(), nullValue()),
-                () -> assertThat(dto.getIntPrimitiveDefaultRules(), equalTo(0)),
+                () -> assertThat(dto.getIntPrimitiveDefaultRules(), equalTo(Integer.MIN_VALUE)),
                 () -> assertThat(dto.getIntLeftBound(), equalTo(minValueLeftBound)),
                 () -> assertThat(dto.getIntRightBound(), equalTo(maxValueRightBound)),
                 () -> assertThat(dto.getIntLeftAndRightBounds(), both(
@@ -144,9 +144,9 @@ class IntegerGenerationTests {
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getIntDefaultRules(), nullValue()),
-                () -> assertThat(dto.getIntPrimitiveDefaultRules(), equalTo(RulesInstance.integerRule.minValue())),
-                () -> assertThat(dto.getIntLeftBound(), equalTo(RulesInstance.integerRule.maxValue())),
-                () -> assertThat(dto.getIntRightBound(), equalTo(RulesInstance.integerRule.minValue())),
+                () -> assertThat(dto.getIntPrimitiveDefaultRules(), equalTo(RulesInstance.NUMBER_RULE.minInt())),
+                () -> assertThat(dto.getIntLeftBound(), equalTo(RulesInstance.NUMBER_RULE.maxInt())),
+                () -> assertThat(dto.getIntRightBound(), equalTo(RulesInstance.NUMBER_RULE.minInt())),
                 () -> assertThat(dto.getIntLeftAndRightBounds(), both(
                         greaterThanOrEqualTo(minValueLeftAndRightBounds)).and(lessThanOrEqualTo(maxValueLeftAndRightBounds))),
                 () -> assertThat(dto.getIntPrimitiveDefault(), equalTo(0)),

@@ -18,7 +18,7 @@ import java.util.Comparator;
  */
 
 @AllArgsConstructor
-public class EnumGenerator implements IGenerator<Enum<?>> {
+public class EnumGenerator implements IGenerator<Enum> {
 
     private final String[] possibleEnumNames;
     private final Class<? extends Enum<?>> enumClass;
@@ -37,7 +37,7 @@ public class EnumGenerator implements IGenerator<Enum<?>> {
             enumInstanceName = sortedEnumNames[sortedEnumNames.length - 1];
         } else if (ruleRemark == RuleRemark.RANDOM_VALUE) {
             int count = sortedEnumNames.length;
-            enumInstanceName = sortedEnumNames[RandomUtils.getRandom().nextInt(count)];
+            enumInstanceName = sortedEnumNames[RandomUtils.RANDOM.nextInt(count)];
         } else if (ruleRemark == RuleRemark.NULL_VALUE) {
             return null;
         } else {

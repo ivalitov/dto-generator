@@ -1,7 +1,6 @@
 package org.laoruga.dtogenerator.generator;
 
 import lombok.AllArgsConstructor;
-import org.apache.commons.math3.random.RandomDataGenerator;
 import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
@@ -9,6 +8,7 @@ import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.builders.CollectionGeneratorBuilder;
+import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Collection;
 import java.util.function.Supplier;
@@ -19,21 +19,21 @@ import java.util.function.Supplier;
  */
 
 @AllArgsConstructor
-public class CollectionGenerator implements ICollectionGenerator<Object> {
+public class CollectionGenerator<T> implements ICollectionGenerator<T> {
 
     private final int minSize;
     private final int maxSize;
-    private final Supplier<Collection<Object>> collectionInstanceSupplier;
-    private final IGenerator<Object> elementGenerator;
+    private final Supplier<Collection<T>> collectionInstanceSupplier;
+    private final IGenerator<T> elementGenerator;
     private final IRuleRemark ruleRemark;
 
-    public static CollectionGeneratorBuilder<?> builder() {
-        return new CollectionGeneratorBuilder<>();
+    public static CollectionGeneratorBuilder builder() {
+        return new CollectionGeneratorBuilder();
     }
 
     @Override
-    public Collection<Object> generate() {
-        Collection<Object> collectionInstance = collectionInstanceSupplier.get();
+    public Collection<T> generate() {
+        Collection<T> collectionInstance = collectionInstanceSupplier.get();
         int maxAttempts = DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().getMaxCollectionGenerationCycles();
         int size;
         switch ((RuleRemark) ruleRemark) {
@@ -44,7 +44,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
                 size = maxSize;
                 break;
             case RANDOM_VALUE:
-                size = new RandomDataGenerator().nextInt(minSize, maxSize);
+                size = RandomUtils.nextInt(minSize, maxSize);
                 break;
             case NULL_VALUE:
                 return null;
@@ -61,7 +61,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
                 if (ineffectiveAttempts == maxAttempts) {
                     throw new DtoGeneratorException("Expected size: '" + size + "' of collection: '"
                             + collectionInstance.getClass() + "' can't be reached. After '" + ineffectiveAttempts
-                            + "' attempts collection size is: '"
+                            + "' attempts collection has size: '"
                             + collectionInstance.size() + "'");
                 }
             }
@@ -69,7 +69,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
         return collectionInstance;
     }
 
-    public IGenerator<Object> getElementGenerator() {
+    public IGenerator<T> getElementGenerator() {
         return elementGenerator;
     }
 

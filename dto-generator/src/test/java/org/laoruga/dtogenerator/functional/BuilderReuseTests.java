@@ -7,8 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
+import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.functional.data.dto.DtoAllKnownTypes;
-import org.laoruga.dtogenerator.rule.RulesInstance;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,8 +20,6 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.exparity.hamcrest.date.LocalDateMatchers.sameOrAfter;
-import static org.exparity.hamcrest.date.LocalDateMatchers.sameOrBefore;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,10 +35,10 @@ class BuilderReuseTests {
 
     @Test
     @DisplayName("Generating of two DTO instances")
-    void generateToDtoInstances() {
+    void generateTwoDtoInstances() {
 
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
-        builder.getTypeGeneratorsConfig().getListConfig().setCollectionInstance(LinkedList::new);
+        builder.getConfig().getTypeGeneratorsConfig().getCollectionConfig(List.class).setCollectionInstanceSupplier(LinkedList::new);
 
         DtoGenerator<DtoAllKnownTypes> dtoGenerator = builder.build();
         DtoAllKnownTypes dto_1 = dtoGenerator.generateDto();
@@ -67,7 +65,7 @@ class BuilderReuseTests {
         DtoAllKnownTypes dto = new DtoAllKnownTypes();
 
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(dto);
-        builder.getTypeGeneratorsConfig().getListConfig().setCollectionInstance(LinkedList::new);
+        builder.getConfig().getTypeGeneratorsConfig().getCollectionConfig(List.class).setCollectionInstanceSupplier(LinkedList::new);
 
         DtoGenerator<DtoAllKnownTypes> dtoGenerator = builder.build();
         DtoAllKnownTypes dto_1 = dtoGenerator.generateDto();
@@ -94,7 +92,7 @@ class BuilderReuseTests {
     void concurrentExecution() {
 
         DtoGeneratorBuilder<DtoAllKnownTypes> builder = DtoGenerator.builder(DtoAllKnownTypes.class);
-        builder.getTypeGeneratorsConfig().getListConfig().setCollectionInstance(LinkedList::new);
+        builder.getConfig().getTypeGeneratorsConfig().getCollectionConfig(List.class).setCollectionInstanceSupplier(LinkedList::new);
 
         DtoGenerator<DtoAllKnownTypes> dtoGenerator = builder.build();
 
@@ -111,11 +109,13 @@ class BuilderReuseTests {
 
             assertNotSame(dto_1, dto_2);
 
+            // to check every field
             assertAll(
                     () -> assertNotEquals(dto_1, dto_2),
                     () -> assertNotEquals(dto_1.hashCode(), dto_2.hashCode()),
                     () -> assertNotEquals(dto_1.getString(), dto_2.getString()),
-                    () -> assertNotEquals(dto_1.getALong(), dto_2.getALong())
+                    () -> assertNotEquals(dto_1.getALong(), dto_2.getALong()),
+                    () -> assertNotEquals(dto_1.getADouble(), dto_2.getADouble())
             );
         }
 
@@ -125,31 +125,29 @@ class BuilderReuseTests {
         LocalDate now = LocalDateTime.now().toLocalDate();
         assertAll(
                 () -> assertThat(dto.getString().length(), both(
-                        greaterThanOrEqualTo(RulesInstance.stringRule.minLength())).and(
-                        lessThanOrEqualTo(RulesInstance.stringRule.maxLength()))),
+                        greaterThanOrEqualTo(RulesInstance.STRING_RULE.minLength())).and(
+                        lessThanOrEqualTo(RulesInstance.STRING_RULE.maxLength()))),
                 () -> assertThat(dto.getInteger(), both(
-                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(
-                        lessThanOrEqualTo(RulesInstance.integerRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt())).and(
+                        lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt()))),
                 () -> assertThat(dto.getALong(), both(
-                        greaterThanOrEqualTo(RulesInstance.longRule.minValue())).and(
-                        lessThanOrEqualTo(RulesInstance.longRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minLong())).and(
+                        lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxLong()))),
                 () -> assertThat(dto.getADouble(), both(
-                        greaterThanOrEqualTo(RulesInstance.doubleRule.minValue())).and(
-                        lessThanOrEqualTo(RulesInstance.doubleRule.maxValue()))),
-                () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), both(
-                        sameOrAfter(now.minusDays(RulesInstance.localDateTimeRule.leftShiftDays()))).and(
-                        sameOrBefore(now.plusDays(RulesInstance.localDateTimeRule.rightShiftDays())))),
+                        greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble())).and(
+                        lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
+                () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), equalTo(now)),
                 () -> assertThat(dto.getClientType(), notNullValue()),
 
                 () -> assertThat(dto.getListOfString().size(), both(
-                        greaterThanOrEqualTo(RulesInstance.listRule.minSize())).and(
-                        lessThanOrEqualTo(RulesInstance.listRule.maxSize()))),
+                        greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
+                        lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
                 () -> assertThat(dto.getSetOfLong().size(), both(
-                        greaterThanOrEqualTo(RulesInstance.listRule.minSize())).and(
-                        lessThanOrEqualTo(RulesInstance.listRule.maxSize()))),
+                        greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
+                        lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
                 () -> assertThat(dto.getLinkedListOfEnum().size(), both(
-                        greaterThanOrEqualTo(RulesInstance.listRule.minSize())).and(
-                        lessThanOrEqualTo(RulesInstance.listRule.maxSize()))),
+                        greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
+                        lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
 
                 () -> assertThat(dto.getInnerDto(), notNullValue()),
                 () -> assertThat(dto.getStringIntegerMap(), nullValue()),
@@ -160,31 +158,29 @@ class BuilderReuseTests {
 
         assertAll(
                 () -> assertThat(dto.getString().length(), both(
-                        greaterThanOrEqualTo(RulesInstance.stringRule.minLength())).and(
-                        lessThanOrEqualTo(RulesInstance.stringRule.maxLength()))),
+                        greaterThanOrEqualTo(RulesInstance.STRING_RULE.minLength())).and(
+                        lessThanOrEqualTo(RulesInstance.STRING_RULE.maxLength()))),
                 () -> assertThat(dto.getInteger(), both(
-                        greaterThanOrEqualTo(RulesInstance.integerRule.minValue())).and(
-                        lessThanOrEqualTo(RulesInstance.integerRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt())).and(
+                        lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt()))),
                 () -> assertThat(dto.getALong(), both(
-                        greaterThanOrEqualTo(RulesInstance.longRule.minValue())).and(
-                        lessThanOrEqualTo(RulesInstance.longRule.maxValue()))),
+                        greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minLong())).and(
+                        lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxLong()))),
                 () -> assertThat(dto.getADouble(), both(
-                        greaterThanOrEqualTo(RulesInstance.doubleRule.minValue())).and(
-                        lessThanOrEqualTo(RulesInstance.doubleRule.maxValue()))),
-                () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), both(
-                        sameOrAfter(now.minusDays(RulesInstance.localDateTimeRule.leftShiftDays()))).and(
-                        sameOrBefore(now.plusDays(RulesInstance.localDateTimeRule.rightShiftDays())))),
+                        greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble())).and(
+                        lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
+                () -> assertThat(dto.getLocalDateTimeAsIs().toLocalDate(), equalTo(now)),
                 () -> assertThat(dto.getClientType(), notNullValue()),
 
                 () -> assertThat(dto.getListOfString().size(), both(
-                        greaterThanOrEqualTo(RulesInstance.listRule.minSize())).and(
-                        lessThanOrEqualTo(RulesInstance.listRule.maxSize()))),
+                        greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
+                        lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
                 () -> assertThat(dto.getSetOfLong().size(), both(
-                        greaterThanOrEqualTo(RulesInstance.listRule.minSize())).and(
-                        lessThanOrEqualTo(RulesInstance.listRule.maxSize()))),
+                        greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
+                        lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
                 () -> assertThat(dto.getLinkedListOfEnum().size(), both(
-                        greaterThanOrEqualTo(RulesInstance.listRule.minSize())).and(
-                        lessThanOrEqualTo(RulesInstance.listRule.maxSize()))),
+                        greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
+                        lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
 
                 () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue()),
 

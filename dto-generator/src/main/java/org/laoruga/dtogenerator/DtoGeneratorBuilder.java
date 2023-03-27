@@ -4,18 +4,19 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
+import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
+import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
-import org.laoruga.dtogenerator.config.dto.DtoGeneratorConfig;
+import org.laoruga.dtogenerator.config.TypeGeneratorsConfigForFiled;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorInstanceConfig;
+import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
-import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 
-import java.lang.annotation.Annotation;
 import java.util.function.Supplier;
 
 import static org.laoruga.dtogenerator.DtoGeneratorBuildersTree.ROOT;
@@ -52,7 +53,8 @@ public class DtoGeneratorBuilder<T> {
     private DtoGeneratorBuilder(Supplier<?> dtoInstanceSupplier) {
         this.configuration = new ConfigurationHolder(
                 new DtoGeneratorInstanceConfig(),
-                new TypeGeneratorsConfigLazy()
+                new TypeGeneratorsConfigLazy(),
+                new TypeGeneratorsConfigForFiled()
         );
         this.remarksHolder = new RemarksHolder();
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
@@ -96,36 +98,37 @@ public class DtoGeneratorBuilder<T> {
      */
 
     /**
-     * Overrides generator builder related to the rule annotation.
-     * Provided generator will be used for any field annotated with rule of provided class.
+     * Overrides generator builder related to generated type.
      *
-     * @param rulesAnnotationClass - rules annotation class
-     * @param generatorBuilder     - field generator builder related to provided rules annotation
-     * @return - builder instance
+     * @param generatedType - type of generated class
+     * @param typeGenerator - generator of provided generated type
+     * @return - this
      */
-    public DtoGeneratorBuilder<T> setGeneratorBuilder(@NonNull Class<? extends Annotation> rulesAnnotationClass,
-                                                      @NonNull IGeneratorBuilder generatorBuilder) {
-        fieldGeneratorsProvider.overrideGenerator(rulesAnnotationClass, generatorBuilder);
+
+    @SuppressWarnings("unchecked")
+    public <U> DtoGeneratorBuilder<T> setGenerator(@NonNull Class<U> generatedType,
+                                                   @NonNull IGenerator<? super U> typeGenerator) {
+        fieldGeneratorsProvider.setGenerator(generatedType, () -> (IGenerator<Object>) typeGenerator);
         return this;
     }
 
     /**
-     * Overrides generator builder for the provided field only.
+     * Overrides generator for the provided field only.
      * If the field is in nested object, path to the field must contain a "path" leads
-     * to the field - sequence of field names separated by dots.
-     * For example, if DTO contains 'person' object, path to the 'age' field inside it
+     * to the field - dots separated sequence of field names.
+     * For example, if DTO contains 'person' object, path to the 'age' field
      * will the following: 'person.age'
      *
-     * @param fieldName        - name of the field or path to the field separated by dots
-     * @param generatorBuilder - field generator builder related to the provided field
-     * @return - builder instance
+     * @param fieldName     - name of the field or path to the field separated by dots
+     * @param typeGenerator - field value generator
+     * @return - this
      */
-    public DtoGeneratorBuilder<T> setGeneratorBuilder(@NonNull String fieldName,
-                                                      @NonNull IGeneratorBuilder generatorBuilder) {
+    public DtoGeneratorBuilder<T> setGenerator(@NonNull String fieldName,
+                                               @NonNull IGenerator<?> typeGenerator) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
                 .getFieldGeneratorsProvider()
-                .setGeneratorBuilderForField(fieldNameAndPath.getLeft(), generatorBuilder);
+                .setGeneratorBuilderForField(fieldNameAndPath.getLeft(), () -> (IGenerator<Object>) typeGenerator);
         return this;
     }
 
@@ -197,12 +200,28 @@ public class DtoGeneratorBuilder<T> {
      * Configuration
      */
 
-    public DtoGeneratorConfig getDtoGeneratorConfig() {
-        return configuration.getDtoGeneratorConfig();
+    public Configuration getConfig() {
+        return configuration;
     }
 
-    public TypeGeneratorsConfigSupplier getTypeGeneratorsConfig() {
-        return configuration.getTypeGeneratorsConfig();
+    public Configuration getStaticConfig() {
+        return DtoGeneratorStaticConfig.getInstance();
     }
+
+    public DtoGeneratorBuilder<T> setTypeGeneratorConfig(@NonNull String fieldName,
+                                                         @NonNull ConfigDto generatorConfig) {
+        Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
+        dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
+                .getFieldGeneratorsProvider()
+                .setGeneratorConfigForField(fieldNameAndPath.getLeft(), generatorConfig);
+        return this;
+    }
+
+    public <U> DtoGeneratorBuilder<T> setTypeGeneratorConfig(@NonNull Class<U> generatedType,
+                                                             @NonNull ConfigDto configDto) {
+        fieldGeneratorsProvider.setGeneratorConfigForType(generatedType, configDto);
+        return this;
+    }
+
 
 }

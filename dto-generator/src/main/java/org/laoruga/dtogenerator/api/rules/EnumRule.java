@@ -17,6 +17,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Repeatable(EnumRules.class)
 public @interface EnumRule {
 
+    Class<?> GENERATED_TYPE = Enum.class;
+
     // All names are used by default
     String[] possibleEnumNames() default {};
 
@@ -24,5 +26,4 @@ public @interface EnumRule {
 
     String group() default Group.DEFAULT;
 
-    Class<? extends Enum> generatedType() default Enum.class;
 }

@@ -9,17 +9,15 @@ import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.generator.providers.GeneratorProvidersMediator;
 import org.laoruga.dtogenerator.rule.IRuleInfo;
 import org.laoruga.dtogenerator.rule.RulesInfoExtractor;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import static org.laoruga.dtogenerator.util.ReflectionUtils.getDefaultMethodValue;
 
 /**
  * @author Il'dar Valitov
@@ -112,37 +110,29 @@ public class FieldGeneratorsProvider {
         if (maybeRulesInfo.isPresent()) {
             return Optional.of(
                     generatorProvidersMediator.getGeneratorByAnnotation(
-                            field,
                             maybeRulesInfo.get(),
                             getDtoInstanceSupplier(),
-                            createDtoGeneratorSupplier(field))
+                            createDtoGeneratorSupplier(field)
+                    )
             );
         }
 
         // attempt to generate value by field type
         if (getConfiguration().getDtoGeneratorConfig().getGenerateAllKnownTypes()) {
-            return generatorProvidersMediator.getGeneratorsByType(field, field.getType());
+            return generatorProvidersMediator.getGeneratorByType(field, field.getType());
         }
 
         return Optional.empty();
     }
 
-    void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder genBuilder) throws DtoGeneratorException {
+    void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder<?> genBuilder) throws DtoGeneratorException {
         generatorProvidersMediator.setGeneratorBuilderForField(fieldName, genBuilder);
     }
 
-    void overrideGenerator(Class<? extends Annotation> rulesClass, @NonNull IGeneratorBuilder genBuilder) {
-        try {
-            Class<?> generatedType = getDefaultMethodValue(rulesClass, "generatedType", Class.class);
-            userGenBuildersMapping.addBuilder(
-                    rulesClass,
-                    generatedType,
-                    genBuilder);
-        } catch (NoSuchMethodException e) {
-            throw new DtoGeneratorException("Rules annotation '" + rulesClass.getName() +
-                    "' does not contain 'generatedType' method with return type 'Class'", e);
-        }
-
+    void setGenerator(Class<?> generatedType, @NonNull IGeneratorBuilder<?> genBuilder) {
+        userGenBuildersMapping.addBuilder(
+                generatedType,
+                genBuilder);
     }
 
     void addGroups(String[] groups) {
@@ -170,5 +160,15 @@ public class FieldGeneratorsProvider {
             throw new DtoGeneratorException("Error while extracting rule annotations from the field: '"
                     + field.getType() + " " + field.getName() + "'", e);
         }
+    }
+
+    public void setGeneratorConfigForField(String fieldName, ConfigDto generatorConfig) {
+        configuration.getTypeGeneratorsConfigForField()
+                .setGeneratorConfigForField(fieldName, generatorConfig);
+    }
+
+    public void setGeneratorConfigForType(Class<?> generatedType, ConfigDto generatorConfig) {
+        configuration.getTypeGeneratorsConfig()
+                .setGeneratorConfigForType(generatedType, generatorConfig);
     }
 }

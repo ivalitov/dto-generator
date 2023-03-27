@@ -1,9 +1,15 @@
 package org.laoruga.dtogenerator.util;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.Primitives;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.laoruga.dtogenerator.api.rules.Entry;
+import org.laoruga.dtogenerator.constants.GeneratedTypes;
+import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.exceptions.DtoGeneratorValidationException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -11,6 +17,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,10 +32,28 @@ import static java.util.stream.Collectors.joining;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReflectionUtils {
-    private static final String TYPE_WITH_SINGLE_GENERIC_TYPE_REGEXP = "[a-zA-Z0-9_.]*<[a-zA-Z0-9_.]*>";
-    private static final Pattern SINGLE_GENERIC_TYPE_REGEXP = Pattern.compile("<([a-zA-Z0-9_.]*)>");
+    private static final String TYPE_WITH_SINGLE_GENERIC_TYPE_REGEXP = "[a-zA-Z0-9_.]*<[$a-zA-Z0-9_.]*>";
+    private static final String TYPE_WITH_PAIRED_GENERIC_TYPE_REGEXP = "[a-zA-Z0-9_.]*<[$a-zA-Z0-9_.]*, [$a-zA-Z0-9_.]*>";
+    private static final Pattern SINGLE_GENERIC_TYPE_REGEXP = Pattern.compile("<([$a-zA-Z0-9_.]*)>");
+    private static final Pattern PAIRED_GENERIC_TYPE_REGEXP = Pattern.compile("<([$a-zA-Z0-9_.]*), ([$a-zA-Z0-9_.]*)>");
+    private static final Pattern ARRAY_TYPE_REGEXP = Pattern.compile("\\[L([$a-zA-Z0-9_.]*);");
 
-    public static Object extractSingeGenericType(String typeName) {
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_ARRAYS;
+
+    static {
+        Map<Class<?>, Class<?>> primitives = new HashMap<>();
+        primitives.put(byte[].class, Byte.TYPE);
+        primitives.put(short[].class, Short.TYPE);
+        primitives.put(char[].class, Character.TYPE);
+        primitives.put(int[].class, Integer.TYPE);
+        primitives.put(long[].class, Long.TYPE);
+        primitives.put(float[].class, Float.TYPE);
+        primitives.put(double[].class, Double.TYPE);
+        primitives.put(boolean[].class, Boolean.TYPE);
+        PRIMITIVE_ARRAYS = ImmutableMap.copyOf(primitives);
+    }
+
+    public static Class<?> extractSingeGenericType(String typeName) {
 
         if (!typeName.matches(TYPE_WITH_SINGLE_GENERIC_TYPE_REGEXP)) {
             throw new DtoGeneratorException("Next type must have single generic type: '" + typeName + "'");
@@ -42,8 +68,45 @@ public final class ReflectionUtils {
         return getClass(matcher.group(1), typeName);
     }
 
+    public static Class<?>[] extractPairedGenericType(String typeName) {
+
+        if (!typeName.matches(TYPE_WITH_PAIRED_GENERIC_TYPE_REGEXP)) {
+            throw new DtoGeneratorException("Next type must have pair of generic type: '" + typeName + "'");
+        }
+
+        Matcher matcher = PAIRED_GENERIC_TYPE_REGEXP.matcher(typeName);
+
+        if (!matcher.find()) {
+            throw new DtoGeneratorException("Cannot find pair of generic types using next regex pattern: "
+                    + PAIRED_GENERIC_TYPE_REGEXP.pattern() + " in type: '" + typeName + "'");
+        }
+        return new Class[]{getClass(matcher.group(1), typeName), getClass(matcher.group(2), typeName)};
+    }
+
     public static Class<?> getSingleGenericType(Field field) throws DtoGeneratorException {
-        return (Class<?>) extractSingeGenericType(field.getGenericType().getTypeName());
+        return extractSingeGenericType(field.getGenericType().getTypeName());
+    }
+
+    public static Class<?>[] getPairedGenericType(Field field) throws DtoGeneratorException {
+        return extractPairedGenericType(field.getGenericType().getTypeName());
+    }
+
+    public static Class<?> getArrayElementType(Class<?> arrayType) throws DtoGeneratorException {
+
+        if (PRIMITIVE_ARRAYS.containsKey(arrayType)) {
+            return PRIMITIVE_ARRAYS.get(arrayType);
+        }
+
+        String typeName = arrayType.getName();
+
+        Matcher matcher = ARRAY_TYPE_REGEXP.matcher(typeName);
+
+        if (!matcher.find()) {
+            throw new DtoGeneratorException("Cannot find array element type using next regex pattern: "
+                    + ARRAY_TYPE_REGEXP.pattern() + " in type: '" + typeName + "'");
+        }
+
+        return getClass(matcher.group(1), typeName);
     }
 
     private static Class<?> getClass(String className, String typeName) {
@@ -64,6 +127,12 @@ public final class ReflectionUtils {
     @SuppressWarnings("unchecked")
 
     public static <T> T createInstance(Class<T> classToCreate, Object... constructorArgs) {
+
+        if (classToCreate.isInterface() || Modifier.isAbstract(classToCreate.getModifiers())) {
+            throw new DtoGeneratorException("Can't create instance of '" + classToCreate + "' because" +
+                    " it is interface or abstract.");
+        }
+
         Optional<Constructor<?>> suitableConstructor;
         try {
 
@@ -107,30 +176,6 @@ public final class ReflectionUtils {
         return true;
     }
 
-
-    /**
-     * 1. Filed type should be assignable from required collectionClass
-     * 2. CollectionClass should not be an interface or abstract
-     *
-     * @param collectionClass - class of collection
-     * @param <T>             - collection element type
-     * @return - new collection instance
-     */
-    public static <T> T createCollectionInstance(Class<T> collectionClass) {
-        if (collectionClass.isInterface() || Modifier.isAbstract(collectionClass.getModifiers())) {
-            throw new DtoGeneratorException("Can't create instance of '" + collectionClass + "' because" +
-                    " it is interface or abstract.");
-        }
-        T collectionInstance;
-        try {
-            collectionInstance = collectionClass.newInstance();
-        } catch (Exception e) {
-            log.error("Exception while creating Collection instance ", e);
-            throw new DtoGeneratorException(e);
-        }
-        return collectionInstance;
-    }
-
     /**
      * @param fieldType       - type of field to assign collectionClass instance
      * @param collectionClass - type to be assigned to the field
@@ -142,15 +187,74 @@ public final class ReflectionUtils {
         }
     }
 
+
     @SuppressWarnings("unchecked")
-    public static <T> T getDefaultMethodValue(Class<? extends Annotation> annotationClass,
-                                              String methodName,
-                                              Class<T> valueType) throws NoSuchMethodException {
-        Method declaredMethod = annotationClass.getDeclaredMethod(methodName);
-        Object defaultValue = declaredMethod.getDefaultValue();
-        if (defaultValue.getClass() == valueType) {
-            return (T) defaultValue;
+    public static <T> T[] invokeMethodReturningArray(Object sourceClass, String fieldName, Class<T> returnedType) {
+        try {
+            Method method = sourceClass.getClass().getMethod(fieldName);
+            return (T[]) method.invoke(sourceClass);
+        } catch (Exception e) {
+            throw new DtoGeneratorException("Unable to get value of the field: '" + fieldName + "'", e);
         }
-        throw new ClassCastException("Field");
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T callStaticMethod(String methodName, Class<?> sourceClass, Class<T> returnType) {
+        try {
+            return (T) sourceClass.getMethod(methodName).invoke(sourceClass);
+        } catch (Exception e) {
+            throw new DtoGeneratorException("Error during invocation of static method: '" + methodName + "'" +
+                    " of class: '" + sourceClass.getName() + "", e);
+        }
+    }
+
+    public static Annotation getSingleRuleFromEntry(Entry mapRule) throws DtoGeneratorValidationException {
+        Class<? extends Annotation> clazz = mapRule.annotationType();
+        Annotation found = null;
+        for (Method method : clazz.getMethods()) {
+            if (method.getName().endsWith("Rule")) {
+                Annotation[] values =
+                        invokeMethodReturningArray(mapRule, method.getName(), Annotation.class);
+                if (values.length >= 1) {
+                    if (values.length > 1 || found != null) {
+                        throw new DtoGeneratorValidationException("More than one annotation found in: '" + mapRule + "'");
+                    }
+                    found = values[0];
+                }
+            }
+        }
+        if (found == null) {
+            throw new DtoGeneratorValidationException("Empty '" + Entry.class.getName() + "' annotation.");
+        }
+        return found;
+    }
+
+    public static Annotation getSingleRuleFromEntry(Entry mapRule, Class<?> requiredType) throws DtoGeneratorValidationException {
+        Class<? extends Annotation> clazz = mapRule.annotationType();
+        Annotation found = null;
+        for (Method method : clazz.getMethods()) {
+            if (method.getName().endsWith("Rule")) {
+                Annotation[] values =
+                        invokeMethodReturningArray(mapRule, method.getName(), Annotation.class);
+                if (values.length >= 1) {
+                    if (values.length > 1 || found != null) {
+                        throw new DtoGeneratorValidationException("More than one annotation found in: '" + mapRule + "'");
+                    }
+                    found = values[0];
+                }
+            }
+        }
+
+        if (found == null) {
+            Optional<Class<? extends Annotation>> rulesClass = GeneratedTypes.getRulesClass(Primitives.wrap(requiredType));
+            if (rulesClass.isPresent() && RulesInstance.INSTANCES_MAP.containsKey(rulesClass.get())) {
+                found = RulesInstance.INSTANCES_MAP.get(rulesClass.get());
+            } else {
+                throw new DtoGeneratorValidationException("Empty '@" + Entry.class.getSimpleName() + "' annotation," +
+                        " but failed to select @Rules annotation by type: '" + requiredType + "'");
+            }
+        }
+
+        return found;
     }
 }
