@@ -53,6 +53,10 @@ public class AllKnownTypesGeneratingTests {
         @NestedDtoRule
         InnerDto innerDto;
 
+        public Integer getInteger() {
+            return integer;
+        }
+
         public String getLocalDateTime() {
             return localDateTime.toString();
         }
@@ -102,7 +106,7 @@ public class AllKnownTypesGeneratingTests {
 
         // DEBUG
         log.info("DEBUG BEGIN");
-        dto.getString().length();
+        dto.getString();
         dto.getInteger();
         dto.getLocalDateTime();
         dto.getClientType();
