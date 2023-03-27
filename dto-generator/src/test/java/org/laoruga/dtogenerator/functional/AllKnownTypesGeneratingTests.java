@@ -39,7 +39,6 @@ import static org.laoruga.dtogenerator.Constants.RESTORE_STATIC_CONFIG;
 public class AllKnownTypesGeneratingTests {
 
     @Getter
-    @ToString
     static class Dto {
 
         String string;
@@ -60,7 +59,6 @@ public class AllKnownTypesGeneratingTests {
     }
 
     @Getter
-    @ToString
     static class InnerDto {
 
         String string;
@@ -103,6 +101,7 @@ public class AllKnownTypesGeneratingTests {
         assertNotNull(dto);
 
         // DEBUG
+        log.info("DEBUG BEGIN");
         dto.getString().length();
         dto.getInteger();
         dto.getLocalDateTime();
@@ -110,6 +109,7 @@ public class AllKnownTypesGeneratingTests {
         dto.getListOfString();
         dto.getSetOfLong();
         dto.getADouble();
+        log.info("DEBUG END");
         // DEBUG
 
         assertAll(
