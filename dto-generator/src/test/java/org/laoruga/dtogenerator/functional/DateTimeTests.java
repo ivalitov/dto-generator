@@ -61,7 +61,7 @@ public class DateTimeTests {
     }
 
     @Test
-    public void annotationConfig() {
+    void annotationConfig() {
 
         final Instant NOW_INSTANT = Instant.now();
         final LocalDateTime NOW = LocalDateTime.now();
@@ -161,7 +161,7 @@ public class DateTimeTests {
     }
 
     @Test
-    public void instanceConfig() {
+    void instanceConfig() {
 
         final LocalDateTime NOW = LocalDateTime.now();
 
@@ -219,7 +219,7 @@ public class DateTimeTests {
     }
 
     @Test
-    public void fieldConfig() {
+    void fieldConfig() {
 
         final LocalDateTime NOW = LocalDateTime.now();
 
@@ -274,7 +274,7 @@ public class DateTimeTests {
     }
 
     @Test
-    public void overrideGeneratorByField() {
+    void overrideGeneratorByField() {
 
         final LocalDateTime NOW = LocalDateTime.now();
         final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
@@ -294,7 +294,7 @@ public class DateTimeTests {
     }
 
     @Test
-    public void overrideGeneratorByType() {
+    void overrideGeneratorByType() {
 
         final LocalDateTime NOW = LocalDateTime.now();
         final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
@@ -314,7 +314,7 @@ public class DateTimeTests {
     }
 
     @Test
-    public void overrideGeneratorByTypeAndField() {
+    void overrideGeneratorByTypeAndField() {
 
         final LocalDateTime NOW = LocalDateTime.now();
         final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
@@ -379,7 +379,7 @@ public class DateTimeTests {
 
 
     @Test
-    public void withoutAnnotations() {
+    void withoutAnnotations() {
 
         final LocalDateTime NOW = LocalDateTime.now();
         final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();

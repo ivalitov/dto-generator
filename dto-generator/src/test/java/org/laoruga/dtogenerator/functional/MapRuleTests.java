@@ -66,7 +66,7 @@ public class MapRuleTests {
     }
 
     @Test
-    public void annotationConfig() {
+    void annotationConfig() {
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
 
         assertAll(
@@ -156,7 +156,7 @@ public class MapRuleTests {
     }
 
     @Test
-    public void instanceConfig() {
+    void instanceConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -227,7 +227,7 @@ public class MapRuleTests {
     }
 
     @Test
-    public void fieldConfig() {
+    void fieldConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -320,7 +320,7 @@ public class MapRuleTests {
     }
 
     @Test
-    public void overrideGeneratorByField() {
+    void overrideGeneratorByField() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -347,7 +347,7 @@ public class MapRuleTests {
     }
 
     @Test
-    public void overrideGeneratorByType() {
+    void overrideGeneratorByType() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -381,7 +381,7 @@ public class MapRuleTests {
     }
 
     @Test
-    public void withoutAnnotations() {
+    void withoutAnnotations() {
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
         builder.getConfig().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);

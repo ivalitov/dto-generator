@@ -88,17 +88,17 @@ public class DateTimeConfig implements ConfigDto {
         if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();
     }
 
-    public static class DateTimeConfigDtoBuilder {
+    public static class DateTimeConfigBuilder {
 
         private List<ChronoConfig> chronoUnitConfigList;
 
-        public DateTimeConfigDtoBuilder addChronoConfig(ChronoUnitConfig config) {
+        public DateTimeConfigBuilder addChronoConfig(ChronoUnitConfig config) {
             chronoUnitConfigList = chronoUnitConfigList == null ? new LinkedList<>() : chronoUnitConfigList;
             chronoUnitConfigList.add(config);
             return this;
         }
 
-        public DateTimeConfigDtoBuilder addChronoConfig(ChronoFieldConfig config) {
+        public DateTimeConfigBuilder addChronoConfig(ChronoFieldConfig config) {
             chronoUnitConfigList = chronoUnitConfigList == null ? new LinkedList<>() : chronoUnitConfigList;
             chronoUnitConfigList.add(config);
             return this;

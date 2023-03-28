@@ -55,7 +55,7 @@ public class RulesInfoExtractor {
      * otherwise {@link IRuleInfo} object containing rules information.
      * @throws DtoGeneratorValidationException - if rules annotations quantity check failed.
      */
-    synchronized public Optional<IRuleInfo> extractRulesInfo(Field fieldToInspect) throws DtoGeneratorValidationException {
+    public synchronized Optional<IRuleInfo> extractRulesInfo(Field fieldToInspect) throws DtoGeneratorValidationException {
 
         this.field = fieldToInspect;
 
