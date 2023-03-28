@@ -9,7 +9,7 @@ import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
-import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.CollectionConfig;
 
 import java.time.Year;
 import java.util.*;
@@ -55,7 +55,7 @@ public class CollectionRuleTests {
     }
 
     @Test
-    public void annotationConfig() {
+    void annotationConfig() {
 
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
 
@@ -71,7 +71,7 @@ public class CollectionRuleTests {
     }
 
     @Test
-    public void listSetQueueConfig() {
+    void listSetQueueConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -101,7 +101,7 @@ public class CollectionRuleTests {
     }
 
     @Test
-    public void collectionConfig() {
+    void collectionConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -151,7 +151,7 @@ public class CollectionRuleTests {
     }
 
     @Test
-    public void instanceConfig() {
+    void instanceConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -179,22 +179,22 @@ public class CollectionRuleTests {
     }
 
     @Test
-    public void fieldConfig() {
+    void fieldConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         builder.setTypeGeneratorConfig("listOfString",
-                        CollectionConfigDto.builder().minSize(0).maxSize(0).build())
+                        CollectionConfig.builder().minSize(0).maxSize(0).build())
                 .setTypeGeneratorConfig("setOfInteger",
-                        CollectionConfigDto.builder().minSize(2).maxSize(2).build())
+                        CollectionConfig.builder().minSize(2).maxSize(2).build())
                 .setTypeGeneratorConfig("queueOfYear",
-                        CollectionConfigDto.builder().minSize(3).maxSize(3).build())
+                        CollectionConfig.builder().minSize(3).maxSize(3).build())
                 .setTypeGeneratorConfig("linkedListOfDouble",
-                        CollectionConfigDto.builder().minSize(4).maxSize(4).build())
+                        CollectionConfig.builder().minSize(4).maxSize(4).build())
                 .setTypeGeneratorConfig("linkedHashSetOfAtomicInteger",
-                        CollectionConfigDto.builder().minSize(5).maxSize(5).build())
+                        CollectionConfig.builder().minSize(5).maxSize(5).build())
                 .setTypeGeneratorConfig("arrayDequeOfEnum",
-                        CollectionConfigDto.builder().minSize(6).maxSize(6).build());
+                        CollectionConfig.builder().minSize(6).maxSize(6).build());
 
         Dto dto = builder.build().generateDto();
 
@@ -240,15 +240,15 @@ public class CollectionRuleTests {
         // field
         builder
                 .setTypeGeneratorConfig("setOfInteger",
-                        CollectionConfigDto.builder().ruleRemark(MIN_VALUE).build())
+                        CollectionConfig.builder().ruleRemark(MIN_VALUE).build())
                 .setTypeGeneratorConfig("queueOfYear",
-                        CollectionConfigDto.builder().maxSize(2).minSize(2).build())
+                        CollectionConfig.builder().maxSize(2).minSize(2).build())
                 .setTypeGeneratorConfig("linkedListOfDouble",
-                        CollectionConfigDto.builder().minSize(4).maxSize(4).build())
+                        CollectionConfig.builder().minSize(4).maxSize(4).build())
                 .setTypeGeneratorConfig("linkedHashSetOfAtomicInteger",
-                        CollectionConfigDto.builder().minSize(0).build())
+                        CollectionConfig.builder().minSize(0).build())
                 .setTypeGeneratorConfig("arrayDequeOfEnum",
-                        CollectionConfigDto.builder().ruleRemark(MIN_VALUE).build());
+                        CollectionConfig.builder().ruleRemark(MIN_VALUE).build());
 
         Dto dto = builder.build().generateDto();
 
@@ -263,7 +263,7 @@ public class CollectionRuleTests {
     }
 
     @Test
-    public void overrideGeneratorByField() {
+    void overrideGeneratorByField() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -295,7 +295,7 @@ public class CollectionRuleTests {
     }
 
     @Test
-    public void overrideGeneratorByType() {
+    void overrideGeneratorByType() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -327,7 +327,7 @@ public class CollectionRuleTests {
     }
 
     @Test
-    public void overrideGeneratorByTypeAndField() {
+    void overrideGeneratorByTypeAndField() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -370,7 +370,7 @@ public class CollectionRuleTests {
     }
 
     @Test
-    public void withoutAnnotations() {
+    void withoutAnnotations() {
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
         builder.getConfig().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
@@ -420,15 +420,15 @@ public class CollectionRuleTests {
         // field
         builder
                 .setTypeGeneratorConfig("setOfInteger",
-                        CollectionConfigDto.builder().ruleRemark(MIN_VALUE).build())
+                        CollectionConfig.builder().ruleRemark(MIN_VALUE).build())
                 .setTypeGeneratorConfig("queueOfYear",
-                        CollectionConfigDto.builder().maxSize(2).minSize(2).build())
+                        CollectionConfig.builder().maxSize(2).minSize(2).build())
                 .setTypeGeneratorConfig("linkedListOfDouble",
-                        CollectionConfigDto.builder().minSize(4).maxSize(4).build())
+                        CollectionConfig.builder().minSize(4).maxSize(4).build())
                 .setTypeGeneratorConfig("linkedHashSetOfAtomicInteger",
-                        CollectionConfigDto.builder().minSize(0).build())
+                        CollectionConfig.builder().minSize(0).build())
                 .setTypeGeneratorConfig("arrayDequeOfEnum",
-                        CollectionConfigDto.builder().ruleRemark(MIN_VALUE).build());
+                        CollectionConfig.builder().ruleRemark(MIN_VALUE).build());
 
         Dto_2 dto = builder.build().generateDto();
 

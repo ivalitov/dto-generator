@@ -15,7 +15,7 @@ import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.configs.ConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 
 import java.util.function.Supplier;
 
@@ -105,10 +105,9 @@ public class DtoGeneratorBuilder<T> {
      * @return - this
      */
 
-    @SuppressWarnings("unchecked")
     public <U> DtoGeneratorBuilder<T> setGenerator(@NonNull Class<U> generatedType,
                                                    @NonNull IGenerator<? super U> typeGenerator) {
-        fieldGeneratorsProvider.setGenerator(generatedType, () -> (IGenerator<Object>) typeGenerator);
+        fieldGeneratorsProvider.setGenerator(generatedType, typeGenerator);
         return this;
     }
 
@@ -128,7 +127,7 @@ public class DtoGeneratorBuilder<T> {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
                 .getFieldGeneratorsProvider()
-                .setGeneratorBuilderForField(fieldNameAndPath.getLeft(), () -> (IGenerator<Object>) typeGenerator);
+                .setGeneratorBuilderForField(fieldNameAndPath.getLeft(), typeGenerator);
         return this;
     }
 

@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.generator.builder.builders.StringGeneratorBuilder;
+import org.laoruga.dtogenerator.generator.config.dto.StringConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
+
+import java.util.Objects;
 
 /**
  * @author Il'dar Valitov
@@ -24,6 +26,15 @@ public class StringGenerator implements IGenerator<String> {
     private final String[] words;
     private final IRuleRemark ruleRemark;
     private final String regexp;
+
+    public StringGenerator(StringConfig config) {
+        maxLength = config.getMaxLength();
+        minLength = config.getMinLength();
+        chars = config.getChars().toCharArray();
+        words = config.getWords();
+        ruleRemark = Objects.requireNonNull(config.getRuleRemark(), "Rule remark not set.");
+        regexp = config.getRegexp();
+    }
 
     @Override
     public String generate() {
@@ -63,13 +74,6 @@ public class StringGenerator implements IGenerator<String> {
             randomItemFromList = randomItemFromList.substring(0, maxLength);
         }
         return randomItemFromList;
-    }
-
-    /**
-     * @return generator builder
-     */
-    public static StringGeneratorBuilder builder() {
-        return new StringGeneratorBuilder();
     }
 
 }

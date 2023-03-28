@@ -1,7 +1,7 @@
 package org.laoruga.dtogenerator.config.types;
 
-import org.laoruga.dtogenerator.generator.configs.*;
-import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.*;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 
 import java.time.temporal.Temporal;
 import java.util.Collection;
@@ -13,19 +13,19 @@ import java.util.Map;
  */
 public interface TypeGeneratorsConfigSupplier {
 
-    StringConfigDto getStringConfig();
+    StringConfig getStringConfig();
 
-    NumberCommonConfigDto getNumberConfig();
+    NumberCommonConfig getNumberConfig();
 
-    DecimalCommonConfigDto getDecimalConfig();
+    DecimalCommonConfig getDecimalConfig();
 
-    EnumConfigDto getEnumConfig();
+    EnumConfig getEnumConfig();
 
-    DateTimeConfigDto getDateTimeConfig(Class<? extends Temporal> dateTimeType);
+    DateTimeConfig getDateTimeConfig(Class<? extends Temporal> dateTimeType);
 
-    CollectionConfigDto getCollectionConfig(Class<? extends Collection> collectionType);
+    CollectionConfig getCollectionConfig(Class<? extends Collection> collectionType);
 
-    ArrayConfigDto getArrayConfig(Class<?> arrayType);
+    ArrayConfig getArrayConfig(Class<?> arrayType);
 
-    MapConfigDto getMapConfig(Class<? extends Map> mapType);
+    MapConfig getMapConfig(Class<? extends Map> mapType);
 }

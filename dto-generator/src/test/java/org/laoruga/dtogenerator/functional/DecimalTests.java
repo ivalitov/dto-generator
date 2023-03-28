@@ -9,7 +9,7 @@ import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.api.rules.DecimalRule;
 import org.laoruga.dtogenerator.constants.Bounds;
-import org.laoruga.dtogenerator.generator.configs.DecimalConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.DecimalConfig;
 
 import java.math.BigDecimal;
 
@@ -48,7 +48,7 @@ public class DecimalTests {
     }
 
     @Test
-    public void annotationConfig() {
+    void annotationConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -93,7 +93,7 @@ public class DecimalTests {
     }
 
     @Test
-    public void instanceConfig() {
+    void instanceConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
         builder.getConfig().getTypeGeneratorsConfig().getDecimalConfig()
@@ -118,37 +118,37 @@ public class DecimalTests {
     }
 
     @Test
-    public void fieldConfig() {
+    void fieldConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         builder
                 .setTypeGeneratorConfig("doubleObject",
-                        DecimalConfigDto.builder()
+                        DecimalConfig.builder()
                                 .minValue(1.0)
                                 .maxValue(101.101)
                                 .ruleRemark(MAX_VALUE).build())
 
                 .setTypeGeneratorConfig("doublePrimitive",
-                        DecimalConfigDto.builder()
+                        DecimalConfig.builder()
                                 .minValue(-1D)
                                 .maxValue(-1D)
                                 .ruleRemark(RANDOM_VALUE).build())
 
                 .setTypeGeneratorConfig("floatObject",
-                        DecimalConfigDto.builder()
+                        DecimalConfig.builder()
                                 .minValue(11_999_999_999F)
                                 .maxValue(111_999_999_999F)
                                 .ruleRemark(MAX_VALUE).build())
 
                 .setTypeGeneratorConfig("floatPrimitive",
-                        DecimalConfigDto.builder()
+                        DecimalConfig.builder()
                                 .minValue(0F)
                                 .maxValue(0F)
                                 .ruleRemark(MIN_VALUE).build())
 
                 .setTypeGeneratorConfig("bigDecimal",
-                        DecimalConfigDto.builder()
+                        DecimalConfig.builder()
                                 .minValue(new BigDecimal("111"))
                                 .maxValue(new BigDecimal("111"))
                                 .ruleRemark(RANDOM_VALUE).build());
@@ -184,11 +184,11 @@ public class DecimalTests {
                 .setMinBigDecimalValue((new BigDecimal(-222)));
 
         // field
-        builder.setTypeGeneratorConfig("doubleObject", DecimalConfigDto.builder().ruleRemark(MIN_VALUE).build())
-                .setTypeGeneratorConfig("doublePrimitive", DecimalConfigDto.builder().ruleRemark(MAX_VALUE).build())
-                .setTypeGeneratorConfig("floatObject", DecimalConfigDto.builder().ruleRemark(MAX_VALUE).build())
-                .setTypeGeneratorConfig("floatPrimitive", DecimalConfigDto.builder().ruleRemark(MIN_VALUE).build())
-                .setTypeGeneratorConfig("bigDecimal", DecimalConfigDto.builder().ruleRemark(MIN_VALUE).build());
+        builder.setTypeGeneratorConfig("doubleObject", DecimalConfig.builder().ruleRemark(MIN_VALUE).build())
+                .setTypeGeneratorConfig("doublePrimitive", DecimalConfig.builder().ruleRemark(MAX_VALUE).build())
+                .setTypeGeneratorConfig("floatObject", DecimalConfig.builder().ruleRemark(MAX_VALUE).build())
+                .setTypeGeneratorConfig("floatPrimitive", DecimalConfig.builder().ruleRemark(MIN_VALUE).build())
+                .setTypeGeneratorConfig("bigDecimal", DecimalConfig.builder().ruleRemark(MIN_VALUE).build());
 
         Dto dto = builder.build().generateDto();
 
@@ -202,7 +202,7 @@ public class DecimalTests {
     }
 
     @Test
-    public void overrideGeneratorByField() {
+    void overrideGeneratorByField() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -225,7 +225,7 @@ public class DecimalTests {
     }
 
     @Test
-    public void overrideGeneratorByType() {
+    void overrideGeneratorByType() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -254,7 +254,7 @@ public class DecimalTests {
     }
 
     @Test
-    public void withoutAnnotations() {
+    void withoutAnnotations() {
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
 
@@ -292,11 +292,11 @@ public class DecimalTests {
                 .setMinBigDecimalValue("22222222222");
 
         // next lines override parts of previous configs
-        builder.setTypeGeneratorConfig("doubleObject", DecimalConfigDto.builder().minValue(-1D).build())
-                .setTypeGeneratorConfig("doublePrimitive", DecimalConfigDto.builder().ruleRemark(MAX_VALUE).maxValue(2D).build())
-                .setTypeGeneratorConfig("floatObject", DecimalConfigDto.builder().minValue(-3F).build())
-                .setTypeGeneratorConfig("floatPrimitive", DecimalConfigDto.builder().minValue(new Float("-4")).build())
-                .setTypeGeneratorConfig("bigDecimal", DecimalConfigDto.builder().minValue(new BigDecimal("-5")).build());
+        builder.setTypeGeneratorConfig("doubleObject", DecimalConfig.builder().minValue(-1D).build())
+                .setTypeGeneratorConfig("doublePrimitive", DecimalConfig.builder().ruleRemark(MAX_VALUE).maxValue(2D).build())
+                .setTypeGeneratorConfig("floatObject", DecimalConfig.builder().minValue(-3F).build())
+                .setTypeGeneratorConfig("floatPrimitive", DecimalConfig.builder().minValue(new Float("-4")).build())
+                .setTypeGeneratorConfig("bigDecimal", DecimalConfig.builder().minValue(new BigDecimal("-5")).build());
 
         Dto_2 dto = builder.build().generateDto();
 

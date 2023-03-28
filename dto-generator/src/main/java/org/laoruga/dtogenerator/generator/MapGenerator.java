@@ -7,10 +7,11 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.builder.builders.MapGeneratorBuilder;
+import org.laoruga.dtogenerator.generator.config.dto.MapConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -19,18 +20,27 @@ import java.util.function.Supplier;
  */
 @AllArgsConstructor
 @Getter
-public class MapGenerator<K, V> implements IGenerator<Map<K, V>> {
+public class MapGenerator implements IGenerator<Map<Object, Object>> {
 
     private Integer minSize;
     private Integer maxSize;
-    private Supplier<Map<K, V>> mapInstanceSupplier;
-    private IGenerator<K> keyGenerator;
-    private IGenerator<V> valueGenerator;
+    private Supplier<Map<Object, Object>> mapInstanceSupplier;
+    private IGenerator<Object> keyGenerator;
+    private IGenerator<Object> valueGenerator;
     private IRuleRemark ruleRemark;
 
+    public MapGenerator(MapConfig config) {
+        minSize = config.getMinSize();
+        maxSize = config.getMaxSize();
+        mapInstanceSupplier = Objects.requireNonNull(config.getMapInstanceSupplier(), "Map instance supplier must be set");
+        keyGenerator = Objects.requireNonNull(config.getKeyGenerator(), "Key generator must be set.");
+        valueGenerator = Objects.requireNonNull(config.getValueGenerator(), "Value generator must be set.");
+        ruleRemark = Objects.requireNonNull(config.getRuleRemark(), "Unexpected error, rule remark haven't set.");
+    }
+
     @Override
-    public Map<K, V> generate() {
-        Map<K,V> mapInstance = mapInstanceSupplier.get();
+    public Map<Object, Object> generate() {
+        Map<Object, Object> mapInstance = mapInstanceSupplier.get();
 
         int maxAttempts = DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().getMaxCollectionGenerationCycles();
         int size;
@@ -53,7 +63,7 @@ public class MapGenerator<K, V> implements IGenerator<Map<K, V>> {
 
         int attempts = 0;
         while (mapInstance.size() < size) {
-            K key = keyGenerator.generate();
+            Object key = keyGenerator.generate();
             if (mapInstance.containsKey(key)) {
                 if (attempts >= maxAttempts) {
                     throw new DtoGeneratorException("Expected size: '" + size + "' of map: '"
@@ -68,10 +78,6 @@ public class MapGenerator<K, V> implements IGenerator<Map<K, V>> {
         }
 
         return mapInstance;
-    }
-
-    public static MapGeneratorBuilder builder() {
-        return new MapGeneratorBuilder();
     }
 
 }

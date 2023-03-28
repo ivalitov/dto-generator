@@ -19,8 +19,8 @@ import java.util.Objects;
 @Getter
 @Builder
 public class RuleInfoCollection implements IRuleInfo {
-    private IRuleInfo collectionRuleInfo;
-    private IRuleInfo elementRuleInfo;
+    private RuleInfo collectionRuleInfo;
+    private RuleInfo elementRuleInfo;
     private Field field;
     private Class<?> elementType;
     private String group;

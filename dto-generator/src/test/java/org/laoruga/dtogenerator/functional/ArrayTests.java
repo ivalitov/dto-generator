@@ -13,7 +13,7 @@ import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
-import org.laoruga.dtogenerator.generator.configs.ArrayConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.ArrayConfig;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -55,7 +55,7 @@ public class ArrayTests {
 
 
     @Test
-    public void annotationConfig() {
+    void annotationConfig() {
 
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
 
@@ -97,7 +97,7 @@ public class ArrayTests {
     }
 
     @Test
-    public void instanceConfig() {
+    void instanceConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -123,31 +123,31 @@ public class ArrayTests {
     }
 
     @Test
-    public void fieldConfig() {
+    void fieldConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         builder.setTypeGeneratorConfig("strings",
-                        ArrayConfigDto.builder()
+                        ArrayConfig.builder()
                                 .minSize(1)
                                 .ruleRemark(MIN_VALUE)
                                 .elementGenerator(() -> "OASIS")
                                 .build())
                 .setTypeGeneratorConfig("integers",
-                        ArrayConfigDto.builder()
+                        ArrayConfig.builder()
                                 .elementGenerator(() -> 2)
                                 .ruleRemark(MAX_VALUE).build())
                 .setTypeGeneratorConfig("ints",
-                        ArrayConfigDto.builder().minSize(6).maxSize(6).build())
+                        ArrayConfig.builder().minSize(6).maxSize(6).build())
                 .setTypeGeneratorConfig("longsObjects",
-                        ArrayConfigDto.builder().minSize(8).maxSize(8).build())
+                        ArrayConfig.builder().minSize(8).maxSize(8).build())
                 .setTypeGeneratorConfig("longs",
-                        ArrayConfigDto.builder()
+                        ArrayConfig.builder()
                                 .minSize(3)
                                 .maxSize(3)
                                 .elementGenerator(() -> 7L).build())
                 .setTypeGeneratorConfig("enums",
-                        ArrayConfigDto.builder().maxSize(11).ruleRemark(MAX_VALUE).build());
+                        ArrayConfig.builder().maxSize(11).ruleRemark(MAX_VALUE).build());
 
         Dto dto = builder.build().generateDto();
 
@@ -187,15 +187,15 @@ public class ArrayTests {
 
         // field
         builder.setTypeGeneratorConfig("strings",
-                        ArrayConfigDto.builder().elementGenerator(() -> "PUSHKIN").build())
+                        ArrayConfig.builder().elementGenerator(() -> "PUSHKIN").build())
                 .setTypeGeneratorConfig("integers",
-                        ArrayConfigDto.builder().ruleRemark(MAX_VALUE).build())
+                        ArrayConfig.builder().ruleRemark(MAX_VALUE).build())
                 .setTypeGeneratorConfig("ints",
-                        ArrayConfigDto.builder().maxSize(6).ruleRemark(MIN_VALUE).build())
+                        ArrayConfig.builder().maxSize(6).ruleRemark(MIN_VALUE).build())
                 .setTypeGeneratorConfig("longs",
-                        ArrayConfigDto.builder().elementGenerator(() -> 88L).build())
+                        ArrayConfig.builder().elementGenerator(() -> 88L).build())
                 .setTypeGeneratorConfig("enums",
-                        ArrayConfigDto.builder().ruleRemark(RANDOM_VALUE).build());
+                        ArrayConfig.builder().ruleRemark(RANDOM_VALUE).build());
 
         Dto dto = builder.build().generateDto();
 
@@ -210,7 +210,7 @@ public class ArrayTests {
     }
 
     @Test
-    public void overrideGeneratorByField() {
+    void overrideGeneratorByField() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -234,7 +234,7 @@ public class ArrayTests {
     }
 
     @Test
-    public void overrideGeneratorByType() {
+    void overrideGeneratorByType() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -258,7 +258,7 @@ public class ArrayTests {
     }
 
     @Test
-    public void overrideGeneratorByTypeAndField() {
+    void overrideGeneratorByTypeAndField() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -302,7 +302,7 @@ public class ArrayTests {
     }
 
     @Test
-    public void withoutAnnotations() {
+    void withoutAnnotations() {
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
 
@@ -348,15 +348,15 @@ public class ArrayTests {
 
         // field
         builder.setTypeGeneratorConfig("strings",
-                        ArrayConfigDto.builder().elementGenerator(() -> "PUSHKIN").build())
+                        ArrayConfig.builder().elementGenerator(() -> "PUSHKIN").build())
                 .setTypeGeneratorConfig("integers",
-                        ArrayConfigDto.builder().ruleRemark(MAX_VALUE).build())
+                        ArrayConfig.builder().ruleRemark(MAX_VALUE).build())
                 .setTypeGeneratorConfig("ints",
-                        ArrayConfigDto.builder().maxSize(6).ruleRemark(MIN_VALUE).build())
+                        ArrayConfig.builder().maxSize(6).ruleRemark(MIN_VALUE).build())
                 .setTypeGeneratorConfig("longs",
-                        ArrayConfigDto.builder().elementGenerator(() -> 88L).build())
+                        ArrayConfig.builder().elementGenerator(() -> 88L).build())
                 .setTypeGeneratorConfig("enums",
-                        ArrayConfigDto.builder().ruleRemark(RANDOM_VALUE).build());
+                        ArrayConfig.builder().ruleRemark(RANDOM_VALUE).build());
 
         Dto_2 dto = builder.build().generateDto();
 

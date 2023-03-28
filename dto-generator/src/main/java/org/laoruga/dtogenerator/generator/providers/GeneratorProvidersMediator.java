@@ -3,10 +3,13 @@ package org.laoruga.dtogenerator.generator.providers;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.constants.RuleType;
-import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
+import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorByAnnotation;
+import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForArray;
+import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForList;
+import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForMap;
+import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliers;
 import org.laoruga.dtogenerator.rule.IRuleInfo;
 import org.laoruga.dtogenerator.rule.RuleInfoCollection;
 import org.laoruga.dtogenerator.rule.RuleInfoMap;
@@ -30,42 +33,57 @@ public class GeneratorProvidersMediator {
     private final GeneratorsProviderByAnnotationForList generatorsProviderByAnnotationForArray;
 
     public GeneratorProvidersMediator(ConfigurationHolder configuration,
-                                      GeneratorBuildersHolder userGenBuildersMapping,
+                                      GeneratorSuppliers userGenBuildersMapping,
                                       RemarksHolder remarksHolder) {
-        generatorsProviderByType = new GeneratorsProviderByType(
-                configuration,
-                userGenBuildersMapping,
-                remarksHolder);
-        generatorProviderOverriddenForField = new GeneratorsProviderByField(
-                configuration,
-                remarksHolder);
-        generatorsProviderByAnnotation =
+        GeneratorConfiguratorByAnnotation configuratorByAnnotation =
+                new GeneratorConfiguratorByAnnotation(configuration, remarksHolder);
+
+        this.generatorProviderOverriddenForField = new GeneratorsProviderByField();
+
+        this.generatorsProviderByType = new GeneratorsProviderByType(
+                configuratorByAnnotation,
+                userGenBuildersMapping
+        );
+
+        this.generatorsProviderByAnnotation =
                 new GeneratorsProviderByAnnotation(
-                        configuration,
+                        configuratorByAnnotation,
                         generatorsProviderByType,
-                        remarksHolder,
-                        userGenBuildersMapping);
-        generatorsProviderByAnnotationForMap =
-                new GeneratorsProviderByAnnotationForMap(generatorsProviderByAnnotation);
-        generatorsProviderByAnnotationForCollection =
-                new GeneratorsProviderByAnnotationForList(generatorsProviderByAnnotation);
-        generatorsProviderByAnnotationForArray =
-                new GeneratorsProviderByAnnotationForArray(generatorsProviderByAnnotation);
+                        userGenBuildersMapping
+                );
+
+        this.generatorsProviderByAnnotationForMap =
+                new GeneratorsProviderByAnnotationForMap(
+                        generatorsProviderByAnnotation,
+                        new GeneratorConfiguratorForMap(configuration, remarksHolder)
+                );
+
+        this.generatorsProviderByAnnotationForCollection =
+                new GeneratorsProviderByAnnotationForList(
+                        generatorsProviderByAnnotation,
+                        new GeneratorConfiguratorForList(configuration, remarksHolder)
+                );
+
+        this.generatorsProviderByAnnotationForArray =
+                new GeneratorsProviderByAnnotationForList(
+                        generatorsProviderByAnnotation,
+                        new GeneratorConfiguratorForArray(configuration, remarksHolder)
+                );
     }
 
     /*
      * By field
      */
 
-    public boolean isGeneratorBuilderOverridden(String fieldName) {
-        return generatorProviderOverriddenForField.isBuilderOverridden(fieldName);
+    public synchronized boolean isGeneratorOverridden(String fieldName) {
+        return generatorProviderOverriddenForField.isGeneratorOverridden(fieldName);
     }
 
-    public void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder<?> genBuilder) {
-        generatorProviderOverriddenForField.setGeneratorBuilderForField(fieldName, genBuilder);
+    public synchronized void setGeneratorForField(String fieldName, IGenerator<?> generator) {
+        generatorProviderOverriddenForField.setGeneratorBuilderForField(fieldName, generator);
     }
 
-    public IGenerator<?> getGeneratorOverriddenForField(Field field) {
+    public synchronized IGenerator<?> getGeneratorOverriddenForField(Field field) {
         return generatorProviderOverriddenForField.getGenerator(field);
     }
 

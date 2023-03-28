@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator;
 import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.generator.builder.builders.NestedDtoGeneratorBuilder;
+import org.laoruga.dtogenerator.generator.config.dto.NestedConfig;
 
 /**
  * @author Il'dar Valitov
@@ -14,8 +14,8 @@ public class NestedDtoGenerator implements IGenerator<Object> {
 
     private final DtoGenerator<?> dtoGenerator;
 
-    public static NestedDtoGeneratorBuilder builder() {
-        return new NestedDtoGeneratorBuilder();
+    public NestedDtoGenerator(NestedConfig config) {
+        this.dtoGenerator = config.getDtoGenerator();
     }
 
     @Override

@@ -5,12 +5,11 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
-import org.laoruga.dtogenerator.generator.configs.ConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.generator.providers.GeneratorProvidersMediator;
+import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliers;
 import org.laoruga.dtogenerator.rule.IRuleInfo;
 import org.laoruga.dtogenerator.rule.RulesInfoExtractor;
 
@@ -32,7 +31,7 @@ public class FieldGeneratorsProvider {
     private Supplier<?> dtoInstanceSupplier;
     private final String[] pathFromDtoRoot;
     private final Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree;
-    private final GeneratorBuildersHolder userGenBuildersMapping;
+    private final GeneratorSuppliers userGenBuildersMapping;
     private final RulesInfoExtractor rulesInfoExtractor;
     private final GeneratorProvidersMediator generatorProvidersMediator;
 
@@ -43,7 +42,7 @@ public class FieldGeneratorsProvider {
                             Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree,
                             Supplier<?> dtoInstanceSupplier) {
         this.configuration = configuration;
-        this.userGenBuildersMapping = new GeneratorBuildersHolder();
+        this.userGenBuildersMapping = new GeneratorSuppliers();
         this.pathFromDtoRoot = pathFromDtoRoot;
         this.rulesInfoExtractor = new RulesInfoExtractor(fieldsFilter);
         this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
@@ -98,7 +97,7 @@ public class FieldGeneratorsProvider {
     Optional<IGenerator<?>> getGenerator(Field field) {
 
         // generator was set explicitly
-        if (generatorProvidersMediator.isGeneratorBuilderOverridden(field.getName())) {
+        if (generatorProvidersMediator.isGeneratorOverridden(field.getName())) {
             return Optional.of(
                     generatorProvidersMediator.getGeneratorOverriddenForField(field)
             );
@@ -125,14 +124,12 @@ public class FieldGeneratorsProvider {
         return Optional.empty();
     }
 
-    void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder<?> genBuilder) throws DtoGeneratorException {
-        generatorProvidersMediator.setGeneratorBuilderForField(fieldName, genBuilder);
+    void setGeneratorBuilderForField(String fieldName, IGenerator<?> generator) throws DtoGeneratorException {
+        generatorProvidersMediator.setGeneratorForField(fieldName, generator);
     }
 
-    void setGenerator(Class<?> generatedType, @NonNull IGeneratorBuilder<?> genBuilder) {
-        userGenBuildersMapping.addBuilder(
-                generatedType,
-                genBuilder);
+    void setGenerator(Class<?> generatedType, @NonNull IGenerator<?> generator) {
+        userGenBuildersMapping.addSuppliersInfo(generatedType, generator);
     }
 
     void addGroups(String[] groups) {

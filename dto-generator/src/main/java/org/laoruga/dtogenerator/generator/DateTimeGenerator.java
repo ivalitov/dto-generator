@@ -3,8 +3,8 @@ package org.laoruga.dtogenerator.generator;
 import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.generator.builder.builders.DateTimeGeneratorBuilder;
-import org.laoruga.dtogenerator.generator.configs.datetime.ChronoConfig;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.ChronoConfig;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.time.temporal.Temporal;
@@ -22,6 +22,12 @@ public class DateTimeGenerator implements IGenerator<Temporal> {
     private final IRuleRemark ruleRemark;
     private final Class<? extends Temporal> generatedType;
 
+    public DateTimeGenerator(DateTimeConfig config) {
+        chronoUnitConfigList = config.getChronoUnitConfigList();
+        ruleRemark = config.getRuleRemark();
+        generatedType = config.getGeneratedType();
+    }
+
     @Override
     public Temporal generate() {
         Temporal now = ReflectionUtils.callStaticMethod("now", generatedType, Temporal.class);
@@ -34,9 +40,4 @@ public class DateTimeGenerator implements IGenerator<Temporal> {
 
         return now;
     }
-
-    public static DateTimeGeneratorBuilder builder() {
-        return new DateTimeGeneratorBuilder();
-    }
-
 }

@@ -8,8 +8,8 @@ import org.laoruga.dtogenerator.api.rules.EnumRule;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.configs.*;
-import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.*;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 
 import java.time.temporal.Temporal;
 import java.util.Collection;
@@ -57,60 +57,60 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
      * Lazy getters
      */
 
-    public StringConfigDto getStringConfig() {
-        return (StringConfigDto) getConfigLazy(
+    public StringConfig getStringConfig() {
+        return (StringConfig) getConfigLazy(
                 StringRule.GENERATED_TYPE,
-                StringConfigDto::new
+                StringConfig::new
         );
     }
 
-    public NumberCommonConfigDto getNumberConfig() {
-        return (NumberCommonConfigDto) getConfigLazy(
+    public NumberCommonConfig getNumberConfig() {
+        return (NumberCommonConfig) getConfigLazy(
                 NumberRule.GENERATED_TYPES,
-                NumberCommonConfigDto::new
+                NumberCommonConfig::new
         );
     }
 
-    public DecimalCommonConfigDto getDecimalConfig() {
-        return (DecimalCommonConfigDto) getConfigLazy(
+    public DecimalCommonConfig getDecimalConfig() {
+        return (DecimalCommonConfig) getConfigLazy(
                 DecimalRule.GENERATED_TYPES,
-                DecimalCommonConfigDto::new
+                DecimalCommonConfig::new
         );
     }
 
-    public EnumConfigDto getEnumConfig() {
-        return (EnumConfigDto) getConfigLazy(
+    public EnumConfig getEnumConfig() {
+        return (EnumConfig) getConfigLazy(
                 EnumRule.GENERATED_TYPE,
-                EnumConfigDto::new
+                EnumConfig::new
         );
     }
 
-    public DateTimeConfigDto getDateTimeConfig(Class<? extends Temporal> dateTimeType) {
-        return (DateTimeConfigDto) getConfigLazy(
+    public DateTimeConfig getDateTimeConfig(Class<? extends Temporal> dateTimeType) {
+        return (DateTimeConfig) getConfigLazy(
                 dateTimeType,
-                DateTimeConfigDto::new
+                DateTimeConfig::new
         );
     }
 
-    public CollectionConfigDto getCollectionConfig(Class<? extends Collection> generatedType) {
-        return (CollectionConfigDto) getConfigLazy(
+    public CollectionConfig getCollectionConfig(Class<? extends Collection> generatedType) {
+        return (CollectionConfig) getConfigLazy(
                 generatedType,
-                CollectionConfigDto::new
+                CollectionConfig::new
         );
     }
 
-    public ArrayConfigDto getArrayConfig(Class<?> arrayType) {
-        return (ArrayConfigDto) getConfigLazy(
+    public ArrayConfig getArrayConfig(Class<?> arrayType) {
+        return (ArrayConfig) getConfigLazy(
                 arrayType,
-                ArrayConfigDto::new
+                ArrayConfig::new
         );
     }
 
     @Override
-    public MapConfigDto getMapConfig(Class<? extends Map> generatedType) {
-        return (MapConfigDto) getConfigLazy(
+    public MapConfig getMapConfig(Class<? extends Map> generatedType) {
+        return (MapConfig) getConfigLazy(
                 generatedType,
-                MapConfigDto::new
+                MapConfig::new
         );
     }
 

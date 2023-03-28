@@ -14,9 +14,9 @@ import org.laoruga.dtogenerator.api.rules.datetime.ChronoFieldShift;
 import org.laoruga.dtogenerator.api.rules.datetime.ChronoUnitShift;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
-import org.laoruga.dtogenerator.generator.configs.datetime.ChronoFieldConfig;
-import org.laoruga.dtogenerator.generator.configs.datetime.ChronoUnitConfig;
-import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.ChronoFieldConfig;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.ChronoUnitConfig;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 
 import java.time.*;
 import java.time.temporal.ChronoField;
@@ -61,7 +61,7 @@ public class DateTimeTests {
     }
 
     @Test
-    public void annotationConfig() {
+    void annotationConfig() {
 
         final Instant NOW_INSTANT = Instant.now();
         final LocalDateTime NOW = LocalDateTime.now();
@@ -161,7 +161,7 @@ public class DateTimeTests {
     }
 
     @Test
-    public void instanceConfig() {
+    void instanceConfig() {
 
         final LocalDateTime NOW = LocalDateTime.now();
 
@@ -219,29 +219,29 @@ public class DateTimeTests {
     }
 
     @Test
-    public void fieldConfig() {
+    void fieldConfig() {
 
         final LocalDateTime NOW = LocalDateTime.now();
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         builder
-                .setTypeGeneratorConfig("localDateTime", DateTimeConfigDto.builder()
+                .setTypeGeneratorConfig("localDateTime", DateTimeConfig.builder()
                         .addChronoConfig(ChronoUnitConfig.newAbsolute(1, DAYS)).build())
 
-                .setTypeGeneratorConfig("localDate", DateTimeConfigDto.builder()
+                .setTypeGeneratorConfig("localDate", DateTimeConfig.builder()
                         .addChronoConfig(ChronoFieldConfig.newAbsolute(2, ChronoField.DAY_OF_MONTH)).build())
 
-                .setTypeGeneratorConfig("localTime", DateTimeConfigDto.builder()
+                .setTypeGeneratorConfig("localTime", DateTimeConfig.builder()
                         .addChronoConfig(ChronoUnitConfig.newAbsolute(3, HOURS)).build())
 
-                .setTypeGeneratorConfig("year", DateTimeConfigDto.builder()
+                .setTypeGeneratorConfig("year", DateTimeConfig.builder()
                         .addChronoConfig(ChronoFieldConfig.newAbsolute(2004, ChronoField.YEAR)).build())
 
-                .setTypeGeneratorConfig("yearMonth", DateTimeConfigDto.builder()
+                .setTypeGeneratorConfig("yearMonth", DateTimeConfig.builder()
                         .addChronoConfig(ChronoUnitConfig.newBounds(5, 5, MONTHS)).build())
 
-                .setTypeGeneratorConfig("instant", DateTimeConfigDto.builder()
+                .setTypeGeneratorConfig("instant", DateTimeConfig.builder()
                         .addChronoConfig(ChronoFieldConfig.newBounds(6, 6, ChronoField.INSTANT_SECONDS)).build());
 
         Dto dto = builder.build().generateDto();
@@ -274,7 +274,7 @@ public class DateTimeTests {
     }
 
     @Test
-    public void overrideGeneratorByField() {
+    void overrideGeneratorByField() {
 
         final LocalDateTime NOW = LocalDateTime.now();
         final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
@@ -294,7 +294,7 @@ public class DateTimeTests {
     }
 
     @Test
-    public void overrideGeneratorByType() {
+    void overrideGeneratorByType() {
 
         final LocalDateTime NOW = LocalDateTime.now();
         final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
@@ -314,7 +314,7 @@ public class DateTimeTests {
     }
 
     @Test
-    public void overrideGeneratorByTypeAndField() {
+    void overrideGeneratorByTypeAndField() {
 
         final LocalDateTime NOW = LocalDateTime.now();
         final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
@@ -379,7 +379,7 @@ public class DateTimeTests {
 
 
     @Test
-    public void withoutAnnotations() {
+    void withoutAnnotations() {
 
         final LocalDateTime NOW = LocalDateTime.now();
         final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();
@@ -450,7 +450,7 @@ public class DateTimeTests {
                 .addChronoConfig(ChronoUnitConfig.newBounds(-100, 100, DAYS));
         builder.setTypeGeneratorConfig(
                 LocalDate.class,
-                DateTimeConfigDto.builder().addChronoConfig(ChronoUnitConfig.newBounds(-200, 200, DAYS)).build()
+                DateTimeConfig.builder().addChronoConfig(ChronoUnitConfig.newBounds(-200, 200, DAYS)).build()
         );
         instanceConfig.getDateTimeConfig(LocalTime.class)
                 .setRuleRemark(MIN_VALUE);
@@ -460,9 +460,9 @@ public class DateTimeTests {
 
 
         // field
-        builder.setTypeGeneratorConfig("localDate", DateTimeConfigDto.builder().ruleRemark(MIN_VALUE).build());
-        builder.setTypeGeneratorConfig("localTime", DateTimeConfigDto.builder().ruleRemark(MAX_VALUE).build());
-        builder.setTypeGeneratorConfig("year", DateTimeConfigDto.builder().addChronoConfig(
+        builder.setTypeGeneratorConfig("localDate", DateTimeConfig.builder().ruleRemark(MIN_VALUE).build());
+        builder.setTypeGeneratorConfig("localTime", DateTimeConfig.builder().ruleRemark(MAX_VALUE).build());
+        builder.setTypeGeneratorConfig("year", DateTimeConfig.builder().addChronoConfig(
                 ChronoUnitConfig.newAbsolute(3, YEARS)).build()
         );
 

@@ -3,12 +3,10 @@ package org.laoruga.dtogenerator.constants;
 import com.google.common.collect.ImmutableMap;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
+import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Il'dar Valitov
@@ -56,5 +54,15 @@ public class GeneratedTypes {
             }
         }
         return false;
+    }
+
+    public static Class<?> getAssignableType(Class<?>[] possibleTypes, Class<?> generatedType) {
+        for (Class<?> possibleType : possibleTypes) {
+            if (possibleType.isAssignableFrom(generatedType)) {
+                return possibleType;
+            }
+        }
+        throw new DtoGeneratorException("There is no types assignable from '" + generatedType +
+                "' in the types list: " + Arrays.asList(possibleTypes));
     }
 }

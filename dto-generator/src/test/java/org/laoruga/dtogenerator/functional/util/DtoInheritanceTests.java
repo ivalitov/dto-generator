@@ -10,7 +10,7 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import org.laoruga.dtogenerator.generator.configs.StringConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.StringConfig;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -73,8 +73,8 @@ class DtoInheritanceTests {
     void dtoWithInheritance() {
 
         Dto dto = DtoGenerator.builder(Dto.class)
-                .setTypeGeneratorConfig("stringAbstract", StringConfigDto.builder().words(new String[]{"stringAbstract_2"}).build())
-                .setTypeGeneratorConfig("dtoNested.stringNested", StringConfigDto.builder().words(new String[]{"stringNested_2"}).build())
+                .setTypeGeneratorConfig("stringAbstract", StringConfig.builder().words(new String[]{"stringAbstract_2"}).build())
+                .setTypeGeneratorConfig("dtoNested.stringNested", StringConfig.builder().words(new String[]{"stringNested_2"}).build())
                 .build().generateDto();
         assertAll(
                 () -> assertThat(dto.getString(), equalTo("string")),

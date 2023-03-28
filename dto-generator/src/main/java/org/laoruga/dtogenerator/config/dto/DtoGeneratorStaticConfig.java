@@ -27,7 +27,7 @@ public final class DtoGeneratorStaticConfig {
         );
     }
 
-    synchronized public static Configuration getInstance() {
+    public synchronized static Configuration getInstance() {
         return INSTANCE;
     }
 

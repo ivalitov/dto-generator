@@ -1,7 +1,7 @@
 package org.laoruga.dtogenerator.config;
 
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.configs.ConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 
 import java.util.HashMap;
 import java.util.Map;

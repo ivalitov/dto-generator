@@ -2,7 +2,6 @@ package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Epic;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -20,7 +19,7 @@ import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.functional.data.dto.DtoAllKnownTypes;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
-import org.laoruga.dtogenerator.generator.configs.datetime.ChronoUnitConfig;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.ChronoUnitConfig;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
