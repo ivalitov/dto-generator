@@ -7,7 +7,7 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.config.dto.MapConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.MapConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Map;
@@ -29,7 +29,7 @@ public class MapGenerator implements IGenerator<Map<Object, Object>> {
     private IGenerator<Object> valueGenerator;
     private IRuleRemark ruleRemark;
 
-    public MapGenerator(MapConfigDto config) {
+    public MapGenerator(MapConfig config) {
         minSize = config.getMinSize();
         maxSize = config.getMaxSize();
         mapInstanceSupplier = Objects.requireNonNull(config.getMapInstanceSupplier(), "Map instance supplier must be set");

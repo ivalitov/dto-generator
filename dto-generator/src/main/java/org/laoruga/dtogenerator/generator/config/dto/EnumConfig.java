@@ -15,18 +15,18 @@ import org.laoruga.dtogenerator.api.rules.EnumRule;
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class EnumConfigDto implements ConfigDto {
+public class EnumConfig implements ConfigDto {
     private String[] possibleEnumNames;
     private Class<? extends Enum<?>> enumClass;
     private IRuleRemark ruleRemark;
 
-    public EnumConfigDto(EnumRule enumRule) {
+    public EnumConfig(EnumRule enumRule) {
         possibleEnumNames = enumRule.possibleEnumNames();
         ruleRemark = enumRule.ruleRemark();
     }
 
     public void merge(ConfigDto from) {
-        EnumConfigDto configDto = (EnumConfigDto) from;
+        EnumConfig configDto = (EnumConfig) from;
         if (configDto.getPossibleEnumNames() != null) this.possibleEnumNames = configDto.getPossibleEnumNames();
         if (configDto.getEnumClass() != null) this.enumClass = configDto.getEnumClass();
         if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();

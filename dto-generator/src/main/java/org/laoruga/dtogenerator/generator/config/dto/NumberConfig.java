@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class NumberConfigDto implements ConfigDto {
+public class NumberConfig implements ConfigDto {
 
     private Number maxValue;
     private Number minValue;
@@ -32,7 +32,7 @@ public class NumberConfigDto implements ConfigDto {
     private boolean isAtomic;
     private IRuleRemark ruleRemark;
 
-    public NumberConfigDto(NumberRule rules, Class<? extends Number> fieldType) {
+    public NumberConfig(NumberRule rules, Class<? extends Number> fieldType) {
         fieldType = Primitives.wrap(fieldType);
 
         this.isAtomic = fieldType == AtomicInteger.class || fieldType == AtomicLong.class;
@@ -69,11 +69,11 @@ public class NumberConfigDto implements ConfigDto {
 
     public void merge(ConfigDto configDto) {
 
-        boolean commonConfig = configDto.getClass() == NumberCommonConfigDto.class;
+        boolean commonConfig = configDto.getClass() == NumberCommonConfig.class;
 
-        NumberConfigDto configFrom = commonConfig
-                ? ((NumberCommonConfigDto) configDto).getConfigOrNull(fieldType)
-                : (NumberConfigDto) configDto;
+        NumberConfig configFrom = commonConfig
+                ? ((NumberCommonConfig) configDto).getConfigOrNull(fieldType)
+                : (NumberConfig) configDto;
 
         if (commonConfig) {
             if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();

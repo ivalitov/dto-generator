@@ -12,7 +12,7 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
  */
 @Builder
 @Getter
-public class NestedConfigDto implements ConfigDto {
+public class NestedConfig implements ConfigDto {
 
     private final DtoGenerator<?> dtoGenerator;
     private IRuleRemark ruleRemark;

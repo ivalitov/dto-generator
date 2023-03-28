@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.generator.config.dto.ArrayConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.ArrayConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.lang.reflect.Array;
@@ -24,7 +24,7 @@ public class ArrayGenerator implements IGenerator<Object> {
     private IGenerator<?> elementGenerator;
     private IRuleRemark ruleRemark;
 
-    public ArrayGenerator(ArrayConfigDto config) {
+    public ArrayGenerator(ArrayConfig config) {
         minSize = config.getMinSize();
         maxSize = config.getMaxSize();
         elementType = Objects.requireNonNull(config.getElementType(), "Array element type must be set");

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.generator.config.dto.DecimalConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.DecimalConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 /**
@@ -20,7 +20,7 @@ public class DecimalGenerator implements IGenerator<Number> {
     private final int precision;
     private final IRuleRemark ruleRemark;
 
-    public DecimalGenerator(DecimalConfigDto config) {
+    public DecimalGenerator(DecimalConfig config) {
         maxValue = config.getMaxValue();
         minValue = config.getMinValue();
         precision = config.getPrecision();

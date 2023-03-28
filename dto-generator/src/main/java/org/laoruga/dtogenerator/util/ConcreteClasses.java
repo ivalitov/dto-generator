@@ -9,7 +9,7 @@ import java.util.*;
  * @author Il'dar Valitov
  * Created on 20.03.2023
  */
-public class ConcreteClasses {
+public final class ConcreteClasses {
     public static Class<?> getConcreteCollectionClass(Class<? extends Collection<?>> fieldType) {
 
         if (!Modifier.isInterface(fieldType.getModifiers()) && !Modifier.isAbstract(fieldType.getModifiers())) {

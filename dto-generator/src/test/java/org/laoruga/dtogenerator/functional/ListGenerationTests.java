@@ -16,8 +16,8 @@ import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientDto;
-import org.laoruga.dtogenerator.generator.config.dto.CollectionConfigDto;
-import org.laoruga.dtogenerator.generator.config.dto.StringConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.CollectionConfig;
+import org.laoruga.dtogenerator.generator.config.dto.StringConfig;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -171,10 +171,10 @@ class ListGenerationTests {
         builder.getStaticConfig().getTypeGeneratorsConfig().getNumberConfig().setMaxIntValue(1).setMinIntValue(1);
 
         // instance
-        builder.setTypeGeneratorConfig("linkedListOfStrings", CollectionConfigDto.builder().maxSize(2).minSize(2).build())
-                .setTypeGeneratorConfig("linkedListOfStrings", StringConfigDto.builder().words(new String[]{"PEACE"}).build())
-                .setTypeGeneratorConfig("vectorOfStrings", StringConfigDto.builder().words(new String[]{"LIFE"}).build())
-                .setTypeGeneratorConfig("linkedListOfStringsImplicit", CollectionConfigDto.builder().maxSize(3).minSize(3).build());
+        builder.setTypeGeneratorConfig("linkedListOfStrings", CollectionConfig.builder().maxSize(2).minSize(2).build())
+                .setTypeGeneratorConfig("linkedListOfStrings", StringConfig.builder().words(new String[]{"PEACE"}).build())
+                .setTypeGeneratorConfig("vectorOfStrings", StringConfig.builder().words(new String[]{"LIFE"}).build())
+                .setTypeGeneratorConfig("linkedListOfStringsImplicit", CollectionConfig.builder().maxSize(3).minSize(3).build());
 
         builder.getConfig().getTypeGeneratorsConfig().getCollectionConfig(List.class).setMinSize(1);
 

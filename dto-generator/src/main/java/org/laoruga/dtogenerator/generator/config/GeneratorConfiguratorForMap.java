@@ -5,7 +5,7 @@ import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
-import org.laoruga.dtogenerator.generator.config.dto.MapConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.MapConfig;
 import org.laoruga.dtogenerator.rule.RuleInfoMap;
 import org.laoruga.dtogenerator.util.ConcreteClasses;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
@@ -36,7 +36,7 @@ public class GeneratorConfiguratorForMap extends GeneratorConfigurator {
                 ? (Class<? extends Map<?, ?>>) ConcreteClasses.getConcreteMapClass((Class<? extends Map<?, ?>>) fieldType)
                 : (Class<? extends Map<?, ?>>) rule.mapClass();
 
-        MapConfigDto newConfigInstance = new MapConfigDto(rule)
+        MapConfig newConfigInstance = new MapConfig(rule)
                 .setMapInstanceSupplier(() -> (Map<Object, Object>) ReflectionUtils.createInstance(mapClass));
 
         return mergeGeneratorConfigurations(

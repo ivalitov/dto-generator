@@ -11,7 +11,7 @@ import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.*;
-import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 
 import java.time.temporal.Temporal;
 import java.util.Collection;
@@ -51,7 +51,7 @@ public class GeneratorConfigurator {
         return (config) -> {
             if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
                 reportPrimitiveCannotBeNull(fieldName);
-                config.merge(new NumberConfigDto(NUMBER_RULE_ZEROS, (Class<? extends Number>) fieldType)
+                config.merge(new NumberConfig(NUMBER_RULE_ZEROS, (Class<? extends Number>) fieldType)
                         .setRuleRemark(MIN_VALUE));
             }
         };
@@ -62,7 +62,7 @@ public class GeneratorConfigurator {
         return (config) -> {
             if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
                 reportPrimitiveCannotBeNull(fieldName);
-                ((DecimalConfigDto) config)
+                ((DecimalConfig) config)
                         .setMinValue(0D)
                         .setMaxValue(0D)
                         .setRuleRemark(MIN_VALUE);
@@ -75,7 +75,7 @@ public class GeneratorConfigurator {
         return config -> {
             if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
                 reportPrimitiveCannotBeNull(fieldName);
-                ((BooleanConfigDto) config).setTrueProbability(0D).setRuleRemark(MIN_VALUE);
+                ((BooleanConfig) config).setTrueProbability(0D).setRuleRemark(MIN_VALUE);
             }
         };
     }
@@ -142,7 +142,7 @@ public class GeneratorConfigurator {
     @SuppressWarnings("unchecked")
     public static Consumer<ConfigDto> getEnumGeneratorSpecificConfig(Class<?> generatedType) {
         return (config) -> {
-            EnumConfigDto enumConfig = (EnumConfigDto) config;
+            EnumConfig enumConfig = (EnumConfig) config;
             if (enumConfig.getEnumClass() == null) {
                 if (generatedType.isEnum()) {
                     enumConfig.setEnumClass((Class<? extends Enum<?>>) generatedType);
@@ -156,7 +156,7 @@ public class GeneratorConfigurator {
 
     public static Consumer<ConfigDto> getTemporalGeneratorSpecificConfig(Class<? extends Temporal> generatedType) {
         return (config) -> {
-            DateTimeConfigDto dateTimeConfig = (DateTimeConfigDto) config;
+            DateTimeConfig dateTimeConfig = (DateTimeConfig) config;
             dateTimeConfig.setGeneratedType(generatedType);
         };
     }
@@ -164,7 +164,7 @@ public class GeneratorConfigurator {
     public static Consumer<ConfigDto> getCollectionGeneratorSpecificConfig(Class<? extends Collection<?>> generatedType,
                                                                     IGenerator<?> elementGenerator) {
         return (config) -> {
-            CollectionConfigDto collectionConfig = (CollectionConfigDto) config;
+            CollectionConfig collectionConfig = (CollectionConfig) config;
             if (collectionConfig.getCollectionInstanceSupplier() == null) {
                 collectionConfig.setCollectionInstanceSupplier(
                         () -> createInstance(generatedType)
@@ -179,10 +179,10 @@ public class GeneratorConfigurator {
     public static Consumer<ConfigDto> getArrayGeneratorSpecificConfig(Class<?> elementType,
                                                                IGenerator<?> elementGenerator) {
         return (config) -> {
-            ArrayConfigDto arrayConfigDto = (ArrayConfigDto) config;
-            arrayConfigDto.setElementType(elementType);
-            if (arrayConfigDto.getElementGenerator() == null) {
-                arrayConfigDto.setElementGenerator(elementGenerator);
+            ArrayConfig arrayConfig = (ArrayConfig) config;
+            arrayConfig.setElementType(elementType);
+            if (arrayConfig.getElementGenerator() == null) {
+                arrayConfig.setElementGenerator(elementGenerator);
             }
         };
     }
@@ -192,17 +192,17 @@ public class GeneratorConfigurator {
                                                              IGenerator<?> keyGenerator,
                                                              IGenerator<?> valueGenerator) {
         return (config) -> {
-            MapConfigDto mapConfigDto = (MapConfigDto) config;
-            if (mapConfigDto.getMapInstanceSupplier() == null) {
-                mapConfigDto.setMapInstanceSupplier(
+            MapConfig mapConfig = (MapConfig) config;
+            if (mapConfig.getMapInstanceSupplier() == null) {
+                mapConfig.setMapInstanceSupplier(
                         () -> (Map<Object, Object>) createInstance(generatedType)
                 );
             }
-            if (mapConfigDto.getKeyGenerator() == null) {
-                mapConfigDto.setKeyGenerator((IGenerator<Object>) keyGenerator);
+            if (mapConfig.getKeyGenerator() == null) {
+                mapConfig.setKeyGenerator((IGenerator<Object>) keyGenerator);
             }
-            if (mapConfigDto.getValueGenerator() == null) {
-                mapConfigDto.setValueGenerator((IGenerator<Object>) valueGenerator);
+            if (mapConfig.getValueGenerator() == null) {
+                mapConfig.setValueGenerator((IGenerator<Object>) valueGenerator);
             }
         };
     }

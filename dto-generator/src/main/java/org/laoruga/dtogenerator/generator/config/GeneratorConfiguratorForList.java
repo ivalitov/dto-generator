@@ -4,7 +4,7 @@ import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
-import org.laoruga.dtogenerator.generator.config.dto.CollectionConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.CollectionConfig;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.rule.RuleInfoCollection;
 import org.laoruga.dtogenerator.util.ConcreteClasses;
@@ -35,7 +35,7 @@ public class GeneratorConfiguratorForList extends GeneratorConfigurator {
                 ? (Class<? extends Collection<?>>) ConcreteClasses.getConcreteCollectionClass((Class<? extends Collection<?>>) fieldType)
                 : (Class<? extends Collection<?>>) rule.collectionClass();
 
-        CollectionConfigDto newConfigInstance = new CollectionConfigDto(rule)
+        CollectionConfig newConfigInstance = new CollectionConfig(rule)
                 .setCollectionInstanceSupplier(() -> ReflectionUtils.createInstance(collectionClass));
 
         return mergeGeneratorConfigurations(

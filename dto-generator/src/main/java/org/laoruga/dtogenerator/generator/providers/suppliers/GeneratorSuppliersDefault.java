@@ -6,7 +6,7 @@ import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.generator.*;
 import org.laoruga.dtogenerator.generator.config.dto.*;
-import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 
 /**
  * @author Il'dar Valitov
@@ -31,64 +31,64 @@ public final class GeneratorSuppliersDefault {
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
                         BooleanRule.class,
-                        config -> new BooleanGenerator((BooleanConfigDto) config)));
+                        config -> new BooleanGenerator((BooleanConfig) config)));
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
                         StringRule.class,
-                        config -> new StringGenerator((StringConfigDto) config)));
+                        config -> new StringGenerator((StringConfig) config)));
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
                         NumberRule.class,
-                        config -> new NumberGenerator((NumberConfigDto) config)));
+                        config -> new NumberGenerator((NumberConfig) config)));
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
                         DecimalRule.class,
-                        config -> new DecimalGenerator((DecimalConfigDto) config)));
+                        config -> new DecimalGenerator((DecimalConfig) config)));
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
                         EnumRule.class,
-                        config -> new EnumGenerator((EnumConfigDto) config)));
+                        config -> new EnumGenerator((EnumConfig) config)));
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
                         DateTimeRule.class,
-                        config -> new DateTimeGenerator((DateTimeConfigDto) config)));
+                        config -> new DateTimeGenerator((DateTimeConfig) config)));
 
         // collection
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
                         CollectionRule.class,
-                        config -> new CollectionGenerator((CollectionConfigDto) config)));
+                        config -> new CollectionGenerator((CollectionConfig) config)));
 
         // map
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
                         MapRule.class,
-                        config -> new MapGenerator((MapConfigDto) config)));
+                        config -> new MapGenerator((MapConfig) config)));
 
         // array
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
                         ArrayRule.class,
-                        config -> new ArrayGenerator((ArrayConfigDto) config)));
+                        config -> new ArrayGenerator((ArrayConfig) config)));
 
         // extended
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
                         CustomRule.class,
-                        config -> new CustomGenerator((CustomConfigDto) config)));
+                        config -> new CustomGenerator((CustomConfig) config)));
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
                         NestedDtoRule.class,
-                        config -> new NestedDtoGenerator((NestedConfigDto) config)));
+                        config -> new NestedDtoGenerator((NestedConfig) config)));
 
         return generatorSuppliers;
     }

@@ -4,10 +4,11 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.api.rules.CollectionRule;
+import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
-import org.laoruga.dtogenerator.util.dummy.DummyCollectionClass;
+import org.laoruga.dtogenerator.util.dummy.DummyMapClass;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -20,38 +21,41 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CollectionConfigDto implements ConfigDto {
+public class MapConfig implements ConfigDto {
     private Integer minSize;
     private Integer maxSize;
-    private Supplier<?> collectionInstanceSupplier;
-    private IGenerator<?> elementGenerator;
+    private Supplier<Map<Object, Object>> mapInstanceSupplier;
+    private IGenerator<Object> keyGenerator;
+    private IGenerator<Object> valueGenerator;
     private IRuleRemark ruleRemark;
 
-    public CollectionConfigDto(CollectionRule rule) {
+    public MapConfig(MapRule rule) {
         this.minSize = rule.minSize();
         this.maxSize = rule.maxSize();
-        this.collectionInstanceSupplier = rule.collectionClass() != DummyCollectionClass.class
-                ? () -> ReflectionUtils.createInstance(rule.collectionClass())
+        this.mapInstanceSupplier = rule.mapClass() != DummyMapClass.class
+                ? () -> ReflectionUtils.createInstance(rule.mapClass())
                 : null;
         this.ruleRemark = rule.ruleRemark();
     }
 
-    public void merge(CollectionConfigDto from) {
+    public void merge(MapConfig from) {
         if (from.getMinSize() != null) this.minSize = from.getMinSize();
         if (from.getMaxSize() != null) this.maxSize = from.getMaxSize();
-        if (from.getCollectionInstanceSupplier() != null) this.collectionInstanceSupplier = from.getCollectionInstanceSupplier();
-        if (from.getElementGenerator() != null) this.elementGenerator = from.getElementGenerator();
+        if (from.getMapInstanceSupplier() != null) this.mapInstanceSupplier = from.getMapInstanceSupplier();
+        if (from.getKeyGenerator() != null) this.keyGenerator = from.getKeyGenerator();
+        if (from.getValueGenerator() != null) this.valueGenerator = from.getValueGenerator();
         if (from.getRuleRemark() != null) this.ruleRemark = from.getRuleRemark();
     }
 
     @Override
     public void merge(ConfigDto configDto) {
-        CollectionConfigDto fromConfig = (CollectionConfigDto) configDto;
+        MapConfig fromConfig = (MapConfig) configDto;
         if (fromConfig.getMinSize() != null) this.minSize = fromConfig.getMinSize();
         if (fromConfig.getMaxSize() != null) this.maxSize = fromConfig.getMaxSize();
-        if (fromConfig.getCollectionInstanceSupplier() != null)
-            this.collectionInstanceSupplier = fromConfig.getCollectionInstanceSupplier();
-        if (fromConfig.getElementGenerator() != null) this.elementGenerator = fromConfig.getElementGenerator();
+        if (fromConfig.getMapInstanceSupplier() != null)
+            this.mapInstanceSupplier = fromConfig.getMapInstanceSupplier();
+        if (fromConfig.getKeyGenerator() != null) this.keyGenerator = fromConfig.getKeyGenerator();
+        if (fromConfig.getValueGenerator() != null) this.valueGenerator = fromConfig.getValueGenerator();
         if (fromConfig.getRuleRemark() != null) this.ruleRemark = fromConfig.getRuleRemark();
     }
 }

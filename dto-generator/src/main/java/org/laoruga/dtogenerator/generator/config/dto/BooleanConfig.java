@@ -15,18 +15,18 @@ import org.laoruga.dtogenerator.api.rules.BooleanRule;
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class BooleanConfigDto implements ConfigDto {
+public class BooleanConfig implements ConfigDto {
 
     private Double trueProbability;
     private IRuleRemark ruleRemark;
 
-    public BooleanConfigDto(BooleanRule rule) {
+    public BooleanConfig(BooleanRule rule) {
         this.trueProbability = rule.trueProbability();
         this.ruleRemark = rule.ruleRemark();
     }
 
     public void merge(ConfigDto from) {
-        BooleanConfigDto configDto = (BooleanConfigDto) from;
+        BooleanConfig configDto = (BooleanConfig) from;
         if (configDto.getTrueProbability() != null) this.trueProbability = configDto.getTrueProbability();
         if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();
     }

@@ -16,21 +16,21 @@ import org.laoruga.dtogenerator.api.rules.ArrayRule;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ArrayConfigDto implements ConfigDto {
+public class ArrayConfig implements ConfigDto {
     private Integer minSize;
     private Integer maxSize;
     private Class<?> elementType;
     private IGenerator<?> elementGenerator;
     private IRuleRemark ruleRemark;
 
-    public ArrayConfigDto(ArrayRule rule, Class<?> elementType) {
+    public ArrayConfig(ArrayRule rule, Class<?> elementType) {
         this.minSize = rule.minSize();
         this.maxSize = rule.maxSize();
         this.elementType = elementType;
         this.ruleRemark = rule.ruleRemark();
     }
 
-    public void merge(ArrayConfigDto from) {
+    public void merge(ArrayConfig from) {
         if (from.getMinSize() != null) this.minSize = from.getMinSize();
         if (from.getMaxSize() != null) this.maxSize = from.getMaxSize();
         if (from.getElementType() != null) this.elementType = from.getElementType();
@@ -40,7 +40,7 @@ public class ArrayConfigDto implements ConfigDto {
 
     @Override
     public void merge(ConfigDto configDto) {
-        ArrayConfigDto fromConfig = (ArrayConfigDto) configDto;
+        ArrayConfig fromConfig = (ArrayConfig) configDto;
         if (fromConfig.getMinSize() != null) this.minSize = fromConfig.getMinSize();
         if (fromConfig.getMaxSize() != null) this.maxSize = fromConfig.getMaxSize();
         if (fromConfig.getElementType() != null)

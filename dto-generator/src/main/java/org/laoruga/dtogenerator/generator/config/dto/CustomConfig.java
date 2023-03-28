@@ -25,7 +25,7 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 @Builder
 @Getter
 @Slf4j
-public class CustomConfigDto implements ConfigDto {
+public class CustomConfig implements ConfigDto {
 
     private Supplier<?> dtoInstanceSupplier;
     private Annotation customGeneratorRules;

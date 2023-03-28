@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.generator.config.dto.BooleanConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.BooleanConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 /**
@@ -18,7 +18,7 @@ public class BooleanGenerator implements IGenerator<Boolean> {
     private final double trueProbability;
     private final IRuleRemark ruleRemark;
 
-    public BooleanGenerator(BooleanConfigDto configDto) {
+    public BooleanGenerator(BooleanConfig configDto) {
         trueProbability = configDto.getTrueProbability();
         ruleRemark = configDto.getRuleRemark();
     }

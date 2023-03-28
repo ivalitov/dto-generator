@@ -18,14 +18,14 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class DecimalConfigDto implements ConfigDto {
+public class DecimalConfig implements ConfigDto {
     private Number maxValue;
     private Number minValue;
     private Integer precision;
     private IRuleRemark ruleRemark;
     private Class<? extends Number> fieldType;
 
-    public DecimalConfigDto(DecimalRule rule, Class<? extends Number> fieldType) {
+    public DecimalConfig(DecimalRule rule, Class<? extends Number> fieldType) {
         fieldType = Primitives.wrap(fieldType);
 
         this.fieldType = fieldType;
@@ -48,11 +48,11 @@ public class DecimalConfigDto implements ConfigDto {
 
     public void merge(ConfigDto configDto) {
 
-        boolean commonConfig = configDto.getClass() == DecimalCommonConfigDto.class;
+        boolean commonConfig = configDto.getClass() == DecimalCommonConfig.class;
 
-        DecimalConfigDto configFrom = commonConfig
-                ? ((DecimalCommonConfigDto) configDto).getConfigOrNull(fieldType)
-                : (DecimalConfigDto) configDto;
+        DecimalConfig configFrom = commonConfig
+                ? ((DecimalCommonConfig) configDto).getConfigOrNull(fieldType)
+                : (DecimalConfig) configDto;
 
         if (commonConfig) {
             if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();

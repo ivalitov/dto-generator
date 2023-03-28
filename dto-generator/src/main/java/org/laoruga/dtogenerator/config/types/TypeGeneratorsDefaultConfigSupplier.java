@@ -6,7 +6,7 @@ import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.generator.config.dto.*;
-import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
@@ -29,55 +29,55 @@ public final class TypeGeneratorsDefaultConfigSupplier {
         add(configSupplier,
                 BooleanRule.GENERATED_TYPE,
                 RulesInstance.BOOLEAN_RULE,
-                BooleanConfigDto.class,
+                BooleanConfig.class,
                 false);
 
         add(configSupplier,
                 new Class[]{StringRule.GENERATED_TYPE},
                 RulesInstance.STRING_RULE,
-                StringConfigDto.class,
+                StringConfig.class,
                 false);
 
         add(configSupplier,
                 NumberRule.GENERATED_TYPES,
                 RulesInstance.NUMBER_RULE,
-                NumberConfigDto.class,
+                NumberConfig.class,
                 true);
 
         add(configSupplier,
                 DecimalRule.GENERATED_TYPES,
                 RulesInstance.DECIMAL_RULE,
-                DecimalConfigDto.class,
+                DecimalConfig.class,
                 true);
 
         add(configSupplier,
                 DateTimeRule.GENERATED_TYPE,
                 RulesInstance.DATE_TIME_RULE,
-                DateTimeConfigDto.class,
+                DateTimeConfig.class,
                 false);
 
         add(configSupplier,
                 EnumRule.GENERATED_TYPE,
                 RulesInstance.ENUM_RULE,
-                EnumConfigDto.class,
+                EnumConfig.class,
                 false);
 
         add(configSupplier,
                 CollectionRule.GENERATED_TYPE,
                 RulesInstance.COLLECTION_RULE,
-                CollectionConfigDto.class,
+                CollectionConfig.class,
                 false);
 
         add(configSupplier,
                 MapRule.GENERATED_TYPE,
                 RulesInstance.MAP_RULE,
-                MapConfigDto.class,
+                MapConfig.class,
                 false);
 
         add(configSupplier,
                 ArrayRule.GENERATED_TYPES,
                 RulesInstance.ARRAY_RULE,
-                ArrayConfigDto.class,
+                ArrayConfig.class,
                 true);
 
         GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER = ImmutableMap.copyOf(configSupplier);

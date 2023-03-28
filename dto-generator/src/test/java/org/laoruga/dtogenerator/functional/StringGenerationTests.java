@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import org.laoruga.dtogenerator.generator.config.dto.StringConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.StringConfig;
 
 import java.util.stream.Stream;
 
@@ -78,7 +78,7 @@ class StringGenerationTests {
 
         Dto_2 dto = DtoGenerator.builder(Dto_2.class)
                 .setTypeGeneratorConfig(String.class,
-                        StringConfigDto.builder()
+                        StringConfig.builder()
                                 .regexp(regexp)
                                 .chars(NUM).build())
                 .build().generateDto();
@@ -104,7 +104,7 @@ class StringGenerationTests {
     void generateByLength(String charSet, Integer minLength, Integer maxLength, String regexpForAssert) {
         Dto_2 dto = DtoGenerator.builder(Dto_2.class)
                 .setTypeGeneratorConfig(String.class,
-                        StringConfigDto.builder()
+                        StringConfig.builder()
                                 .minLength(minLength)
                                 .maxLength(maxLength)
                                 .chars(charSet).build())

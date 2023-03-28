@@ -15,7 +15,7 @@ import org.laoruga.dtogenerator.api.rules.StringRule;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StringConfigDto implements ConfigDto {
+public class StringConfig implements ConfigDto {
 
     private Integer maxLength;
     private Integer minLength;
@@ -24,7 +24,7 @@ public class StringConfigDto implements ConfigDto {
     private IRuleRemark ruleRemark;
     private String regexp;
 
-    public StringConfigDto(StringRule stringRule) {
+    public StringConfig(StringRule stringRule) {
         this.maxLength = stringRule.maxLength();
         this.minLength = stringRule.minLength();
         this.words = stringRule.words();
@@ -34,7 +34,7 @@ public class StringConfigDto implements ConfigDto {
     }
 
     public void merge(ConfigDto from) {
-        StringConfigDto configDto = (StringConfigDto) from;
+        StringConfig configDto = (StringConfig) from;
         if (configDto.getMaxLength() != null) this.maxLength = configDto.getMaxLength();
         if (configDto.getMinLength() != null) this.minLength = configDto.getMinLength();
         if (configDto.getWords() != null) this.words = configDto.getWords();

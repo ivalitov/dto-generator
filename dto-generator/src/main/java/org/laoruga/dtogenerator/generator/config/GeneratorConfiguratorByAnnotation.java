@@ -9,7 +9,7 @@ import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.*;
-import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 
 import java.lang.annotation.Annotation;
 import java.time.temporal.Temporal;
@@ -39,7 +39,7 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
             if (BooleanRule.class == rulesClass) {
 
                 return mergeGeneratorConfigurations(
-                        () -> new BooleanConfigDto((BooleanRule) rules),
+                        () -> new BooleanConfig((BooleanRule) rules),
                         booleanGeneratorSpecificConfig(fieldType, fieldName),
                         fieldType,
                         fieldName);
@@ -47,7 +47,7 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
             } else if (StringRule.class == rulesClass) {
 
                 return mergeGeneratorConfigurations(
-                        () -> new StringConfigDto((StringRule) rules),
+                        () -> new StringConfig((StringRule) rules),
                         fieldType,
                         fieldName);
 
@@ -59,7 +59,7 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
                     Class<? extends Number> fieldTypeNumber = (Class<? extends Number>) fieldType;
 
                     return mergeGeneratorConfigurations(
-                            () -> new DecimalConfigDto((DecimalRule) rules, fieldTypeNumber),
+                            () -> new DecimalConfig((DecimalRule) rules, fieldTypeNumber),
                             decimalGeneratorSpecificConfig(fieldType, fieldName),
                             fieldType,
                             fieldName);
@@ -76,7 +76,7 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
                     Class<? extends Number> fieldTypeNumber = (Class<? extends Number>) fieldType;
 
                     return mergeGeneratorConfigurations(
-                            () -> new NumberConfigDto((NumberRule) rules, fieldTypeNumber),
+                            () -> new NumberConfig((NumberRule) rules, fieldTypeNumber),
                             integerGeneratorSpecificConfig(fieldType, fieldName),
                             fieldType,
                             fieldName);
@@ -89,7 +89,7 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
 
                 if (Enum.class.isAssignableFrom(fieldType)) {
                     return mergeGeneratorConfigurations(
-                            () -> new EnumConfigDto((EnumRule) rules),
+                            () -> new EnumConfig((EnumRule) rules),
                             getEnumGeneratorSpecificConfig(fieldType),
                             fieldType,
                             fieldName
@@ -106,7 +106,7 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
                     Class<? extends Temporal> fieldTypeTemporal = (Class<? extends Temporal>) fieldType;
 
                     return mergeGeneratorConfigurations(
-                            () -> new DateTimeConfigDto((DateTimeRule) rules, fieldTypeTemporal),
+                            () -> new DateTimeConfig((DateTimeRule) rules, fieldTypeTemporal),
                             fieldType,
                             fieldName);
                 }
@@ -115,14 +115,14 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
 
             } else if (CustomRule.class == rulesClass) {
 
-                return CustomConfigDto.builder()
+                return CustomConfig.builder()
                         .customGeneratorRules(rules)
                         .dtoInstanceSupplier(dtoInstanceSupplier)
                         .build();
 
             } else if (NestedDtoRule.class == rulesClass) {
 
-                return NestedConfigDto.builder()
+                return NestedConfig.builder()
                         .dtoGenerator(nestedDtoGeneratorSupplier.get())
                         .build();
 

@@ -23,17 +23,17 @@ import java.util.List;
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class DateTimeConfigDto implements ConfigDto {
+public class DateTimeConfig implements ConfigDto {
 
     private List<ChronoConfig> chronoUnitConfigList;
     private IRuleRemark ruleRemark;
     private Class<? extends Temporal> generatedType;
 
-    public DateTimeConfigDto(DateTimeRule rule) {
+    public DateTimeConfig(DateTimeRule rule) {
         this(rule, null);
     }
 
-    public DateTimeConfigDto(DateTimeRule rule, Class<? extends Temporal> fieldType) {
+    public DateTimeConfig(DateTimeRule rule, Class<? extends Temporal> fieldType) {
 
         ChronoUnitShift[] chronoUnitShifts = rule.chronoUnitShift();
         if (chronoUnitShifts.length > 0) {
@@ -65,20 +65,20 @@ public class DateTimeConfigDto implements ConfigDto {
         this.ruleRemark = rule.ruleRemark();
     }
 
-    public DateTimeConfigDto addChronoConfig(ChronoUnitConfig config) {
+    public DateTimeConfig addChronoConfig(ChronoUnitConfig config) {
         chronoUnitConfigList = chronoUnitConfigList == null ? new LinkedList<>() : chronoUnitConfigList;
         chronoUnitConfigList.add(config);
         return this;
     }
 
-    public DateTimeConfigDto addChronoConfig(ChronoFieldConfig config) {
+    public DateTimeConfig addChronoConfig(ChronoFieldConfig config) {
         chronoUnitConfigList = chronoUnitConfigList == null ? new LinkedList<>() : chronoUnitConfigList;
         chronoUnitConfigList.add(config);
         return this;
     }
 
     public void merge(ConfigDto from) {
-        DateTimeConfigDto configDto = (DateTimeConfigDto) from;
+        DateTimeConfig configDto = (DateTimeConfig) from;
         if (configDto.getChronoUnitConfigList() != null)
             this.chronoUnitConfigList = configDto.getChronoUnitConfigList();
         if (configDto.getChronoUnitConfigList() != null)

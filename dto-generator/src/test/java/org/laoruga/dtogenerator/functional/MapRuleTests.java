@@ -15,7 +15,7 @@ import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
-import org.laoruga.dtogenerator.generator.config.dto.MapConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.MapConfig;
 import org.laoruga.dtogenerator.generator.config.dto.datetime.ChronoUnitConfig;
 
 import java.time.LocalDateTime;
@@ -235,13 +235,13 @@ public class MapRuleTests {
 
         builder
                 .setTypeGeneratorConfig("stringIntegerMap",
-                        MapConfigDto.builder().maxSize(10).build())
+                        MapConfig.builder().maxSize(10).build())
                 .setTypeGeneratorConfig("enumLongHashMap",
-                        MapConfigDto.builder().minSize(1).maxSize(1).build())
+                        MapConfig.builder().minSize(1).maxSize(1).build())
                 .setTypeGeneratorConfig("doubleLocalDateTimeTreeMap",
-                        MapConfigDto.builder().ruleRemark(MAX_VALUE).build())
+                        MapConfig.builder().ruleRemark(MAX_VALUE).build())
                 .setTypeGeneratorConfig("yearBooleanMap",
-                        MapConfigDto.builder().mapInstanceSupplier(() -> objectObjectLinkedHashMap).build());
+                        MapConfig.builder().mapInstanceSupplier(() -> objectObjectLinkedHashMap).build());
 
         Dto dto = builder.build().generateDto();
 
@@ -294,16 +294,16 @@ public class MapRuleTests {
         // field
         builder
                 .setTypeGeneratorConfig("stringIntegerMap",
-                        MapConfigDto.builder().maxSize(15).build())
+                        MapConfig.builder().maxSize(15).build())
 
                 .setTypeGeneratorConfig("enumLongHashMap",
-                        MapConfigDto.builder().valueGenerator(() -> 1L).build())
+                        MapConfig.builder().valueGenerator(() -> 1L).build())
 
                 .setTypeGeneratorConfig("doubleLocalDateTimeTreeMap",
-                        MapConfigDto.builder().minSize(1).maxSize(1).build())
+                        MapConfig.builder().minSize(1).maxSize(1).build())
 
                 .setTypeGeneratorConfig("yearBooleanMap",
-                        MapConfigDto.builder().minSize(20).ruleRemark(RANDOM_VALUE).valueGenerator(() -> TRUE).build());
+                        MapConfig.builder().minSize(20).ruleRemark(RANDOM_VALUE).valueGenerator(() -> TRUE).build());
 
         Dto dto = builder.build().generateDto();
 
@@ -434,16 +434,16 @@ public class MapRuleTests {
         // field
         builder
                 .setTypeGeneratorConfig("stringIntegerMap",
-                        MapConfigDto.builder().maxSize(15).build())
+                        MapConfig.builder().maxSize(15).build())
 
                 .setTypeGeneratorConfig("enumLongHashMap",
-                        MapConfigDto.builder().valueGenerator(() -> 1L).build())
+                        MapConfig.builder().valueGenerator(() -> 1L).build())
 
                 .setTypeGeneratorConfig("doubleLocalDateTimeTreeMap",
-                        MapConfigDto.builder().minSize(1).maxSize(1).build())
+                        MapConfig.builder().minSize(1).maxSize(1).build())
 
                 .setTypeGeneratorConfig("yearBooleanMap",
-                        MapConfigDto.builder().minSize(20).ruleRemark(RANDOM_VALUE).valueGenerator(() -> TRUE).build());
+                        MapConfig.builder().minSize(20).ruleRemark(RANDOM_VALUE).valueGenerator(() -> TRUE).build());
 
 
         Dto_2 dto = builder.build().generateDto();

@@ -7,7 +7,7 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.config.dto.CollectionConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.CollectionConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Collection;
@@ -28,7 +28,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
     private final IGenerator<Object> elementGenerator;
     private final IRuleRemark ruleRemark;
 
-    public CollectionGenerator(CollectionConfigDto collectionConfig) {
+    public CollectionGenerator(CollectionConfig collectionConfig) {
         minSize = collectionConfig.getMinSize();
         maxSize = collectionConfig.getMaxSize();
         collectionInstanceSupplier = (Supplier<Collection<Object>>) Objects.requireNonNull(collectionConfig.getCollectionInstanceSupplier(), "Collection instance must be set.");

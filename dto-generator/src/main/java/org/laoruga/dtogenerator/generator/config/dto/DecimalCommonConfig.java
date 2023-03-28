@@ -17,28 +17,28 @@ import java.util.Map;
  * Created on 19.02.2023
  */
 @NoArgsConstructor
-public class DecimalCommonConfigDto implements ConfigDto {
+public class DecimalCommonConfig implements ConfigDto {
 
     @Getter
     @Setter
     @Accessors(chain = true)
     private IRuleRemark ruleRemark;
 
-    private final Map<Class<?>, DecimalConfigDto> map = new HashMap<>();
+    private final Map<Class<?>, DecimalConfig> map = new HashMap<>();
 
     /*
      * Double
      */
 
-    public DecimalCommonConfigDto setMaxDoubleValue(double value) {
+    public DecimalCommonConfig setMaxDoubleValue(double value) {
         return setMaxValue(Double.class, value);
     }
 
-    public DecimalCommonConfigDto setMinDoubleValue(double value) {
+    public DecimalCommonConfig setMinDoubleValue(double value) {
         return setMinValue(Double.class, value);
     }
 
-    public DecimalCommonConfigDto setRuleRemarkDouble(IRuleRemark value) {
+    public DecimalCommonConfig setRuleRemarkDouble(IRuleRemark value) {
         return setRuleRemark(Double.class, value);
     }
 
@@ -46,15 +46,15 @@ public class DecimalCommonConfigDto implements ConfigDto {
      * Float
      */
 
-    public DecimalCommonConfigDto setMaxFloatValue(float value) {
+    public DecimalCommonConfig setMaxFloatValue(float value) {
         return setMaxValue(Float.class, value);
     }
 
-    public DecimalCommonConfigDto setMinFloatValue(float value) {
+    public DecimalCommonConfig setMinFloatValue(float value) {
         return setMinValue(Float.class, value);
     }
 
-    public DecimalCommonConfigDto setRuleRemarkFloat(IRuleRemark value) {
+    public DecimalCommonConfig setRuleRemarkFloat(IRuleRemark value) {
         return setRuleRemark(Float.class, value);
     }
 
@@ -62,15 +62,15 @@ public class DecimalCommonConfigDto implements ConfigDto {
      * BigDecimal
      */
 
-    public DecimalCommonConfigDto setMaxBigDecimalValue(BigDecimal value) {
+    public DecimalCommonConfig setMaxBigDecimalValue(BigDecimal value) {
         return setMaxValue(BigDecimal.class, value);
     }
 
-    public DecimalCommonConfigDto setMinBigDecimalValue(BigDecimal value) {
+    public DecimalCommonConfig setMinBigDecimalValue(BigDecimal value) {
         return setMinValue(BigDecimal.class, value);
     }
 
-    public DecimalCommonConfigDto setMaxBigDecimalValue(String value) {
+    public DecimalCommonConfig setMaxBigDecimalValue(String value) {
         try {
             return setMaxBigDecimalValue(new BigDecimal(value));
         } catch (NumberFormatException e) {
@@ -78,7 +78,7 @@ public class DecimalCommonConfigDto implements ConfigDto {
         }
     }
 
-    public DecimalCommonConfigDto setMinBigDecimalValue(String value) {
+    public DecimalCommonConfig setMinBigDecimalValue(String value) {
         try {
             return setMinBigDecimalValue(new BigDecimal(value));
         } catch (NumberFormatException e) {
@@ -86,7 +86,7 @@ public class DecimalCommonConfigDto implements ConfigDto {
         }
     }
 
-    public DecimalCommonConfigDto setRuleRemarkBigDecimal(IRuleRemark value) {
+    public DecimalCommonConfig setRuleRemarkBigDecimal(IRuleRemark value) {
         return setRuleRemark(BigDecimal.class, value);
     }
 
@@ -94,25 +94,25 @@ public class DecimalCommonConfigDto implements ConfigDto {
      * Common setters
      */
 
-    private DecimalCommonConfigDto setMaxValue(Class<?> type, Number maxValue) {
-        map.putIfAbsent(type, new DecimalConfigDto());
+    private DecimalCommonConfig setMaxValue(Class<?> type, Number maxValue) {
+        map.putIfAbsent(type, new DecimalConfig());
         map.get(type).setMaxValue(maxValue);
         return this;
     }
 
-    private DecimalCommonConfigDto setMinValue(Class<?> type, Number minValue) {
-        map.putIfAbsent(type, new DecimalConfigDto());
+    private DecimalCommonConfig setMinValue(Class<?> type, Number minValue) {
+        map.putIfAbsent(type, new DecimalConfig());
         map.get(type).setMinValue(minValue);
         return this;
     }
 
-    private DecimalCommonConfigDto setRuleRemark(Class<?> type, IRuleRemark ruleRemark) {
-        map.putIfAbsent(type, new DecimalConfigDto());
+    private DecimalCommonConfig setRuleRemark(Class<?> type, IRuleRemark ruleRemark) {
+        map.putIfAbsent(type, new DecimalConfig());
         map.get(type).setRuleRemark(ruleRemark);
         return this;
     }
 
-    DecimalConfigDto getConfigOrNull(Class<? extends Number> generateType) {
+    DecimalConfig getConfigOrNull(Class<? extends Number> generateType) {
         return map.get(generateType);
     }
 

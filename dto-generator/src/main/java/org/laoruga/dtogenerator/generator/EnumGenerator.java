@@ -6,7 +6,7 @@ import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.config.dto.EnumConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.EnumConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Arrays;
@@ -24,18 +24,18 @@ public class EnumGenerator implements IGenerator<Enum> {
     private final Class<? extends Enum<?>> enumClass;
     private final IRuleRemark ruleRemark;
 
-    public EnumGenerator(EnumConfigDto enumConfigDto) {
-        if (enumConfigDto.getEnumClass() == null) {
+    public EnumGenerator(EnumConfig enumConfig) {
+        if (enumConfig.getEnumClass() == null) {
             throw new DtoGeneratorException("Enum class wasn't set for generator.");
         }
-        if (enumConfigDto.getPossibleEnumNames().length == 0) {
-            enumConfigDto.setPossibleEnumNames(Arrays
-                    .stream(enumConfigDto.getEnumClass().getEnumConstants())
+        if (enumConfig.getPossibleEnumNames().length == 0) {
+            enumConfig.setPossibleEnumNames(Arrays
+                    .stream(enumConfig.getEnumClass().getEnumConstants())
                     .map(Enum::name).toArray(String[]::new));
         }
-        possibleEnumNames = enumConfigDto.getPossibleEnumNames();
-        enumClass = enumConfigDto.getEnumClass();
-        ruleRemark = enumConfigDto.getRuleRemark();
+        possibleEnumNames = enumConfig.getPossibleEnumNames();
+        enumClass = enumConfig.getEnumClass();
+        ruleRemark = enumConfig.getRuleRemark();
     }
 
     @Override
