@@ -1,9 +1,7 @@
 package org.laoruga.dtogenerator.generator.providers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.reflect.Field;
@@ -15,13 +13,11 @@ import java.util.Map;
  * Created on 24.11.2022
  */
 @Slf4j
-public class GeneratorsProviderByField extends GeneratorsProviderAbstract {
+public class GeneratorsProviderByField  {
 
     private final Map<String, IGenerator<?>> overriddenGeneratorsForFields;
 
-    public GeneratorsProviderByField(ConfigurationHolder configuration,
-                                     RemarksHolder remarksHolder) {
-        super(configuration, remarksHolder);
+    public GeneratorsProviderByField() {
         this.overriddenGeneratorsForFields = new HashMap<>();
     }
 

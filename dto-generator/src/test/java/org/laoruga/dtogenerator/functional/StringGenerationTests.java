@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import org.laoruga.dtogenerator.generator.configs.StringConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.StringConfigDto;
 
 import java.util.stream.Stream;
 

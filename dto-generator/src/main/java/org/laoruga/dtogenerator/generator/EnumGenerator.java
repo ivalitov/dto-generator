@@ -6,7 +6,7 @@ import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.configs.EnumConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.EnumConfigDto;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Arrays;

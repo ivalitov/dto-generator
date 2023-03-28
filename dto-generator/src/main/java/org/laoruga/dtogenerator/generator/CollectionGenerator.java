@@ -7,7 +7,7 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.CollectionConfigDto;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Collection;

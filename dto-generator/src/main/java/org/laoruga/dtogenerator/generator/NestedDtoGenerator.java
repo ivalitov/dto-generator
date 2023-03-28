@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator;
 import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.generator.configs.NestedConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.NestedConfigDto;
 
 /**
  * @author Il'dar Valitov

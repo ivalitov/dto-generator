@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.generator.supplier;
+package org.laoruga.dtogenerator.generator.providers.suppliers;
 
 import com.google.common.primitives.Primitives;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
@@ -8,7 +8,7 @@ import org.laoruga.dtogenerator.api.rules.EnumRule;
 import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.constants.GeneratedTypes;
-import org.laoruga.dtogenerator.generator.configs.ConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -18,8 +18,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * An instance contain all the possible to use generator providers.
- * It gives methods to retrieving generators by generated type or @Rules.
+ * An instance contain all the possible to use generator suppliers.
+ * It gives methods to retrieving generator by generated type or @Rules.
  *
  * @author Il'dar Valitov
  * Created on 13.05.2022
@@ -27,7 +27,7 @@ import java.util.function.Function;
 public final class GeneratorSuppliers {
 
     /**
-     * Map for rules annotations with 'Object.class' generated type
+     * Map for rule annotations with 'Object.class' generated type
      */
     private final Map<Class<? extends Annotation>, GeneratorSupplierInfo> rulesClassGeneratorInfoMap;
     private final Map<Class<?>, GeneratorSupplierInfo> generatedTypeGeneratorInfoMap;

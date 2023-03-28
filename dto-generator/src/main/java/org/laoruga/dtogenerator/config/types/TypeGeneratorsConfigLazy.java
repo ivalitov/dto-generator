@@ -8,8 +8,8 @@ import org.laoruga.dtogenerator.api.rules.EnumRule;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.configs.*;
-import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.*;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfigDto;
 
 import java.time.temporal.Temporal;
 import java.util.Collection;

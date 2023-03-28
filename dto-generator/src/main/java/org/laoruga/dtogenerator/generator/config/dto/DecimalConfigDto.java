@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.generator.configs;
+package org.laoruga.dtogenerator.generator.config.dto;
 
 import com.google.common.primitives.Primitives;
 import lombok.*;

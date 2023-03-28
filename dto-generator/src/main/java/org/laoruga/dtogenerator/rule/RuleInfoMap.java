@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.constants.RuleType;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Objects;
 

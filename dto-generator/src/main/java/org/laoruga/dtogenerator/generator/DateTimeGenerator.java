@@ -3,8 +3,8 @@ package org.laoruga.dtogenerator.generator;
 import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.generator.configs.datetime.ChronoConfig;
-import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.ChronoConfig;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfigDto;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.time.temporal.Temporal;

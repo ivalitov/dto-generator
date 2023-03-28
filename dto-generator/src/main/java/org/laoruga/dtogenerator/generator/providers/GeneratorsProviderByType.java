@@ -2,19 +2,18 @@ package org.laoruga.dtogenerator.generator.providers;
 
 import com.google.common.primitives.Primitives;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.rules.ArrayRule;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
-import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsDefaultConfigSupplier;
 import org.laoruga.dtogenerator.constants.GeneratedTypes;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.configs.ConfigDto;
-import org.laoruga.dtogenerator.generator.supplier.GeneralGeneratorSuppliers;
-import org.laoruga.dtogenerator.generator.supplier.GeneratorSuppliers;
+import org.laoruga.dtogenerator.generator.config.GeneratorConfigurator;
+import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
+import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliers;
+import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliersDefault;
 import org.laoruga.dtogenerator.util.ConcreteClasses;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
@@ -26,20 +25,22 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static org.laoruga.dtogenerator.generator.config.GeneratorConfigurator.*;
+
 /**
  * @author Il'dar Valitov
  * Created on 24.11.2022
  */
 @Slf4j
-public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
+public class GeneratorsProviderByType {
 
+    private final GeneratorConfigurator generatorConfigurator;
     private final GeneratorSuppliers userGeneratorSuppliers;
-    private final GeneratorSuppliers generalGeneratorSuppliers = GeneralGeneratorSuppliers.getInstance();
+    private final GeneratorSuppliers defaultGeneratorSuppliers = GeneratorSuppliersDefault.getInstance();
 
-    public GeneratorsProviderByType(ConfigurationHolder configuration,
-                                    GeneratorSuppliers userGeneratorSuppliers,
-                                    RemarksHolder remarksHolder) {
-        super(configuration, remarksHolder);
+    public GeneratorsProviderByType(GeneratorConfigurator generatorConfigurator,
+                                    GeneratorSuppliers userGeneratorSuppliers) {
+        this.generatorConfigurator = generatorConfigurator;
         this.userGeneratorSuppliers = userGeneratorSuppliers;
     }
 
@@ -63,19 +64,19 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
 
     private Optional<Function<ConfigDto, IGenerator<?>>> getGeneratorSupplier(Class<?> generatedType) {
 
-        Optional<Function<ConfigDto, IGenerator<?>>> maybeBuilder =
+        Optional<Function<ConfigDto, IGenerator<?>>> maybeGeneratorSupplier =
                 userGeneratorSuppliers.getGeneratorSupplier(generatedType);
 
-        if (!maybeBuilder.isPresent()) {
-            maybeBuilder = generalGeneratorSuppliers.getGeneratorSupplier(generatedType);
+        if (!maybeGeneratorSupplier.isPresent()) {
+            maybeGeneratorSupplier = defaultGeneratorSuppliers.getGeneratorSupplier(generatedType);
         }
 
-        return maybeBuilder;
+        return maybeGeneratorSupplier;
     }
 
     @SuppressWarnings("unchecked")
     private ConfigDto getGeneratorConfig(Field field,
-                                                   Class<?> generatedType) {
+                                         Class<?> generatedType) {
         Consumer<ConfigDto> specificConfig;
 
         if (CollectionRule.GENERATED_TYPE.isAssignableFrom(generatedType)) {
@@ -90,7 +91,7 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
                             () -> new DtoGeneratorException(
                                     "Collection element generator not found, for type: " + "'" + elementType + "'"));
 
-            specificConfig = getCollectionGeneratorSupplier(
+            specificConfig = getCollectionGeneratorSpecificConfig(
                     concreteCollectionClass,
                     elementGenerator
             );
@@ -111,7 +112,7 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
                     () -> new DtoGeneratorException(
                             "Map value generator not found, for type: " + "'" + keyValueTypes[1] + "'"));
 
-            specificConfig = getMapGeneratorSupplier(
+            specificConfig = getMapGeneratorSpecificConfig(
                     concreteMapClass,
                     keyGenerator,
                     valueGenerator
@@ -119,11 +120,11 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
 
         } else if (DateTimeRule.GENERATED_TYPE.isAssignableFrom(generatedType)) {
 
-            specificConfig = getTemporalGeneratorSupplier((Class<Temporal>) generatedType);
+            specificConfig = getTemporalGeneratorSpecificConfig((Class<Temporal>) generatedType);
 
         } else if (generatedType.isEnum() || field.getType() == Enum.class) {
 
-            specificConfig = enumGeneratorSpecificConfig(generatedType);
+            specificConfig = getEnumGeneratorSpecificConfig(generatedType);
 
         } else if (GeneratedTypes.isAssignableFrom(ArrayRule.GENERATED_TYPES, generatedType)) {
 
@@ -133,7 +134,7 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
                             () -> new DtoGeneratorException(
                                     "Array element generator not found, for type: " + "'" + elementType + "'"));
 
-            specificConfig = getArrayGeneratorSupplier(
+            specificConfig = getArrayGeneratorSpecificConfig(
                     elementType,
                     elementGenerator
             );
@@ -144,7 +145,7 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
 
         }
 
-       return mergeGeneratorConfigurations(
+        return generatorConfigurator.mergeGeneratorConfigurations(
                 TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(
                         Primitives.wrap(generatedType)
                 ),

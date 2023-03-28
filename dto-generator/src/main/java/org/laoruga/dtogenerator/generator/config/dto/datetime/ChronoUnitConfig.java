@@ -1,42 +1,41 @@
-package org.laoruga.dtogenerator.generator.configs.datetime;
+package org.laoruga.dtogenerator.generator.config.dto.datetime;
 
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.time.temporal.Temporal;
-import java.time.temporal.TemporalField;
+import java.time.temporal.TemporalUnit;
 
 /**
  * @author Il'dar Valitov
  * Created on 15.03.2023
  */
-public class ChronoFieldConfig implements ChronoConfig {
-
-    private final long value;
+public class ChronoUnitConfig implements ChronoConfig {
+    private final long shift;
     private final long leftBound;
     private final long rightBound;
-    private final TemporalField field;
+    private final TemporalUnit unit;
 
-    ChronoFieldConfig(long value, long leftBound, long rightBound, TemporalField field) {
-        this.value = value;
+    ChronoUnitConfig(long shift, long leftBound, long rightBound, TemporalUnit unit) {
+        this.shift = shift;
         this.leftBound = leftBound;
         this.rightBound = rightBound;
-        this.field = field;
+        this.unit = unit;
     }
 
-    public static ChronoFieldConfig newAbsolute(long value, TemporalField unit) {
-        return new ChronoFieldConfig(value, 0L, 0L, unit);
+    public static ChronoUnitConfig newAbsolute(long shift, TemporalUnit unit) {
+        return new ChronoUnitConfig(shift, 0L, 0L, unit);
     }
 
-    public static ChronoFieldConfig newBounds(long leftBound, long rightBound, TemporalField unit) {
-        return new ChronoFieldConfig(0, leftBound, rightBound, unit);
+    public static ChronoUnitConfig newBounds(long leftBound, long rightBound, TemporalUnit unit) {
+        return new ChronoUnitConfig(0, leftBound, rightBound, unit);
     }
 
     @Override
     public Temporal adjust(Temporal temporal, IRuleRemark ruleRemark) {
-        if (value != 0) {
-            return temporal.with(field, value);
+        if (shift != 0) {
+            return temporal.plus(shift, unit);
         }
         long shiftValue;
         if (ruleRemark == RuleRemark.MIN_VALUE) {
@@ -48,6 +47,8 @@ public class ChronoFieldConfig implements ChronoConfig {
         } else {
             throw new IllegalStateException("Unexpected value " + ruleRemark);
         }
-        return temporal.with(field, shiftValue);
+
+        return temporal.plus(shiftValue, unit);
     }
+
 }

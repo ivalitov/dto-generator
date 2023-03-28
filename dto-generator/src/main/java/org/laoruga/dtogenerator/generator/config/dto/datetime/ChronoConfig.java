@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.generator.configs.datetime;
+package org.laoruga.dtogenerator.generator.config.dto.datetime;
 
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 

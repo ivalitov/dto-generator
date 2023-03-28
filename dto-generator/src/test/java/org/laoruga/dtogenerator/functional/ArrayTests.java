@@ -13,7 +13,7 @@ import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
-import org.laoruga.dtogenerator.generator.configs.ArrayConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.ArrayConfigDto;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

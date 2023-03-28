@@ -10,7 +10,7 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import org.laoruga.dtogenerator.generator.configs.StringConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.StringConfigDto;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

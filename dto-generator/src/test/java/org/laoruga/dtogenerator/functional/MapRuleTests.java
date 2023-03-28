@@ -15,8 +15,8 @@ import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
-import org.laoruga.dtogenerator.generator.configs.MapConfigDto;
-import org.laoruga.dtogenerator.generator.configs.datetime.ChronoUnitConfig;
+import org.laoruga.dtogenerator.generator.config.dto.MapConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.ChronoUnitConfig;
 
 import java.time.LocalDateTime;
 import java.time.Year;

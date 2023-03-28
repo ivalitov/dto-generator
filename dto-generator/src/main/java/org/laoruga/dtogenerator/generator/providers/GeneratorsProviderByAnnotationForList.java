@@ -5,16 +5,11 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.rules.CollectionRule;
-import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
-import org.laoruga.dtogenerator.generator.configs.ConfigDto;
+import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForList;
+import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.rule.RuleInfoCollection;
-import org.laoruga.dtogenerator.util.ConcreteClasses;
-import org.laoruga.dtogenerator.util.ReflectionUtils;
-import org.laoruga.dtogenerator.util.dummy.DummyCollectionClass;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -28,10 +23,13 @@ import java.util.function.Supplier;
 @Getter(AccessLevel.PRIVATE)
 public class GeneratorsProviderByAnnotationForList {
 
+    protected final GeneratorConfiguratorForList generatorConfiguratorForList;
     protected final GeneratorsProviderByAnnotation generatorsProvider;
 
-    public GeneratorsProviderByAnnotationForList(GeneratorsProviderByAnnotation generatorsProvider) {
+    public GeneratorsProviderByAnnotationForList(GeneratorsProviderByAnnotation generatorsProvider,
+                                                 GeneratorConfiguratorForList generatorConfiguratorForList) {
         this.generatorsProvider = generatorsProvider;
+        this.generatorConfiguratorForList = generatorConfiguratorForList;
     }
 
     IGenerator<?> getGenerator(RuleInfoCollection collectionRuleInfo,
@@ -58,20 +56,19 @@ public class GeneratorsProviderByAnnotationForList {
         Optional<Function<ConfigDto, IGenerator<?>>> maybeUserCollectionGenerator =
                 generatorsProvider.getUserGeneratorSupplier(fieldType);
 
+        ConfigDto listGeneratorConfig = generatorConfiguratorForList.createGeneratorConfig(
+                collectionRuleInfo,
+                elementGenerator,
+                fieldType,
+                fieldName
+        );
 
         if (maybeUserCollectionGenerator.isPresent()) {
-            // user generators are not configurable yet
-            return maybeUserCollectionGenerator.get().apply(null);
+            return maybeUserCollectionGenerator.get().apply(listGeneratorConfig);
         } else {
-            Function<ConfigDto, IGenerator<?>> defaultGenBuilder = generatorsProvider.getDefaultGenBuilder(
+            Function<ConfigDto, IGenerator<?>> defaultGenBuilder = generatorsProvider.getDefaultGeneratorSupplier(
                     collectionRuleInfo.getRule(),
                     fieldType);
-            ConfigDto listGeneratorConfig = getGeneratorConfig(
-                    collectionRuleInfo,
-                    elementGenerator,
-                    fieldType,
-                    fieldName
-            );
 
             IGenerator<?> generator = defaultGenBuilder.apply(listGeneratorConfig);
 
@@ -80,27 +77,5 @@ public class GeneratorsProviderByAnnotationForList {
 
             return generator;
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    protected ConfigDto getGeneratorConfig(RuleInfoCollection ruleInfo,
-                                           IGenerator<?> elementGenerator,
-                                           Class<?> fieldType,
-                                           String fieldName) {
-        CollectionRule rule = (CollectionRule) ruleInfo.getRule();
-
-        Class<? extends Collection<?>> collectionClass = rule.collectionClass() == DummyCollectionClass.class
-                ? (Class<? extends Collection<?>>) ConcreteClasses.getConcreteCollectionClass((Class<? extends Collection<?>>) fieldType)
-                : (Class<? extends Collection<?>>) rule.collectionClass();
-
-        CollectionConfigDto configDto = new CollectionConfigDto(rule)
-                .setCollectionInstanceSupplier(() -> ReflectionUtils.createInstance(collectionClass));
-
-        return generatorsProvider.mergeGeneratorConfigurations(
-                () -> configDto,
-                generatorsProvider.getCollectionGeneratorSupplier(collectionClass, elementGenerator),
-                fieldType,
-                fieldName);
-
     }
 }

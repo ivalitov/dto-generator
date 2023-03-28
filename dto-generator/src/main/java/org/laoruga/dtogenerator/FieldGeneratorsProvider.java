@@ -7,9 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.configs.ConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.generator.providers.GeneratorProvidersMediator;
-import org.laoruga.dtogenerator.generator.supplier.GeneratorSuppliers;
+import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliers;
 import org.laoruga.dtogenerator.rule.IRuleInfo;
 import org.laoruga.dtogenerator.rule.RulesInfoExtractor;
 

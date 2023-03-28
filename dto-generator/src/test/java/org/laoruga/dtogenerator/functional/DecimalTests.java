@@ -9,7 +9,7 @@ import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.api.rules.DecimalRule;
 import org.laoruga.dtogenerator.constants.Bounds;
-import org.laoruga.dtogenerator.generator.configs.DecimalConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.DecimalConfigDto;
 
 import java.math.BigDecimal;
 

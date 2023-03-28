@@ -1,19 +1,19 @@
-package org.laoruga.dtogenerator.generator.supplier;
+package org.laoruga.dtogenerator.generator.providers.suppliers;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.generator.*;
-import org.laoruga.dtogenerator.generator.configs.*;
-import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.*;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfigDto;
 
 /**
  * @author Il'dar Valitov
  * Created on 24.11.2022
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class GeneralGeneratorSuppliers {
+public final class GeneratorSuppliersDefault {
 
     private static GeneratorSuppliers instance;
 

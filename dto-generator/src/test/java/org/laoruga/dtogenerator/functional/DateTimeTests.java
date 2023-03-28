@@ -14,9 +14,9 @@ import org.laoruga.dtogenerator.api.rules.datetime.ChronoFieldShift;
 import org.laoruga.dtogenerator.api.rules.datetime.ChronoUnitShift;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
-import org.laoruga.dtogenerator.generator.configs.datetime.ChronoFieldConfig;
-import org.laoruga.dtogenerator.generator.configs.datetime.ChronoUnitConfig;
-import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.ChronoFieldConfig;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.ChronoUnitConfig;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfigDto;
 
 import java.time.*;
 import java.time.temporal.ChronoField;

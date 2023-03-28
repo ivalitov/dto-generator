@@ -5,17 +5,12 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.rules.MapRule;
-import org.laoruga.dtogenerator.generator.configs.ConfigDto;
-import org.laoruga.dtogenerator.generator.configs.MapConfigDto;
+import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForMap;
+import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.rule.IRuleInfo;
 import org.laoruga.dtogenerator.rule.RuleInfoMap;
-import org.laoruga.dtogenerator.util.ConcreteClasses;
-import org.laoruga.dtogenerator.util.ReflectionUtils;
-import org.laoruga.dtogenerator.util.dummy.DummyMapClass;
 
 import java.lang.reflect.Field;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -29,10 +24,13 @@ import java.util.function.Supplier;
 @Getter(AccessLevel.PRIVATE)
 public class GeneratorsProviderByAnnotationForMap {
 
-    GeneratorsProviderByAnnotation generatorsProvider;
+    private final GeneratorsProviderByAnnotation generatorsProvider;
+    private final GeneratorConfiguratorForMap configuratorForMap;
 
-    public GeneratorsProviderByAnnotationForMap(GeneratorsProviderByAnnotation generatorsProvider) {
+    public GeneratorsProviderByAnnotationForMap(GeneratorsProviderByAnnotation generatorsProvider,
+                                                GeneratorConfiguratorForMap configuratorForMap) {
         this.generatorsProvider = generatorsProvider;
+        this.configuratorForMap = configuratorForMap;
     }
 
     IGenerator<?> getGenerator(RuleInfoMap mapRruleInfo,
@@ -54,7 +52,7 @@ public class GeneratorsProviderByAnnotationForMap {
         }
 
         Function<ConfigDto, IGenerator<?>> mapGenBuilder =
-                generatorsProvider.getDefaultGenBuilder(
+                generatorsProvider.getDefaultGeneratorSupplier(
                         mapRruleInfo.getRule(),
                         fieldType
                 );
@@ -82,7 +80,7 @@ public class GeneratorsProviderByAnnotationForMap {
         generatorsProvider.prepareCustomRemarks(keyGenerator, fieldName);
         generatorsProvider.prepareCustomRemarks(valueGenerator, fieldName);
 
-        ConfigDto configDto = getGeneratorConfig(
+        ConfigDto configDto = configuratorForMap.createGeneratorConfig(
                 mapRruleInfo,
                 keyGenerator,
                 valueGenerator,
@@ -91,31 +89,6 @@ public class GeneratorsProviderByAnnotationForMap {
         );
 
         return mapGenBuilder.apply(configDto);
-    }
-
-    @SuppressWarnings("unchecked")
-    private ConfigDto getGeneratorConfig(RuleInfoMap mapRruleInfo,
-                                         IGenerator<?> keyGenerator,
-                                         IGenerator<?> valueGenerator,
-                                         Class<?> fieldType,
-                                         String fieldName) {
-
-        MapRule rule = mapRruleInfo.getRule();
-
-        MapConfigDto configDto;
-
-        Class<? extends Map<?, ?>> mapClass = rule.mapClass() == DummyMapClass.class
-                ? (Class<? extends Map<?, ?>>) ConcreteClasses.getConcreteMapClass((Class<? extends Map<?, ?>>) fieldType)
-                : (Class<? extends Map<?, ?>>) rule.mapClass();
-
-        configDto = new MapConfigDto(rule)
-                .setMapInstanceSupplier(() -> (Map<Object, Object>) ReflectionUtils.createInstance(mapClass));
-
-        return generatorsProvider.mergeGeneratorConfigurations(
-                () -> configDto,
-                generatorsProvider.getMapGeneratorSupplier(mapClass, keyGenerator, valueGenerator),
-                fieldType,
-                fieldName);
     }
 
 }

@@ -1,9 +1,9 @@
-package org.laoruga.dtogenerator.generator.supplier;
+package org.laoruga.dtogenerator.generator.providers.suppliers;
 
 import lombok.Getter;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.constants.GeneratedTypes;
-import org.laoruga.dtogenerator.generator.configs.ConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;

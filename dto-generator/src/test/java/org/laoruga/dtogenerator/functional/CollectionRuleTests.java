@@ -9,7 +9,7 @@ import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
-import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.CollectionConfigDto;
 
 import java.time.Year;
 import java.util.*;

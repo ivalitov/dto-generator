@@ -16,8 +16,8 @@ import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientDto;
-import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
-import org.laoruga.dtogenerator.generator.configs.StringConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.CollectionConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.StringConfigDto;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;

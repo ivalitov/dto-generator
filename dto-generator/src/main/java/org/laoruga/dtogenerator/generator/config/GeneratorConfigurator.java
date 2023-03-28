@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.generator.providers;
+package org.laoruga.dtogenerator.generator.config;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,8 +10,8 @@ import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.configs.*;
-import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.*;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfigDto;
 
 import java.time.temporal.Temporal;
 import java.util.Collection;
@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static org.laoruga.dtogenerator.constants.RuleRemark.MIN_VALUE;
+import static org.laoruga.dtogenerator.constants.RuleRemark.NULL_VALUE;
+import static org.laoruga.dtogenerator.constants.RulesInstance.NUMBER_RULE_ZEROS;
 import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 
 /**
@@ -26,20 +29,55 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
  * Created on 24.11.2022
  */
 @Slf4j
-public abstract class GeneratorsProviderAbstract {
+public class GeneratorConfigurator {
 
     @Getter(AccessLevel.PROTECTED)
     private final ConfigurationHolder configuration;
-    @Getter(AccessLevel.PROTECTED)
+    @Getter(AccessLevel.PUBLIC)
     private final RemarksHolder remarksHolder;
 
-    protected static final Consumer<ConfigDto> EMPTY_SPECIFIC_CONFIG = configDto -> {
+    public static final Consumer<ConfigDto> EMPTY_SPECIFIC_CONFIG = configDto -> {
         log.debug("Specific config is absent.");
     };
 
-    protected GeneratorsProviderAbstract(ConfigurationHolder configuration, RemarksHolder remarksHolder) {
+    protected GeneratorConfigurator(ConfigurationHolder configuration, RemarksHolder remarksHolder) {
         this.configuration = configuration;
         this.remarksHolder = remarksHolder;
+    }
+
+    @SuppressWarnings("unchecked")
+    static Consumer<ConfigDto> integerGeneratorSpecificConfig(Class<?> fieldType,
+                                                       String fieldName) {
+        return (config) -> {
+            if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
+                reportPrimitiveCannotBeNull(fieldName);
+                config.merge(new NumberConfigDto(NUMBER_RULE_ZEROS, (Class<? extends Number>) fieldType)
+                        .setRuleRemark(MIN_VALUE));
+            }
+        };
+    }
+
+    static Consumer<ConfigDto> decimalGeneratorSpecificConfig(Class<?> fieldType,
+                                                              String fieldName) {
+        return (config) -> {
+            if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
+                reportPrimitiveCannotBeNull(fieldName);
+                ((DecimalConfigDto) config)
+                        .setMinValue(0D)
+                        .setMaxValue(0D)
+                        .setRuleRemark(MIN_VALUE);
+            }
+        };
+    }
+
+    static Consumer<ConfigDto> booleanGeneratorSpecificConfig(Class<?> fieldType,
+                                                              String fieldName) {
+        return config -> {
+            if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
+                reportPrimitiveCannotBeNull(fieldName);
+                ((BooleanConfigDto) config).setTrueProbability(0D).setRuleRemark(MIN_VALUE);
+            }
+        };
     }
 
     public IRuleRemark getRuleRemark(String fieldName) {
@@ -57,7 +95,7 @@ public abstract class GeneratorsProviderAbstract {
                 fieldName);
     }
 
-    protected ConfigDto mergeGeneratorConfigurations(Supplier<ConfigDto> newConfigInstanceSupplier,
+    public ConfigDto mergeGeneratorConfigurations(Supplier<ConfigDto> newConfigInstanceSupplier,
                                                      Consumer<ConfigDto> specificConfiguration,
                                                      Class<?> fieldType,
                                                      String fieldName) {
@@ -96,8 +134,13 @@ public abstract class GeneratorsProviderAbstract {
         return config;
     }
 
+
+    /*
+     * Specific type configurations
+     */
+
     @SuppressWarnings("unchecked")
-    protected Consumer<ConfigDto> enumGeneratorSpecificConfig(Class<?> generatedType) {
+    public static Consumer<ConfigDto> getEnumGeneratorSpecificConfig(Class<?> generatedType) {
         return (config) -> {
             EnumConfigDto enumConfig = (EnumConfigDto) config;
             if (enumConfig.getEnumClass() == null) {
@@ -111,15 +154,15 @@ public abstract class GeneratorsProviderAbstract {
         };
     }
 
-    protected Consumer<ConfigDto> getTemporalGeneratorSupplier(Class<? extends Temporal> generatedType) {
+    public static Consumer<ConfigDto> getTemporalGeneratorSpecificConfig(Class<? extends Temporal> generatedType) {
         return (config) -> {
             DateTimeConfigDto dateTimeConfig = (DateTimeConfigDto) config;
             dateTimeConfig.setGeneratedType(generatedType);
         };
     }
 
-    protected Consumer<ConfigDto> getCollectionGeneratorSupplier(Class<? extends Collection<?>> generatedType,
-                                                                 IGenerator<?> elementGenerator) {
+    public static Consumer<ConfigDto> getCollectionGeneratorSpecificConfig(Class<? extends Collection<?>> generatedType,
+                                                                    IGenerator<?> elementGenerator) {
         return (config) -> {
             CollectionConfigDto collectionConfig = (CollectionConfigDto) config;
             if (collectionConfig.getCollectionInstanceSupplier() == null) {
@@ -133,8 +176,8 @@ public abstract class GeneratorsProviderAbstract {
         };
     }
 
-    protected Consumer<ConfigDto> getArrayGeneratorSupplier(Class<?> elementType,
-                                                            IGenerator<?> elementGenerator) {
+    public static Consumer<ConfigDto> getArrayGeneratorSpecificConfig(Class<?> elementType,
+                                                               IGenerator<?> elementGenerator) {
         return (config) -> {
             ArrayConfigDto arrayConfigDto = (ArrayConfigDto) config;
             arrayConfigDto.setElementType(elementType);
@@ -145,10 +188,9 @@ public abstract class GeneratorsProviderAbstract {
     }
 
     @SuppressWarnings("unchecked")
-    protected Consumer<ConfigDto>
-    getMapGeneratorSupplier(Class<? extends Map<?, ?>> generatedType,
-                            IGenerator<?> keyGenerator,
-                            IGenerator<?> valueGenerator) {
+    public static Consumer<ConfigDto> getMapGeneratorSpecificConfig(Class<? extends Map<?, ?>> generatedType,
+                                                             IGenerator<?> keyGenerator,
+                                                             IGenerator<?> valueGenerator) {
         return (config) -> {
             MapConfigDto mapConfigDto = (MapConfigDto) config;
             if (mapConfigDto.getMapInstanceSupplier() == null) {
@@ -163,6 +205,10 @@ public abstract class GeneratorsProviderAbstract {
                 mapConfigDto.setValueGenerator((IGenerator<Object>) valueGenerator);
             }
         };
+    }
+
+    protected static void reportPrimitiveCannotBeNull(String fieldName) {
+        log.warn("Primitive field " + fieldName + " can't be null, it will be assigned to '0'");
     }
 
 }

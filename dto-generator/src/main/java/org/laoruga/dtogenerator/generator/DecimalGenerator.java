@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.generator.configs.DecimalConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.DecimalConfigDto;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 /**

@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.generator.configs.StringConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.StringConfigDto;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Objects;

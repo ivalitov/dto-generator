@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.constants.RuleType;
 
 import java.lang.annotation.Annotation;

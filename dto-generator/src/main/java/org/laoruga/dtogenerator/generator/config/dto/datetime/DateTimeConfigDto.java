@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.generator.configs.datetime;
+package org.laoruga.dtogenerator.generator.config.dto.datetime;
 
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -6,7 +6,7 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.datetime.ChronoFieldShift;
 import org.laoruga.dtogenerator.api.rules.datetime.ChronoUnitShift;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
-import org.laoruga.dtogenerator.generator.configs.ConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 
 import java.time.temporal.Temporal;
 import java.util.Arrays;
