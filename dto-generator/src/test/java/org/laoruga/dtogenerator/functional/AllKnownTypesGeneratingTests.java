@@ -17,6 +17,7 @@ import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -49,6 +50,9 @@ public class AllKnownTypesGeneratingTests {
         Set<Long> setOfLong;
         @NestedDtoRule
         InnerDto innerDto;
+
+        // unknown type
+        Date date;
     }
 
     static class InnerDto {
@@ -62,6 +66,9 @@ public class AllKnownTypesGeneratingTests {
         ClientType clientType;
         List<String> listOfString;
         Set<Long> setOfLong;
+
+        // unknown type
+        Date date;
     }
 
     @BeforeEach
@@ -105,7 +112,8 @@ public class AllKnownTypesGeneratingTests {
                 () -> assertThat(dto.clientType, notNullValue()),
                 () -> assertThat(dto.listOfString.size(), equalTo(1)),
                 () -> assertThat(dto.setOfLong.size(), equalTo(1)),
-                () -> assertThat(dto.aDouble, notNullValue())
+                () -> assertThat(dto.aDouble, notNullValue()),
+                () -> assertThat(dto.date, nullValue())
         );
 
         InnerDto innerDto = dto.innerDto;
@@ -127,7 +135,9 @@ public class AllKnownTypesGeneratingTests {
                 () -> assertThat(innerDto.clientType, notNullValue()),
                 () -> assertThat(innerDto.listOfString.size(), equalTo(1)),
                 () -> assertThat(innerDto.setOfLong.size(), equalTo(1)),
-                () -> assertThat(innerDto.aDouble, notNullValue())
+                () -> assertThat(innerDto.aDouble, notNullValue()),
+                () -> assertThat(innerDto.date, nullValue())
+
         );
     }
 

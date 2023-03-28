@@ -4,15 +4,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.rules.ArrayRule;
-import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.builder.builders.ArrayGeneratorBuilder;
 import org.laoruga.dtogenerator.generator.configs.ArrayConfigDto;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
+import org.laoruga.dtogenerator.rule.RuleInfoCollection;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
-
-import java.lang.annotation.Annotation;
 
 
 /**
@@ -28,40 +24,20 @@ public class GeneratorsProviderByAnnotationForArray extends GeneratorsProviderBy
     }
 
     @Override
-    protected IGenerator<?> buildListGenerator(Annotation arrayRule,
-                                               IGeneratorBuilder<?> arrayGenBuilder,
-                                               IGenerator<?> elementGenerator,
-                                               Class<?> fieldType,
-                                               String fieldName) {
-        Class<? extends Annotation> rulesClass = arrayRule.annotationType();
+    protected ConfigDto getGeneratorConfig(RuleInfoCollection arrayRule,
+                                           IGenerator<?> elementGenerator,
+                                           Class<?> fieldType,
+                                           String fieldName) {
+        ArrayRule rule = (ArrayRule) arrayRule.getRule();
 
-        if (arrayGenBuilder instanceof ArrayGeneratorBuilder) {
+        Class<?> arrayElementType = ReflectionUtils.getArrayElementType(fieldType);
 
-            ArrayConfigDto configDto;
+        ArrayConfigDto configDto = new ArrayConfigDto(rule, arrayElementType);
 
-            if (ArrayRule.class == rulesClass) {
-
-                ArrayRule rule = (ArrayRule) arrayRule;
-
-                Class<?> arrayElementType = ReflectionUtils.getArrayElementType(fieldType);
-
-                configDto = new ArrayConfigDto(rule, arrayElementType);
-
-                return generatorsProvider.getGenerator(
-                        () -> configDto,
-                        () -> (IGeneratorBuilderConfigurable<?>) arrayGenBuilder,
-                        generatorsProvider.getArrayGeneratorSupplier(arrayElementType, elementGenerator),
-                        fieldType,
-                        fieldName);
-
-
-            } else {
-                throw new DtoGeneratorException("Unknown rules annotation class '" + rulesClass + "'");
-            }
-        }
-
-        log.debug("Unknown array builder builds as is, without Rules annotation params passing.");
-
-        return arrayGenBuilder.build();
+        return generatorsProvider.mergeGeneratorConfigurations(
+                () -> configDto,
+                generatorsProvider.getArrayGeneratorSupplier(arrayElementType, elementGenerator),
+                fieldType,
+                fieldName);
     }
 }

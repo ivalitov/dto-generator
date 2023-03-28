@@ -3,10 +3,9 @@ package org.laoruga.dtogenerator.generator.providers;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.constants.RuleType;
-import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
+import org.laoruga.dtogenerator.generator.supplier.GeneratorSuppliers;
 import org.laoruga.dtogenerator.rule.IRuleInfo;
 import org.laoruga.dtogenerator.rule.RuleInfoCollection;
 import org.laoruga.dtogenerator.rule.RuleInfoMap;
@@ -30,7 +29,7 @@ public class GeneratorProvidersMediator {
     private final GeneratorsProviderByAnnotationForList generatorsProviderByAnnotationForArray;
 
     public GeneratorProvidersMediator(ConfigurationHolder configuration,
-                                      GeneratorBuildersHolder userGenBuildersMapping,
+                                      GeneratorSuppliers userGenBuildersMapping,
                                       RemarksHolder remarksHolder) {
         generatorsProviderByType = new GeneratorsProviderByType(
                 configuration,
@@ -57,15 +56,15 @@ public class GeneratorProvidersMediator {
      * By field
      */
 
-    public boolean isGeneratorBuilderOverridden(String fieldName) {
-        return generatorProviderOverriddenForField.isBuilderOverridden(fieldName);
+    public synchronized boolean isGeneratorOverridden(String fieldName) {
+        return generatorProviderOverriddenForField.isGeneratorOverridden(fieldName);
     }
 
-    public void setGeneratorBuilderForField(String fieldName, IGeneratorBuilder<?> genBuilder) {
-        generatorProviderOverriddenForField.setGeneratorBuilderForField(fieldName, genBuilder);
+    public synchronized void setGeneratorForField(String fieldName, IGenerator<?> generator) {
+        generatorProviderOverriddenForField.setGeneratorBuilderForField(fieldName, generator);
     }
 
-    public IGenerator<?> getGeneratorOverriddenForField(Field field) {
+    public synchronized IGenerator<?> getGeneratorOverriddenForField(Field field) {
         return generatorProviderOverriddenForField.getGenerator(field);
     }
 

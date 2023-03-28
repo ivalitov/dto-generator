@@ -6,7 +6,7 @@ import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.builder.builders.EnumGeneratorBuilder;
+import org.laoruga.dtogenerator.generator.configs.EnumConfigDto;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Arrays;
@@ -23,6 +23,20 @@ public class EnumGenerator implements IGenerator<Enum> {
     private final String[] possibleEnumNames;
     private final Class<? extends Enum<?>> enumClass;
     private final IRuleRemark ruleRemark;
+
+    public EnumGenerator(EnumConfigDto enumConfigDto) {
+        if (enumConfigDto.getEnumClass() == null) {
+            throw new DtoGeneratorException("Enum class wasn't set for generator.");
+        }
+        if (enumConfigDto.getPossibleEnumNames().length == 0) {
+            enumConfigDto.setPossibleEnumNames(Arrays
+                    .stream(enumConfigDto.getEnumClass().getEnumConstants())
+                    .map(Enum::name).toArray(String[]::new));
+        }
+        possibleEnumNames = enumConfigDto.getPossibleEnumNames();
+        enumClass = enumConfigDto.getEnumClass();
+        ruleRemark = enumConfigDto.getRuleRemark();
+    }
 
     @Override
     @SneakyThrows
@@ -50,10 +64,6 @@ public class EnumGenerator implements IGenerator<Enum> {
         }
         throw new DtoGeneratorException("Enum instance with name: '" + enumInstanceName +
                 "' not found in Class: '" + enumClass + "'");
-    }
-
-    public static EnumGeneratorBuilder builder() {
-        return new EnumGeneratorBuilder();
     }
 
 }

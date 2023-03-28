@@ -2,22 +2,21 @@ package org.laoruga.dtogenerator.generator.providers;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.builder.builders.EnumGeneratorBuilder;
 import org.laoruga.dtogenerator.generator.configs.*;
 import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
 
 import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
@@ -26,12 +25,17 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
  * @author Il'dar Valitov
  * Created on 24.11.2022
  */
+@Slf4j
 public abstract class GeneratorsProviderAbstract {
 
     @Getter(AccessLevel.PROTECTED)
     private final ConfigurationHolder configuration;
     @Getter(AccessLevel.PROTECTED)
     private final RemarksHolder remarksHolder;
+
+    protected static final Consumer<ConfigDto> EMPTY_SPECIFIC_CONFIG = configDto -> {
+        log.debug("Specific config is absent.");
+    };
 
     protected GeneratorsProviderAbstract(ConfigurationHolder configuration, RemarksHolder remarksHolder) {
         this.configuration = configuration;
@@ -43,14 +47,22 @@ public abstract class GeneratorsProviderAbstract {
                 remarksHolder.getBasicRemarks().getBasicRuleRemark(fieldName) : null;
     }
 
-    protected IGenerator<?> getGenerator(Supplier<ConfigDto> configDtoSupplier,
-                                         Supplier<IGeneratorBuilderConfigurable<?>> genBuildSupplier,
-                                         BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>, IGenerator<?>> generatorSupplier,
-                                         Class<?> fieldType,
-                                         String fieldName) {
-        IGeneratorBuilderConfigurable<?> genBuilder = genBuildSupplier.get();
+    protected ConfigDto mergeGeneratorConfigurations(Supplier<ConfigDto> newConfigInstanceSupplier,
+                                                     Class<?> fieldType,
+                                                     String fieldName) {
+        return mergeGeneratorConfigurations(
+                newConfigInstanceSupplier,
+                EMPTY_SPECIFIC_CONFIG,
+                fieldType,
+                fieldName);
+    }
 
-        ConfigDto config = configDtoSupplier.get();
+    protected ConfigDto mergeGeneratorConfigurations(Supplier<ConfigDto> newConfigInstanceSupplier,
+                                                     Consumer<ConfigDto> specificConfiguration,
+                                                     Class<?> fieldType,
+                                                     String fieldName) {
+
+        ConfigDto config = newConfigInstanceSupplier.get();
 
         ConfigDto staticConfig = ((TypeGeneratorsConfigLazy) DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig())
                 .getOrNull(fieldType);
@@ -77,15 +89,16 @@ public abstract class GeneratorsProviderAbstract {
             config.setRuleRemark(getRuleRemark(fieldName));
         }
 
-        return generatorSupplier.apply(config, genBuilder);
+        if (specificConfiguration != null) {
+            specificConfiguration.accept(config);
+        }
+
+        return config;
     }
 
     @SuppressWarnings("unchecked")
-    protected BiFunction<
-            ConfigDto,
-            IGeneratorBuilderConfigurable<?>,
-            IGenerator<?>> getEnumGeneratorSupplier(Class<?> generatedType) {
-        return (config, builder) -> {
+    protected Consumer<ConfigDto> enumGeneratorSpecificConfig(Class<?> generatedType) {
+        return (config) -> {
             EnumConfigDto enumConfig = (EnumConfigDto) config;
             if (enumConfig.getEnumClass() == null) {
                 if (generatedType.isEnum()) {
@@ -95,23 +108,19 @@ public abstract class GeneratorsProviderAbstract {
                             + generatedType + "'");
                 }
             }
-            return ((EnumGeneratorBuilder) builder).build(config, true);
         };
     }
 
-    protected BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>, IGenerator<?>>
-    getTemporalGeneratorSupplier(Class<? extends Temporal> generatedType) {
-        return (config, builder) -> {
+    protected Consumer<ConfigDto> getTemporalGeneratorSupplier(Class<? extends Temporal> generatedType) {
+        return (config) -> {
             DateTimeConfigDto dateTimeConfig = (DateTimeConfigDto) config;
             dateTimeConfig.setGeneratedType(generatedType);
-            return builder.build(config, true);
         };
     }
 
-    protected BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>,
-            IGenerator<?>> getCollectionGeneratorSupplier(Class<? extends Collection<?>> generatedType,
-                                                          IGenerator<?> elementGenerator) {
-        return (config, builder) -> {
+    protected Consumer<ConfigDto> getCollectionGeneratorSupplier(Class<? extends Collection<?>> generatedType,
+                                                                 IGenerator<?> elementGenerator) {
+        return (config) -> {
             CollectionConfigDto collectionConfig = (CollectionConfigDto) config;
             if (collectionConfig.getCollectionInstanceSupplier() == null) {
                 collectionConfig.setCollectionInstanceSupplier(
@@ -121,29 +130,26 @@ public abstract class GeneratorsProviderAbstract {
             if (collectionConfig.getElementGenerator() == null) {
                 collectionConfig.setElementGenerator(elementGenerator);
             }
-            return builder.build(config, true);
         };
     }
 
-    protected BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>,
-            IGenerator<?>> getArrayGeneratorSupplier(Class<?> elementType,
-                                                     IGenerator<?> elementGenerator) {
-        return (config, builder) -> {
+    protected Consumer<ConfigDto> getArrayGeneratorSupplier(Class<?> elementType,
+                                                            IGenerator<?> elementGenerator) {
+        return (config) -> {
             ArrayConfigDto arrayConfigDto = (ArrayConfigDto) config;
             arrayConfigDto.setElementType(elementType);
             if (arrayConfigDto.getElementGenerator() == null) {
                 arrayConfigDto.setElementGenerator(elementGenerator);
             }
-            return builder.build(config, true);
         };
     }
 
     @SuppressWarnings("unchecked")
-    protected BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>, IGenerator<?>>
+    protected Consumer<ConfigDto>
     getMapGeneratorSupplier(Class<? extends Map<?, ?>> generatedType,
                             IGenerator<?> keyGenerator,
                             IGenerator<?> valueGenerator) {
-        return (config, builder) -> {
+        return (config) -> {
             MapConfigDto mapConfigDto = (MapConfigDto) config;
             if (mapConfigDto.getMapInstanceSupplier() == null) {
                 mapConfigDto.setMapInstanceSupplier(
@@ -156,7 +162,6 @@ public abstract class GeneratorsProviderAbstract {
             if (mapConfigDto.getValueGenerator() == null) {
                 mapConfigDto.setValueGenerator((IGenerator<Object>) valueGenerator);
             }
-            return builder.build(config, true);
         };
     }
 

@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.constants.RuleType;
 
 import java.lang.annotation.Annotation;
@@ -19,8 +20,8 @@ import java.util.Objects;
 @Getter
 @Builder
 public class RuleInfoCollection implements IRuleInfo {
-    private IRuleInfo collectionRuleInfo;
-    private IRuleInfo elementRuleInfo;
+    private RuleInfo collectionRuleInfo;
+    private RuleInfo elementRuleInfo;
     private Field field;
     private Class<?> elementType;
     private String group;

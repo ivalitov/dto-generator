@@ -7,10 +7,11 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.builder.builders.CollectionGeneratorBuilder;
+import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -19,21 +20,29 @@ import java.util.function.Supplier;
  */
 
 @AllArgsConstructor
-public class CollectionGenerator<T> implements ICollectionGenerator<T> {
+public class CollectionGenerator implements ICollectionGenerator<Object> {
 
     private final int minSize;
     private final int maxSize;
-    private final Supplier<Collection<T>> collectionInstanceSupplier;
-    private final IGenerator<T> elementGenerator;
+    private final Supplier<Collection<Object>> collectionInstanceSupplier;
+    private final IGenerator<Object> elementGenerator;
     private final IRuleRemark ruleRemark;
 
-    public static CollectionGeneratorBuilder builder() {
-        return new CollectionGeneratorBuilder();
+    public CollectionGenerator(CollectionConfigDto collectionConfig) {
+        minSize = collectionConfig.getMinSize();
+        maxSize = collectionConfig.getMaxSize();
+        collectionInstanceSupplier = (Supplier<Collection<Object>>) Objects.requireNonNull(collectionConfig.getCollectionInstanceSupplier(), "Collection instance must be set.");
+        elementGenerator = (IGenerator<Object>) Objects.requireNonNull(collectionConfig.getElementGenerator(), "Collection element generator must be set");
+        ruleRemark = Objects.requireNonNull(collectionConfig.getRuleRemark(), "Unexpected error, rule remark haven't set.");
     }
 
+//    public static CollectionGeneratorBuilder builder() {
+//        return new CollectionGeneratorBuilder();
+//    }
+
     @Override
-    public Collection<T> generate() {
-        Collection<T> collectionInstance = collectionInstanceSupplier.get();
+    public Collection<Object> generate() {
+        Collection<Object> collectionInstance = collectionInstanceSupplier.get();
         int maxAttempts = DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().getMaxCollectionGenerationCycles();
         int size;
         switch ((RuleRemark) ruleRemark) {
@@ -69,7 +78,7 @@ public class CollectionGenerator<T> implements ICollectionGenerator<T> {
         return collectionInstance;
     }
 
-    public IGenerator<T> getElementGenerator() {
+    public IGenerator<Object> getElementGenerator() {
         return elementGenerator;
     }
 

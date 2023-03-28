@@ -5,21 +5,18 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
-import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.builder.builders.CollectionGeneratorBuilder;
 import org.laoruga.dtogenerator.generator.configs.CollectionConfigDto;
+import org.laoruga.dtogenerator.generator.configs.ConfigDto;
 import org.laoruga.dtogenerator.rule.RuleInfoCollection;
 import org.laoruga.dtogenerator.util.ConcreteClasses;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 import org.laoruga.dtogenerator.util.dummy.DummyCollectionClass;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 
@@ -58,64 +55,52 @@ public class GeneratorsProviderByAnnotationForList {
 
         // Collection generator builder
 
-        Optional<IGeneratorBuilder<?>> maybeCollectionUserGenBuilder =
-                generatorsProvider.getUsersGenBuilder(fieldType);
+        Optional<Function<ConfigDto, IGenerator<?>>> maybeUserCollectionGenerator =
+                generatorsProvider.getUserGeneratorSupplier(fieldType);
 
-        IGeneratorBuilder<?> collectionGenBuilder = maybeCollectionUserGenBuilder.isPresent() ?
-                maybeCollectionUserGenBuilder.get() :
-                generatorsProvider.getDefaultGenBuilder(
-                        collectionRuleInfo.getRule(),
-                        fieldType);
 
-        generatorsProvider.prepareCustomRemarks(elementGenerator, fieldName);
+        if (maybeUserCollectionGenerator.isPresent()) {
+            // user generators are not configurable yet
+            return maybeUserCollectionGenerator.get().apply(null);
+        } else {
+            Function<ConfigDto, IGenerator<?>> defaultGenBuilder = generatorsProvider.getDefaultGenBuilder(
+                    collectionRuleInfo.getRule(),
+                    fieldType);
+            ConfigDto listGeneratorConfig = getGeneratorConfig(
+                    collectionRuleInfo,
+                    elementGenerator,
+                    fieldType,
+                    fieldName
+            );
 
-        return buildListGenerator(
-                collectionRuleInfo.getRule(),
-                collectionGenBuilder,
-                elementGenerator,
-                fieldType,
-                fieldName
-        );
+            IGenerator<?> generator = defaultGenBuilder.apply(listGeneratorConfig);
 
+            generatorsProvider.prepareCustomRemarks(elementGenerator, fieldName);
+            generatorsProvider.prepareCustomRemarks(generator, fieldName);
+
+            return generator;
+        }
     }
 
     @SuppressWarnings("unchecked")
-    protected IGenerator<?> buildListGenerator(Annotation collectionRule,
-                                               IGeneratorBuilder<?> collectionGenBuilder,
-                                               IGenerator<?> elementGenerator,
-                                               Class<?> fieldType,
-                                               String fieldName) {
-        Class<? extends Annotation> rulesClass = collectionRule.annotationType();
+    protected ConfigDto getGeneratorConfig(RuleInfoCollection ruleInfo,
+                                           IGenerator<?> elementGenerator,
+                                           Class<?> fieldType,
+                                           String fieldName) {
+        CollectionRule rule = (CollectionRule) ruleInfo.getRule();
 
-        if (collectionGenBuilder instanceof CollectionGeneratorBuilder) {
+        Class<? extends Collection<?>> collectionClass = rule.collectionClass() == DummyCollectionClass.class
+                ? (Class<? extends Collection<?>>) ConcreteClasses.getConcreteCollectionClass((Class<? extends Collection<?>>) fieldType)
+                : (Class<? extends Collection<?>>) rule.collectionClass();
 
-            CollectionConfigDto configDto;
+        CollectionConfigDto configDto = new CollectionConfigDto(rule)
+                .setCollectionInstanceSupplier(() -> ReflectionUtils.createInstance(collectionClass));
 
-            if (CollectionRule.class == rulesClass && CollectionRule.GENERATED_TYPE.isAssignableFrom(fieldType)) {
+        return generatorsProvider.mergeGeneratorConfigurations(
+                () -> configDto,
+                generatorsProvider.getCollectionGeneratorSupplier(collectionClass, elementGenerator),
+                fieldType,
+                fieldName);
 
-                CollectionRule rule = (CollectionRule) collectionRule;
-
-                Class<? extends Collection<?>> collectionClass = rule.collectionClass() == DummyCollectionClass.class
-                        ? (Class<? extends Collection<?>>) ConcreteClasses.getConcreteCollectionClass((Class<? extends Collection<?>>) fieldType)
-                        : (Class<? extends Collection<?>>) rule.collectionClass();
-
-                configDto = new CollectionConfigDto(rule)
-                        .setCollectionInstanceSupplier(() -> ReflectionUtils.createInstance(collectionClass));
-
-                return generatorsProvider.getGenerator(
-                        () -> configDto,
-                        () -> (IGeneratorBuilderConfigurable<?>) collectionGenBuilder,
-                        generatorsProvider.getCollectionGeneratorSupplier(collectionClass, elementGenerator),
-                        fieldType,
-                        fieldName);
-
-            } else {
-                throw new DtoGeneratorException("Unknown rules annotation class '" + rulesClass + "'");
-            }
-        }
-
-        log.debug("Unknown collection builder builds as is, without Rules annotation params passing.");
-
-        return collectionGenBuilder.build();
     }
 }

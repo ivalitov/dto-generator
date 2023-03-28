@@ -1,14 +1,16 @@
-package org.laoruga.dtogenerator.generator.builder.builders;
+package org.laoruga.dtogenerator.generator.configs;
 
+import lombok.Builder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.NotImplementedException;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorDtoDependent;
+import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.CustomGenerator;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -18,30 +20,34 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 
 /**
  * @author Il'dar Valitov
- * Created on 19.02.2023
+ * Created on 27.03.2023
  */
+@Builder
+@Getter
 @Slf4j
-public class CustomGeneratorBuilder implements IGeneratorBuilder<Object> {
+public class CustomConfigDto implements ConfigDto {
 
     private Supplier<?> dtoInstanceSupplier;
     private Annotation customGeneratorRules;
+    private IRuleRemark ruleRemark;
 
-    public CustomGeneratorBuilder setDtoInstanceSupplier(Supplier<?> dtoInstanceSupplier) {
-        this.dtoInstanceSupplier = dtoInstanceSupplier;
-        return this;
+    @Override
+    public void merge(ConfigDto configDto) {
+        throw new NotImplementedException();
     }
 
-    public CustomGeneratorBuilder setCustomGeneratorRules(Annotation customGeneratorRules) {
-        this.customGeneratorRules = customGeneratorRules;
+    @Override
+    public ConfigDto setRuleRemark(IRuleRemark ruleRemark) {
+        this.ruleRemark = ruleRemark;
         return this;
     }
 
     @Override
-    public CustomGenerator build() {
-        return new CustomGenerator(createCustomGenerator());
+    public IRuleRemark getRuleRemark() {
+        return ruleRemark;
     }
 
-    IGenerator<?> createCustomGenerator() throws DtoGeneratorException {
+    public IGenerator<?> getCustomGenerator() throws DtoGeneratorException {
         CustomRule customRules;
         try {
             customRules = (CustomRule) customGeneratorRules;

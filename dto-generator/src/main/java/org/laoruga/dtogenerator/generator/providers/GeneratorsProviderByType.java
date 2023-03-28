@@ -4,8 +4,6 @@ import com.google.common.primitives.Primitives;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.rules.ArrayRule;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.MapRule;
@@ -14,10 +12,9 @@ import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsDefaultConfigSupplier;
 import org.laoruga.dtogenerator.constants.GeneratedTypes;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
-import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolderGeneral;
-import org.laoruga.dtogenerator.generator.builder.builders.EnumGeneratorBuilder;
 import org.laoruga.dtogenerator.generator.configs.ConfigDto;
+import org.laoruga.dtogenerator.generator.supplier.GeneralGeneratorSuppliers;
+import org.laoruga.dtogenerator.generator.supplier.GeneratorSuppliers;
 import org.laoruga.dtogenerator.util.ConcreteClasses;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
@@ -26,7 +23,8 @@ import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * @author Il'dar Valitov
@@ -35,54 +33,50 @@ import java.util.function.BiFunction;
 @Slf4j
 public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
 
-    private final GeneratorBuildersHolder userGeneratorBuilders;
-    private final GeneratorBuildersHolder generalGeneratorBuilders = GeneratorBuildersHolderGeneral.getInstance();
+    private final GeneratorSuppliers userGeneratorSuppliers;
+    private final GeneratorSuppliers generalGeneratorSuppliers = GeneralGeneratorSuppliers.getInstance();
 
     public GeneratorsProviderByType(ConfigurationHolder configuration,
-                                    GeneratorBuildersHolder userGeneratorBuilders,
+                                    GeneratorSuppliers userGeneratorSuppliers,
                                     RemarksHolder remarksHolder) {
         super(configuration, remarksHolder);
-        this.userGeneratorBuilders = userGeneratorBuilders;
+        this.userGeneratorSuppliers = userGeneratorSuppliers;
     }
 
     public Optional<IGenerator<?>> getGenerator(Field field, Class<?> generatedType) {
 
         generatedType = Primitives.wrap(generatedType);
 
-        Optional<IGeneratorBuilder<?>> maybeBuilder = getGeneratorBuilder(generatedType);
+        Optional<Function<ConfigDto, IGenerator<?>>> maybeGeneratorSupplier = getGeneratorSupplier(generatedType);
 
-        if (!maybeBuilder.isPresent()) {
-            log.debug("Generator builder not found for field type: " + generatedType);
+        if (!maybeGeneratorSupplier.isPresent()) {
+            log.debug("Generator supplier not found for field type: " + generatedType);
             return Optional.empty();
         }
 
-        IGeneratorBuilder<?> generatorBuilder = maybeBuilder.get();
+        ConfigDto generatorConfig = getGeneratorConfig(field, generatedType);
 
-        if (generatorBuilder instanceof IGeneratorBuilderConfigurable) {
-            return configureGenerator(
-                    field,
-                    generatedType,
-                    (IGeneratorBuilderConfigurable<?>) generatorBuilder);
-        }
-
-        log.debug("Unknown generator builder found by field type, trying to build 'as is' without configuring.");
-        return Optional.of(generatorBuilder.build());
+        return Optional.of(
+                maybeGeneratorSupplier.get().apply(generatorConfig)
+        );
     }
 
-    private Optional<IGeneratorBuilder<?>> getGeneratorBuilder(Class<?> generatedType) {
-        Optional<IGeneratorBuilder<?>> maybeBuilder = userGeneratorBuilders.getBuilder(generatedType);
+    private Optional<Function<ConfigDto, IGenerator<?>>> getGeneratorSupplier(Class<?> generatedType) {
+
+        Optional<Function<ConfigDto, IGenerator<?>>> maybeBuilder =
+                userGeneratorSuppliers.getGeneratorSupplier(generatedType);
+
         if (!maybeBuilder.isPresent()) {
-            maybeBuilder = generalGeneratorBuilders.getBuilder(generatedType);
+            maybeBuilder = generalGeneratorSuppliers.getGeneratorSupplier(generatedType);
         }
+
         return maybeBuilder;
     }
 
-
     @SuppressWarnings("unchecked")
-    private Optional<IGenerator<?>> configureGenerator(Field field,
-                                                       Class<?> generatedType,
-                                                       IGeneratorBuilderConfigurable<?> genBuilder) {
-        BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>, IGenerator<?>> generatorSupplier;
+    private ConfigDto getGeneratorConfig(Field field,
+                                                   Class<?> generatedType) {
+        Consumer<ConfigDto> specificConfig;
 
         if (CollectionRule.GENERATED_TYPE.isAssignableFrom(generatedType)) {
 
@@ -96,7 +90,7 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
                             () -> new DtoGeneratorException(
                                     "Collection element generator not found, for type: " + "'" + elementType + "'"));
 
-            generatorSupplier = getCollectionGeneratorSupplier(
+            specificConfig = getCollectionGeneratorSupplier(
                     concreteCollectionClass,
                     elementGenerator
             );
@@ -117,7 +111,7 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
                     () -> new DtoGeneratorException(
                             "Map value generator not found, for type: " + "'" + keyValueTypes[1] + "'"));
 
-            generatorSupplier = getMapGeneratorSupplier(
+            specificConfig = getMapGeneratorSupplier(
                     concreteMapClass,
                     keyGenerator,
                     valueGenerator
@@ -125,11 +119,11 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
 
         } else if (DateTimeRule.GENERATED_TYPE.isAssignableFrom(generatedType)) {
 
-            generatorSupplier = getTemporalGeneratorSupplier((Class<Temporal>) generatedType);
+            specificConfig = getTemporalGeneratorSupplier((Class<Temporal>) generatedType);
 
-        } else if (genBuilder instanceof EnumGeneratorBuilder) {
+        } else if (generatedType.isEnum() || field.getType() == Enum.class) {
 
-            generatorSupplier = getEnumGeneratorSupplier(generatedType);
+            specificConfig = enumGeneratorSpecificConfig(generatedType);
 
         } else if (GeneratedTypes.isAssignableFrom(ArrayRule.GENERATED_TYPES, generatedType)) {
 
@@ -139,26 +133,24 @@ public class GeneratorsProviderByType extends GeneratorsProviderAbstract {
                             () -> new DtoGeneratorException(
                                     "Array element generator not found, for type: " + "'" + elementType + "'"));
 
-            generatorSupplier = getArrayGeneratorSupplier(
+            specificConfig = getArrayGeneratorSupplier(
                     elementType,
                     elementGenerator
             );
 
         } else {
 
-            generatorSupplier = (config, builder) -> builder.build(config, true);
+            specificConfig = EMPTY_SPECIFIC_CONFIG;
 
         }
 
-        return Optional.of(
-                getGenerator(
-                        TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(
-                                Primitives.wrap(generatedType)
-                        ),
-                        () -> genBuilder,
-                        generatorSupplier,
-                        generatedType,
-                        field.getName()));
+       return mergeGeneratorConfigurations(
+                TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(
+                        Primitives.wrap(generatedType)
+                ),
+                specificConfig,
+                generatedType,
+                field.getName());
     }
 
 }

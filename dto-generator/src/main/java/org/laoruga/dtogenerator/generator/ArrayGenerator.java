@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.generator.builder.builders.ArrayGeneratorBuilder;
+import org.laoruga.dtogenerator.generator.configs.ArrayConfigDto;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.lang.reflect.Array;
+import java.util.Objects;
 
 /**
  * @author Il'dar Valitov
@@ -17,14 +18,18 @@ import java.lang.reflect.Array;
 @AllArgsConstructor
 public class ArrayGenerator implements IGenerator<Object> {
 
-    private final int minSize;
-    private final int maxSize;
-    private final Class<?> elementType;
-    private final IGenerator<?> elementGenerator;
-    private final IRuleRemark ruleRemark;
+    private int minSize;
+    private int maxSize;
+    private Class<?> elementType;
+    private IGenerator<?> elementGenerator;
+    private IRuleRemark ruleRemark;
 
-    public static ArrayGeneratorBuilder builder() {
-        return new ArrayGeneratorBuilder();
+    public ArrayGenerator(ArrayConfigDto config) {
+        minSize = config.getMinSize();
+        maxSize = config.getMaxSize();
+        elementType = Objects.requireNonNull(config.getElementType(), "Array element type must be set");
+        elementGenerator = Objects.requireNonNull(config.getElementGenerator(), "Array element generator must be set");
+        ruleRemark = Objects.requireNonNull(config.getRuleRemark(), "Unexpected error, rule remark haven't set.");
     }
 
     @Override
@@ -61,5 +66,4 @@ public class ArrayGenerator implements IGenerator<Object> {
     public IGenerator<?> getElementGenerator() {
         return elementGenerator;
     }
-
 }

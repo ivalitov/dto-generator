@@ -6,29 +6,27 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilder;
-import org.laoruga.dtogenerator.api.generators.IGeneratorBuilderConfigurable;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkableArgs;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
-import org.laoruga.dtogenerator.config.types.TypeGeneratorsDefaultConfigSupplier;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.*;
-import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolder;
-import org.laoruga.dtogenerator.generator.builder.GeneratorBuildersHolderGeneral;
-import org.laoruga.dtogenerator.generator.builder.builders.*;
+import org.laoruga.dtogenerator.generator.CustomGenerator;
+import org.laoruga.dtogenerator.generator.MapGenerator;
 import org.laoruga.dtogenerator.generator.configs.*;
 import org.laoruga.dtogenerator.generator.configs.datetime.DateTimeConfigDto;
+import org.laoruga.dtogenerator.generator.supplier.GeneralGeneratorSuppliers;
+import org.laoruga.dtogenerator.generator.supplier.GeneratorSuppliers;
 import org.laoruga.dtogenerator.rule.IRuleInfo;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.time.temporal.Temporal;
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.laoruga.dtogenerator.constants.RuleRemark.MIN_VALUE;
@@ -43,17 +41,17 @@ import static org.laoruga.dtogenerator.constants.RulesInstance.NUMBER_RULE_ZEROS
 public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
 
     private final GeneratorsProviderByType generatorsProviderByType;
-    private final GeneratorBuildersHolder userGeneratorBuildersHolder;
-    private final GeneratorBuildersHolder defaultGeneratorBuildersHolder;
+    private final GeneratorSuppliers userGeneratorSuppliers;
+    private final GeneratorSuppliers defaultGeneratorSuppliers;
 
     public GeneratorsProviderByAnnotation(ConfigurationHolder configuration,
                                           GeneratorsProviderByType generatorsProviderByType,
                                           RemarksHolder remarksHolder,
-                                          GeneratorBuildersHolder userGeneratorBuildersHolder) {
+                                          GeneratorSuppliers userGeneratorSuppliers) {
         super(configuration, remarksHolder);
         this.generatorsProviderByType = generatorsProviderByType;
-        this.userGeneratorBuildersHolder = userGeneratorBuildersHolder;
-        this.defaultGeneratorBuildersHolder = GeneratorBuildersHolderGeneral.getInstance();
+        this.userGeneratorSuppliers = userGeneratorSuppliers;
+        this.defaultGeneratorSuppliers = GeneralGeneratorSuppliers.getInstance();
     }
 
     IGenerator<?> getGenerator(IRuleInfo ruleInfo,
@@ -63,32 +61,33 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
         String fieldName = ruleInfo.getField().getName();
         Class<?> requiredType = ruleInfo.getRequiredType();
 
-        Optional<IGeneratorBuilder<?>> maybeUsersKeyGenBuilder = getUsersGenBuilder(requiredType);
+        Optional<Function<ConfigDto, IGenerator<?>>> maybeUserGeneratorSupplier = getUserGeneratorSupplier(requiredType);
 
-        boolean isUserBuilder = maybeUsersKeyGenBuilder.isPresent();
+        boolean isUserGenerator = maybeUserGeneratorSupplier.isPresent();
 
-        IGeneratorBuilder<?> generatorBuilder = isUserBuilder ?
-                maybeUsersKeyGenBuilder.get() :
+        Function<ConfigDto, IGenerator<?>> generatorSupplier = isUserGenerator ?
+                maybeUserGeneratorSupplier.get() :
                 getDefaultGenBuilder(ruleInfo.getRule(), requiredType);
 
-        return buildGenerator(
+        ConfigDto config = getGeneratorConfig(
                 ruleInfo.getRule(),
-                generatorBuilder,
                 requiredType,
                 fieldName,
                 dtoInstanceSupplier,
                 nestedDtoGeneratorSupplier);
+
+        return generatorSupplier.apply(config);
     }
 
-    protected IGeneratorBuilder<?> getDefaultGenBuilder(Annotation rules, Class<?> generatedType) {
-        Optional<IGeneratorBuilder<?>> maybeBuilder;
+    Function<ConfigDto, IGenerator<?>> getDefaultGenBuilder(Annotation rules, Class<?> generatedType) {
+        Optional<Function<ConfigDto, IGenerator<?>>> maybeBuilder;
         switch (RuleType.getType(rules)) {
             case CUSTOM:
             case NESTED:
-                maybeBuilder = defaultGeneratorBuildersHolder.getBuilder(rules);
+                maybeBuilder = defaultGeneratorSuppliers.getGeneratorSupplier(rules);
                 break;
             default:
-                maybeBuilder = defaultGeneratorBuildersHolder.getBuilder(generatedType);
+                maybeBuilder = defaultGeneratorSuppliers.getGeneratorSupplier(generatedType);
         }
 
         return maybeBuilder.orElseThrow(() ->
@@ -97,12 +96,11 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
         );
     }
 
-    protected Optional<IGeneratorBuilder<?>> getUsersGenBuilder(Class<?> generatedType) {
-        return userGeneratorBuildersHolder.getBuilder(generatedType);
+    Optional<Function<ConfigDto, IGenerator<?>>> getUserGeneratorSupplier(Class<?> generatedType) {
+        return userGeneratorSuppliers.getGeneratorSupplier(generatedType);
     }
 
-    protected IGenerator<?> buildGenerator(Annotation rules,
-                                           final IGeneratorBuilder<?> generatorBuilder,
+    ConfigDto getGeneratorConfig(Annotation rules,
                                            Class<?> fieldType,
                                            String fieldName,
                                            Supplier<?> dtoInstanceSupplier,
@@ -112,36 +110,31 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
 
         try {
 
-            if (BooleanRule.class == rulesClass && generatorBuilder instanceof BooleanGeneratorBuilder) {
+            if (BooleanRule.class == rulesClass) {
 
-                return getGenerator(
+                return mergeGeneratorConfigurations(
                         () -> new BooleanConfigDto((BooleanRule) rules),
-                        () -> (IGeneratorBuilderConfigurable<?>) generatorBuilder,
-                        booleanGeneratorSupplier(fieldType, fieldName),
+                        booleanGeneratorSpecificConfig(fieldType, fieldName),
                         fieldType,
                         fieldName);
 
-            } else if (StringRule.class == rulesClass && generatorBuilder instanceof StringGeneratorBuilder) {
+            } else if (StringRule.class == rulesClass) {
 
-                return getGenerator(
+                return mergeGeneratorConfigurations(
                         () -> new StringConfigDto((StringRule) rules),
-                        () -> (IGeneratorBuilderConfigurable<?>) generatorBuilder,
-                        (config, builder) -> builder.build(config, true),
                         fieldType,
                         fieldName);
 
-            } else if (DecimalRule.class == rulesClass
-                    && generatorBuilder instanceof DecimalGeneratorBuilder) {
+            } else if (DecimalRule.class == rulesClass) {
 
                 if (Number.class.isAssignableFrom(Primitives.wrap(fieldType))) {
 
                     @SuppressWarnings("unchecked")
                     Class<? extends Number> fieldTypeNumber = (Class<? extends Number>) fieldType;
 
-                    return getGenerator(
+                    return mergeGeneratorConfigurations(
                             () -> new DecimalConfigDto((DecimalRule) rules, fieldTypeNumber),
-                            () -> (IGeneratorBuilderConfigurable<?>) generatorBuilder,
-                            doubleGeneratorSupplier(fieldType, fieldName),
+                            decimalGeneratorSpecificConfig(fieldType, fieldName),
                             fieldType,
                             fieldName);
 
@@ -150,17 +143,15 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
                 throw new IllegalArgumentException("Unexpected state. Field type '" + fieldType
                         + "' doesn't extend Number.class");
 
-            } else if (NumberRule.class == rulesClass
-                    && generatorBuilder instanceof NumberGeneratorBuilder) {
+            } else if (NumberRule.class == rulesClass) {
 
                 if (Number.class.isAssignableFrom(Primitives.wrap(fieldType))) {
                     @SuppressWarnings("unchecked")
                     Class<? extends Number> fieldTypeNumber = (Class<? extends Number>) fieldType;
 
-                    return getGenerator(
+                    return mergeGeneratorConfigurations(
                             () -> new NumberConfigDto((NumberRule) rules, fieldTypeNumber),
-                            () -> (IGeneratorBuilderConfigurable<?>) generatorBuilder,
-                            integerGeneratorSupplier(fieldType, fieldName),
+                            integerGeneratorSpecificConfig(fieldType, fieldName),
                             fieldType,
                             fieldName);
                 }
@@ -168,13 +159,12 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
                 throw new IllegalArgumentException("Unexpected state. Field type '" + fieldType
                         + "' doesn't extend Number.class");
 
-            } else if (EnumRule.class == rulesClass && generatorBuilder instanceof EnumGeneratorBuilder) {
+            } else if (EnumRule.class == rulesClass) {
 
                 if (Enum.class.isAssignableFrom(fieldType)) {
-                    return getGenerator(
+                    return mergeGeneratorConfigurations(
                             () -> new EnumConfigDto((EnumRule) rules),
-                            () -> (IGeneratorBuilderConfigurable<?>) generatorBuilder,
-                            getEnumGeneratorSupplier(fieldType),
+                            enumGeneratorSpecificConfig(fieldType),
                             fieldType,
                             fieldName
                     );
@@ -182,49 +172,37 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
 
                 throw new IllegalArgumentException("Unexpected state. Field type '" + fieldType + "' is not Enum");
 
-            } else if (DateTimeRule.class == rulesClass && generatorBuilder instanceof DateTimeGeneratorBuilder) {
+            } else if (DateTimeRule.class == rulesClass) {
 
                 if (Temporal.class.isAssignableFrom(fieldType)) {
 
                     @SuppressWarnings("unchecked")
                     Class<? extends Temporal> fieldTypeTemporal = (Class<? extends Temporal>) fieldType;
 
-                    return getGenerator(
+                    return mergeGeneratorConfigurations(
                             () -> new DateTimeConfigDto((DateTimeRule) rules, fieldTypeTemporal),
-                            () -> (IGeneratorBuilderConfigurable<?>) generatorBuilder,
-                            (config, builder) -> builder.build(config, true),
                             fieldType,
                             fieldName);
                 }
 
                 throw new IllegalArgumentException("Unexpected state. Field type '" + fieldType + "' is not Temporal");
 
-            } else if (CustomRule.class == rulesClass && generatorBuilder instanceof CustomGeneratorBuilder) {
-                return ((CustomGeneratorBuilder) generatorBuilder)
-                        .setCustomGeneratorRules(rules)
-                        .setDtoInstanceSupplier(dtoInstanceSupplier)
+            } else if (CustomRule.class == rulesClass) {
+
+                return CustomConfigDto.builder()
+                        .customGeneratorRules(rules)
+                        .dtoInstanceSupplier(dtoInstanceSupplier)
                         .build();
 
-            } else if (NestedDtoRule.class == rulesClass && generatorBuilder instanceof NestedDtoGeneratorBuilder) {
-                return ((NestedDtoGeneratorBuilder) generatorBuilder)
-                        .setNestedDtoGeneratorSupplier(nestedDtoGeneratorSupplier)
+            } else if (NestedDtoRule.class == rulesClass) {
+
+                return NestedConfigDto.builder()
+                        .dtoGenerator(nestedDtoGeneratorSupplier.get())
                         .build();
 
             } else {
 
-                if (generatorBuilder instanceof IGeneratorBuilderConfigurable) {
-                    return getGenerator(
-                            TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(
-                                    Primitives.wrap(fieldType)
-                            ),
-                            () -> (IGeneratorBuilderConfigurable<?>) generatorBuilder,
-                            (config, builder) -> builder.build(config, true),
-                            fieldType,
-                            fieldName);
-                }
-
-                log.debug("Unknown generator builder, trying to build 'as is' without configuring.");
-                return generatorBuilder.build();
+                throw new DtoGeneratorException("Unable to rules class: '" + rulesClass  + "'.");
 
             }
 
@@ -233,7 +211,7 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
         }
     }
 
-    protected void prepareCustomRemarks(IGenerator<?> generator, String fieldName) {
+    void prepareCustomRemarks(IGenerator<?> generator, String fieldName) {
         if (generator instanceof CustomGenerator) {
             IGenerator<?> usersGeneratorInstance = ((CustomGenerator) generator).getUsersGeneratorInstance();
             if (usersGeneratorInstance instanceof ICollectionGenerator) {
@@ -287,49 +265,41 @@ public class GeneratorsProviderByAnnotation extends GeneratorsProviderAbstract {
     }
 
     /*
-     * Implementation of functional interfaces for code readability
+     * Specific type configurations
      */
 
     @SuppressWarnings("unchecked")
-    BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>, IGenerator<?>> integerGeneratorSupplier(Class<?> fieldType,
-                                                                                                    String fieldName) {
-        return (config, builder) -> {
+    Consumer<ConfigDto> integerGeneratorSpecificConfig(Class<?> fieldType,
+                                                       String fieldName) {
+        return (config) -> {
             if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
                 reportPrimitiveCannotBeNull(fieldName);
-                return
-                        NumberGenerator.builder(
-                                        new NumberConfigDto(NUMBER_RULE_ZEROS, (Class<? extends Number>) fieldType))
-                                .ruleRemark(MIN_VALUE)
-                                .build();
+                config.merge(new NumberConfigDto(NUMBER_RULE_ZEROS, (Class<? extends Number>) fieldType)
+                        .setRuleRemark(MIN_VALUE));
             }
-            return builder.build(config, true);
         };
     }
 
-    BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>, IGenerator<?>> doubleGeneratorSupplier(Class<?> fieldType,
-                                                                                                   String fieldName) {
-        return (config, builder) -> {
+    Consumer<ConfigDto> decimalGeneratorSpecificConfig(Class<?> fieldType,
+                                                       String fieldName) {
+        return (config) -> {
             if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
                 reportPrimitiveCannotBeNull(fieldName);
-                return DecimalGenerator.builder()
-                        .minValue(0D)
-                        .maxValue(0D)
-                        .ruleRemark(MIN_VALUE).build();
+                ((DecimalConfigDto) config)
+                        .setMinValue(0D)
+                        .setMaxValue(0D)
+                        .setRuleRemark(MIN_VALUE);
             }
-            return builder.build(config, true);
         };
     }
 
-    BiFunction<ConfigDto, IGeneratorBuilderConfigurable<?>, IGenerator<?>> booleanGeneratorSupplier(Class<?> fieldType,
-                                                                                                    String fieldName) {
-        return (config, builder) -> {
+    Consumer<ConfigDto> booleanGeneratorSpecificConfig(Class<?> fieldType,
+                                                       String fieldName) {
+        return config -> {
             if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
                 reportPrimitiveCannotBeNull(fieldName);
-                return BooleanGenerator.builder()
-                        .trueProbability(0D)
-                        .ruleRemark(MIN_VALUE).build();
+                ((BooleanConfigDto) config).setTrueProbability(0D).setRuleRemark(MIN_VALUE);
             }
-            return builder.build(config, true);
         };
     }
 
