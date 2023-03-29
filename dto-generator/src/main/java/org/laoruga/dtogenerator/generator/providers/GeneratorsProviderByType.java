@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.laoruga.dtogenerator.generator.config.GeneratorConfigurator.*;
 
@@ -51,23 +52,26 @@ public class GeneratorsProviderByType {
 
         generatedType = Primitives.wrap(generatedType);
 
-        Optional<Function<ConfigDto, IGenerator<?>>> maybeGeneratorSupplier = getGeneratorSupplier(generatedType);
+        Optional<Function<ConfigDto, IGenerator<?>>> maybeUserGeneratorSupplier =
+                userGeneratorSuppliers.getGeneratorSupplier(generatedType);
 
-        if (!maybeGeneratorSupplier.isPresent()) {
+        Optional<Function<ConfigDto, IGenerator<?>>> maybeDefaultGeneratorSupplier =
+                defaultGeneratorSuppliers.getGeneratorSupplier(generatedType);
+
+        if (!maybeUserGeneratorSupplier.isPresent() && !maybeDefaultGeneratorSupplier.isPresent()) {
             log.debug("Generator supplier not found for field type: " + generatedType);
             return Optional.empty();
         }
 
-        Optional<ConfigDto> generatorConfig = getGeneratorConfig(field, generatedType);
-
-        if (!generatorConfig.isPresent()) {
-            log.debug("Generator config not found for field type: " + generatedType);
-            return Optional.empty();
+        if (maybeUserGeneratorSupplier.isPresent()) {
+            log.debug("Generator config not found for field type: '" + generatedType + "'. Try to use generator as is.");
+            return Optional.of(maybeUserGeneratorSupplier.get().apply(null));
         }
 
-        return Optional.of(
-                maybeGeneratorSupplier.get().apply(generatorConfig.get())
-        );
+        Optional<ConfigDto> generatorConfig = getGeneratorConfig(field, generatedType);
+
+        return generatorConfig.map(configDto -> maybeDefaultGeneratorSupplier.get().apply(configDto));
+
     }
 
     private Optional<Function<ConfigDto, IGenerator<?>>> getGeneratorSupplier(Class<?> generatedType) {
@@ -136,13 +140,18 @@ public class GeneratorsProviderByType {
 
         }
 
-        return Optional.of(generatorConfigurator.mergeGeneratorConfigurations(
-                TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(
-                        Primitives.wrap(generatedType)
-                ),
-                specificConfig,
-                generatedType,
-                field.getName()));
+        Optional<Supplier<ConfigDto>> maybeDefaultConfigSupplier =
+                TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(Primitives.wrap(generatedType));
+
+        return maybeDefaultConfigSupplier.map(configDtoSupplier ->
+                generatorConfigurator.mergeGeneratorConfigurations(
+                        configDtoSupplier,
+                        specificConfig,
+                        generatedType,
+                        field.getName()
+                )
+        );
+
     }
 
     @SuppressWarnings("unchecked")
