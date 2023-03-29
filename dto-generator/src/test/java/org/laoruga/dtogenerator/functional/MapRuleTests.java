@@ -1,12 +1,17 @@
 package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Epic;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Value;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.api.rules.Entry;
 import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
@@ -63,7 +68,16 @@ public class MapRuleTests {
         )
         Map<Year, Boolean> yearBooleanMap;
 
+        @MapRule(minSize = 1, maxSize = 1,
+                key = @Entry(customRule = @CustomRule(generatorClass = CustomGenerator.class, args = "MARIO")),
+                value = @Entry(customRule = @CustomRule(generatorClass = CustomGenerator.class, args = "LUIGI"))
+        )
+        Map<CustomDto, CustomDto> customDtoOfCustomDto;
+
     }
+
+    final CustomDto CUSTOM_DTO_MARIO = new CustomDto("MARIO");
+    final CustomDto CUSTOM_DTO_LUIGI = new CustomDto("LUIGI");
 
     @Test
     void annotationConfig() {
@@ -80,7 +94,10 @@ public class MapRuleTests {
                 () -> assertThat(dto.doubleLocalDateTimeTreeMap.values(), everyItem(notNullValue())),
 
                 () -> assertThat(dto.yearBooleanMap.size(), greaterThanOrEqualTo(1)),
-                () -> assertThat(dto.yearBooleanMap.values(), everyItem(notNullValue()))
+                () -> assertThat(dto.yearBooleanMap.values(), everyItem(notNullValue())),
+
+                () -> assertThat(dto.customDtoOfCustomDto.size(), equalTo(1)),
+                () -> assertThat(dto.customDtoOfCustomDto.get(CUSTOM_DTO_MARIO), equalTo(CUSTOM_DTO_LUIGI))
         );
     }
 
@@ -91,7 +108,7 @@ public class MapRuleTests {
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         TypeGeneratorsConfigSupplier staticConfig = builder.getStaticConfig().getTypeGeneratorsConfig();
-        
+
         staticConfig.getMapConfig(Map.class)
                 .setMapInstanceSupplier(LinkedHashMap::new)
                 .setMinSize(1)
@@ -119,7 +136,11 @@ public class MapRuleTests {
 
                 () -> assertThat(dto.yearBooleanMap.getClass(), equalTo(LinkedHashMap.class)),
                 () -> assertThat(dto.yearBooleanMap.size(), greaterThanOrEqualTo(1)),
-                () -> assertThat(dto.yearBooleanMap.values(), everyItem(notNullValue()))
+                () -> assertThat(dto.yearBooleanMap.values(), everyItem(notNullValue())),
+
+                () -> assertThat(dto.customDtoOfCustomDto.getClass(), equalTo(LinkedHashMap.class)),
+                () -> assertThat(dto.customDtoOfCustomDto.size(), equalTo(1)),
+                () -> assertThat(dto.customDtoOfCustomDto.get(CUSTOM_DTO_MARIO), equalTo(CUSTOM_DTO_LUIGI))
         );
 
         // Map.class config - the same
@@ -151,7 +172,12 @@ public class MapRuleTests {
 
                 () -> assertThat(dto2.yearBooleanMap.getClass(), equalTo(LinkedHashMap.class)),
                 () -> assertThat(dto2.yearBooleanMap.size(), greaterThanOrEqualTo(1)),
-                () -> assertThat(dto2.yearBooleanMap.values(), everyItem(notNullValue()))
+                () -> assertThat(dto2.yearBooleanMap.values(), everyItem(notNullValue())),
+
+
+                () -> assertThat(dto.customDtoOfCustomDto.getClass(), equalTo(LinkedHashMap.class)),
+                () -> assertThat(dto.customDtoOfCustomDto.size(), equalTo(1)),
+                () -> assertThat(dto.customDtoOfCustomDto.get(CUSTOM_DTO_MARIO), equalTo(CUSTOM_DTO_LUIGI))
         );
     }
 
@@ -189,7 +215,11 @@ public class MapRuleTests {
 
                 () -> assertThat(dto.yearBooleanMap.getClass(), equalTo(LinkedHashMap.class)),
                 () -> assertThat(dto.yearBooleanMap.size(), greaterThanOrEqualTo(1)),
-                () -> assertThat(dto.yearBooleanMap.values(), everyItem(notNullValue()))
+                () -> assertThat(dto.yearBooleanMap.values(), everyItem(notNullValue())),
+
+                () -> assertThat(dto.customDtoOfCustomDto.getClass(), equalTo(LinkedHashMap.class)),
+                () -> assertThat(dto.customDtoOfCustomDto.size(), equalTo(1)),
+                () -> assertThat(dto.customDtoOfCustomDto.get(CUSTOM_DTO_MARIO), equalTo(CUSTOM_DTO_LUIGI))
         );
 
         // Map.class config - the same
@@ -222,7 +252,11 @@ public class MapRuleTests {
 
                 () -> assertThat(dto2.yearBooleanMap.getClass(), equalTo(LinkedHashMap.class)),
                 () -> assertThat(dto2.yearBooleanMap.size(), greaterThanOrEqualTo(1)),
-                () -> assertThat(dto2.yearBooleanMap.values(), everyItem(notNullValue()))
+                () -> assertThat(dto2.yearBooleanMap.values(), everyItem(notNullValue())),
+
+                () -> assertThat(dto2.customDtoOfCustomDto.getClass(), equalTo(LinkedHashMap.class)),
+                () -> assertThat(dto2.customDtoOfCustomDto.size(), equalTo(1)),
+                () -> assertThat(dto2.customDtoOfCustomDto.get(CUSTOM_DTO_MARIO), equalTo(CUSTOM_DTO_LUIGI))
         );
     }
 
@@ -241,7 +275,9 @@ public class MapRuleTests {
                 .setTypeGeneratorConfig("doubleLocalDateTimeTreeMap",
                         MapConfig.builder().ruleRemark(MAX_VALUE).build())
                 .setTypeGeneratorConfig("yearBooleanMap",
-                        MapConfig.builder().mapInstanceSupplier(() -> objectObjectLinkedHashMap).build());
+                        MapConfig.builder().mapInstanceSupplier(() -> objectObjectLinkedHashMap).build())
+                .setTypeGeneratorConfig("customDtoOfCustomDto",
+                        MapConfig.builder().minSize(0).maxSize(0).build());
 
         Dto dto = builder.build().generateDto();
 
@@ -256,7 +292,9 @@ public class MapRuleTests {
                 () -> assertThat(dto.doubleLocalDateTimeTreeMap.values(), everyItem(notNullValue())),
 
                 () -> assertThat(dto.yearBooleanMap, sameInstance(objectObjectLinkedHashMap)),
-                () -> assertThat(dto.yearBooleanMap.values(), everyItem(notNullValue()))
+                () -> assertThat(dto.yearBooleanMap.values(), everyItem(notNullValue())),
+
+                () -> assertThat(dto.customDtoOfCustomDto.size(), equalTo(0))
         );
 
     }
@@ -303,7 +341,10 @@ public class MapRuleTests {
                         MapConfig.builder().minSize(1).maxSize(1).build())
 
                 .setTypeGeneratorConfig("yearBooleanMap",
-                        MapConfig.builder().minSize(20).ruleRemark(RANDOM_VALUE).valueGenerator(() -> TRUE).build());
+                        MapConfig.builder().minSize(20).ruleRemark(RANDOM_VALUE).valueGenerator(() -> TRUE).build())
+
+                .setGenerator("customDtoOfCustomDto",
+                        HashMap::new);
 
         Dto dto = builder.build().generateDto();
 
@@ -315,7 +356,8 @@ public class MapRuleTests {
                 () -> assertThat("Instance + field - 2", dto.doubleLocalDateTimeTreeMap.size(), equalTo(1)),
                 () -> assertThat("Instance + field - 2", dto.doubleLocalDateTimeTreeMap.keySet(), everyItem(equalTo(1D))),
                 () -> assertThat("Static + Instance + field - 2", dto.yearBooleanMap.size(), equalTo(20)),
-                () -> assertThat("Static + Instance + field - 2", dto.yearBooleanMap.values(), everyItem(equalTo(TRUE)))
+                () -> assertThat("Static + Instance + field - 2", dto.yearBooleanMap.values(), everyItem(equalTo(TRUE))),
+                () -> assertThat("Overridden generator", dto.customDtoOfCustomDto, notNullValue())
         );
     }
 
@@ -328,13 +370,15 @@ public class MapRuleTests {
         HashMap<ClientType, Long> enumLongHashMap = new HashMap<>();
         TreeMap<Double, LocalDateTime> doubleLocalDateTimeTreeMap = new TreeMap<>();
         Map<Year, Boolean> yearBooleanMap = new ConcurrentHashMap<>();
+        Map<CustomDto, CustomDto> customDtoOfCustomDto = new ConcurrentHashMap<>();
 
 
         builder
                 .setGenerator("stringIntegerMap", () -> stringIntegerMap)
                 .setGenerator("enumLongHashMap", () -> enumLongHashMap)
                 .setGenerator("doubleLocalDateTimeTreeMap", () -> doubleLocalDateTimeTreeMap)
-                .setGenerator("yearBooleanMap", () -> yearBooleanMap);
+                .setGenerator("yearBooleanMap", () -> yearBooleanMap)
+                .setGenerator("customDtoOfCustomDto", () -> customDtoOfCustomDto);
 
         Dto dto = builder.build().generateDto();
 
@@ -342,7 +386,8 @@ public class MapRuleTests {
                 () -> assertThat(dto.stringIntegerMap, sameInstance(stringIntegerMap)),
                 () -> assertThat(dto.enumLongHashMap, sameInstance(enumLongHashMap)),
                 () -> assertThat(dto.doubleLocalDateTimeTreeMap, sameInstance(doubleLocalDateTimeTreeMap)),
-                () -> assertThat(dto.yearBooleanMap, sameInstance(yearBooleanMap))
+                () -> assertThat(dto.yearBooleanMap, sameInstance(yearBooleanMap)),
+                () -> assertThat(dto.customDtoOfCustomDto, sameInstance(customDtoOfCustomDto))
         );
     }
 
@@ -365,7 +410,8 @@ public class MapRuleTests {
                 () -> assertThat(dto.stringIntegerMap, sameInstance(stringIntegerMap)),
                 () -> assertThat(dto.enumLongHashMap, sameInstance(enumLongHashMap)),
                 () -> assertThat(dto.doubleLocalDateTimeTreeMap, sameInstance(doubleLocalDateTimeTreeMap)),
-                () -> assertThat(dto.yearBooleanMap, sameInstance(stringIntegerMap))
+                () -> assertThat(dto.yearBooleanMap, sameInstance(stringIntegerMap)),
+                () -> assertThat(dto.customDtoOfCustomDto, sameInstance(stringIntegerMap))
         );
     }
 
@@ -378,6 +424,8 @@ public class MapRuleTests {
         TreeMap<Double, LocalDateTime> doubleLocalDateTimeTreeMap;
 
         Map<Year, Boolean> yearBooleanMap;
+
+        Map<CustomDto, CustomDto> customDtoOfCustomDto;
     }
 
     @Test
@@ -392,7 +440,8 @@ public class MapRuleTests {
                 () -> assertThat(dto.stringIntegerMap.values(), everyItem(notNullValue())),
                 () -> assertThat(dto.enumLongHashMap.values(), everyItem(notNullValue())),
                 () -> assertThat(dto.doubleLocalDateTimeTreeMap.values(), everyItem(notNullValue())),
-                () -> assertThat(dto.yearBooleanMap.values(), everyItem(notNullValue()))
+                () -> assertThat(dto.yearBooleanMap.values(), everyItem(notNullValue())),
+                () -> assertThat(dto.customDtoOfCustomDto, nullValue())
         );
     }
 
@@ -418,7 +467,7 @@ public class MapRuleTests {
                 .setRuleRemark(MAX_VALUE);
 
         staticConfig.getTypeGeneratorsConfig().getDateTimeConfig(Year.class)
-                        .addChronoConfig(ChronoUnitConfig.newBounds(-100, 100, YEARS));
+                .addChronoConfig(ChronoUnitConfig.newBounds(-100, 100, YEARS));
 
         // instance
         builder.getConfig().getTypeGeneratorsConfig().getMapConfig(Map.class)
@@ -456,9 +505,33 @@ public class MapRuleTests {
                 () -> assertThat("Instance + field - 2", dto.doubleLocalDateTimeTreeMap.size(), equalTo(1)),
                 () -> assertThat("Instance + field - 2", dto.doubleLocalDateTimeTreeMap.keySet(), everyItem(equalTo(1D))),
                 () -> assertThat("Static + Instance + field - 2", dto.yearBooleanMap.size(), equalTo(20)),
-                () -> assertThat("Static + Instance + field - 2", dto.yearBooleanMap.values(), everyItem(equalTo(TRUE)))
+                () -> assertThat("Static + Instance + field - 2", dto.yearBooleanMap.values(), everyItem(equalTo(TRUE))),
+                () -> assertThat("Unknown type", dto.customDtoOfCustomDto, nullValue())
         );
 
+    }
+
+
+    @Value
+    static class CustomDto {
+        String argument;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    static class CustomGenerator implements ICustomGeneratorArgs<CustomDto> {
+
+        String arg;
+
+        @Override
+        public CustomDto generate() {
+            return new CustomDto(arg);
+        }
+
+        @Override
+        public void setArgs(String[] args) {
+            arg = args[0];
+        }
     }
 
 }

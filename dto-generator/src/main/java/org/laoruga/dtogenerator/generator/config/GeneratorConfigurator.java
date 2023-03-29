@@ -47,7 +47,7 @@ public class GeneratorConfigurator {
 
     @SuppressWarnings("unchecked")
     static Consumer<ConfigDto> integerGeneratorSpecificConfig(Class<?> fieldType,
-                                                       String fieldName) {
+                                                              String fieldName) {
         return (config) -> {
             if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
                 reportPrimitiveCannotBeNull(fieldName);
@@ -96,9 +96,9 @@ public class GeneratorConfigurator {
     }
 
     public ConfigDto mergeGeneratorConfigurations(Supplier<ConfigDto> newConfigInstanceSupplier,
-                                                     Consumer<ConfigDto> specificConfiguration,
-                                                     Class<?> fieldType,
-                                                     String fieldName) {
+                                                  Consumer<ConfigDto> specificConfiguration,
+                                                  Class<?> fieldType,
+                                                  String fieldName) {
 
         ConfigDto config = newConfigInstanceSupplier.get();
 
@@ -162,7 +162,7 @@ public class GeneratorConfigurator {
     }
 
     public static Consumer<ConfigDto> getCollectionGeneratorSpecificConfig(Class<? extends Collection<?>> generatedType,
-                                                                    IGenerator<?> elementGenerator) {
+                                                                           IGenerator<?> elementGenerator) {
         return (config) -> {
             CollectionConfig collectionConfig = (CollectionConfig) config;
             if (collectionConfig.getCollectionInstanceSupplier() == null) {
@@ -177,7 +177,7 @@ public class GeneratorConfigurator {
     }
 
     public static Consumer<ConfigDto> getArrayGeneratorSpecificConfig(Class<?> elementType,
-                                                               IGenerator<?> elementGenerator) {
+                                                                      IGenerator<?> elementGenerator) {
         return (config) -> {
             ArrayConfig arrayConfig = (ArrayConfig) config;
             arrayConfig.setElementType(elementType);
@@ -187,10 +187,11 @@ public class GeneratorConfigurator {
         };
     }
 
+
     @SuppressWarnings("unchecked")
     public static Consumer<ConfigDto> getMapGeneratorSpecificConfig(Class<? extends Map<?, ?>> generatedType,
-                                                             IGenerator<?> keyGenerator,
-                                                             IGenerator<?> valueGenerator) {
+                                                                    IGenerator<?> keyGenerator,
+                                                                    IGenerator<?> valueGenerator) {
         return (config) -> {
             MapConfig mapConfig = (MapConfig) config;
             if (mapConfig.getMapInstanceSupplier() == null) {
