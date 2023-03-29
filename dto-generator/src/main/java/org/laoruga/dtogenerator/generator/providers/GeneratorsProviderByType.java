@@ -89,61 +89,25 @@ public class GeneratorsProviderByType {
 
         if (CollectionRule.GENERATED_TYPE.isAssignableFrom(generatedType)) {
 
-            Class<? extends Collection<?>> generatedTypeCollection = (Class<? extends Collection<?>>) generatedType;
-            Class<? extends Collection<?>> concreteCollectionClass =
-                    (Class<? extends Collection<?>>) ConcreteClasses.getConcreteCollectionClass(generatedTypeCollection);
+            Optional<Consumer<ConfigDto>> maybeCollectionSpecificConfig =
+                    getCollectionSpecificConfigWithElementGenerator(field, generatedType);
 
-            Class<?> elementType = ReflectionUtils.getSingleGenericType(field);
-            Optional<IGenerator<?>> maybeGenerator = getGenerator(field, elementType);
-
-            if (!maybeGenerator.isPresent()) {
-                if (configuration.getDtoGeneratorConfig().getGenerateAllKnownTypes()) {
-                    return Optional.empty();
-                }
-                throw new DtoGeneratorException(
-                        "Collection element generator not found, for type: " + "'" + elementType + "'");
+            if (!maybeCollectionSpecificConfig.isPresent()) {
+                return Optional.empty();
             }
 
-            IGenerator<?> elementGenerator = maybeGenerator.get();
-
-            specificConfig = getCollectionGeneratorSpecificConfig(
-                    concreteCollectionClass,
-                    elementGenerator
-            );
+            specificConfig = maybeCollectionSpecificConfig.get();
 
         } else if (MapRule.GENERATED_TYPE.isAssignableFrom(generatedType)) {
 
-            Class<? extends Map<?, ?>> generatedTypeMap = (Class<? extends Map<?, ?>>) generatedType;
-            Class<? extends Map<?, ?>> concreteMapClass =
-                    (Class<? extends Map<?, ?>>) ConcreteClasses.getConcreteMapClass(generatedTypeMap);
+            Optional<Consumer<ConfigDto>> maybeMapSpecificConfig =
+                    getMapSpecificConfigWithKeyValueGenerators(field, generatedType);
 
-            Class<?>[] keyValueTypes = ReflectionUtils.getPairedGenericType(field);
-
-            Optional<IGenerator<?>> maybeKeyGenerator = getGenerator(field, keyValueTypes[0]);
-            Optional<IGenerator<?>> maybeValueGenerator = getGenerator(field, keyValueTypes[1]);
-
-            if (!maybeKeyGenerator.isPresent() || !maybeValueGenerator.isPresent()) {
-                if (configuration.getDtoGeneratorConfig().getGenerateAllKnownTypes()) {
-                    return Optional.empty();
-                }
-                throw new DtoGeneratorException("Map key or value generator not found," +
-                        " for key type: '" + keyValueTypes[1] + "'" +
-                        " and value type: " + "'" + keyValueTypes[1] + "'");
+            if (!maybeMapSpecificConfig.isPresent()) {
+                return Optional.empty();
             }
 
-            IGenerator<?> keyGenerator = maybeKeyGenerator.orElseThrow(
-                    () -> new DtoGeneratorException(
-                            "Map key generator not found, for type: " + "'" + keyValueTypes[0] + "'"));
-
-            IGenerator<?> valueGenerator = getGenerator(field, keyValueTypes[1]).orElseThrow(
-                    () -> new DtoGeneratorException(
-                            "Map value generator not found, for type: " + "'" + keyValueTypes[1] + "'"));
-
-            specificConfig = getMapGeneratorSpecificConfig(
-                    concreteMapClass,
-                    keyGenerator,
-                    valueGenerator
-            );
+            specificConfig = maybeMapSpecificConfig.get();
 
         } else if (DateTimeRule.GENERATED_TYPE.isAssignableFrom(generatedType)) {
 
@@ -179,6 +143,63 @@ public class GeneratorsProviderByType {
                 specificConfig,
                 generatedType,
                 field.getName()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Optional<Consumer<ConfigDto>> getCollectionSpecificConfigWithElementGenerator(Field field, Class<?> generatedType) {
+        Class<? extends Collection<?>> generatedTypeCollection = (Class<? extends Collection<?>>) generatedType;
+        Class<? extends Collection<?>> concreteCollectionClass =
+                (Class<? extends Collection<?>>) ConcreteClasses.getConcreteCollectionClass(generatedTypeCollection);
+
+        Class<?> elementType = ReflectionUtils.getSingleGenericType(field);
+        Optional<IGenerator<?>> maybeGenerator = getGenerator(field, elementType);
+
+        if (!maybeGenerator.isPresent()) {
+            if (configuration.getDtoGeneratorConfig().getGenerateAllKnownTypes()) {
+                return Optional.empty();
+            }
+            throw new DtoGeneratorException(
+                    "Collection element generator not found, for type: " + "'" + elementType + "'");
+        }
+
+        IGenerator<?> elementGenerator = maybeGenerator.get();
+
+        return Optional.of(
+                getCollectionGeneratorSpecificConfig(concreteCollectionClass, elementGenerator)
+        );
+    }
+
+    @SuppressWarnings("unchecked")
+    private Optional<Consumer<ConfigDto>> getMapSpecificConfigWithKeyValueGenerators(Field field, Class<?> generatedType) {
+        Class<? extends Map<?, ?>> generatedTypeMap = (Class<? extends Map<?, ?>>) generatedType;
+        Class<? extends Map<?, ?>> concreteMapClass =
+                (Class<? extends Map<?, ?>>) ConcreteClasses.getConcreteMapClass(generatedTypeMap);
+
+        Class<?>[] keyValueTypes = ReflectionUtils.getPairedGenericType(field);
+
+        Optional<IGenerator<?>> maybeKeyGenerator = getGenerator(field, keyValueTypes[0]);
+        Optional<IGenerator<?>> maybeValueGenerator = getGenerator(field, keyValueTypes[1]);
+
+        if (!maybeKeyGenerator.isPresent() || !maybeValueGenerator.isPresent()) {
+            if (configuration.getDtoGeneratorConfig().getGenerateAllKnownTypes()) {
+                return Optional.empty();
+            }
+            throw new DtoGeneratorException("Map key or value generator not found," +
+                    " for key type: '" + keyValueTypes[1] + "'" +
+                    " and value type: " + "'" + keyValueTypes[1] + "'");
+        }
+
+        IGenerator<?> keyGenerator = maybeKeyGenerator.orElseThrow(
+                () -> new DtoGeneratorException(
+                        "Map key generator not found, for type: " + "'" + keyValueTypes[0] + "'"));
+
+        IGenerator<?> valueGenerator = getGenerator(field, keyValueTypes[1]).orElseThrow(
+                () -> new DtoGeneratorException(
+                        "Map value generator not found, for type: " + "'" + keyValueTypes[1] + "'"));
+
+        return Optional.of(
+                getMapGeneratorSpecificConfig(concreteMapClass, keyGenerator, valueGenerator)
+        );
     }
 
 }
