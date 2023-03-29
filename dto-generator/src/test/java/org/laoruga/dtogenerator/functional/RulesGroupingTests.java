@@ -16,14 +16,12 @@ import org.laoruga.dtogenerator.api.rules.datetime.ChronoUnitShift;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.constants.Group;
 import org.laoruga.dtogenerator.constants.RulesInstance;
+import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -83,6 +81,25 @@ class RulesGroupingTests {
         private List<Integer> intListDefault;
     }
 
+    @Getter
+    @NoArgsConstructor
+    static class DtoMap {
+
+        @MapRule(minSize = 10)
+        @MapRule(group = GROUP_1,
+                maxSize = 1, value = @Entry(numberRule = @NumberRule(minInt = 1, maxInt = 1)))
+        Map<String, Integer> stringIntegerMap;
+
+        @MapRule(minSize = 3, maxSize = 3)
+        @MapRule(group = GROUP_1, minSize = 2, maxSize = 2)
+        HashMap<ClientType, Long> enumLongHashMap;
+
+        @MapRule(group = GROUP_2, minSize = 4, maxSize = 4)
+        @MapRule(group = GROUP_3)
+        TreeMap<Double, LocalDateTime> doubleLocalDateTimeTreeMap;
+
+    }
+
     @DisplayName("Default group")
     @Test
     void defaultGroup() {
@@ -138,6 +155,38 @@ class RulesGroupingTests {
                     both(greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt()))
                             .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt())));
         }
+    }
+
+    @DisplayName("Map rules group")
+    @Test
+    void mapRulesDefault() {
+        DtoGeneratorBuilder<DtoMap> builder = DtoGenerator.builder(DtoMap.class);
+
+        DtoMap dto = builder.includeGroups(GROUP_1).build().generateDto();
+
+        assertAll(
+                () -> assertThat(dto.stringIntegerMap.size(), equalTo(1)),
+                () -> assertThat(dto.enumLongHashMap.size(), equalTo(2)),
+                () -> assertThat(dto.doubleLocalDateTimeTreeMap, nullValue())
+        );
+
+        DtoMap dto2 = builder.includeGroups(GROUP_2).build().generateDto();
+
+        assertAll(
+                () -> assertThat(dto2.stringIntegerMap.size(), equalTo(1)),
+                () -> assertThat(dto2.enumLongHashMap.size(), equalTo(2)),
+                () -> assertThat(dto2.doubleLocalDateTimeTreeMap.size(), equalTo(4))
+        );
+
+        DtoGeneratorBuilder<DtoMap> builder2 = DtoGenerator.builder(DtoMap.class);
+        DtoMap dto3 = builder2.build().generateDto();
+
+        assertAll(
+                () -> assertThat(dto3.stringIntegerMap.size(), equalTo(10)),
+                () -> assertThat(dto3.enumLongHashMap.size(), equalTo(3)),
+                () -> assertThat(dto3.doubleLocalDateTimeTreeMap, nullValue())
+        );
+
     }
 
     /*
