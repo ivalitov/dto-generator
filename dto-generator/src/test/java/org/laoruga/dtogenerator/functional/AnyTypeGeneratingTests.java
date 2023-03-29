@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName("Any Type Generating Tests")
 @Epic("ANY_TYPE_GENERATING")
 @Slf4j
-public class AnyTypeGeneratingTests {
+class AnyTypeGeneratingTests {
 
 
     static class Dto {

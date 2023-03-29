@@ -48,7 +48,7 @@ class IntegerGenerationTests {
         private int intPrimitive = intPrimitiveVal;
     }
 
-    public static void simpleIntegerGenerationAssertions(DtoInteger dto) {
+    static void simpleIntegerGenerationAssertions(DtoInteger dto) {
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getIntDefaultRules(), both(

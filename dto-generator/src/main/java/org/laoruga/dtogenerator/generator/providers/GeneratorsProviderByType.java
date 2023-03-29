@@ -74,18 +74,6 @@ public class GeneratorsProviderByType {
 
     }
 
-    private Optional<Function<ConfigDto, IGenerator<?>>> getGeneratorSupplier(Class<?> generatedType) {
-
-        Optional<Function<ConfigDto, IGenerator<?>>> maybeGeneratorSupplier =
-                userGeneratorSuppliers.getGeneratorSupplier(generatedType);
-
-        if (!maybeGeneratorSupplier.isPresent()) {
-            maybeGeneratorSupplier = defaultGeneratorSuppliers.getGeneratorSupplier(generatedType);
-        }
-
-        return maybeGeneratorSupplier;
-    }
-
     @SuppressWarnings("unchecked")
     private Optional<ConfigDto> getGeneratorConfig(Field field,
                                                    Class<?> generatedType) {
