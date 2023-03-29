@@ -51,12 +51,6 @@ public class GeneratorsProviderByAnnotationForMap {
             return maybeUsersMapGenBuilder.get().apply(null);
         }
 
-        Function<ConfigDto, IGenerator<?>> mapGenBuilder =
-                generatorsProvider.getDefaultGeneratorSupplier(
-                        mapRruleInfo.getRule(),
-                        fieldType
-                );
-
         // Map key generator builder
 
         IRuleInfo keyRule = mapRruleInfo.getKeyRule();
@@ -77,8 +71,11 @@ public class GeneratorsProviderByAnnotationForMap {
                         nestedDtoGeneratorSupplier) :
                 generatorsProvider.getGeneratorByType(field, valueRule.getRequiredType());
 
-        generatorsProvider.prepareCustomRemarks(keyGenerator, fieldName);
-        generatorsProvider.prepareCustomRemarks(valueGenerator, fieldName);
+        Function<ConfigDto, IGenerator<?>> mapGenBuilder =
+                generatorsProvider.getDefaultGeneratorSupplier(
+                        mapRruleInfo.getRule(),
+                        fieldType
+                );
 
         ConfigDto configDto = configuratorForMap.createGeneratorConfig(
                 mapRruleInfo,

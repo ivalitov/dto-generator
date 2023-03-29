@@ -41,6 +41,7 @@ public class GeneratorProvidersMediator {
         this.generatorProviderOverriddenForField = new GeneratorsProviderByField();
 
         this.generatorsProviderByType = new GeneratorsProviderByType(
+                configuration,
                 configuratorByAnnotation,
                 userGenBuildersMapping
         );

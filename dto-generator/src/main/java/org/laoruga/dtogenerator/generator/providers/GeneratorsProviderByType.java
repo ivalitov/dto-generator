@@ -7,6 +7,7 @@ import org.laoruga.dtogenerator.api.rules.ArrayRule;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
+import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsDefaultConfigSupplier;
 import org.laoruga.dtogenerator.constants.GeneratedTypes;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
@@ -34,12 +35,14 @@ import static org.laoruga.dtogenerator.generator.config.GeneratorConfigurator.*;
 @Slf4j
 public class GeneratorsProviderByType {
 
+    private final Configuration configuration;
     private final GeneratorConfigurator generatorConfigurator;
     private final GeneratorSuppliers userGeneratorSuppliers;
     private final GeneratorSuppliers defaultGeneratorSuppliers = GeneratorSuppliersDefault.getInstance();
 
-    public GeneratorsProviderByType(GeneratorConfigurator generatorConfigurator,
+    public GeneratorsProviderByType(Configuration configuration, GeneratorConfigurator generatorConfigurator,
                                     GeneratorSuppliers userGeneratorSuppliers) {
+        this.configuration = configuration;
         this.generatorConfigurator = generatorConfigurator;
         this.userGeneratorSuppliers = userGeneratorSuppliers;
     }
@@ -55,10 +58,15 @@ public class GeneratorsProviderByType {
             return Optional.empty();
         }
 
-        ConfigDto generatorConfig = getGeneratorConfig(field, generatedType);
+        Optional<ConfigDto> generatorConfig = getGeneratorConfig(field, generatedType);
+
+        if (!generatorConfig.isPresent()) {
+            log.debug("Generator config not found for field type: " + generatedType);
+            return Optional.empty();
+        }
 
         return Optional.of(
-                maybeGeneratorSupplier.get().apply(generatorConfig)
+                maybeGeneratorSupplier.get().apply(generatorConfig.get())
         );
     }
 
@@ -75,8 +83,8 @@ public class GeneratorsProviderByType {
     }
 
     @SuppressWarnings("unchecked")
-    private ConfigDto getGeneratorConfig(Field field,
-                                         Class<?> generatedType) {
+    private Optional<ConfigDto> getGeneratorConfig(Field field,
+                                                   Class<?> generatedType) {
         Consumer<ConfigDto> specificConfig;
 
         if (CollectionRule.GENERATED_TYPE.isAssignableFrom(generatedType)) {
@@ -86,10 +94,17 @@ public class GeneratorsProviderByType {
                     (Class<? extends Collection<?>>) ConcreteClasses.getConcreteCollectionClass(generatedTypeCollection);
 
             Class<?> elementType = ReflectionUtils.getSingleGenericType(field);
-            IGenerator<?> elementGenerator =
-                    getGenerator(field, elementType).orElseThrow(
-                            () -> new DtoGeneratorException(
-                                    "Collection element generator not found, for type: " + "'" + elementType + "'"));
+            Optional<IGenerator<?>> maybeGenerator = getGenerator(field, elementType);
+
+            if (!maybeGenerator.isPresent()) {
+                if (configuration.getDtoGeneratorConfig().getGenerateAllKnownTypes()) {
+                    return Optional.empty();
+                }
+                throw new DtoGeneratorException(
+                        "Collection element generator not found, for type: " + "'" + elementType + "'");
+            }
+
+            IGenerator<?> elementGenerator = maybeGenerator.get();
 
             specificConfig = getCollectionGeneratorSpecificConfig(
                     concreteCollectionClass,
@@ -104,7 +119,19 @@ public class GeneratorsProviderByType {
 
             Class<?>[] keyValueTypes = ReflectionUtils.getPairedGenericType(field);
 
-            IGenerator<?> keyGenerator = getGenerator(field, keyValueTypes[0]).orElseThrow(
+            Optional<IGenerator<?>> maybeKeyGenerator = getGenerator(field, keyValueTypes[0]);
+            Optional<IGenerator<?>> maybeValueGenerator = getGenerator(field, keyValueTypes[1]);
+
+            if (!maybeKeyGenerator.isPresent() || !maybeValueGenerator.isPresent()) {
+                if (configuration.getDtoGeneratorConfig().getGenerateAllKnownTypes()) {
+                    return Optional.empty();
+                }
+                throw new DtoGeneratorException("Map key or value generator not found," +
+                        " for key type: '" + keyValueTypes[1] + "'" +
+                        " and value type: " + "'" + keyValueTypes[1] + "'");
+            }
+
+            IGenerator<?> keyGenerator = maybeKeyGenerator.orElseThrow(
                     () -> new DtoGeneratorException(
                             "Map key generator not found, for type: " + "'" + keyValueTypes[0] + "'"));
 
@@ -145,13 +172,13 @@ public class GeneratorsProviderByType {
 
         }
 
-        return generatorConfigurator.mergeGeneratorConfigurations(
+        return Optional.of(generatorConfigurator.mergeGeneratorConfigurations(
                 TypeGeneratorsDefaultConfigSupplier.getDefaultConfigSupplier(
                         Primitives.wrap(generatedType)
                 ),
                 specificConfig,
                 generatedType,
-                field.getName());
+                field.getName()));
     }
 
 }

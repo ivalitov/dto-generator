@@ -56,6 +56,11 @@ public class GeneratorsProviderByAnnotationForList {
         Optional<Function<ConfigDto, IGenerator<?>>> maybeUserCollectionGenerator =
                 generatorsProvider.getUserGeneratorSupplier(fieldType);
 
+        if (maybeUserCollectionGenerator.isPresent()) {
+            // user generators are not configurable yet
+            return maybeUserCollectionGenerator.get().apply(null);
+        }
+
         ConfigDto listGeneratorConfig = generatorConfiguratorForList.createGeneratorConfig(
                 collectionRuleInfo,
                 elementGenerator,
@@ -63,19 +68,8 @@ public class GeneratorsProviderByAnnotationForList {
                 fieldName
         );
 
-        if (maybeUserCollectionGenerator.isPresent()) {
-            return maybeUserCollectionGenerator.get().apply(listGeneratorConfig);
-        } else {
-            Function<ConfigDto, IGenerator<?>> defaultGenBuilder = generatorsProvider.getDefaultGeneratorSupplier(
-                    collectionRuleInfo.getRule(),
-                    fieldType);
-
-            IGenerator<?> generator = defaultGenBuilder.apply(listGeneratorConfig);
-
-            generatorsProvider.prepareCustomRemarks(elementGenerator, fieldName);
-            generatorsProvider.prepareCustomRemarks(generator, fieldName);
-
-            return generator;
-        }
+        return generatorsProvider
+                .getDefaultGeneratorSupplier(collectionRuleInfo.getRule(), fieldType)
+                .apply(listGeneratorConfig);
     }
 }

@@ -54,11 +54,10 @@ public class GeneratorsProviderByAnnotation {
 
         Optional<Function<ConfigDto, IGenerator<?>>> maybeUserGeneratorSupplier = getUserGeneratorSupplier(requiredType);
 
-        boolean isUserGenerator = maybeUserGeneratorSupplier.isPresent();
-
-        Function<ConfigDto, IGenerator<?>> generatorSupplier = isUserGenerator ?
-                maybeUserGeneratorSupplier.get() :
-                getDefaultGeneratorSupplier(ruleInfo.getRule(), requiredType);
+        if (maybeUserGeneratorSupplier.isPresent()) {
+            // user generators are not configurable yet
+            return maybeUserGeneratorSupplier.get().apply(null);
+        }
 
         ConfigDto config = configuratorByAnnotation.createGeneratorConfig(
                 ruleInfo.getRule(),
@@ -67,7 +66,11 @@ public class GeneratorsProviderByAnnotation {
                 dtoInstanceSupplier,
                 nestedDtoGeneratorSupplier);
 
-        return generatorSupplier.apply(config);
+        IGenerator<?> generator = getDefaultGeneratorSupplier(ruleInfo.getRule(), requiredType).apply(config);
+
+        prepareCustomRemarks(generator, fieldName);
+
+        return generator;
     }
 
     Function<ConfigDto, IGenerator<?>> getDefaultGeneratorSupplier(Annotation rules, Class<?> generatedType) {

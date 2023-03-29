@@ -1,19 +1,25 @@
 package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Epic;
+import lombok.Value;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
+import org.laoruga.dtogenerator.api.rules.CustomRule;
+import org.laoruga.dtogenerator.api.rules.Entry;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.generator.config.dto.CollectionConfig;
 
 import java.time.Year;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -52,6 +58,9 @@ public class CollectionRuleTests {
         @CollectionRule
         ArrayDeque<Planets> arrayDequeOfEnum;
 
+        @CollectionRule(minSize = 3, maxSize = 3, element = @Entry(customRule =
+        @CustomRule(generatorClass = CustomGenerator.class, args = "SUPER_HERO")))
+        List<CustomDto> listOfCustomDto;
     }
 
     @Test
@@ -65,7 +74,11 @@ public class CollectionRuleTests {
                 () -> assertThat(dto.queueOfYear, not(empty())),
                 () -> assertThat(dto.linkedListOfDouble, not(empty())),
                 () -> assertThat(dto.linkedHashSetOfAtomicInteger, not(empty())),
-                () -> assertThat(dto.arrayDequeOfEnum, not(empty()))
+                () -> assertThat(dto.arrayDequeOfEnum, not(empty())),
+                () -> assertThat(dto.listOfCustomDto, hasSize(3)),
+                () -> assertThat(
+                        dto.listOfCustomDto.stream().map(i -> i.argument).collect(Collectors.toList()),
+                        everyItem(equalTo("SUPER_HERO")))
         );
 
     }
@@ -96,7 +109,8 @@ public class CollectionRuleTests {
                 // ambiguous config - List & Queue
                 () -> assertThat(dto.linkedListOfDouble, notNullValue()),
                 () -> assertThat(dto.linkedHashSetOfAtomicInteger, hasSize(1)),
-                () -> assertThat(dto.arrayDequeOfEnum, hasSize(2))
+                () -> assertThat(dto.arrayDequeOfEnum, hasSize(2)),
+                () -> assertThat(dto.listOfCustomDto, empty())
         );
     }
 
@@ -117,7 +131,8 @@ public class CollectionRuleTests {
                 () -> assertThat(dto.queueOfYear, empty()),
                 () -> assertThat(dto.linkedListOfDouble, empty()),
                 () -> assertThat(dto.linkedHashSetOfAtomicInteger, empty()),
-                () -> assertThat(dto.arrayDequeOfEnum, empty())
+                () -> assertThat(dto.arrayDequeOfEnum, empty()),
+                () -> assertThat(dto.listOfCustomDto, empty())
         );
     }
 
@@ -146,7 +161,8 @@ public class CollectionRuleTests {
                 () -> assertThat(dto.queueOfYear, hasSize(1)),
                 () -> assertThat(dto.linkedListOfDouble, hasSize(1)),
                 () -> assertThat(dto.linkedHashSetOfAtomicInteger, hasSize(2)),
-                () -> assertThat(dto.arrayDequeOfEnum, hasSize(3))
+                () -> assertThat(dto.arrayDequeOfEnum, hasSize(3)),
+                () -> assertThat(dto.listOfCustomDto, hasSize(1))
         );
     }
 
@@ -174,7 +190,8 @@ public class CollectionRuleTests {
                 () -> assertThat(dto.queueOfYear, hasSize(1)),
                 () -> assertThat(dto.linkedListOfDouble, hasSize(1)),
                 () -> assertThat(dto.linkedHashSetOfAtomicInteger, hasSize(2)),
-                () -> assertThat(dto.arrayDequeOfEnum, hasSize(3))
+                () -> assertThat(dto.arrayDequeOfEnum, hasSize(3)),
+                () -> assertThat(dto.listOfCustomDto, hasSize(1))
         );
     }
 
@@ -194,7 +211,9 @@ public class CollectionRuleTests {
                 .setTypeGeneratorConfig("linkedHashSetOfAtomicInteger",
                         CollectionConfig.builder().minSize(5).maxSize(5).build())
                 .setTypeGeneratorConfig("arrayDequeOfEnum",
-                        CollectionConfig.builder().minSize(6).maxSize(6).build());
+                        CollectionConfig.builder().minSize(6).maxSize(6).build())
+                .setTypeGeneratorConfig("listOfCustomDto",
+                        CollectionConfig.builder().minSize(7).maxSize(7).build());
 
         Dto dto = builder.build().generateDto();
 
@@ -204,7 +223,8 @@ public class CollectionRuleTests {
                 () -> assertThat(dto.queueOfYear, hasSize(3)),
                 () -> assertThat(dto.linkedListOfDouble, hasSize(4)),
                 () -> assertThat(dto.linkedHashSetOfAtomicInteger, hasSize(5)),
-                () -> assertThat(dto.arrayDequeOfEnum, hasSize(6))
+                () -> assertThat(dto.arrayDequeOfEnum, hasSize(6)),
+                () -> assertThat(dto.listOfCustomDto, hasSize(7))
         );
 
     }
@@ -258,7 +278,8 @@ public class CollectionRuleTests {
                 () -> assertThat("Instance + field", dto.queueOfYear, hasSize(2)),
                 () -> assertThat("Instance + field", dto.linkedListOfDouble, hasSize(4)),
                 () -> assertThat("Static + instance", dto.linkedHashSetOfAtomicInteger, hasSize(4)),
-                () -> assertThat("Static + field", dto.arrayDequeOfEnum, hasSize(3))
+                () -> assertThat("Static + field", dto.arrayDequeOfEnum, hasSize(3)),
+                () -> assertThat("Static + field", dto.listOfCustomDto, hasSize(5))
         );
     }
 
@@ -273,6 +294,7 @@ public class CollectionRuleTests {
         final LinkedList<Double> linkedListOfDouble = new LinkedList<>();
         final LinkedHashSet<AtomicInteger> linkedHashSetOfAtomicInteger = new LinkedHashSet<>();
         final ArrayDeque<Planets> arrayDequeOfEnum = new ArrayDeque<>();
+        final List<CustomDto> listOfCustomDto = new CopyOnWriteArrayList<>();
 
         builder
                 .setGenerator("listOfString", () -> listOfString)
@@ -280,7 +302,8 @@ public class CollectionRuleTests {
                 .setGenerator("queueOfYear", () -> queueOfYear)
                 .setGenerator("linkedListOfDouble", () -> linkedListOfDouble)
                 .setGenerator("linkedHashSetOfAtomicInteger", () -> linkedHashSetOfAtomicInteger)
-                .setGenerator("arrayDequeOfEnum", () -> arrayDequeOfEnum);
+                .setGenerator("arrayDequeOfEnum", () -> arrayDequeOfEnum)
+                .setGenerator("listOfCustomDto", () -> listOfCustomDto);
 
         Dto dto = builder.build().generateDto();
 
@@ -290,7 +313,8 @@ public class CollectionRuleTests {
                 () -> assertThat(dto.queueOfYear, sameInstance(queueOfYear)),
                 () -> assertThat(dto.linkedListOfDouble, sameInstance(linkedListOfDouble)),
                 () -> assertThat(dto.linkedHashSetOfAtomicInteger, sameInstance(linkedHashSetOfAtomicInteger)),
-                () -> assertThat(dto.arrayDequeOfEnum, sameInstance(arrayDequeOfEnum))
+                () -> assertThat(dto.arrayDequeOfEnum, sameInstance(arrayDequeOfEnum)),
+                () -> assertThat(dto.listOfCustomDto, sameInstance(listOfCustomDto))
         );
     }
 
@@ -322,7 +346,8 @@ public class CollectionRuleTests {
                 () -> assertThat(dto.queueOfYear, sameInstance(queueOfYear)),
                 () -> assertThat(dto.linkedListOfDouble, sameInstance(linkedListOfDouble)),
                 () -> assertThat(dto.linkedHashSetOfAtomicInteger, sameInstance(linkedHashSetOfAtomicInteger)),
-                () -> assertThat(dto.arrayDequeOfEnum, sameInstance(arrayDequeOfEnum))
+                () -> assertThat(dto.arrayDequeOfEnum, sameInstance(arrayDequeOfEnum)),
+                () -> assertThat(dto.listOfCustomDto, sameInstance(listOfString))
         );
     }
 
@@ -366,6 +391,7 @@ public class CollectionRuleTests {
         LinkedList<Double> linkedListOfDouble;
         LinkedHashSet<AtomicInteger> linkedHashSetOfAtomicInteger;
         ArrayDeque<Planets> arrayDequeOfEnum;
+        List<CustomDto> listOfCustomDto;
 
     }
 
@@ -383,7 +409,8 @@ public class CollectionRuleTests {
                 () -> assertThat(dto.queueOfYear, not(empty())),
                 () -> assertThat(dto.linkedListOfDouble, not(empty())),
                 () -> assertThat(dto.linkedHashSetOfAtomicInteger, not(empty())),
-                () -> assertThat(dto.arrayDequeOfEnum, not(empty()))
+                () -> assertThat(dto.arrayDequeOfEnum, not(empty())),
+                () -> assertThat(dto.listOfCustomDto, nullValue())
         );
 
     }
@@ -428,7 +455,8 @@ public class CollectionRuleTests {
                 .setTypeGeneratorConfig("linkedHashSetOfAtomicInteger",
                         CollectionConfig.builder().minSize(0).build())
                 .setTypeGeneratorConfig("arrayDequeOfEnum",
-                        CollectionConfig.builder().ruleRemark(MIN_VALUE).build());
+                        CollectionConfig.builder().ruleRemark(MIN_VALUE).build())
+                .setGenerator("listOfCustomDto", ArrayList::new);
 
         Dto_2 dto = builder.build().generateDto();
 
@@ -438,9 +466,31 @@ public class CollectionRuleTests {
                 () -> assertThat("Instance + field", dto.queueOfYear, hasSize(2)),
                 () -> assertThat("Instance + field", dto.linkedListOfDouble, hasSize(4)),
                 () -> assertThat("Static + instance", dto.linkedHashSetOfAtomicInteger, hasSize(4)),
-                () -> assertThat("Static + field", dto.arrayDequeOfEnum, hasSize(3))
+                () -> assertThat("Static + field", dto.arrayDequeOfEnum, hasSize(3)),
+                () -> assertThat("Generator", dto.listOfCustomDto, hasSize(0))
         );
 
+    }
+
+
+    @Value
+    static class CustomDto {
+        String argument;
+    }
+
+    static class CustomGenerator implements ICustomGeneratorArgs<CustomDto> {
+
+        String arg;
+
+        @Override
+        public CustomDto generate() {
+            return new CustomDto(arg);
+        }
+
+        @Override
+        public void setArgs(String[] args) {
+            arg = args[0];
+        }
     }
 
 }
