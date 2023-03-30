@@ -3,6 +3,7 @@ package org.laoruga.dtogenerator.generator.providers;
 import com.google.common.primitives.Primitives;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 import org.laoruga.dtogenerator.api.rules.ArrayRule;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.MapRule;
@@ -11,8 +12,10 @@ import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsDefaultConfigSupplier;
 import org.laoruga.dtogenerator.constants.GeneratedTypes;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.generator.config.CustomGeneratorConfigurator;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfigurator;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
+import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSupplierInfo;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliers;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliersDefault;
 import org.laoruga.dtogenerator.util.ConcreteClasses;
@@ -24,7 +27,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.laoruga.dtogenerator.generator.config.GeneratorConfigurator.*;
@@ -39,39 +41,59 @@ public class GeneratorsProviderByType {
     private final Configuration configuration;
     private final GeneratorConfigurator generatorConfigurator;
     private final GeneratorSuppliers userGeneratorSuppliers;
+    private final Supplier<?> dtoInstanceSupplier;
     private final GeneratorSuppliers defaultGeneratorSuppliers = GeneratorSuppliersDefault.getInstance();
 
-    public GeneratorsProviderByType(Configuration configuration, GeneratorConfigurator generatorConfigurator,
-                                    GeneratorSuppliers userGeneratorSuppliers) {
+    public GeneratorsProviderByType(Configuration configuration,
+                                    GeneratorConfigurator generatorConfigurator,
+                                    GeneratorSuppliers userGeneratorSuppliers,
+                                    Supplier<?> dtoInstanceSupplier) {
         this.configuration = configuration;
         this.generatorConfigurator = generatorConfigurator;
         this.userGeneratorSuppliers = userGeneratorSuppliers;
+        this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
     public Optional<IGenerator<?>> getGenerator(Field field, Class<?> generatedType) {
 
         generatedType = Primitives.wrap(generatedType);
 
-        Optional<Function<ConfigDto, IGenerator<?>>> maybeUserGeneratorSupplier =
-                userGeneratorSuppliers.getGeneratorSupplier(generatedType);
+        Optional<GeneratorSupplierInfo> maybeUserGeneratorSupplierInfo =
+                userGeneratorSuppliers.getGeneratorSupplierInfo(generatedType);
 
-        Optional<Function<ConfigDto, IGenerator<?>>> maybeDefaultGeneratorSupplier =
-                defaultGeneratorSuppliers.getGeneratorSupplier(generatedType);
+        Optional<GeneratorSupplierInfo> maybeDefaultGeneratorSupplierInfo =
+                defaultGeneratorSuppliers.getGeneratorSupplierInfo(generatedType);
 
-        if (!maybeUserGeneratorSupplier.isPresent() && !maybeDefaultGeneratorSupplier.isPresent()) {
+        if (!maybeUserGeneratorSupplierInfo.isPresent() && !maybeDefaultGeneratorSupplierInfo.isPresent()) {
             log.debug("Generator supplier not found for field type: " + generatedType);
             return Optional.empty();
         }
 
-        if (maybeUserGeneratorSupplier.isPresent()) {
+        if (maybeUserGeneratorSupplierInfo.isPresent()) {
             log.debug("Generator config not found for field type: '" + generatedType + "'. Try to use generator as is.");
-            return Optional.of(maybeUserGeneratorSupplier.get().apply(null));
+
+            GeneratorSupplierInfo generatorSupplierInfo = maybeUserGeneratorSupplierInfo.get();
+
+            IGenerator<?> userGenerator = generatorSupplierInfo.getGeneratorSupplier().apply(null);
+
+            if (userGenerator instanceof ICustomGenerator) {
+                CustomGeneratorConfigurator.builder()
+                        .args(generatorSupplierInfo.getCustomGeneratorArgs())
+                        .dtoInstanceSupplier(dtoInstanceSupplier)
+                        .build()
+                        .configure((ICustomGenerator<?>) userGenerator);
+            }
+
+            return Optional.of(generatorSupplierInfo.getGeneratorSupplier().apply(null));
         }
 
         Optional<ConfigDto> generatorConfig = getGeneratorConfig(field, generatedType);
 
-        return generatorConfig.map(configDto -> maybeDefaultGeneratorSupplier.get().apply(configDto));
-
+        return generatorConfig.map(configDto ->
+                maybeDefaultGeneratorSupplierInfo.get()
+                        .getGeneratorSupplier()
+                        .apply(configDto)
+        );
     }
 
     @SuppressWarnings("unchecked")
@@ -139,7 +161,6 @@ public class GeneratorsProviderByType {
                         field.getName()
                 )
         );
-
     }
 
     @SuppressWarnings("unchecked")

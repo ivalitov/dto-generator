@@ -8,14 +8,12 @@ import org.laoruga.dtogenerator.api.rules.EnumRule;
 import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.constants.GeneratedTypes;
-import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * An instance contain all the possible to use generator suppliers.
@@ -38,13 +36,13 @@ public final class GeneratorSuppliers {
     }
 
     /**
-     * Get generator supplier by generated type
+     * Get generator supplier info by generated type
      *
      * @param generatedType - type supposed to be generated
      * @return - supplier if exists
      */
-    public Optional<Function<ConfigDto, IGenerator<?>>> getGeneratorSupplier(Class<?> generatedType) {
 
+    public Optional<GeneratorSupplierInfo> getGeneratorSupplierInfo(Class<?> generatedType) {
         generatedType = generatedType.isPrimitive() ? Primitives.wrap(generatedType) : generatedType;
 
         GeneratorSupplierInfo foundInfo = generatedTypeGeneratorInfoMap.get(generatedType);
@@ -79,12 +77,19 @@ public final class GeneratorSuppliers {
 
         }
 
-        return Optional.of(foundInfo.getGeneratorSupplier());
+        return Optional.of(foundInfo);
     }
 
-    public Optional<Function<ConfigDto, IGenerator<?>>> getGeneratorSupplier(Annotation rulesAnnotation) {
-        return Optional.ofNullable(rulesClassGeneratorInfoMap.get(rulesAnnotation.annotationType()))
-                .map(GeneratorSupplierInfo::getGeneratorSupplier);
+    /**
+     * Get generator supplier info by rules annotation,
+     * used when generated type is unknown
+     *
+     * @param rulesAnnotation - rules annotation
+     * @return - supplier if exists
+     */
+
+    public Optional<GeneratorSupplierInfo> getGeneratorSupplierInfo(Annotation rulesAnnotation) {
+        return Optional.ofNullable(rulesClassGeneratorInfoMap.get(rulesAnnotation.annotationType()));
     }
 
     public void addSuppliersInfo(GeneratorSupplierInfo info) {
@@ -114,9 +119,9 @@ public final class GeneratorSuppliers {
         }
     }
 
-    public void addSuppliersInfo(Class<?> generatedType, IGenerator<?> generator) {
+    public void addSuppliersInfo(Class<?> generatedType, IGenerator<?> generator, String[] args) {
         GeneratorSupplierInfo info = GeneratorSupplierInfo.createInstance(
-                null, generatedType, (configDto) -> generator
+                null, generatedType, (configDto) -> generator, args
         );
         addSuppliersInfo(info);
     }

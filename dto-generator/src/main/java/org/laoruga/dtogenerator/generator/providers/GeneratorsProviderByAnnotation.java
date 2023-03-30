@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.generator.providers;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
@@ -13,6 +13,7 @@ import org.laoruga.dtogenerator.generator.CustomGenerator;
 import org.laoruga.dtogenerator.generator.MapGenerator;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorByAnnotation;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
+import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSupplierInfo;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliers;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliersDefault;
 import org.laoruga.dtogenerator.rule.IRuleInfo;
@@ -47,7 +48,7 @@ public class GeneratorsProviderByAnnotation {
 
     IGenerator<?> getGenerator(IRuleInfo ruleInfo,
                                Supplier<?> dtoInstanceSupplier,
-                               Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
+                               Supplier<DtoGeneratorBuilder<?>> nestedDtoGeneratorSupplier) {
 
         String fieldName = ruleInfo.getField().getName();
         Class<?> requiredType = ruleInfo.getRequiredType();
@@ -78,10 +79,15 @@ public class GeneratorsProviderByAnnotation {
         switch (RuleType.getType(rules)) {
             case CUSTOM:
             case NESTED:
-                maybeBuilder = defaultGeneratorSuppliers.getGeneratorSupplier(rules);
+                maybeBuilder = defaultGeneratorSuppliers
+                        .getGeneratorSupplierInfo(rules)
+                        .map(GeneratorSupplierInfo::getGeneratorSupplier);
                 break;
+
             default:
-                maybeBuilder = defaultGeneratorSuppliers.getGeneratorSupplier(generatedType);
+                maybeBuilder = defaultGeneratorSuppliers
+                        .getGeneratorSupplierInfo(generatedType)
+                        .map(GeneratorSupplierInfo::getGeneratorSupplier);
         }
 
         return maybeBuilder.orElseThrow(() ->
@@ -91,7 +97,9 @@ public class GeneratorsProviderByAnnotation {
     }
 
     Optional<Function<ConfigDto, IGenerator<?>>> getUserGeneratorSupplier(Class<?> generatedType) {
-        return userGeneratorSuppliers.getGeneratorSupplier(generatedType);
+        return userGeneratorSuppliers
+                .getGeneratorSupplierInfo(generatedType)
+                .map(GeneratorSupplierInfo::getGeneratorSupplier);
     }
 
 

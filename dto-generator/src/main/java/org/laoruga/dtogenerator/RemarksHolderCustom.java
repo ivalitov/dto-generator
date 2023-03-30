@@ -7,6 +7,7 @@ import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemarkArgs;
 import org.laoruga.dtogenerator.util.dummy.DummyCustomGenerator;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Il'dar Valitov
@@ -32,7 +33,17 @@ public class RemarksHolderCustom {
      * @param toCopy - source
      */
     RemarksHolderCustom(RemarksHolderCustom toCopy) {
-        this(toCopy.customRuleRemarksMapByGenerator);
+        this(
+                toCopy.customRuleRemarksMapByGenerator.entrySet()
+                        .stream()
+                        .collect(
+                                Collectors.toMap(
+                                        Map.Entry::getKey,
+                                        entry -> new HashSet<>(entry.getValue())
+                                )
+                        )
+        );
+
     }
 
     private RemarksHolderCustom(

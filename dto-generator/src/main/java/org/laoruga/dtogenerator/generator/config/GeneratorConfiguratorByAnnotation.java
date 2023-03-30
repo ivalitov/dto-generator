@@ -2,8 +2,9 @@ package org.laoruga.dtogenerator.generator.config;
 
 import com.google.common.primitives.Primitives;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.RemarksHolder;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
@@ -14,6 +15,8 @@ import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 import java.lang.annotation.Annotation;
 import java.time.temporal.Temporal;
 import java.util.function.Supplier;
+
+import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 
 /**
  * @author Il'dar Valitov
@@ -30,7 +33,7 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
                                            Class<?> fieldType,
                                            String fieldName,
                                            Supplier<?> dtoInstanceSupplier,
-                                           Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
+                                           Supplier<DtoGeneratorBuilder<?>> nestedDtoGeneratorSupplier) {
 
         Class<? extends Annotation> rulesClass = rules.annotationType();
 
@@ -115,15 +118,27 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
 
             } else if (CustomRule.class == rulesClass) {
 
-                return CustomConfig.builder()
-                        .customGeneratorRules(rules)
+                CustomRule customRule = (CustomRule) rules;
+
+                ICustomGenerator<?> generatorInstance = createInstance(customRule.generatorClass());
+
+                CustomGeneratorConfigurator.builder()
+                        .args(customRule.args())
                         .dtoInstanceSupplier(dtoInstanceSupplier)
+                        .build()
+                        .configure(generatorInstance);
+
+                return CustomConfig.builder()
+                        .customGenerator(generatorInstance)
                         .build();
 
             } else if (NestedDtoRule.class == rulesClass) {
 
+                NestedDtoRule nestedRule = (NestedDtoRule) rules;
+
                 return NestedConfig.builder()
-                        .dtoGenerator(nestedDtoGeneratorSupplier.get())
+                        .ruleRemark(nestedRule.ruleRemark())
+                        .dtoGeneratorBuilder(nestedDtoGeneratorSupplier.get())
                         .build();
 
             } else {

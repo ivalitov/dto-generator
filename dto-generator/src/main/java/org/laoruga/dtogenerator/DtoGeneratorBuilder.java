@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.config.Configuration;
@@ -102,12 +103,14 @@ public class DtoGeneratorBuilder<T> {
      *
      * @param generatedType - type of generated class
      * @param typeGenerator - generator of provided generated type
+     * @param args          - params for custom generators with args {@link ICustomGeneratorArgs}
      * @return - this
      */
 
     public <U> DtoGeneratorBuilder<T> setGenerator(@NonNull Class<U> generatedType,
-                                                   @NonNull IGenerator<? super U> typeGenerator) {
-        fieldGeneratorsProvider.setGenerator(generatedType, typeGenerator);
+                                                   @NonNull IGenerator<? super U> typeGenerator,
+                                                   String... args) {
+        fieldGeneratorsProvider.setGenerator(generatedType, typeGenerator, args);
         return this;
     }
 
@@ -120,14 +123,16 @@ public class DtoGeneratorBuilder<T> {
      *
      * @param fieldName     - name of the field or path to the field separated by dots
      * @param typeGenerator - field value generator
+     * @param args          - params for custom generators with args {@link ICustomGeneratorArgs}
      * @return - this
      */
     public DtoGeneratorBuilder<T> setGenerator(@NonNull String fieldName,
-                                               @NonNull IGenerator<?> typeGenerator) {
+                                               @NonNull IGenerator<?> typeGenerator,
+                                               String... args) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
                 .getFieldGeneratorsProvider()
-                .setGeneratorBuilderForField(fieldNameAndPath.getLeft(), typeGenerator);
+                .setGeneratorBuilderForField(fieldNameAndPath.getLeft(), typeGenerator, args);
         return this;
     }
 
@@ -222,5 +227,8 @@ public class DtoGeneratorBuilder<T> {
         return this;
     }
 
-
+    public DtoGeneratorBuilder<T> generateKnownTypes() {
+        configuration.getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
+        return this;
+    }
 }

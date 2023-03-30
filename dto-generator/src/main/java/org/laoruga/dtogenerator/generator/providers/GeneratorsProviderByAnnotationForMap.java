@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator.providers;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForMap;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
@@ -35,7 +35,7 @@ public class GeneratorsProviderByAnnotationForMap {
 
     IGenerator<?> getGenerator(RuleInfoMap mapRruleInfo,
                                Supplier<?> dtoInstanceSupplier,
-                               Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
+                               Supplier<DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier) {
 
         final Field field = mapRruleInfo.getField();
         final Class<?> fieldType = field.getType();
@@ -58,7 +58,7 @@ public class GeneratorsProviderByAnnotationForMap {
                 generatorsProvider.getGenerator(
                         keyRule,
                         dtoInstanceSupplier,
-                        nestedDtoGeneratorSupplier) :
+                        nestedDtoGeneratorBuilderSupplier) :
                 generatorsProvider.getGeneratorByType(field, keyRule.getRequiredType());
 
         // Map value generator builder
@@ -68,7 +68,7 @@ public class GeneratorsProviderByAnnotationForMap {
                 generatorsProvider.getGenerator(
                         valueRule,
                         dtoInstanceSupplier,
-                        nestedDtoGeneratorSupplier) :
+                        nestedDtoGeneratorBuilderSupplier) :
                 generatorsProvider.getGeneratorByType(field, valueRule.getRequiredType());
 
         Function<ConfigDto, IGenerator<?>> mapGenBuilder =

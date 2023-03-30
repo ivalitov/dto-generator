@@ -21,7 +21,7 @@ public class ExecutorOfCollectionGenerator extends ExecutorOfDtoDependentGenerat
     public boolean execute(Field field, IGenerator<?> generator) {
         if (generator instanceof ICollectionGenerator) {
 
-            IGenerator<?> innerGenerator = ((ICollectionGenerator) generator).getElementGenerator();
+            IGenerator<?> innerGenerator = ((ICollectionGenerator<?>) generator).getElementGenerator();
 
             if (isItDtoDependentGenerator(innerGenerator)) {
                 return super.execute(field, generator);

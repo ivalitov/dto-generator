@@ -16,27 +16,29 @@ import java.util.stream.Collectors;
  * Created on 01.02.2023
  */
 @Getter
-class GeneratorSupplierInfo {
+public class GeneratorSupplierInfo {
 
     private Class<? extends Annotation> rules;
     private Class<?> generatedType;
     private Function<ConfigDto, IGenerator<?>> generatorSupplier;
+    private String[] customGeneratorArgs;
 
     static GeneratorSupplierInfo createInstance(Class<? extends Annotation> rules,
-                                                       Class<?> generatedType,
-                                                       Function<ConfigDto, IGenerator<?>> builderSupplier) {
+                                                Class<?> generatedType,
+                                                Function<ConfigDto, IGenerator<?>> builderSupplier,
+                                                String... customGeneratorArgs) {
         GeneratorSupplierInfo genBuilderInfo = new GeneratorSupplierInfo();
         genBuilderInfo.rules = rules;
         genBuilderInfo.generatedType = generatedType;
         genBuilderInfo.generatorSupplier = builderSupplier;
+        genBuilderInfo.customGeneratorArgs = customGeneratorArgs;
         return genBuilderInfo;
     }
 
     static List<GeneratorSupplierInfo> createInstances(Class<? extends Annotation> rules,
-                                                              Function<ConfigDto, IGenerator<?>> builderSupplier) {
+                                                       Function<ConfigDto, IGenerator<?>> builderSupplier) {
         return Arrays.stream(GeneratedTypes.get(rules))
                 .map(type -> createInstance(rules, type, builderSupplier))
                 .collect(Collectors.toList());
     }
-
 }

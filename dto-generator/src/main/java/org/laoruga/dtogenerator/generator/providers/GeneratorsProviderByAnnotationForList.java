@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator.providers;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForList;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
@@ -34,7 +34,7 @@ public class GeneratorsProviderByAnnotationForList {
 
     IGenerator<?> getGenerator(RuleInfoCollection collectionRuleInfo,
                                Supplier<?> dtoInstanceSupplier,
-                               Supplier<DtoGenerator<?>> nestedDtoGeneratorSupplier) {
+                               Supplier<DtoGeneratorBuilder<?>> nestedDtoGeneratorSupplier) {
 
         final Field field = collectionRuleInfo.getField();
         final Class<?> fieldType = field.getType();
