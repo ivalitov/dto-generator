@@ -104,7 +104,7 @@ public class GeneratorsProviderByAnnotation {
             if (usersGeneratorInstance instanceof ICollectionGenerator) {
 
                 prepareCustomRemarks(
-                        ((ICollectionGenerator<?>) usersGeneratorInstance).getElementGenerator(),
+                        ((ICollectionGenerator) usersGeneratorInstance).getElementGenerator(),
                         fieldName
                 );
 

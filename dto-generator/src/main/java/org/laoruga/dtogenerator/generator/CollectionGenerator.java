@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  */
 
 @AllArgsConstructor
-public class CollectionGenerator implements ICollectionGenerator<Object> {
+public class CollectionGenerator implements ICollectionGenerator {
 
     private final int minSize;
     private final int maxSize;

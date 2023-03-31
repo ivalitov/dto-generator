@@ -1,6 +1,7 @@
 package org.laoruga.dtogenerator.generator;
 
 import lombok.AllArgsConstructor;
+import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
@@ -16,7 +17,7 @@ import java.util.Objects;
  */
 
 @AllArgsConstructor
-public class ArrayGenerator implements IGenerator<Object> {
+public class ArrayGenerator implements ICollectionGenerator {
 
     private int minSize;
     private int maxSize;
@@ -66,5 +67,10 @@ public class ArrayGenerator implements IGenerator<Object> {
         }
 
         return newArray;
+    }
+
+    @Override
+    public IGenerator<?> getElementGenerator() {
+        return elementGenerator;
     }
 }

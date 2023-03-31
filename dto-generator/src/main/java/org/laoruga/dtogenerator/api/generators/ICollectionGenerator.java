@@ -7,7 +7,7 @@ import java.util.Collection;
  * Created on 28.04.2022
  */
 
-public interface ICollectionGenerator<T> extends IGenerator<Collection<T>> {
+public interface ICollectionGenerator extends IGenerator<Object> {
 
-    IGenerator<T> getElementGenerator();
+    IGenerator<?> getElementGenerator();
 }
