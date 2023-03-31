@@ -76,13 +76,16 @@ public class DtoGeneratorBuilder<T> {
      * @param pathFromRootDto path to nested dto
      */
 
-    protected DtoGeneratorBuilder(DtoGeneratorBuilder<?> copyFrom, String[] pathFromRootDto) {
+    protected DtoGeneratorBuilder(DtoGeneratorBuilder<?> copyFrom,
+                                  String[] pathFromRootDto,
+                                  Supplier<?> dtoInstanceSupplier) {
         this.remarksHolder = new RemarksHolder(copyFrom.getRemarksHolder());
         this.configuration = copyFrom.getConfiguration();
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
                 copyFrom.getFieldGeneratorsProvider(),
                 remarksHolder,
-                pathFromRootDto);
+                pathFromRootDto,
+                dtoInstanceSupplier);
         this.dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
     }
 

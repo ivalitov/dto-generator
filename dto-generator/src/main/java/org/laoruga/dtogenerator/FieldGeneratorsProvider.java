@@ -28,7 +28,7 @@ import java.util.function.Supplier;
 public class FieldGeneratorsProvider {
 
     private final ConfigurationHolder configuration;
-    private Supplier<?> dtoInstanceSupplier;
+    private final Supplier<?> dtoInstanceSupplier;
     private final String[] pathFromDtoRoot;
     private final Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree;
     private final GeneratorSuppliers userGenBuildersMapping;
@@ -60,7 +60,8 @@ public class FieldGeneratorsProvider {
      */
     FieldGeneratorsProvider(FieldGeneratorsProvider copyFrom,
                             RemarksHolder remarksHolder,
-                            String[] pathFromDtoRoot) {
+                            String[] pathFromDtoRoot,
+                            Supplier<?> dtoInstanceSupplier) {
         this.configuration = copyFrom.getConfiguration();
         this.userGenBuildersMapping = copyFrom.getUserGenBuildersMapping();
         this.pathFromDtoRoot = pathFromDtoRoot;
@@ -70,23 +71,8 @@ public class FieldGeneratorsProvider {
                 copyFrom.getConfiguration(),
                 copyFrom.getUserGenBuildersMapping(),
                 remarksHolder,
-                // TODO to pass correct instance supplier
                 dtoInstanceSupplier);
-    }
-
-    /**
-     * Setter for delayed field initialisation.
-     * When nested DTO params are setting {@link DtoGeneratorBuilder},
-     * we don't know type of nested field yet.
-     *
-     * @param dtoInstanceSupplier dto instance to build
-     */
-    void setDtoInstanceSupplier(DtoInstanceSupplier dtoInstanceSupplier) {
-        try {
-            this.dtoInstanceSupplier = dtoInstanceSupplier;
-        } catch (ClassCastException e) {
-            throw new DtoGeneratorException("Unexpected error", e);
-        }
+        this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
     /**
@@ -117,7 +103,7 @@ public class FieldGeneratorsProvider {
                             maybeRulesInfo.get(),
                             getDtoInstanceSupplier(),
                             // TODO
-                            createDtoGeneratorBuilderSupplier(field)
+                            nestedDtoGeneratorBuilderSupplier(field)
                     )
             );
         }
@@ -142,21 +128,14 @@ public class FieldGeneratorsProvider {
         rulesInfoExtractor.getFieldsGroupFilter().includeGroups(groups);
     }
 
-    private Supplier<DtoGeneratorBuilder<?>> createDtoGeneratorBuilderSupplier(Field field) {
+    private Supplier<DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier(Field field) {
         return () -> {
-
             String[] pathToNestedDtoField =
                     Arrays.copyOf(pathFromDtoRoot, pathFromDtoRoot.length + 1);
 
             pathToNestedDtoField[pathFromDtoRoot.length] = field.getName();
 
-            DtoGeneratorBuilder<?> nestedDtoGeneratorBuilder =
-                    dtoGeneratorBuildersTree.get().getBuilderLazy(pathToNestedDtoField);
-
-            nestedDtoGeneratorBuilder.getFieldGeneratorsProvider().setDtoInstanceSupplier(
-                    new DtoInstanceSupplier(field.getType())
-            );
-            return nestedDtoGeneratorBuilder;
+            return dtoGeneratorBuildersTree.get().getBuilderLazy(pathToNestedDtoField);
         };
     }
 
