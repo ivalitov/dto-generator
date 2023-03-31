@@ -29,16 +29,24 @@ public class DecimalGenerator implements IGenerator<Number> {
 
     @Override
     public Number generate() {
-        if (ruleRemark == RuleRemark.MIN_VALUE) {
-            return minValue;
+        switch ((RuleRemark) ruleRemark) {
+
+            case MIN_VALUE:
+                return minValue;
+
+            case MAX_VALUE:
+                return maxValue;
+
+            case NULL_VALUE:
+                return null;
+
+            case RANDOM_VALUE:
+            case NOT_DEFINED:
+                return RandomUtils.nextNumberDecimal(minValue, maxValue, precision);
+
+            default:
+                throw new IllegalStateException("Unexpected value " + ruleRemark);
         }
-        if (ruleRemark == RuleRemark.MAX_VALUE) {
-            return maxValue;
-        }
-        if (ruleRemark == RuleRemark.RANDOM_VALUE) {
-            return RandomUtils.nextNumberDecimal(minValue, maxValue, precision);
-        }
-        throw new IllegalStateException("Unexpected value " + ruleRemark);
     }
 
 }

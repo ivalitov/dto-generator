@@ -46,17 +46,23 @@ public class MapGenerator implements IGenerator<Map<Object, Object>> {
         int size;
 
         switch ((RuleRemark) ruleRemark) {
+
             case MIN_VALUE:
                 size = minSize;
                 break;
+
             case MAX_VALUE:
                 size = maxSize;
                 break;
+
             case RANDOM_VALUE:
+            case NOT_DEFINED:
                 size = RandomUtils.nextInt(minSize, maxSize);
                 break;
+
             case NULL_VALUE:
                 return null;
+
             default:
                 throw new IllegalStateException("Unexpected value: " + ruleRemark);
         }

@@ -38,16 +38,7 @@ public class ChronoFieldConfig implements ChronoConfig {
         if (value != 0) {
             return temporal.with(field, value);
         }
-        long shiftValue;
-        if (ruleRemark == RuleRemark.MIN_VALUE) {
-            shiftValue = leftBound;
-        } else if (ruleRemark == RuleRemark.MAX_VALUE) {
-            shiftValue = rightBound;
-        } else if (ruleRemark == RuleRemark.RANDOM_VALUE) {
-            shiftValue = RandomUtils.nextLong(leftBound, rightBound);
-        } else {
-            throw new IllegalStateException("Unexpected value " + ruleRemark);
-        }
+        long shiftValue = selectShift((RuleRemark) ruleRemark, leftBound, rightBound);
         return temporal.with(field, shiftValue);
     }
 }

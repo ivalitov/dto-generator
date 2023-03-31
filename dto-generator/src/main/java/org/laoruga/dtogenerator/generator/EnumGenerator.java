@@ -45,25 +45,35 @@ public class EnumGenerator implements IGenerator<Enum> {
                 .sorted(Comparator.comparing(String::length))
                 .toArray(String[]::new);
         String enumInstanceName;
-        if (ruleRemark == RuleRemark.MIN_VALUE) {
-            enumInstanceName = sortedEnumNames[0];
-        } else if (ruleRemark == RuleRemark.MAX_VALUE) {
-            enumInstanceName = sortedEnumNames[sortedEnumNames.length - 1];
-        } else if (ruleRemark == RuleRemark.RANDOM_VALUE) {
-            int count = sortedEnumNames.length;
-            enumInstanceName = sortedEnumNames[RandomUtils.RANDOM.nextInt(count)];
-        } else if (ruleRemark == RuleRemark.NULL_VALUE) {
-            return null;
-        } else {
-            throw new IllegalStateException("Unexpected value " + ruleRemark);
+        switch ((RuleRemark) ruleRemark) {
+
+            case MIN_VALUE:
+                enumInstanceName = sortedEnumNames[0];
+                break;
+
+            case MAX_VALUE:
+                enumInstanceName = sortedEnumNames[sortedEnumNames.length - 1];
+                break;
+
+            case NULL_VALUE:
+                return null;
+
+            case RANDOM_VALUE:
+            case NOT_DEFINED:
+                int count = sortedEnumNames.length;
+                enumInstanceName = sortedEnumNames[RandomUtils.RANDOM.nextInt(count)];
+                break;
+
+            default:
+                throw new IllegalStateException("Unexpected value " + ruleRemark);
         }
         for (Enum<?> enumConstant : enumClass.getEnumConstants()) {
             if (enumConstant.name().equals(enumInstanceName)) {
                 return enumConstant;
             }
         }
-        throw new DtoGeneratorException("Enum instance with name: '" + enumInstanceName +
-                "' not found in Class: '" + enumClass + "'");
+        throw new DtoGeneratorException("Enum instance with name: " +
+                "'" + enumInstanceName + "' not found in Class: '" + enumClass + "'");
     }
 
 }

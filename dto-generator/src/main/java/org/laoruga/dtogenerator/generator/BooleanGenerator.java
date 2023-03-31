@@ -25,19 +25,24 @@ public class BooleanGenerator implements IGenerator<Boolean> {
 
     @Override
     public Boolean generate() {
-        if (ruleRemark == RuleRemark.MIN_VALUE) {
-            return false;
+        switch ((RuleRemark) ruleRemark) {
+
+            case MIN_VALUE:
+                return false;
+
+            case MAX_VALUE:
+                return true;
+
+            case RANDOM_VALUE:
+            case NOT_DEFINED:
+                return RandomUtils.RANDOM.nextDouble() < trueProbability;
+
+            case NULL_VALUE:
+                return null;
+
+            default:
+                throw new IllegalStateException("Unexpected value " + ruleRemark);
         }
-        if (ruleRemark == RuleRemark.MAX_VALUE) {
-            return true;
-        }
-        if (ruleRemark == RuleRemark.RANDOM_VALUE) {
-            return RandomUtils.RANDOM.nextDouble() < trueProbability;
-        }
-        if (ruleRemark == RuleRemark.NULL_VALUE) {
-            return null;
-        }
-        throw new IllegalStateException("Unexpected value " + ruleRemark);
     }
 
 }

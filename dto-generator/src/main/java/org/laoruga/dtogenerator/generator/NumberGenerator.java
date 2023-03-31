@@ -35,16 +35,26 @@ public class NumberGenerator implements IGenerator<Number> {
 
         Number result;
 
-        if (ruleRemark == RuleRemark.MIN_VALUE) {
-            result = minValue;
-        } else if (ruleRemark == RuleRemark.MAX_VALUE) {
-            result = maxValue;
-        } else if (ruleRemark == RuleRemark.RANDOM_VALUE) {
-            result = RandomUtils.nextNumber(minValue, maxValue);
-        } else if (ruleRemark == RuleRemark.NULL_VALUE) {
-            return null;
-        } else {
-            throw new IllegalStateException("Unexpected value " + ruleRemark);
+        switch ((RuleRemark) ruleRemark) {
+
+            case MIN_VALUE:
+                result = minValue;
+                break;
+
+            case MAX_VALUE:
+                result = maxValue;
+                break;
+
+            case NULL_VALUE:
+                return null;
+
+            case RANDOM_VALUE:
+            case NOT_DEFINED:
+                result = RandomUtils.nextNumber(minValue, maxValue);
+                break;
+
+            default:
+                throw new IllegalStateException("Unexpected value " + ruleRemark);
         }
 
         if (isAtomic) {

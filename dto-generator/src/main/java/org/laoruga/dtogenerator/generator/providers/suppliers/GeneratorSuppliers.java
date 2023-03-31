@@ -121,7 +121,7 @@ public final class GeneratorSuppliers {
 
     public void addSuppliersInfo(Class<?> generatedType, IGenerator<?> generator, String[] args) {
         GeneratorSupplierInfo info = GeneratorSupplierInfo.createInstance(
-                null, generatedType, (configDto) -> generator, args
+                null, generatedType, configDto -> generator, args
         );
         addSuppliersInfo(info);
     }

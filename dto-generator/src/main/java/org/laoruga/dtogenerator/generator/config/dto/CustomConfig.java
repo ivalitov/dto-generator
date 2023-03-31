@@ -19,12 +19,15 @@ public class CustomConfig implements ConfigDto {
 
     private ICustomGenerator<?> customGenerator;
 
-    private final static RuntimeException NOT_IMPLEMENTED =
+    private static final RuntimeException NOT_IMPLEMENTED =
             new NotImplementedException(
                     "Remarks for custom rules are set via " + DtoGeneratorBuilder.class + " methods." +
                             " CustomConfig isn't supposed to be merged."
             );
 
+    /**
+     * @deprecated - configs are not applicable for Custom generators for today
+     */
     @Override
     @Deprecated
     public void merge(ConfigDto from) {
@@ -32,12 +35,18 @@ public class CustomConfig implements ConfigDto {
     }
 
 
+    /**
+     * @deprecated - rule remarks for custom config provided another way for today
+     */
     @Override
     @Deprecated
     public ConfigDto setRuleRemark(IRuleRemark ruleRemark) {
         throw NOT_IMPLEMENTED;
     }
 
+    /**
+     * @deprecated - rule remarks for custom config provided another way for today
+     */
     @Override
     @Deprecated
     public IRuleRemark getRuleRemark() {

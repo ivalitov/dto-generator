@@ -108,7 +108,7 @@ public class GeneratorsProviderByAnnotation {
                         fieldName
                 );
 
-            } else if (usersGeneratorInstance instanceof MapGenerator) {
+            }  else if (usersGeneratorInstance instanceof MapGenerator) {
 
                 prepareCustomRemarks(
                         ((MapGenerator) usersGeneratorInstance).getKeyGenerator(),

@@ -126,7 +126,7 @@ public class FieldGeneratorsProvider {
     }
 
     private Function<String, DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier() {
-        return (fieldName) -> {
+        return fieldName -> {
             String[] pathToNestedDtoField =
                     Arrays.copyOf(pathFromDtoRoot, pathFromDtoRoot.length + 1);
 

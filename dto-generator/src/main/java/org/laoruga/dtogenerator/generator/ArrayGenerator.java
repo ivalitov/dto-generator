@@ -33,21 +33,26 @@ public class ArrayGenerator implements IGenerator<Object> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Object generate() {
         int size;
         switch ((RuleRemark) ruleRemark) {
+
             case MIN_VALUE:
                 size = minSize;
                 break;
+
             case MAX_VALUE:
                 size = maxSize;
                 break;
+
             case RANDOM_VALUE:
+            case NOT_DEFINED:
                 size = RandomUtils.nextInt(minSize, maxSize);
                 break;
+
             case NULL_VALUE:
                 return null;
+
             default:
                 throw new IllegalStateException("Unexpected value: " + ruleRemark);
         }
@@ -61,9 +66,5 @@ public class ArrayGenerator implements IGenerator<Object> {
         }
 
         return newArray;
-    }
-
-    public IGenerator<?> getElementGenerator() {
-        return elementGenerator;
     }
 }

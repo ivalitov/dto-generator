@@ -39,23 +39,37 @@ public class StringGenerator implements IGenerator<String> {
     @Override
     public String generate() {
         int length;
-        if (ruleRemark == RuleRemark.MIN_VALUE) {
-            length = minLength;
-        } else if (ruleRemark == RuleRemark.MAX_VALUE) {
-            length = maxLength;
-        } else if (ruleRemark == RuleRemark.RANDOM_VALUE) {
-            length = RandomUtils.nextInt(minLength, maxLength);
-        } else if (ruleRemark == RuleRemark.NULL_VALUE) {
-            return null;
-        } else {
-            throw new IllegalStateException("Unexpected value " + ruleRemark);
+
+        switch ((RuleRemark) ruleRemark) {
+
+            case MIN_VALUE:
+                length = minLength;
+                break;
+
+            case MAX_VALUE:
+                length = maxLength;
+                break;
+
+            case NULL_VALUE:
+                return null;
+
+            case RANDOM_VALUE:
+            case NOT_DEFINED:
+                length = RandomUtils.nextInt(minLength, maxLength);
+                break;
+
+            default:
+                throw new IllegalStateException("Unexpected value " + ruleRemark);
         }
+
         if (words.length != 0) {
             return getRandomWord();
         }
+
         if (regexp != null && !regexp.isEmpty()) {
             return generateStringByRegexp();
         }
+
         return generateString(length);
 
     }

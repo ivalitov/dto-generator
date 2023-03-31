@@ -28,6 +28,7 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
     private final IGenerator<Object> elementGenerator;
     private final IRuleRemark ruleRemark;
 
+    @SuppressWarnings("unchecked")
     public CollectionGenerator(CollectionConfig collectionConfig) {
         minSize = collectionConfig.getMinSize();
         maxSize = collectionConfig.getMaxSize();
@@ -36,27 +37,29 @@ public class CollectionGenerator implements ICollectionGenerator<Object> {
         ruleRemark = Objects.requireNonNull(collectionConfig.getRuleRemark(), "Unexpected error, rule remark haven't set.");
     }
 
-//    public static CollectionGeneratorBuilder builder() {
-//        return new CollectionGeneratorBuilder();
-//    }
-
     @Override
     public Collection<Object> generate() {
         Collection<Object> collectionInstance = collectionInstanceSupplier.get();
         int maxAttempts = DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().getMaxCollectionGenerationCycles();
         int size;
         switch ((RuleRemark) ruleRemark) {
+
             case MIN_VALUE:
                 size = minSize;
                 break;
+
             case MAX_VALUE:
                 size = maxSize;
                 break;
+
             case RANDOM_VALUE:
+            case NOT_DEFINED:
                 size = RandomUtils.nextInt(minSize, maxSize);
                 break;
+
             case NULL_VALUE:
                 return null;
+
             default:
                 throw new IllegalStateException("Unexpected value: " + ruleRemark);
         }

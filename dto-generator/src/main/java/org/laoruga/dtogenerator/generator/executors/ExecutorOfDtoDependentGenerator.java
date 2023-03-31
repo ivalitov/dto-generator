@@ -57,9 +57,6 @@ public class ExecutorOfDtoDependentGenerator extends ExecutorOfGenerator {
             return ((CustomGenerator) generator).getUsersGeneratorInstance()
                     instanceof ICustomGeneratorDtoDependent;
         }
-        if (generator instanceof ICustomGeneratorDtoDependent) {
-            return true;
-        }
-        return false;
+        return generator instanceof ICustomGeneratorDtoDependent;
     }
 }
