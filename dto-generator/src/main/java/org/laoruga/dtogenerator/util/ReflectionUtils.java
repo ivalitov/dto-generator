@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.rules.Entry;
 import org.laoruga.dtogenerator.constants.GeneratedTypes;
-import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorValidationException;

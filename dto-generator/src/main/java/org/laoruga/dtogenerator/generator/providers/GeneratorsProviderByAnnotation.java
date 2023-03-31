@@ -2,7 +2,6 @@ package org.laoruga.dtogenerator.generator.providers;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
@@ -22,7 +21,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * @author Il'dar Valitov
@@ -46,9 +44,7 @@ public class GeneratorsProviderByAnnotation {
         this.defaultGeneratorSuppliers = GeneratorSuppliersDefault.getInstance();
     }
 
-    IGenerator<?> getGenerator(IRuleInfo ruleInfo,
-                               Supplier<?> dtoInstanceSupplier,
-                               Supplier<DtoGeneratorBuilder<?>> nestedDtoGeneratorSupplier) {
+    IGenerator<?> getGenerator(IRuleInfo ruleInfo) {
 
         String fieldName = ruleInfo.getField().getName();
         Class<?> requiredType = ruleInfo.getRequiredType();
@@ -63,9 +59,8 @@ public class GeneratorsProviderByAnnotation {
         ConfigDto config = configuratorByAnnotation.createGeneratorConfig(
                 ruleInfo.getRule(),
                 requiredType,
-                fieldName,
-                dtoInstanceSupplier,
-                nestedDtoGeneratorSupplier);
+                fieldName
+        );
 
         IGenerator<?> generator = getDefaultGeneratorSupplier(ruleInfo.getRule(), requiredType).apply(config);
 

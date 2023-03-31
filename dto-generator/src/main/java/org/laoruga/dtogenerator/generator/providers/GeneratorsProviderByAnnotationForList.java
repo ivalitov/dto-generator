@@ -3,7 +3,6 @@ package org.laoruga.dtogenerator.generator.providers;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForList;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
@@ -12,7 +11,6 @@ import org.laoruga.dtogenerator.rule.RuleInfoCollection;
 import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 
 /**
@@ -32,9 +30,7 @@ public class GeneratorsProviderByAnnotationForList {
         this.generatorConfiguratorForList = generatorConfiguratorForList;
     }
 
-    IGenerator<?> getGenerator(RuleInfoCollection collectionRuleInfo,
-                               Supplier<?> dtoInstanceSupplier,
-                               Supplier<DtoGeneratorBuilder<?>> nestedDtoGeneratorSupplier) {
+    IGenerator<?> getGenerator(RuleInfoCollection collectionRuleInfo) {
 
         final Field field = collectionRuleInfo.getField();
         final Class<?> fieldType = field.getType();
@@ -45,10 +41,7 @@ public class GeneratorsProviderByAnnotationForList {
         // Collection element generator builder
 
         IGenerator<?> elementGenerator = collectionRuleInfo.isElementRulesExist() ?
-                generatorsProvider.getGenerator(
-                        collectionRuleInfo.getElementRuleInfo(),
-                        dtoInstanceSupplier,
-                        nestedDtoGeneratorSupplier) :
+                generatorsProvider.getGenerator(collectionRuleInfo.getElementRuleInfo()) :
                 generatorsProvider.getGeneratorByType(field, collectionElementType);
 
         // Collection generator builder

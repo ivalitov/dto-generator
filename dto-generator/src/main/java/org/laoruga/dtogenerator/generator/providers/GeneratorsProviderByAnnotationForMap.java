@@ -3,7 +3,6 @@ package org.laoruga.dtogenerator.generator.providers;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForMap;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
@@ -13,7 +12,6 @@ import org.laoruga.dtogenerator.rule.RuleInfoMap;
 import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 
 /**
@@ -33,9 +31,7 @@ public class GeneratorsProviderByAnnotationForMap {
         this.configuratorForMap = configuratorForMap;
     }
 
-    IGenerator<?> getGenerator(RuleInfoMap mapRruleInfo,
-                               Supplier<?> dtoInstanceSupplier,
-                               Supplier<DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier) {
+    IGenerator<?> getGenerator(RuleInfoMap mapRruleInfo) {
 
         final Field field = mapRruleInfo.getField();
         final Class<?> fieldType = field.getType();
@@ -55,20 +51,14 @@ public class GeneratorsProviderByAnnotationForMap {
 
         IRuleInfo keyRule = mapRruleInfo.getKeyRule();
         IGenerator<?> keyGenerator = mapRruleInfo.isKeyRulesExist() ?
-                generatorsProvider.getGenerator(
-                        keyRule,
-                        dtoInstanceSupplier,
-                        nestedDtoGeneratorBuilderSupplier) :
+                generatorsProvider.getGenerator(keyRule) :
                 generatorsProvider.getGeneratorByType(field, keyRule.getRequiredType());
 
         // Map value generator builder
 
         IRuleInfo valueRule = mapRruleInfo.getValueRule();
         IGenerator<?> valueGenerator = mapRruleInfo.isValueRulesExist() ?
-                generatorsProvider.getGenerator(
-                        valueRule,
-                        dtoInstanceSupplier,
-                        nestedDtoGeneratorBuilderSupplier) :
+                generatorsProvider.getGenerator(valueRule) :
                 generatorsProvider.getGeneratorByType(field, valueRule.getRequiredType());
 
         Function<ConfigDto, IGenerator<?>> mapGenBuilder =

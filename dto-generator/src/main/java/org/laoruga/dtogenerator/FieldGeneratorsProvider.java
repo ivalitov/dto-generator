@@ -16,6 +16,7 @@ import org.laoruga.dtogenerator.rule.RulesInfoExtractor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -50,8 +51,8 @@ public class FieldGeneratorsProvider {
                 configuration,
                 userGenBuildersMapping,
                 remarksProvider,
-                dtoInstanceSupplier
-        );
+                dtoInstanceSupplier,
+                nestedDtoGeneratorBuilderSupplier());
         this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
@@ -71,7 +72,8 @@ public class FieldGeneratorsProvider {
                 copyFrom.getConfiguration(),
                 copyFrom.getUserGenBuildersMapping(),
                 remarksHolder,
-                dtoInstanceSupplier);
+                dtoInstanceSupplier,
+                nestedDtoGeneratorBuilderSupplier());
         this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
@@ -99,12 +101,7 @@ public class FieldGeneratorsProvider {
         // field annotated with rules
         if (maybeRulesInfo.isPresent()) {
             return Optional.of(
-                    generatorProvidersMediator.getGeneratorByAnnotation(
-                            maybeRulesInfo.get(),
-                            getDtoInstanceSupplier(),
-                            // TODO
-                            nestedDtoGeneratorBuilderSupplier(field)
-                    )
+                    generatorProvidersMediator.getGeneratorByAnnotation(maybeRulesInfo.get())
             );
         }
 
@@ -128,12 +125,12 @@ public class FieldGeneratorsProvider {
         rulesInfoExtractor.getFieldsGroupFilter().includeGroups(groups);
     }
 
-    private Supplier<DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier(Field field) {
-        return () -> {
+    private Function<String, DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier() {
+        return (fieldName) -> {
             String[] pathToNestedDtoField =
                     Arrays.copyOf(pathFromDtoRoot, pathFromDtoRoot.length + 1);
 
-            pathToNestedDtoField[pathFromDtoRoot.length] = field.getName();
+            pathToNestedDtoField[pathFromDtoRoot.length] = fieldName;
 
             return dtoGeneratorBuildersTree.get().getBuilderLazy(pathToNestedDtoField);
         };

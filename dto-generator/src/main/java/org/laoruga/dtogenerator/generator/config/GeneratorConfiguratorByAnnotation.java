@@ -14,6 +14,7 @@ import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 
 import java.lang.annotation.Annotation;
 import java.time.temporal.Temporal;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
@@ -25,15 +26,21 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 @Slf4j
 public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
 
-    public GeneratorConfiguratorByAnnotation(ConfigurationHolder configuration, RemarksHolder remarksHolder) {
+    private final Function<String, DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier;
+    private final Supplier<?> dtoInstanceSupplier;
+
+    public GeneratorConfiguratorByAnnotation(ConfigurationHolder configuration,
+                                             RemarksHolder remarksHolder,
+                                             Supplier<?> dtoInstanceSupplier,
+                                             Function<String, DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier) {
         super(configuration, remarksHolder);
+        this.dtoInstanceSupplier = dtoInstanceSupplier;
+        this.nestedDtoGeneratorBuilderSupplier = nestedDtoGeneratorBuilderSupplier;
     }
 
     public ConfigDto createGeneratorConfig(Annotation rules,
                                            Class<?> fieldType,
-                                           String fieldName,
-                                           Supplier<?> dtoInstanceSupplier,
-                                           Supplier<DtoGeneratorBuilder<?>> nestedDtoGeneratorSupplier) {
+                                           String fieldName) {
 
         Class<? extends Annotation> rulesClass = rules.annotationType();
 
@@ -138,7 +145,7 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
 
                 return NestedConfig.builder()
                         .ruleRemark(nestedRule.ruleRemark())
-                        .dtoGeneratorBuilder(nestedDtoGeneratorSupplier.get())
+                        .dtoGeneratorBuilder(nestedDtoGeneratorBuilderSupplier.apply(fieldName))
                         .build();
 
             } else {
