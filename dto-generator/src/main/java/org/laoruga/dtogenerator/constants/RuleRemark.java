@@ -12,6 +12,5 @@ public enum RuleRemark implements IRuleRemark {
     MAX_VALUE,
     RANDOM_VALUE,
     NULL_VALUE,
-    // TODO
     NOT_DEFINED
 }
