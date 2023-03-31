@@ -17,12 +17,12 @@ import org.laoruga.dtogenerator.functional.data.customgenerator.RemarkNonArgs;
 import org.laoruga.dtogenerator.functional.data.customgenerator.RemarkUniversal;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.*;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.laoruga.dtogenerator.functional.data.customgenerator.ClientRemark.CLIENT_TYPE;
 import static org.laoruga.dtogenerator.functional.data.customgenerator.ClientRemark.DOCUMENT;
@@ -45,7 +45,8 @@ class CustomDtoGenerationTests {
 
         assertAll(
                 () -> assertEquals(stringRequiredForClient, clientInfo.getId()),
-                () -> assertNotNull(clientInfo.getClientType())
+                () -> assertNotNull(clientInfo.getClientType()),
+                () -> assertThat(dto.getClients(), hasSize(greaterThanOrEqualTo(1)))
         );
     }
 

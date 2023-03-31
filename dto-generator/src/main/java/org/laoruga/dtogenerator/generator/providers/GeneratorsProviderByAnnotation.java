@@ -2,14 +2,12 @@ package org.laoruga.dtogenerator.generator.providers;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
 import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkableArgs;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.CustomGenerator;
-import org.laoruga.dtogenerator.generator.MapGenerator;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorByAnnotation;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSupplierInfo;
@@ -101,26 +99,8 @@ public class GeneratorsProviderByAnnotation {
     void prepareCustomRemarks(IGenerator<?> generator, String fieldName) {
         if (generator instanceof CustomGenerator) {
             IGenerator<?> usersGeneratorInstance = ((CustomGenerator) generator).getUsersGeneratorInstance();
-            if (usersGeneratorInstance instanceof ICollectionGenerator) {
 
-                prepareCustomRemarks(
-                        ((ICollectionGenerator) usersGeneratorInstance).getElementGenerator(),
-                        fieldName
-                );
-
-            }  else if (usersGeneratorInstance instanceof MapGenerator) {
-
-                prepareCustomRemarks(
-                        ((MapGenerator) usersGeneratorInstance).getKeyGenerator(),
-                        fieldName
-                );
-
-                prepareCustomRemarks(
-                        ((MapGenerator) usersGeneratorInstance).getValueGenerator(),
-                        fieldName
-                );
-
-            } else if (usersGeneratorInstance instanceof ICustomGeneratorRemarkableArgs) {
+            if (usersGeneratorInstance instanceof ICustomGeneratorRemarkableArgs) {
 
                 ((ICustomGeneratorRemarkableArgs<?>) usersGeneratorInstance).setRuleRemarks(
                         configuratorByAnnotation.getRemarksHolder()

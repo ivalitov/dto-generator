@@ -128,10 +128,10 @@ public class GeneratorProvidersMediator {
             generator = generatorsProviderByAnnotationForMap.getGenerator((RuleInfoMap) ruleInfo);
 
         } else {
-            generator = generatorsProviderByAnnotation.getGenerator(ruleInfo);
-        }
 
-        generatorsProviderByAnnotation.prepareCustomRemarks(generator, ruleInfo.getField().getName());
+            generator = generatorsProviderByAnnotation.getGenerator(ruleInfo);
+
+        }
 
         return generator;
     }

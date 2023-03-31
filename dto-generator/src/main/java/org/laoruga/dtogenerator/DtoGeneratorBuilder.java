@@ -165,12 +165,16 @@ public class DtoGeneratorBuilder<T> {
      */
 
     public DtoGeneratorBuilder<T> addRuleRemark(@NonNull String fieldName,
-                                                @NonNull ICustomRuleRemark ruleRemark) {
+                                                @NonNull ICustomRuleRemark ruleRemark,
+                                                ICustomRuleRemark... ruleRemarks) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
-        dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
+        RemarksHolderCustom customRemarks = dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
                 .getRemarksHolder()
-                .getCustomRemarks()
-                .addRemark(fieldNameAndPath.getLeft(), ruleRemark);
+                .getCustomRemarks();
+        customRemarks.addRemark(fieldNameAndPath.getLeft(), ruleRemark);
+        for (ICustomRuleRemark remark : ruleRemarks) {
+            customRemarks.addRemark(fieldNameAndPath.getLeft(), remark);
+        }
         return this;
     }
 
