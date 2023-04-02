@@ -189,7 +189,8 @@ public class CustomRemarksTests {
                 .build()
                 .generateDto();
 
-        Matcher<Flower> flowerMatcherForMap = FlowerMatcher.flowerMatcherAnyPart(new int[]{4, 5, 6, 7, 8, 9}, countries.split(","));
+        Matcher<Flower> flowerMatcherForMap = FlowerMatcher
+                .flowerMatcherAnyPart(new int[]{4, 5, 6, 7, 8, 9}, countries.split(","));
 
         assertAll(
                 () -> assertThat(dto.singleFlower, flowerMatcher(1, "Moldova")),
@@ -198,7 +199,8 @@ public class CustomRemarksTests {
                 () -> assertThat(dto.flowerBouquet, everyItem(flowerMatcherAnyPart(2, "Iran"))),
 
                 () -> assertThat(dto.flowerBouquetArray.length, equalTo(10)),
-                () -> assertThat(Arrays.asList(dto.flowerBouquetArray), everyItem(flowerMatcherAnyPart(3, countries.split(",")))),
+                () -> assertThat(Arrays.asList(dto.flowerBouquetArray),
+                        everyItem(flowerMatcherAnyPart(3, countries.split(",")))),
 
                 () -> assertThat(dto.flowerBouquetMap.size(), equalTo(5)),
                 () -> assertThat(dto.flowerBouquetMap.keySet(), everyItem(flowerMatcherForMap)),
@@ -211,14 +213,18 @@ public class CustomRemarksTests {
                 () -> assertThat(nestedDto.singleFlower, flowerMatcher(10, "Moldova_nested")),
 
                 () -> assertThat(nestedDto.flowerBouquet, hasSize(10)),
-                () -> assertThat(nestedDto.flowerBouquet, everyItem(flowerMatcherAnyPart(20, "Iran_nested"))),
+                () -> assertThat(nestedDto.flowerBouquet,
+                        everyItem(flowerMatcherAnyPart(20, "Iran_nested"))),
 
                 () -> assertThat(nestedDto.flowerBouquetArray.length, equalTo(10)),
-                () -> assertThat(Arrays.asList(nestedDto.flowerBouquetArray), everyItem(flowerMatcherAnyPart(30, countriesNested.split(",")))),
+                () -> assertThat(Arrays.asList(nestedDto.flowerBouquetArray),
+                        everyItem(flowerMatcherAnyPart(30, countriesNested.split(",")))),
 
                 () -> assertThat(nestedDto.flowerBouquetMap.size(), equalTo(1)),
-                () -> assertThat(nestedDto.flowerBouquetMap.keySet(), everyItem(flowerMatcher(40, "Somewhere_nested"))),
-                () -> assertThat(nestedDto.flowerBouquetMap.values(), everyItem(flowerMatcher(40, "Somewhere_nested")))
+                () -> assertThat(nestedDto.flowerBouquetMap.keySet(),
+                        everyItem(flowerMatcher(40, "Somewhere_nested"))),
+                () -> assertThat(nestedDto.flowerBouquetMap.values(),
+                        everyItem(flowerMatcher(40, "Somewhere_nested")))
         );
 
     }
@@ -259,30 +265,39 @@ public class CustomRemarksTests {
                 () -> assertThat("Any + field remark", dto.singleFlower, FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, "Moldova")),
 
                 () -> assertThat("Any + field remark", dto.flowerBouquet, hasSize(10)),
-                () -> assertThat("Any + field remark", dto.flowerBouquet, everyItem(flowerMatcherAnyPart(2, allFieldCounty))),
+                () -> assertThat("Any + field remark", dto.flowerBouquet,
+                        everyItem(flowerMatcherAnyPart(2, allFieldCounty))),
 
                 () -> assertThat("Any-field remark only", dto.flowerBouquetArray.length, equalTo(10)),
-                () -> assertThat("Any-field remark only", Arrays.asList(dto.flowerBouquetArray), everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, allFieldCounty))),
+                () -> assertThat("Any-field remark only", Arrays.asList(dto.flowerBouquetArray),
+                        everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, allFieldCounty))),
 
                 () -> assertThat("Any + field remark", dto.flowerBouquetMap.size(), equalTo(5)),
-                () -> assertThat("Any + field remark", dto.flowerBouquetMap.keySet(), everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, countries.split(",")))),
-                () -> assertThat("Any + field remark", dto.flowerBouquetMap.values(), everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, countries.split(","))))
+                () -> assertThat("Any + field remark", dto.flowerBouquetMap.keySet(),
+                        everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, countries.split(",")))),
+                () -> assertThat("Any + field remark", dto.flowerBouquetMap.values(),
+                        everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, countries.split(","))))
         );
 
         NestedDto nestedDto = dto.nestedDto;
 
         assertAll(
-                () -> assertThat("Any + field remark", nestedDto.singleFlower, flowerMatcher(10, allFieldCounty)),
+                () -> assertThat("Any + field remark", nestedDto.singleFlower,
+                        flowerMatcher(10, allFieldCounty)),
 
                 () -> assertThat("Any-field remark only", nestedDto.flowerBouquet, hasSize(10)),
-                () -> assertThat("Any-field remark only", nestedDto.flowerBouquet, everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, allFieldCounty))),
+                () -> assertThat("Any-field remark only", nestedDto.flowerBouquet,
+                        everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, allFieldCounty))),
 
                 () -> assertThat("Any + field remark", nestedDto.flowerBouquetArray.length, equalTo(10)),
-                () -> assertThat("Any + field remark", Arrays.asList(nestedDto.flowerBouquetArray), everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, "Iran_nested"))),
+                () -> assertThat("Any + field remark", Arrays.asList(nestedDto.flowerBouquetArray),
+                        everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, "Iran_nested"))),
 
                 () -> assertThat("Any + field remark", nestedDto.flowerBouquetMap.size(), equalTo(1)),
-                () -> assertThat("Any + field remark", nestedDto.flowerBouquetMap.keySet(), everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, "Somewhere_nested"))),
-                () -> assertThat("Any + field remark", nestedDto.flowerBouquetMap.values(), everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, "Somewhere_nested")))
+                () -> assertThat("Any + field remark", nestedDto.flowerBouquetMap.keySet(),
+                        everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, "Somewhere_nested"))),
+                () -> assertThat("Any + field remark", nestedDto.flowerBouquetMap.values(),
+                        everyItem(FlowerMatcher.flowerMatcherAnyPart(allFieldPetals, "Somewhere_nested")))
         );
     }
 
