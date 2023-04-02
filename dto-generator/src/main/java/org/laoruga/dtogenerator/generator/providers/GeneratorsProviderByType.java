@@ -41,17 +41,17 @@ public class GeneratorsProviderByType {
     private final Configuration configuration;
     private final GeneratorConfigurator generatorConfigurator;
     private final GeneratorSuppliers userGeneratorSuppliers;
-    private final Supplier<?> dtoInstanceSupplier;
+    private final Supplier<?> rootDtoInstanceSupplier;
     private final GeneratorSuppliers defaultGeneratorSuppliers = GeneratorSuppliersDefault.getInstance();
 
     public GeneratorsProviderByType(Configuration configuration,
                                     GeneratorConfigurator generatorConfigurator,
                                     GeneratorSuppliers userGeneratorSuppliers,
-                                    Supplier<?> dtoInstanceSupplier) {
+                                    Supplier<?> rootDtoInstanceSupplier) {
         this.configuration = configuration;
         this.generatorConfigurator = generatorConfigurator;
         this.userGeneratorSuppliers = userGeneratorSuppliers;
-        this.dtoInstanceSupplier = dtoInstanceSupplier;
+        this.rootDtoInstanceSupplier = rootDtoInstanceSupplier;
     }
 
     public Optional<IGenerator<?>> getGenerator(Field field, Class<?> generatedType) {
@@ -79,7 +79,7 @@ public class GeneratorsProviderByType {
             if (userGenerator instanceof ICustomGenerator) {
                 CustomGeneratorConfigurator.builder()
                         .args(generatorSupplierInfo.getCustomGeneratorArgs())
-                        .dtoInstanceSupplier(dtoInstanceSupplier)
+                        .dtoInstanceSupplier(rootDtoInstanceSupplier)
                         .build()
                         .configure((ICustomGenerator<?>) userGenerator);
             }

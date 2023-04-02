@@ -19,10 +19,10 @@ import java.util.function.Supplier;
 public class GeneratorsProviderByField {
 
     private final Map<String, IGenerator<?>> overriddenGeneratorsForFields;
-    private final Supplier<?> dtoInstanceSupplier;
+    private final Supplier<?> rootDtoInstanceSupplier;
 
-    public GeneratorsProviderByField(Supplier<?> dtoInstanceSupplier) {
-        this.dtoInstanceSupplier = dtoInstanceSupplier;
+    public GeneratorsProviderByField(Supplier<?> rootDtoInstanceSupplier) {
+        this.rootDtoInstanceSupplier = rootDtoInstanceSupplier;
         this.overriddenGeneratorsForFields = new HashMap<>();
     }
 
@@ -42,7 +42,7 @@ public class GeneratorsProviderByField {
         if (generator instanceof ICustomGenerator) {
             CustomGeneratorConfigurator.builder()
                     .args(args)
-                    .dtoInstanceSupplier(dtoInstanceSupplier)
+                    .dtoInstanceSupplier(rootDtoInstanceSupplier)
                     .build()
                     .configure((ICustomGenerator<?>) generator);
         }

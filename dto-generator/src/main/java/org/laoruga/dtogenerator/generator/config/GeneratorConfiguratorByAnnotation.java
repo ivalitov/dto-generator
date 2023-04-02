@@ -27,14 +27,14 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
 
     private final Function<String, DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier;
-    private final Supplier<?> dtoInstanceSupplier;
+    private final Supplier<?> rootDtoInstanceSupplier;
 
     public GeneratorConfiguratorByAnnotation(ConfigurationHolder configuration,
                                              RemarksHolder remarksHolder,
-                                             Supplier<?> dtoInstanceSupplier,
+                                             Supplier<?> rootDtoInstanceSupplier,
                                              Function<String, DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier) {
         super(configuration, remarksHolder);
-        this.dtoInstanceSupplier = dtoInstanceSupplier;
+        this.rootDtoInstanceSupplier = rootDtoInstanceSupplier;
         this.nestedDtoGeneratorBuilderSupplier = nestedDtoGeneratorBuilderSupplier;
     }
 
@@ -131,7 +131,7 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
 
                 CustomGeneratorConfigurator.builder()
                         .args(customRule.args())
-                        .dtoInstanceSupplier(dtoInstanceSupplier)
+                        .dtoInstanceSupplier(rootDtoInstanceSupplier)
                         .build()
                         .configure(generatorInstance);
 

@@ -79,13 +79,15 @@ public class DtoGeneratorBuilder<T> {
     protected DtoGeneratorBuilder(DtoGeneratorBuilder<?> copyFrom,
                                   String[] pathFromRootDto,
                                   Supplier<?> dtoInstanceSupplier) {
+        final ConfigurationHolder configurationCopy = new ConfigurationHolder(copyFrom.getConfiguration());
         this.remarksHolder = new RemarksHolder(copyFrom.getRemarksHolder());
-        this.configuration = copyFrom.getConfiguration();
+        this.configuration = configurationCopy;
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
                 copyFrom.getFieldGeneratorsProvider(),
                 remarksHolder,
                 pathFromRootDto,
-                dtoInstanceSupplier);
+                dtoInstanceSupplier,
+                configurationCopy);
         this.dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
     }
 

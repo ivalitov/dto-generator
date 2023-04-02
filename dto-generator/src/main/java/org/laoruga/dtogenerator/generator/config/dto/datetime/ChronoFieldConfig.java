@@ -2,7 +2,6 @@ package org.laoruga.dtogenerator.generator.config.dto.datetime;
 
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalField;

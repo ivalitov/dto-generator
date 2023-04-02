@@ -19,6 +19,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static org.laoruga.dtogenerator.DtoGeneratorBuildersTree.ROOT;
+
 /**
  * @author Il'dar Valitov
  * Created on 15.05.2022
@@ -57,24 +59,29 @@ public class FieldGeneratorsProvider {
     }
 
     /**
-     * Constructor to copy
+     * Constructor to copy for generation of nested DTO
      */
     FieldGeneratorsProvider(FieldGeneratorsProvider copyFrom,
                             RemarksHolder remarksHolder,
                             String[] pathFromDtoRoot,
-                            Supplier<?> dtoInstanceSupplier) {
-        this.configuration = copyFrom.getConfiguration();
+                            Supplier<?> dtoInstanceSupplier,
+                            ConfigurationHolder configurationCopy) {
+        this.configuration = configurationCopy;
         this.userGenBuildersMapping = copyFrom.getUserGenBuildersMapping();
         this.pathFromDtoRoot = pathFromDtoRoot;
         this.rulesInfoExtractor = copyFrom.getRulesInfoExtractor();
         this.dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
+        this.dtoInstanceSupplier = dtoInstanceSupplier;
+        Supplier<?> rootDtoInstanceSupplier = dtoGeneratorBuildersTree.get()
+                .getBuilderLazy(ROOT)
+                .getFieldGeneratorsProvider()
+                .getDtoInstanceSupplier();
         this.generatorProvidersMediator = new GeneratorProvidersMediator(
-                copyFrom.getConfiguration(),
+                configurationCopy,
                 copyFrom.getUserGenBuildersMapping(),
                 remarksHolder,
-                dtoInstanceSupplier,
+                rootDtoInstanceSupplier,
                 nestedDtoGeneratorBuilderSupplier());
-        this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
     /**

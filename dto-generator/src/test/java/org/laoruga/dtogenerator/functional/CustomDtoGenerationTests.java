@@ -17,7 +17,6 @@ import org.laoruga.dtogenerator.functional.data.customgenerator.RemarkNonArgs;
 import org.laoruga.dtogenerator.functional.data.customgenerator.RemarkUniversal;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.*;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 

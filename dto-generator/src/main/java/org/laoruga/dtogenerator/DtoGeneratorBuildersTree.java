@@ -29,7 +29,7 @@ public class DtoGeneratorBuildersTree {
      * @return {@link DtoGeneratorBuilder} which was found in the tree.
      * If generator not found, it is instantiating lazy.
      */
-    public DtoGeneratorBuilder<?> getBuilderLazy(String[] fields) {
+    public DtoGeneratorBuilder<?> getBuilderLazy(String... fields) {
         if (fields.length < 1) {
             throw new IllegalArgumentException(
                     "Path must contain at least 1 element, but was: " + Arrays.asList(fields));

@@ -36,24 +36,24 @@ public class GeneratorProvidersMediator {
     public GeneratorProvidersMediator(ConfigurationHolder configuration,
                                       GeneratorSuppliers userGenBuildersMapping,
                                       RemarksHolder remarksHolder,
-                                      Supplier<?> dtoInstanceSupplier,
+                                      Supplier<?> rootDtoInstanceSupplier,
                                       Function<String, DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier) {
         GeneratorConfiguratorByAnnotation configuratorByAnnotation =
                 new GeneratorConfiguratorByAnnotation(
                         configuration,
                         remarksHolder,
-                        dtoInstanceSupplier,
+                        rootDtoInstanceSupplier,
                         nestedDtoGeneratorBuilderSupplier);
 
         this.generatorProviderOverriddenForField = new GeneratorsProviderByField(
-                dtoInstanceSupplier
+                rootDtoInstanceSupplier
         );
 
         this.generatorsProviderByType = new GeneratorsProviderByType(
                 configuration,
                 configuratorByAnnotation,
                 userGenBuildersMapping,
-                dtoInstanceSupplier
+                rootDtoInstanceSupplier
         );
 
         this.generatorsProviderByAnnotation =
