@@ -1,7 +1,7 @@
 package org.laoruga.dtogenerator.generator.config;
 
 import org.laoruga.dtogenerator.RemarksHolder;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.generator.config.dto.CollectionConfig;
@@ -25,7 +25,7 @@ public class GeneratorConfiguratorForList extends GeneratorConfigurator {
 
     @SuppressWarnings("unchecked")
     public ConfigDto createGeneratorConfig(RuleInfoCollection ruleInfo,
-                                           IGenerator<?> elementGenerator,
+                                           Generator<?> elementGenerator,
                                            Class<?> fieldType,
                                            String fieldName) {
 

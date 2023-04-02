@@ -5,7 +5,7 @@ package org.laoruga.dtogenerator.api.generators;
  * Created on 16.04.2022
  */
 
-public interface IGenerator<T> {
+public interface Generator<T> {
 
     T generate();
 }

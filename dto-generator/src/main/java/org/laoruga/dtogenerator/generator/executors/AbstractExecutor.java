@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.generator.executors;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 
 import java.lang.reflect.Field;
 
@@ -23,15 +23,15 @@ abstract class AbstractExecutor {
         this.nextExecutor = DUMMY;
     }
 
-    public abstract boolean execute(Field field, IGenerator<?> generator);
+    public abstract boolean execute(Field field, Generator<?> generator);
 
-    protected boolean executeNextInstead(Field field, IGenerator<?> generator) {
+    protected boolean executeNextInstead(Field field, Generator<?> generator) {
         return nextExecutor.execute(field, generator);
     }
 
     private static final AbstractExecutor DUMMY = new AbstractExecutor() {
         @Override
-        public boolean execute(Field field, IGenerator<?> generator) {
+        public boolean execute(Field field, Generator<?> generator) {
             throw new IllegalStateException("Next executor haven't defined");
         }
     };

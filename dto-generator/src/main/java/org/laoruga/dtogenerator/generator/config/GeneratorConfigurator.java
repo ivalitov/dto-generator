@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.RemarksHolder;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
@@ -161,7 +161,7 @@ public class GeneratorConfigurator {
     }
 
     public static Consumer<ConfigDto> getCollectionGeneratorSpecificConfig(Class<? extends Collection<?>> generatedType,
-                                                                           IGenerator<?> elementGenerator) {
+                                                                           Generator<?> elementGenerator) {
         return (config) -> {
             CollectionConfig collectionConfig = (CollectionConfig) config;
             if (collectionConfig.getCollectionInstanceSupplier() == null) {
@@ -176,7 +176,7 @@ public class GeneratorConfigurator {
     }
 
     public static Consumer<ConfigDto> getArrayGeneratorSpecificConfig(Class<?> elementType,
-                                                                      IGenerator<?> elementGenerator) {
+                                                                      Generator<?> elementGenerator) {
         return (config) -> {
             ArrayConfig arrayConfig = (ArrayConfig) config;
             arrayConfig.setElementType(elementType);
@@ -189,8 +189,8 @@ public class GeneratorConfigurator {
 
     @SuppressWarnings("unchecked")
     public static Consumer<ConfigDto> getMapGeneratorSpecificConfig(Class<? extends Map<?, ?>> generatedType,
-                                                                    IGenerator<?> keyGenerator,
-                                                                    IGenerator<?> valueGenerator) {
+                                                                    Generator<?> keyGenerator,
+                                                                    Generator<?> valueGenerator) {
         return (config) -> {
             MapConfig mapConfig = (MapConfig) config;
             if (mapConfig.getMapInstanceSupplier() == null) {
@@ -199,10 +199,10 @@ public class GeneratorConfigurator {
                 );
             }
             if (mapConfig.getKeyGenerator() == null) {
-                mapConfig.setKeyGenerator((IGenerator<Object>) keyGenerator);
+                mapConfig.setKeyGenerator((Generator<Object>) keyGenerator);
             }
             if (mapConfig.getValueGenerator() == null) {
-                mapConfig.setValueGenerator((IGenerator<Object>) valueGenerator);
+                mapConfig.setValueGenerator((Generator<Object>) valueGenerator);
             }
         };
     }

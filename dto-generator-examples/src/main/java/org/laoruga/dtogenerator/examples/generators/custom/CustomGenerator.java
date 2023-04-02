@@ -1,6 +1,5 @@
 package org.laoruga.dtogenerator.examples.generators.custom;
 
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Arrays;
@@ -13,7 +12,7 @@ import java.util.stream.Collectors;
  * @author Il'dar Valitov
  * Created on 15.11.2022
  */
-public class CustomGenerator implements ICustomGenerator<Map<String, String>> {
+public class CustomGenerator implements org.laoruga.dtogenerator.api.generators.custom.CustomGenerator<Map<String, String>> {
 
     protected static final int MIN_PLANETS_NUMBER = 3;
     protected static final List<String> planets =

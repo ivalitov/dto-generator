@@ -18,19 +18,19 @@ import java.util.Objects;
 @Setter(AccessLevel.PACKAGE)
 @Getter
 @Builder
-public class RuleInfoMap implements IRuleInfo {
-    private RuleInfo mapRule;
-    private RuleInfo keyRule;
-    private RuleInfo valueRule;
+public class RuleInfoMap implements RuleInfo {
+    private RuleInfoSimple mapRule;
+    private RuleInfoSimple keyRule;
+    private RuleInfoSimple valueRule;
 
     private Field field;
     private String group;
 
-    public IRuleInfo getValueRule() {
+    public RuleInfo getValueRule() {
         return Objects.requireNonNull(valueRule, "Value rule wasn't set.");
     }
 
-    public IRuleInfo getKeyRule() {
+    public RuleInfo getKeyRule() {
         return Objects.requireNonNull(keyRule, "Key rule wasn't set.");
     }
 

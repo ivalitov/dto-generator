@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.api.rules.*;
 
 import java.util.HashMap;
@@ -99,7 +99,7 @@ class FieldsGroupingTests {
         Integer secondGroupInt;
     }
 
-    static class MapGen implements ICustomGenerator<Map<String, String>> {
+    static class MapGen implements CustomGenerator<Map<String, String>> {
         @Override
         public Map<String, String> generate() {
             return new HashMap<>();

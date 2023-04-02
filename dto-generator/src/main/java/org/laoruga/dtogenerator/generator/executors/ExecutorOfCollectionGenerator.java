@@ -1,7 +1,7 @@
 package org.laoruga.dtogenerator.generator.executors;
 
-import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
+import org.laoruga.dtogenerator.api.generators.ListGenerator;
 
 import java.lang.reflect.Field;
 import java.util.function.Supplier;
@@ -18,10 +18,10 @@ public class ExecutorOfCollectionGenerator extends ExecutorOfDtoDependentGenerat
     }
 
     @Override
-    public boolean execute(Field field, IGenerator<?> generator) {
-        if (generator instanceof ICollectionGenerator) {
+    public boolean execute(Field field, Generator<?> generator) {
+        if (generator instanceof ListGenerator) {
 
-            IGenerator<?> innerGenerator = ((ICollectionGenerator) generator).getElementGenerator();
+            Generator<?> innerGenerator = ((ListGenerator) generator).getElementGenerator();
 
             if (isItDtoDependentGenerator(innerGenerator)) {
                 return super.execute(field, generator);

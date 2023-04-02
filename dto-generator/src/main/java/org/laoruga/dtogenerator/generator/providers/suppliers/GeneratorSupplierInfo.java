@@ -1,7 +1,7 @@
 package org.laoruga.dtogenerator.generator.providers.suppliers;
 
 import lombok.Getter;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.constants.GeneratedTypes;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 
@@ -20,12 +20,12 @@ public class GeneratorSupplierInfo {
 
     private Class<? extends Annotation> rules;
     private Class<?> generatedType;
-    private Function<ConfigDto, IGenerator<?>> generatorSupplier;
+    private Function<ConfigDto, Generator<?>> generatorSupplier;
     private String[] customGeneratorArgs;
 
     static GeneratorSupplierInfo createInstance(Class<? extends Annotation> rules,
                                                 Class<?> generatedType,
-                                                Function<ConfigDto, IGenerator<?>> builderSupplier,
+                                                Function<ConfigDto, Generator<?>> builderSupplier,
                                                 String... customGeneratorArgs) {
         GeneratorSupplierInfo genBuilderInfo = new GeneratorSupplierInfo();
         genBuilderInfo.rules = rules;
@@ -36,7 +36,7 @@ public class GeneratorSupplierInfo {
     }
 
     static List<GeneratorSupplierInfo> createInstances(Class<? extends Annotation> rules,
-                                                       Function<ConfigDto, IGenerator<?>> builderSupplier) {
+                                                       Function<ConfigDto, Generator<?>> builderSupplier) {
         return Arrays.stream(GeneratedTypes.get(rules))
                 .map(type -> createInstance(rules, type, builderSupplier))
                 .collect(Collectors.toList());

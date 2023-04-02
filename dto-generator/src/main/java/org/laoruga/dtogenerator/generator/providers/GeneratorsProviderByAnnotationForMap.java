@@ -3,10 +3,10 @@ package org.laoruga.dtogenerator.generator.providers;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForMap;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
-import org.laoruga.dtogenerator.rule.IRuleInfo;
+import org.laoruga.dtogenerator.rule.RuleInfo;
 import org.laoruga.dtogenerator.rule.RuleInfoMap;
 
 import java.lang.reflect.Field;
@@ -31,7 +31,7 @@ public class GeneratorsProviderByAnnotationForMap {
         this.configuratorForMap = configuratorForMap;
     }
 
-    IGenerator<?> getGenerator(RuleInfoMap mapRruleInfo) {
+    Generator<?> getGenerator(RuleInfoMap mapRruleInfo) {
 
         final Field field = mapRruleInfo.getField();
         final Class<?> fieldType = field.getType();
@@ -39,7 +39,7 @@ public class GeneratorsProviderByAnnotationForMap {
 
         // Map generator builder
 
-        Optional<Function<ConfigDto, IGenerator<?>>> maybeUsersMapGenBuilder =
+        Optional<Function<ConfigDto, Generator<?>>> maybeUsersMapGenBuilder =
                 generatorsProvider.getUserGeneratorSupplier(fieldType);
 
         if (maybeUsersMapGenBuilder.isPresent()) {
@@ -49,19 +49,19 @@ public class GeneratorsProviderByAnnotationForMap {
 
         // Map key generator builder
 
-        IRuleInfo keyRule = mapRruleInfo.getKeyRule();
-        IGenerator<?> keyGenerator = mapRruleInfo.isKeyRulesExist() ?
+        RuleInfo keyRule = mapRruleInfo.getKeyRule();
+        Generator<?> keyGenerator = mapRruleInfo.isKeyRulesExist() ?
                 generatorsProvider.getGenerator(keyRule) :
                 generatorsProvider.getGeneratorByType(field, keyRule.getRequiredType());
 
         // Map value generator builder
 
-        IRuleInfo valueRule = mapRruleInfo.getValueRule();
-        IGenerator<?> valueGenerator = mapRruleInfo.isValueRulesExist() ?
+        RuleInfo valueRule = mapRruleInfo.getValueRule();
+        Generator<?> valueGenerator = mapRruleInfo.isValueRulesExist() ?
                 generatorsProvider.getGenerator(valueRule) :
                 generatorsProvider.getGeneratorByType(field, valueRule.getRequiredType());
 
-        Function<ConfigDto, IGenerator<?>> mapGenBuilder =
+        Function<ConfigDto, Generator<?>> mapGenBuilder =
                 generatorsProvider.getDefaultGeneratorSupplier(
                         mapRruleInfo.getRule(),
                         fieldType

@@ -1,14 +1,14 @@
 package org.laoruga.dtogenerator.examples.generators.custom.remark;
 
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
-import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemarkArgs;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
+import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkArgs;
 import org.laoruga.dtogenerator.examples.generators.custom.CustomGeneratorRemarkable;
 
 /**
  * @author Il'dar Valitov
  * Created on 21.11.2022
  */
-public enum PersonRemark implements ICustomRuleRemarkArgs {
+public enum PersonRemark implements CustomRuleRemarkArgs {
 
     AGE_RANGE(2),
     GENDER(1),
@@ -23,7 +23,7 @@ public enum PersonRemark implements ICustomRuleRemarkArgs {
     }
 
     @Override
-    public Class<? extends ICustomGenerator<?>> getGeneratorClass() {
+    public Class<? extends CustomGenerator<?>> getGeneratorClass() {
         return CustomGeneratorRemarkable.class;
     }
 

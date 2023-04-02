@@ -18,14 +18,14 @@ import java.util.Objects;
 @Setter(AccessLevel.PACKAGE)
 @Getter
 @Builder
-public class RuleInfoCollection implements IRuleInfo {
-    private RuleInfo collectionRuleInfo;
-    private RuleInfo elementRuleInfo;
+public class RuleInfoCollection implements RuleInfo {
+    private RuleInfoSimple collectionRuleInfo;
+    private RuleInfoSimple elementRuleInfo;
     private Field field;
     private Class<?> elementType;
     private String group;
 
-    public IRuleInfo getElementRuleInfo() {
+    public RuleInfo getElementRuleInfo() {
         return Objects.requireNonNull(elementRuleInfo, "Element rule wasn't set.");
     }
 

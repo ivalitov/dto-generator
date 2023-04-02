@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.generator.providers;
 
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.RemarksHolder;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorByAnnotation;
@@ -10,7 +10,7 @@ import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForArray;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForList;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForMap;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliers;
-import org.laoruga.dtogenerator.rule.IRuleInfo;
+import org.laoruga.dtogenerator.rule.RuleInfo;
 import org.laoruga.dtogenerator.rule.RuleInfoCollection;
 import org.laoruga.dtogenerator.rule.RuleInfoMap;
 
@@ -90,11 +90,11 @@ public class GeneratorProvidersMediator {
         return generatorProviderOverriddenForField.isGeneratorOverridden(fieldName);
     }
 
-    public synchronized void setGeneratorForField(String fieldName, IGenerator<?> generator, String... args) {
+    public synchronized void setGeneratorForField(String fieldName, Generator<?> generator, String... args) {
         generatorProviderOverriddenForField.setGeneratorBuilderForField(fieldName, generator, args);
     }
 
-    public synchronized IGenerator<?> getGeneratorOverriddenForField(Field field) {
+    public synchronized Generator<?> getGeneratorOverriddenForField(Field field) {
         return generatorProviderOverriddenForField.getGenerator(field);
     }
 
@@ -102,7 +102,7 @@ public class GeneratorProvidersMediator {
      * By type
      */
 
-    public Optional<IGenerator<?>> getGeneratorByType(Field field, Class<?> generatedType) {
+    public Optional<Generator<?>> getGeneratorByType(Field field, Class<?> generatedType) {
         return generatorsProviderByType
                 .getGenerator(field, generatedType)
                 .map(Objects::requireNonNull);
@@ -112,8 +112,8 @@ public class GeneratorProvidersMediator {
      * By rules annotation
      */
 
-    public IGenerator<?> getGeneratorByAnnotation(IRuleInfo ruleInfo) {
-        IGenerator<?> generator;
+    public Generator<?> getGeneratorByAnnotation(RuleInfo ruleInfo) {
+        Generator<?> generator;
 
         if (ruleInfo.isTypesEqual(RuleType.COLLECTION)) {
 

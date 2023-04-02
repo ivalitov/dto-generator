@@ -4,13 +4,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.generator.providers.GeneratorProvidersMediator;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliers;
-import org.laoruga.dtogenerator.rule.IRuleInfo;
+import org.laoruga.dtogenerator.rule.RuleInfo;
 import org.laoruga.dtogenerator.rule.RulesInfoExtractor;
 
 import java.lang.reflect.Field;
@@ -94,7 +94,7 @@ public class FieldGeneratorsProvider {
      * - no explicit generators attached for the field
      * else generator instance
      */
-    Optional<IGenerator<?>> getGenerator(Field field) {
+    Optional<Generator<?>> getGenerator(Field field) {
 
         // generator was set explicitly
         if (generatorProvidersMediator.isGeneratorOverridden(field.getName())) {
@@ -103,7 +103,7 @@ public class FieldGeneratorsProvider {
             );
         }
 
-        Optional<IRuleInfo> maybeRulesInfo = getRuleInfo(field);
+        Optional<RuleInfo> maybeRulesInfo = getRuleInfo(field);
 
         // field annotated with rules
         if (maybeRulesInfo.isPresent()) {
@@ -120,11 +120,11 @@ public class FieldGeneratorsProvider {
         return Optional.empty();
     }
 
-    void setGeneratorBuilderForField(String fieldName, IGenerator<?> generator, String... args) throws DtoGeneratorException {
+    void setGeneratorBuilderForField(String fieldName, Generator<?> generator, String... args) throws DtoGeneratorException {
         generatorProvidersMediator.setGeneratorForField(fieldName, generator, args);
     }
 
-    void setGenerator(Class<?> generatedType, @NonNull IGenerator<?> generator, String[] args) {
+    void setGenerator(Class<?> generatedType, @NonNull Generator<?> generator, String[] args) {
         userGenBuildersMapping.addSuppliersInfo(generatedType, generator, args);
     }
 
@@ -143,7 +143,7 @@ public class FieldGeneratorsProvider {
         };
     }
 
-    private Optional<IRuleInfo> getRuleInfo(Field field) {
+    private Optional<RuleInfo> getRuleInfo(Field field) {
         try {
             return rulesInfoExtractor.extractRulesInfo(field);
         } catch (Exception e) {

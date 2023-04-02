@@ -90,12 +90,12 @@ class RulesInfoExtractorTests {
                           boolean multiple,
                           RulesInfoExtractor rulesInfoExtractor) {
         Field field = UtilsRoot.getField(dtoClass, fieldName);
-        Optional<IRuleInfo> iRuleInfo = rulesInfoExtractor.extractRulesInfo(field);
+        Optional<RuleInfo> iRuleInfo = rulesInfoExtractor.extractRulesInfo(field);
 
         assertTrue(iRuleInfo.isPresent());
-        assertInstanceOf(RuleInfo.class, iRuleInfo.get());
+        assertInstanceOf(RuleInfoSimple.class, iRuleInfo.get());
 
-        RuleInfo ruleInfo = (RuleInfo) iRuleInfo.get();
+        RuleInfoSimple ruleInfo = (RuleInfoSimple) iRuleInfo.get();
 
         assertAll(
                 () -> assertThat(ruleInfo.getRule().annotationType(), equalTo(rulesClass)),
@@ -133,7 +133,7 @@ class RulesInfoExtractorTests {
                              String group,
                              boolean multipleRules) {
         Field field = UtilsRoot.getField(dtoClass, fieldName);
-        Optional<IRuleInfo> iRuleInfo = rulesInfoExtractor.extractRulesInfo(field);
+        Optional<RuleInfo> iRuleInfo = rulesInfoExtractor.extractRulesInfo(field);
 
         assertTrue(iRuleInfo.isPresent());
         assertInstanceOf(RuleInfoCollection.class, iRuleInfo.get());
@@ -142,12 +142,12 @@ class RulesInfoExtractorTests {
 
         assertAll(
                 () -> assertThat(ruleInfo.getRule().annotationType(), equalTo(collectionRuleClass)),
-                () -> assertThat(ruleInfo.getCollectionRuleInfo().getClass(), equalTo(RuleInfo.class)),
-                () -> assertThat(ruleInfo.getElementRuleInfo().getClass(), equalTo(RuleInfo.class)),
+                () -> assertThat(ruleInfo.getCollectionRuleInfo().getClass(), equalTo(RuleInfoSimple.class)),
+                () -> assertThat(ruleInfo.getElementRuleInfo().getClass(), equalTo(RuleInfoSimple.class)),
                 () -> assertThat(ruleInfo.getGroup(), equalTo(group))
         );
 
-        RuleInfo collectionRuleInfo = (RuleInfo) ruleInfo.getCollectionRuleInfo();
+        RuleInfoSimple collectionRuleInfo = ruleInfo.getCollectionRuleInfo();
 
         assertAll(
                 () -> assertThat(collectionRuleInfo.getRule().annotationType(), equalTo(collectionRuleClass)),
@@ -156,7 +156,7 @@ class RulesInfoExtractorTests {
                 () -> assertThat(collectionRuleInfo.getGroup(), equalTo(group))
         );
 
-        RuleInfo elementRuleInfo = (RuleInfo) ruleInfo.getElementRuleInfo();
+        RuleInfoSimple elementRuleInfo = (RuleInfoSimple) ruleInfo.getElementRuleInfo();
 
         assertAll(
                 () -> assertThat(elementRuleInfo.getRule().annotationType(), equalTo(itemRuleClass)),

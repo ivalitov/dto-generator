@@ -3,9 +3,8 @@ package org.laoruga.dtogenerator.generator;
 import com.mifmif.common.regex.Generex;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.generator.config.dto.StringConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
@@ -18,7 +17,7 @@ import java.util.Objects;
 
 @AllArgsConstructor
 @Slf4j
-public class StringGenerator implements IGenerator<String> {
+public class StringGenerator implements Generator<String> {
 
     private final int maxLength;
     private final int minLength;
@@ -40,7 +39,7 @@ public class StringGenerator implements IGenerator<String> {
     public String generate() {
         int length;
 
-        switch ((RuleRemark) ruleRemark) {
+        switch ((org.laoruga.dtogenerator.constants.RuleRemark) ruleRemark) {
 
             case MIN_VALUE:
                 length = minLength;

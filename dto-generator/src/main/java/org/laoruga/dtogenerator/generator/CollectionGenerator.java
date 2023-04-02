@@ -1,11 +1,10 @@
 package org.laoruga.dtogenerator.generator;
 
 import lombok.AllArgsConstructor;
-import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
+import org.laoruga.dtogenerator.api.generators.ListGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
-import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.CollectionConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
@@ -20,12 +19,12 @@ import java.util.function.Supplier;
  */
 
 @AllArgsConstructor
-public class CollectionGenerator implements ICollectionGenerator {
+public class CollectionGenerator implements ListGenerator {
 
     private final int minSize;
     private final int maxSize;
     private final Supplier<Collection<Object>> collectionInstanceSupplier;
-    private final IGenerator<Object> elementGenerator;
+    private final Generator<Object> elementGenerator;
     private final IRuleRemark ruleRemark;
 
     @SuppressWarnings("unchecked")
@@ -33,7 +32,7 @@ public class CollectionGenerator implements ICollectionGenerator {
         minSize = collectionConfig.getMinSize();
         maxSize = collectionConfig.getMaxSize();
         collectionInstanceSupplier = (Supplier<Collection<Object>>) Objects.requireNonNull(collectionConfig.getCollectionInstanceSupplier(), "Collection instance must be set.");
-        elementGenerator = (IGenerator<Object>) Objects.requireNonNull(collectionConfig.getElementGenerator(), "Collection element generator must be set");
+        elementGenerator = (Generator<Object>) Objects.requireNonNull(collectionConfig.getElementGenerator(), "Collection element generator must be set");
         ruleRemark = Objects.requireNonNull(collectionConfig.getRuleRemark(), "Unexpected error, rule remark haven't set.");
     }
 
@@ -42,7 +41,7 @@ public class CollectionGenerator implements ICollectionGenerator {
         Collection<Object> collectionInstance = collectionInstanceSupplier.get();
         int maxAttempts = DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().getMaxCollectionGenerationCycles();
         int size;
-        switch ((RuleRemark) ruleRemark) {
+        switch ((org.laoruga.dtogenerator.constants.RuleRemark) ruleRemark) {
 
             case MIN_VALUE:
                 size = minSize;
@@ -81,7 +80,7 @@ public class CollectionGenerator implements ICollectionGenerator {
         return collectionInstance;
     }
 
-    public IGenerator<Object> getElementGenerator() {
+    public Generator<Object> getElementGenerator() {
         return elementGenerator;
     }
 

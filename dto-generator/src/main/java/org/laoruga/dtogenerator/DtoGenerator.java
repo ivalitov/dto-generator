@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.executors.BatchExecutor;
 import org.laoruga.dtogenerator.generator.executors.ExecutorOfCollectionGenerator;
@@ -105,7 +105,7 @@ public class DtoGenerator<T> {
         return (T) dtoInstance;
     }
 
-    private Map<Field, IGenerator<?>> prepareGenerators(Class<?> dtoClass, Map<Field, IGenerator<?>> generatorMap) {
+    private Map<Field, Generator<?>> prepareGenerators(Class<?> dtoClass, Map<Field, Generator<?>> generatorMap) {
 
         if (dtoClass.getSuperclass() != null && dtoClass.getSuperclass() != Object.class) {
             prepareGenerators(dtoClass.getSuperclass(), generatorMap);
@@ -118,7 +118,7 @@ public class DtoGenerator<T> {
                 continue;
             }
 
-            Optional<IGenerator<?>> generator = Optional.empty();
+            Optional<Generator<?>> generator = Optional.empty();
             try {
                 generator = fieldGeneratorsProvider.getGenerator(field);
             } catch (Exception e) {
