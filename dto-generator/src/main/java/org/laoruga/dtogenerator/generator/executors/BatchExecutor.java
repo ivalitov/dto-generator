@@ -60,8 +60,8 @@ public class BatchExecutor {
 
             if (!success) {
                 logErrorInfo();
-                throw new DtoGeneratorException("After all attempts, there are not generated field left." +
-                        " See details for every not completed field above.");
+                throw new DtoGeneratorException("All attempts to generate field values have been exhausted," +
+                        " but not all fields have been set. See details for every not set field above.");
             }
 
         } finally {

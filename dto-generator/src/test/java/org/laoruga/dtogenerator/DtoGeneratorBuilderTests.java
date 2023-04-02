@@ -28,23 +28,23 @@ class DtoGeneratorBuilderTests {
     }
 
     @Test
-    @DisplayName("Try to overwrite remark for field")
+    @DisplayName("Attempt to overwrite remark for field")
     void tryToOverwriteRemarkForField() {
         DtoGeneratorException e = assertThrows(DtoGeneratorException.class,
                 () -> DtoGenerator.builder(Dto.class)
                         .setRuleRemark("string", MAX_VALUE)
                         .setRuleRemark("string", MIN_VALUE));
-        assertThat(e.getMessage(), containsString("Try to overwrite remark"));
+        assertThat(e.getMessage(), containsString("Attempt to overwrite remark"));
     }
 
     @Test
-    @DisplayName("Try to overwrite remark for all fields")
+    @DisplayName("Attempt to overwrite remark for all fields")
     void tryToOverwriteRemarkForAllFields() {
         DtoGeneratorException e = assertThrows(DtoGeneratorException.class,
                 () -> DtoGenerator.builder(Dto.class)
                         .setRuleRemark(RANDOM_VALUE)
                         .setRuleRemark(NULL_VALUE));
-        assertThat(e.getMessage(), containsString("Try to overwrite remark for all fields"));
+        assertThat(e.getMessage(), containsString("Attempt to overwrite remark for all fields"));
     }
 
 }

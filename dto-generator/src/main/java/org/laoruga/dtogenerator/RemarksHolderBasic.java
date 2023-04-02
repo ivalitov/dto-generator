@@ -7,7 +7,6 @@ import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -30,16 +29,12 @@ public class RemarksHolderBasic {
      * @param toCopy - source
      */
     RemarksHolderBasic(RemarksHolderBasic toCopy) {
-        this(toCopy.basicRuleRemarkForAnyField);
+        this(new AtomicReference<>(toCopy.basicRuleRemarkForAnyField.get()));
     }
 
     private RemarksHolderBasic(AtomicReference<IRuleRemark> basicRuleRemarkForAnyField) {
         this.basicRuleRemarksMapByField = new HashMap<>();
         this.basicRuleRemarkForAnyField = basicRuleRemarkForAnyField;
-    }
-
-    public boolean isBasicRuleRemarkExists(String fieldName) {
-        return basicRuleRemarksMapByField.containsKey(fieldName) || basicRuleRemarkForAnyField.get() != null;
     }
 
     /*
@@ -49,7 +44,7 @@ public class RemarksHolderBasic {
     void setBasicRuleRemarkForField(@NonNull String filedName,
                                     @NonNull RuleRemark ruleRemark) {
         if (basicRuleRemarksMapByField.containsKey(filedName)) {
-            throw new DtoGeneratorException("Try to overwrite remark from: '" + getBasicRuleRemark(filedName) + "'" +
+            throw new DtoGeneratorException("Attempt to overwrite remark from: '" + getBasicRuleRemarkOrNull(filedName) + "'" +
                     " to: '" + ruleRemark + "' for field '" + filedName + "'.");
         }
         basicRuleRemarksMapByField.put(filedName, ruleRemark);
@@ -57,16 +52,16 @@ public class RemarksHolderBasic {
 
     void setBasicRuleRemarkForAnyField(RuleRemark basicRuleRemark) {
         if (basicRuleRemarkForAnyField.get() != null && basicRuleRemarkForAnyField.get() != basicRuleRemark) {
-            throw new DtoGeneratorException("Try to overwrite remark for all fields from: '"
+            throw new DtoGeneratorException("Attempt to overwrite remark for all fields from: '"
                     + basicRuleRemarkForAnyField.get() + "' to: '" + basicRuleRemark + "'.");
         }
         basicRuleRemarkForAnyField.set(basicRuleRemark);
     }
 
-    public IRuleRemark getBasicRuleRemark(String fieldName) throws NullPointerException {
+    public IRuleRemark getBasicRuleRemarkOrNull(String fieldName) throws NullPointerException {
         if (basicRuleRemarksMapByField.containsKey(fieldName)) {
             return basicRuleRemarksMapByField.get(fieldName);
         }
-        return Objects.requireNonNull(basicRuleRemarkForAnyField.get());
+        return basicRuleRemarkForAnyField.get();
     }
 }

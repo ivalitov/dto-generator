@@ -117,6 +117,10 @@ public final class RandomUtils {
         return RANDOM_DATA_GENERATOR.nextLong(minNumber, maxNumber);
     }
 
+    public static synchronized long nextLong() {
+        return RANDOM.nextLong();
+    }
+
     public static Number nextNumber(Number minNumber, Number maxNumber) {
         if (minNumber.equals(maxNumber)) {
             return minNumber;

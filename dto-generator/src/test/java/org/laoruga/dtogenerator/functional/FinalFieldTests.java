@@ -32,7 +32,7 @@ public class FinalFieldTests {
 
     @Test
     @DisplayName("Do Not Generate Final Field")
-    public void doNotGenerateFinal() {
+    void doNotGenerateFinal() {
 
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
 
@@ -54,12 +54,11 @@ public class FinalFieldTests {
 
         @StringRule
         String string = "string";
-
     }
 
     @Test
     @DisplayName("Generate Static Field But Not Final")
-    public void staticFields() {
+    void staticFields() {
 
         Dto2 dto = DtoGenerator.builder(Dto2.class).build().generateDto();
 
@@ -67,9 +66,7 @@ public class FinalFieldTests {
                 () -> assertThat(Dto2.staticFinalString, equalTo("STATIC_CONSTANT")),
                 () -> assertThat(Dto2.staticString, not(equalTo("static_variable"))),
                 () -> assertThat(dto.getString(), not(equalTo("string")))
-
         );
-
     }
 
 }

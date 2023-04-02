@@ -104,7 +104,7 @@ public class DateTimeTests {
 
     @Test
     @Tag(RESTORE_STATIC_CONFIG)
-    public void staticConfig() {
+    void staticConfig() {
 
         final LocalDateTime NOW = LocalDateTime.now();
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
@@ -422,7 +422,7 @@ public class DateTimeTests {
 
     @Test
     @Tag(RESTORE_STATIC_CONFIG)
-    public void withoutAnnotationsWithOverriddenConfig() {
+    void withoutAnnotationsWithOverriddenConfig() {
 
         final LocalDateTime NOW = LocalDateTime.now();
         final Instant NOW_INSTANT = NOW.atZone(ZoneId.systemDefault()).toInstant();

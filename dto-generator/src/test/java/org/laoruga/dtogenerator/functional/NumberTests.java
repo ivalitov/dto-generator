@@ -92,7 +92,7 @@ public class NumberTests {
 
     @Test
     @Tag(RESTORE_STATIC_CONFIG)
-    public void staticConfig() {
+    void staticConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -215,7 +215,7 @@ public class NumberTests {
 
     @Test
     @Tag(RESTORE_STATIC_CONFIG)
-    public void staticAndInstanceAndFieldAndAnnotationConfig() {
+    void staticAndInstanceAndFieldAndAnnotationConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -401,7 +401,7 @@ public class NumberTests {
 
     @Test
     @Tag(RESTORE_STATIC_CONFIG)
-    public void withoutAnnotationsWithOverriddenConfig() {
+    void withoutAnnotationsWithOverriddenConfig() {
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
 

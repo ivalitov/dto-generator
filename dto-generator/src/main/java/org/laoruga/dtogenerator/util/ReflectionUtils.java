@@ -257,4 +257,21 @@ public final class ReflectionUtils {
 
         return found;
     }
+
+    public static Field getField(Class<?> from, String fieldName) {
+        try {
+            return from.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            throw new DtoGeneratorException("Field not found.", e);
+        }
+    }
+
+    public static Class<?> getFieldType(String[] fields, int initialIdx, Class<?> initialType) {
+
+        if (fields.length == initialIdx) {
+            return initialType;
+        }
+
+        return getFieldType(fields, initialIdx + 1, ReflectionUtils.getField(initialType, fields[initialIdx]).getType());
+    }
 }

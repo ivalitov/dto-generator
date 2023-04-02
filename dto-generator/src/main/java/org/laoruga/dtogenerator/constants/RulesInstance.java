@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.util.dummy.DummyCustomGenerator;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -29,7 +30,7 @@ public final class RulesInstance {
     @CollectionRule(element = @Entry)
     @MapRule(key = @Entry, value = @Entry)
     @ArrayRule(element = @Entry)
-    @CustomRule(generatorClass = Object.class)
+    @CustomRule(generatorClass = DummyCustomGenerator.class)
     @NestedDtoRule
     private static final Object ANNOTATIONS = null;
 

@@ -41,8 +41,13 @@ public class ExecutorOfDtoDependentGenerator extends ExecutorOfGenerator {
      * @throws DtoGeneratorException - throws if all attempts are spent
      */
     protected boolean isDtoReadyForFieldGeneration(IGenerator<?> generator) throws DtoGeneratorException {
-        IGenerator<?> usersGeneratorInstance = ((CustomGenerator) generator).getUsersGeneratorInstance();
-        boolean dtoReady = ((ICustomGeneratorDtoDependent<?, ?>) usersGeneratorInstance).isDtoReady();
+        ICustomGeneratorDtoDependent<?, ?> usersGeneratorInstance;
+        if (generator instanceof CustomGenerator) {
+            usersGeneratorInstance = (ICustomGeneratorDtoDependent<?, ?>) ((CustomGenerator) generator).getUsersGeneratorInstance();
+        } else {
+            usersGeneratorInstance = (ICustomGeneratorDtoDependent<?, ?>) generator;
+        }
+        boolean dtoReady = usersGeneratorInstance.isDtoReady();
         log.debug("Object " + (dtoReady ? "is" : "isn't") + " ready to generate dependent field value");
         return dtoReady;
     }
@@ -52,6 +57,6 @@ public class ExecutorOfDtoDependentGenerator extends ExecutorOfGenerator {
             return ((CustomGenerator) generator).getUsersGeneratorInstance()
                     instanceof ICustomGeneratorDtoDependent;
         }
-        return false;
+        return generator instanceof ICustomGeneratorDtoDependent;
     }
 }

@@ -2,8 +2,7 @@ package org.laoruga.dtogenerator.generator.config.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.apache.commons.lang3.NotImplementedException;
-import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 
 /**
@@ -14,12 +13,14 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 @Getter
 public class NestedConfig implements ConfigDto {
 
-    private final DtoGenerator<?> dtoGenerator;
+    private DtoGeneratorBuilder<?> dtoGeneratorBuilder;
     private IRuleRemark ruleRemark;
 
     @Override
-    public void merge(ConfigDto configDto) {
-        throw new NotImplementedException();
+    public void merge(ConfigDto from) {
+        NestedConfig nestedConfigFrom = (NestedConfig) from;
+        if (nestedConfigFrom.dtoGeneratorBuilder != null) dtoGeneratorBuilder = nestedConfigFrom.dtoGeneratorBuilder;
+        if (nestedConfigFrom.ruleRemark != null) ruleRemark = nestedConfigFrom.ruleRemark;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Epic;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,12 +9,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
-import org.laoruga.dtogenerator.api.rules.NumberRule;
-import org.laoruga.dtogenerator.api.rules.StringRule;
+import org.laoruga.dtogenerator.DtoGeneratorBuilder;
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorDtoDependent;
+import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.constants.RulesInstance;
-import org.laoruga.dtogenerator.functional.data.dto.dtoclient.*;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -39,15 +42,6 @@ class NestedDtoGenerationTests {
         private Integer intDefaultRules;
         @NestedDtoRule()
         private IntegerGenerationTests.DtoInteger dtoNested;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    static class DtoCustomNested {
-        @NumberRule()
-        private Integer intDefaultRules;
-        @NestedDtoRule()
-        private ClientDto clientDto;
     }
 
     @Getter
@@ -89,48 +83,6 @@ class NestedDtoGenerationTests {
                 greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt()))
                 .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt())));
         simpleIntegerGenerationAssertions(dto.getDtoNested());
-    }
-
-    @RepeatedTest(10)
-    @DisplayName("Nested Dto Generation With Custom Rules")
-    void nestedDtoWithCustomRules() {
-        DtoCustomNested dto = DtoGenerator.builder(DtoCustomNested.class).build().generateDto();
-        assertNotNull(dto);
-        assertThat(dto.getIntDefaultRules(), both(
-                greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt()))
-                .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt())));
-
-        // Dto generated with custom generator
-        ClientDto clientDto = dto.getClientDto();
-
-        // base assertions for client generation
-        CustomDtoGenerationTests.baseAssertions(clientDto);
-
-        ClientInfoDto clientInfo = clientDto.getClientInfo();
-        if (clientInfo.getClientType() == ClientType.ORG) {
-            OrgInfoDto orgInfo = ((OrgInfoDto) clientInfo);
-            assertThat(orgInfo.getOrgName(), not(startsWith(ClientDto.PREFIX)));
-        } else {
-            PersonInfoDto personInfo = ((PersonInfoDto) clientInfo);
-            assertAll(
-                    () -> assertThat(personInfo.getFirstName(), not(startsWith(ClientDto.PREFIX))),
-                    () -> assertThat(personInfo.getMiddleName(), not(startsWith(ClientDto.PREFIX))),
-                    () -> assertThat(personInfo.getSecondName(), not(startsWith(ClientDto.PREFIX)))
-            );
-        }
-
-        ClientInfoDto clientInfoWithPrefix = clientDto.getClientInfoWithPrefix();
-        if (clientInfoWithPrefix.getClientType() == ClientType.ORG) {
-            OrgInfoDto orgInfoWithPrefix = ((OrgInfoDto) clientInfoWithPrefix);
-            assertThat(orgInfoWithPrefix.getOrgName(), startsWith(ClientDto.PREFIX));
-        } else {
-            PersonInfoDto personInfoWithPrefix = ((PersonInfoDto) clientInfoWithPrefix);
-            assertAll(
-                    () -> assertThat(personInfoWithPrefix.getFirstName(), startsWith(ClientDto.PREFIX)),
-                    () -> assertThat(personInfoWithPrefix.getMiddleName(), startsWith(ClientDto.PREFIX)),
-                    () -> assertThat(personInfoWithPrefix.getSecondName(), startsWith(ClientDto.PREFIX))
-            );
-        }
     }
 
     @Test
@@ -196,6 +148,178 @@ class NestedDtoGenerationTests {
         );
 
         simpleIntegerGenerationAssertions(dto.getDtoNestedInteger());
+    }
+
+
+    static class DtoAnnotationNestedRemarks {
+
+        @StringRule
+        private String justString;
+
+        @NestedDtoRule
+        private Nested_3 notDefined;
+
+        @NestedDtoRule(ruleRemark = RuleRemark.MAX_VALUE)
+        private Nested_3 maxValues;
+
+        @NestedDtoRule(ruleRemark = RuleRemark.MIN_VALUE)
+        private Nested_3 minValues;
+    }
+
+    static class Nested_3 {
+
+        @NumberRule
+        private Integer integer;
+
+        @DecimalRule
+        private Double aDouble;
+    }
+
+    @Test
+    void nestedDtoAnnotationRemarks() {
+        DtoAnnotationNestedRemarks dto = DtoGenerator.builder(DtoAnnotationNestedRemarks.class)
+                .build().generateDto();
+
+        assertAll(
+                // there is few possibility of false negative result
+                () -> assertThat(dto.notDefined.aDouble, not(equalTo(Double.MAX_VALUE))),
+                () -> assertThat(dto.notDefined.integer, not(equalTo(Integer.MAX_VALUE))),
+
+                () -> assertThat(dto.maxValues.aDouble, equalTo(Double.MAX_VALUE)),
+                () -> assertThat(dto.maxValues.integer, equalTo(Integer.MAX_VALUE)),
+
+                () -> assertThat(dto.minValues.aDouble, equalTo(Double.MIN_VALUE)),
+                () -> assertThat(dto.minValues.integer, equalTo(Integer.MIN_VALUE))
+        );
+    }
+
+    @Test
+    void nestedDtoAnnotationRemarksGeneralOverride() {
+        DtoGeneratorBuilder<DtoAnnotationNestedRemarks> builder = DtoGenerator.builder(DtoAnnotationNestedRemarks.class);
+
+        builder.setRuleRemark(RuleRemark.MAX_VALUE);
+
+        DtoAnnotationNestedRemarks dto = builder.build().generateDto();
+
+        assertAll(
+                () -> assertThat(dto.notDefined.aDouble, equalTo(Double.MAX_VALUE)),
+                () -> assertThat(dto.notDefined.integer, equalTo(Integer.MAX_VALUE)),
+
+                () -> assertThat(dto.maxValues.aDouble, equalTo(Double.MAX_VALUE)),
+                () -> assertThat(dto.maxValues.integer, equalTo(Integer.MAX_VALUE)),
+
+                () -> assertThat(dto.minValues.aDouble, equalTo(Double.MAX_VALUE)),
+                () -> assertThat(dto.minValues.integer, equalTo(Integer.MAX_VALUE))
+        );
+    }
+
+    @Test
+    void nestedDtoAnnotationRemarksOverrideByField() {
+        DtoGeneratorBuilder<DtoAnnotationNestedRemarks> builder = DtoGenerator.builder(DtoAnnotationNestedRemarks.class);
+
+        builder
+                .setRuleRemark("notDefined.aDouble", RuleRemark.MIN_VALUE)
+                .setRuleRemark("notDefined.integer", RuleRemark.MAX_VALUE)
+                .setRuleRemark("maxValues.aDouble", RuleRemark.MIN_VALUE)
+                .setRuleRemark("maxValues.integer", RuleRemark.MIN_VALUE)
+                .setRuleRemark("minValues.aDouble", RuleRemark.MAX_VALUE)
+                .setRuleRemark("minValues.integer", RuleRemark.MAX_VALUE);
+
+        Consumer<DtoAnnotationNestedRemarks> assertions = dto ->
+                assertAll(
+                        () -> assertThat(dto.notDefined.aDouble, equalTo(Double.MIN_VALUE)),
+                        () -> assertThat(dto.notDefined.integer, equalTo(Integer.MAX_VALUE)),
+
+                        () -> assertThat(dto.maxValues.aDouble, equalTo(Double.MIN_VALUE)),
+                        () -> assertThat(dto.maxValues.integer, equalTo(Integer.MIN_VALUE)),
+
+                        () -> assertThat(dto.minValues.aDouble, equalTo(Double.MAX_VALUE)),
+                        () -> assertThat(dto.minValues.integer, equalTo(Integer.MAX_VALUE))
+                );
+
+        DtoAnnotationNestedRemarks dto1 = builder.build().generateDto();
+
+        assertions.accept(dto1);
+
+        DtoAnnotationNestedRemarks dto2 = builder.setRuleRemark(RuleRemark.MAX_VALUE).build().generateDto();
+
+        // remarks priority check
+        assertions.accept(dto2);
+    }
+
+    static class DtoWithNestedWithCustom {
+
+        @NumberRule
+        private Integer integer;
+
+        @NestedDtoRule
+        private Nested_4 nestedDto;
+    }
+
+    static class Nested_4 {
+
+        @CustomRule(generatorClass = CustomTypeGenerator.class)
+        private CustomType customType;
+
+        @StringRule(words = "LUDWIG")
+        private String string;
+    }
+
+    @AllArgsConstructor
+    static class CustomType {
+        String value;
+    }
+
+    static class CustomTypeGenerator implements ICustomGeneratorDtoDependent<CustomType, Object> {
+        Supplier<Object> generatedDtoSupplier;
+        Object generatedDto;
+
+        @Override
+        public CustomType generate() {
+            String requiredString;
+            if (generatedDto.getClass() == Nested_4.class) {
+                requiredString = ((Nested_4) generatedDto).string;
+            } else if (generatedDto.getClass() == DtoWithNestedWithCustom.class) {
+                requiredString = String.valueOf(((DtoWithNestedWithCustom) generatedDto).integer);
+            } else {
+                throw new IllegalStateException("Unknown root dto type: '" + generatedDto.getClass() + "'");
+            }
+            return new CustomType(requiredString);
+        }
+
+        @Override
+        public void setDtoSupplier(Supplier<Object> generatedDto) {
+            this.generatedDtoSupplier = generatedDto;
+        }
+
+        @Override
+        public boolean isDtoReady() {
+            if (generatedDto == null) {
+                generatedDto = generatedDtoSupplier.get();
+            }
+            if (generatedDto.getClass() == Nested_4.class) {
+                return ((Nested_4) generatedDto).string != null;
+            } else if (generatedDto.getClass() == DtoWithNestedWithCustom.class) {
+                return ((DtoWithNestedWithCustom) generatedDto).integer != null;
+            } else {
+                throw new IllegalStateException("Unknown root dto type: '" + generatedDto.getClass() + "'");
+            }
+        }
+
+    }
+
+    @Test
+    void nestedDtoWithCustomDtoDependentRules() {
+        DtoGeneratorBuilder<DtoWithNestedWithCustom> builder =
+                DtoGenerator.builder(DtoWithNestedWithCustom.class);
+
+        DtoWithNestedWithCustom dto = builder.build().generateDto();
+
+        assertAll(
+                () -> assertThat(dto.integer, notNullValue()),
+                () -> assertThat(dto.nestedDto.string, notNullValue()),
+                () -> assertThat(dto.nestedDto.customType.value, equalTo(String.valueOf(dto.integer)))
+        );
     }
 
 }

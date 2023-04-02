@@ -1,5 +1,6 @@
 package org.laoruga.dtogenerator.api.rules;
 
+import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.constants.Group;
 
@@ -18,7 +19,7 @@ public @interface CustomRule {
 
     Class<?> GENERATED_TYPE = Object.class;
 
-    Class<?> generatorClass();
+    Class<? extends ICustomGenerator<?>> generatorClass();
 
     String[] args() default {};
 

@@ -1,6 +1,7 @@
 package org.laoruga.dtogenerator.generator;
 
 import lombok.AllArgsConstructor;
+import org.laoruga.dtogenerator.api.generators.ICollectionGenerator;
 import org.laoruga.dtogenerator.api.generators.IGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
@@ -16,7 +17,7 @@ import java.util.Objects;
  */
 
 @AllArgsConstructor
-public class ArrayGenerator implements IGenerator<Object> {
+public class ArrayGenerator implements ICollectionGenerator {
 
     private int minSize;
     private int maxSize;
@@ -33,21 +34,26 @@ public class ArrayGenerator implements IGenerator<Object> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Object generate() {
         int size;
         switch ((RuleRemark) ruleRemark) {
+
             case MIN_VALUE:
                 size = minSize;
                 break;
+
             case MAX_VALUE:
                 size = maxSize;
                 break;
+
             case RANDOM_VALUE:
+            case NOT_DEFINED:
                 size = RandomUtils.nextInt(minSize, maxSize);
                 break;
+
             case NULL_VALUE:
                 return null;
+
             default:
                 throw new IllegalStateException("Unexpected value: " + ruleRemark);
         }
@@ -63,6 +69,7 @@ public class ArrayGenerator implements IGenerator<Object> {
         return newArray;
     }
 
+    @Override
     public IGenerator<?> getElementGenerator() {
         return elementGenerator;
     }

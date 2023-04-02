@@ -12,6 +12,7 @@ import org.laoruga.dtogenerator.util.ReflectionUtils;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -83,7 +84,7 @@ public final class TypeGeneratorsDefaultConfigSupplier {
         GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER = ImmutableMap.copyOf(configSupplier);
     }
 
-    public static Supplier<ConfigDto> getDefaultConfigSupplier(Class<?> generatedType) {
+    public static Optional<Supplier<ConfigDto>> getDefaultConfigSupplier(Class<?> generatedType) {
 
         if (!GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER.containsKey(generatedType)) {
 
@@ -91,15 +92,16 @@ public final class TypeGeneratorsDefaultConfigSupplier {
                     GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER.entrySet()) {
 
                 if (typeSupplierEntry.getKey().isAssignableFrom(generatedType)) {
-                    return typeSupplierEntry.getValue();
+                    return Optional.of(typeSupplierEntry.getValue());
                 }
 
             }
 
-            throw new IllegalArgumentException("Unable to get default config. Unknown type: " + generatedType);
+            log.info("Unable to get default config. Unknown type: " + generatedType);
+            return Optional.empty();
         }
 
-        return GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER.get(generatedType);
+        return Optional.of(GENERATED_TYPE_TO_DEFAULT_CONFIG_NEW_INSTANCE_SUPPLIER.get(generatedType));
     }
 
     private static void add(

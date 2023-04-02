@@ -2,7 +2,6 @@ package org.laoruga.dtogenerator.generator.config.dto.datetime;
 
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.constants.RuleRemark;
-import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalField;
@@ -38,16 +37,7 @@ public class ChronoFieldConfig implements ChronoConfig {
         if (value != 0) {
             return temporal.with(field, value);
         }
-        long shiftValue;
-        if (ruleRemark == RuleRemark.MIN_VALUE) {
-            shiftValue = leftBound;
-        } else if (ruleRemark == RuleRemark.MAX_VALUE) {
-            shiftValue = rightBound;
-        } else if (ruleRemark == RuleRemark.RANDOM_VALUE) {
-            shiftValue = RandomUtils.nextLong(leftBound, rightBound);
-        } else {
-            throw new IllegalStateException("Unexpected value " + ruleRemark);
-        }
+        long shiftValue = selectShift((RuleRemark) ruleRemark, leftBound, rightBound);
         return temporal.with(field, shiftValue);
     }
 }

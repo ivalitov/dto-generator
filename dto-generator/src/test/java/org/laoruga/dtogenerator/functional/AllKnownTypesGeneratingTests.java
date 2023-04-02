@@ -35,7 +35,7 @@ import static org.laoruga.dtogenerator.Constants.RESTORE_STATIC_CONFIG;
 @Epic("ALL_KNOWN_TYPES_GENERATING")
 @Slf4j
 @ExtendWith(Extensions.RestoreStaticConfig.class)
-public class AllKnownTypesGeneratingTests {
+class AllKnownTypesGeneratingTests {
 
     static class Dto {
 

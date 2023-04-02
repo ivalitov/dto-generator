@@ -28,7 +28,7 @@ import static org.laoruga.dtogenerator.constants.RuleRemark.*;
  */
 @ExtendWith(Extensions.RestoreStaticConfig.class)
 @Epic("ARRAY_RULES")
-public class ArrayTests {
+class ArrayTests {
 
     static class Dto {
 
@@ -71,7 +71,7 @@ public class ArrayTests {
 
     @Test
     @Tag(RESTORE_STATIC_CONFIG)
-    public void staticConfig() {
+    void staticConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -164,7 +164,7 @@ public class ArrayTests {
 
     @Test
     @Tag(RESTORE_STATIC_CONFIG)
-    public void staticAndInstanceAndFieldAndAnnotationConfig() {
+    void staticAndInstanceAndFieldAndAnnotationConfig() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
@@ -323,7 +323,7 @@ public class ArrayTests {
 
     @Test
     @Tag(RESTORE_STATIC_CONFIG)
-    public void withoutAnnotationsWithOverriddenConfig() {
+    void withoutAnnotationsWithOverriddenConfig() {
 
         DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
 

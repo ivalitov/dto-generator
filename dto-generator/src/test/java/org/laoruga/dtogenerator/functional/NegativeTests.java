@@ -24,7 +24,7 @@ import static org.laoruga.dtogenerator.constants.Group.GROUP_1;
  */
 @DisplayName("Negative tests")
 @Epic("NEGATIVE_TESTS")
-public class NegativeTests {
+class NegativeTests {
 
     static class DtoNegative1 {
         @NumberRule

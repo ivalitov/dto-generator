@@ -1,6 +1,7 @@
 package org.laoruga.dtogenerator;
 
 import lombok.Getter;
+import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -28,7 +29,7 @@ public class DtoGeneratorBuildersTree {
      * @return {@link DtoGeneratorBuilder} which was found in the tree.
      * If generator not found, it is instantiating lazy.
      */
-    public DtoGeneratorBuilder<?> getBuilderLazy(String[] fields) {
+    public DtoGeneratorBuilder<?> getBuilderLazy(String... fields) {
         if (fields.length < 1) {
             throw new IllegalArgumentException(
                     "Path must contain at least 1 element, but was: " + Arrays.asList(fields));
@@ -50,15 +51,29 @@ public class DtoGeneratorBuildersTree {
             }
         }
 
-        Node newNode = new Node(
-                new DtoGeneratorBuilder<>(tree.getDtoGeneratorBuilder(), fields),
-                fields[idx]
-        );
+        Node newNode = initNewNode(fields, idx);
 
         node.getChildren().add(newNode);
 
         return newNode;
     }
+
+    private Node initNewNode(String[] fields, int idx) {
+        Class<?> rootType = tree.dtoGeneratorBuilder
+                .getFieldGeneratorsProvider()
+                .getDtoInstanceSupplier().get()
+                .getClass();
+
+        DtoInstanceSupplier dtoInstanceSupplier = new DtoInstanceSupplier(
+                ReflectionUtils.getFieldType(fields, 1, rootType)
+        );
+
+        return new Node(
+                new DtoGeneratorBuilder<>(tree.getDtoGeneratorBuilder(), fields, dtoInstanceSupplier),
+                fields[idx]
+        );
+    }
+
 
     /**
      * Builder tree node.

@@ -80,9 +80,8 @@ public class GeneratorConfigurator {
         };
     }
 
-    public IRuleRemark getRuleRemark(String fieldName) {
-        return remarksHolder.getBasicRemarks().isBasicRuleRemarkExists(fieldName) ?
-                remarksHolder.getBasicRemarks().getBasicRuleRemark(fieldName) : null;
+    public IRuleRemark getRuleRemarkOrNull(String fieldName) {
+        return remarksHolder.getBasicRemarks().getBasicRuleRemarkOrNull(fieldName);
     }
 
     protected ConfigDto mergeGeneratorConfigurations(Supplier<ConfigDto> newConfigInstanceSupplier,
@@ -123,8 +122,8 @@ public class GeneratorConfigurator {
             config.merge(fieldConfig);
         }
 
-        if (getRuleRemark(fieldName) != null) {
-            config.setRuleRemark(getRuleRemark(fieldName));
+        if (getRuleRemarkOrNull(fieldName) != null) {
+            config.setRuleRemark(getRuleRemarkOrNull(fieldName));
         }
 
         if (specificConfiguration != null) {
