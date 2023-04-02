@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.ChronoUnitShift;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
@@ -291,7 +291,7 @@ class RulesGroupingTests {
         String arg;
     }
 
-    static class CustomGen implements ICustomGeneratorArgs<CustomDto> {
+    static class CustomGen implements CustomGeneratorArgs<CustomDto> {
 
         String arg;
 

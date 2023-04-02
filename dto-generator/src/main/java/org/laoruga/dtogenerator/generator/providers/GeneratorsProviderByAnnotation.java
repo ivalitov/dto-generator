@@ -2,9 +2,9 @@ package org.laoruga.dtogenerator.generator.providers;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkableArgs;
+import org.laoruga.dtogenerator.api.generators.Generator;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkable;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkableArgs;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.CustomGenerator;
@@ -13,7 +13,7 @@ import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSupplierInfo;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliers;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliersDefault;
-import org.laoruga.dtogenerator.rule.IRuleInfo;
+import org.laoruga.dtogenerator.rule.RuleInfo;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -42,12 +42,12 @@ public class GeneratorsProviderByAnnotation {
         this.defaultGeneratorSuppliers = GeneratorSuppliersDefault.getInstance();
     }
 
-    IGenerator<?> getGenerator(IRuleInfo ruleInfo) {
+    Generator<?> getGenerator(RuleInfo ruleInfo) {
 
         String fieldName = ruleInfo.getField().getName();
         Class<?> requiredType = ruleInfo.getRequiredType();
 
-        Optional<Function<ConfigDto, IGenerator<?>>> maybeUserGeneratorSupplier = getUserGeneratorSupplier(requiredType);
+        Optional<Function<ConfigDto, Generator<?>>> maybeUserGeneratorSupplier = getUserGeneratorSupplier(requiredType);
 
         if (maybeUserGeneratorSupplier.isPresent()) {
             // user generators are not configurable yet
@@ -60,15 +60,15 @@ public class GeneratorsProviderByAnnotation {
                 fieldName
         );
 
-        IGenerator<?> generator = getDefaultGeneratorSupplier(ruleInfo.getRule(), requiredType).apply(config);
+        Generator<?> generator = getDefaultGeneratorSupplier(ruleInfo.getRule(), requiredType).apply(config);
 
         prepareCustomRemarks(generator, fieldName);
 
         return generator;
     }
 
-    Function<ConfigDto, IGenerator<?>> getDefaultGeneratorSupplier(Annotation rules, Class<?> generatedType) {
-        Optional<Function<ConfigDto, IGenerator<?>>> maybeBuilder;
+    Function<ConfigDto, Generator<?>> getDefaultGeneratorSupplier(Annotation rules, Class<?> generatedType) {
+        Optional<Function<ConfigDto, Generator<?>>> maybeBuilder;
         switch (RuleType.getType(rules)) {
             case CUSTOM:
             case NESTED:
@@ -89,27 +89,27 @@ public class GeneratorsProviderByAnnotation {
         );
     }
 
-    Optional<Function<ConfigDto, IGenerator<?>>> getUserGeneratorSupplier(Class<?> generatedType) {
+    Optional<Function<ConfigDto, Generator<?>>> getUserGeneratorSupplier(Class<?> generatedType) {
         return userGeneratorSuppliers
                 .getGeneratorSupplierInfo(generatedType)
                 .map(GeneratorSupplierInfo::getGeneratorSupplier);
     }
 
 
-    void prepareCustomRemarks(IGenerator<?> generator, String fieldName) {
+    void prepareCustomRemarks(Generator<?> generator, String fieldName) {
         if (generator instanceof CustomGenerator) {
-            IGenerator<?> usersGeneratorInstance = ((CustomGenerator) generator).getUsersGeneratorInstance();
+            Generator<?> usersGeneratorInstance = ((CustomGenerator) generator).getUsersGeneratorInstance();
 
-            if (usersGeneratorInstance instanceof ICustomGeneratorRemarkableArgs) {
+            if (usersGeneratorInstance instanceof CustomGeneratorRemarkableArgs) {
 
-                ((ICustomGeneratorRemarkableArgs<?>) usersGeneratorInstance).setRuleRemarks(
+                ((CustomGeneratorRemarkableArgs<?>) usersGeneratorInstance).setRuleRemarks(
                         configuratorByAnnotation.getRemarksHolder()
                                 .getCustomRemarks()
                                 .getRemarksWithArgs(fieldName, usersGeneratorInstance.getClass()));
 
-            } else if (usersGeneratorInstance instanceof ICustomGeneratorRemarkable) {
+            } else if (usersGeneratorInstance instanceof CustomGeneratorRemarkable) {
 
-                ((ICustomGeneratorRemarkable<?>) usersGeneratorInstance).setRuleRemarks(
+                ((CustomGeneratorRemarkable<?>) usersGeneratorInstance).setRuleRemarks(
                         configuratorByAnnotation.getRemarksHolder()
                                 .getCustomRemarks()
                                 .getRemarks(fieldName, usersGeneratorInstance.getClass())
@@ -120,8 +120,8 @@ public class GeneratorsProviderByAnnotation {
 
     }
 
-    IGenerator<?> getGeneratorByType(Field field, Class<?> generatedType) {
-        Optional<IGenerator<?>> generatorByType = generatorsProviderByType.getGenerator(field, generatedType);
+    Generator<?> getGeneratorByType(Field field, Class<?> generatedType) {
+        Optional<Generator<?>> generatorByType = generatorsProviderByType.getGenerator(field, generatedType);
 
         if (!generatorByType.isPresent()) {
             throw new DtoGeneratorException("Generator wasn't found by type: '" + generatedType + "'" +

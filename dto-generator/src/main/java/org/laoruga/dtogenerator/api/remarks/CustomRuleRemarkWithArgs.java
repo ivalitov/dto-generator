@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.api.remarks;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 
 /**
  * @author Il'dar Valitov
@@ -11,9 +11,9 @@ import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
 
 @AllArgsConstructor
 @Getter
-public class CustomRuleRemarkWithArgs implements ICustomRuleRemarkArgs {
+public class CustomRuleRemarkWithArgs implements CustomRuleRemarkArgs {
 
-    private ICustomRuleRemarkArgs customRuleRemark;
+    private CustomRuleRemarkArgs customRuleRemark;
     private String[] args;
 
     @Override
@@ -27,12 +27,12 @@ public class CustomRuleRemarkWithArgs implements ICustomRuleRemarkArgs {
     }
 
     @Override
-    public Class<? extends ICustomGenerator<?>> getGeneratorClass() {
+    public Class<? extends CustomGenerator<?>> getGeneratorClass() {
         return customRuleRemark.getGeneratorClass();
     }
 
     @Override
-    public ICustomRuleRemarkArgs getRemarkInstance() {
+    public CustomRuleRemarkArgs getRemarkInstance() {
         return customRuleRemark;
     }
 

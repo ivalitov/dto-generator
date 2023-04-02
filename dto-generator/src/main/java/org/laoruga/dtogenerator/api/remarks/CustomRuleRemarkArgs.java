@@ -8,7 +8,7 @@ import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
  * Created on 05.02.2023
  */
 
-public interface ICustomRuleRemarkArgs extends ICustomRuleRemark {
+public interface CustomRuleRemarkArgs extends CustomRuleRemark {
     /**
      * Call this method for passing 'remark' to {@link DtoGeneratorBuilder}
      *
@@ -29,13 +29,13 @@ public interface ICustomRuleRemarkArgs extends ICustomRuleRemark {
 
     /**
      * A method for checking that the correct number of args
-     * have been passed with {@link ICustomRuleRemarkArgs#setArgs(java.lang.String...)}
+     * have been passed with {@link CustomRuleRemarkArgs#setArgs(java.lang.String...)}
      *
      * @return required number of args
      */
     int requiredArgsNumber();
 
-    default ICustomRuleRemark getRemarkInstance() {
+    default CustomRuleRemark getRemarkInstance() {
         return this;
     }
 }

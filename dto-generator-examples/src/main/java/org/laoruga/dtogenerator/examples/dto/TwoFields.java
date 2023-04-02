@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.examples.dto;
 import lombok.Getter;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import org.laoruga.dtogenerator.examples.generators.custom.CustomGeneratorDtoDependent;
+import org.laoruga.dtogenerator.examples.generators.custom.ExampleCustomGeneratorDtoDependent;
 
 /**
  * @author Il'dar Valitov
@@ -12,7 +12,7 @@ import org.laoruga.dtogenerator.examples.generators.custom.CustomGeneratorDtoDep
 @Getter
 public class TwoFields {
 
-    @CustomRule(generatorClass = CustomGeneratorDtoDependent.class)
+    @CustomRule(generatorClass = ExampleCustomGeneratorDtoDependent.class)
     String firstField;
 
     @StringRule(maxLength = 10)

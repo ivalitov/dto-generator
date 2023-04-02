@@ -1,7 +1,7 @@
 package org.laoruga.dtogenerator.generator.executors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.reflect.Field;
@@ -27,7 +27,7 @@ public class ExecutorOfGenerator extends AbstractExecutor {
     }
 
     @Override
-    public boolean execute(Field field, IGenerator<?> generator) {
+    public boolean execute(Field field, Generator<?> generator) {
         Object result;
         try {
             result = generator.generate();

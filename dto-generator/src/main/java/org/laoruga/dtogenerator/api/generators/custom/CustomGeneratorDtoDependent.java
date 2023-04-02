@@ -7,7 +7,7 @@ import java.util.function.Supplier;
  * Created on 16.04.2022
  */
 
-public interface ICustomGeneratorDtoDependent<T, V> extends ICustomGenerator<T> {
+public interface CustomGeneratorDtoDependent<T, V> extends CustomGenerator<T> {
 
     void setDtoSupplier(Supplier<V> generatedDto);
 

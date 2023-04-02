@@ -4,9 +4,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
-import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
+import org.laoruga.dtogenerator.api.generators.Generator;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
@@ -108,12 +108,12 @@ public class DtoGeneratorBuilder<T> {
      *
      * @param generatedType - type of generated class
      * @param typeGenerator - generator of provided generated type
-     * @param args          - params for custom generators with args {@link ICustomGeneratorArgs}
+     * @param args          - params for custom generators with args {@link CustomGeneratorArgs}
      * @return - this
      */
 
     public <U> DtoGeneratorBuilder<T> setGenerator(@NonNull Class<U> generatedType,
-                                                   @NonNull IGenerator<? super U> typeGenerator,
+                                                   @NonNull Generator<? super U> typeGenerator,
                                                    String... args) {
         fieldGeneratorsProvider.setGenerator(generatedType, typeGenerator, args);
         return this;
@@ -128,11 +128,11 @@ public class DtoGeneratorBuilder<T> {
      *
      * @param fieldName     - name of the field or path to the field separated by dots
      * @param typeGenerator - field value generator
-     * @param args          - params for custom generators with args {@link ICustomGeneratorArgs}
+     * @param args          - params for custom generators with args {@link CustomGeneratorArgs}
      * @return - this
      */
     public DtoGeneratorBuilder<T> setGenerator(@NonNull String fieldName,
-                                               @NonNull IGenerator<?> typeGenerator,
+                                               @NonNull Generator<?> typeGenerator,
                                                String... args) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
@@ -167,20 +167,20 @@ public class DtoGeneratorBuilder<T> {
      */
 
     public DtoGeneratorBuilder<T> addRuleRemark(@NonNull String fieldName,
-                                                @NonNull ICustomRuleRemark ruleRemark,
-                                                ICustomRuleRemark... ruleRemarks) {
+                                                @NonNull CustomRuleRemark ruleRemark,
+                                                CustomRuleRemark... ruleRemarks) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         RemarksHolderCustom customRemarks = dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
                 .getRemarksHolder()
                 .getCustomRemarks();
         customRemarks.addRemark(fieldNameAndPath.getLeft(), ruleRemark);
-        for (ICustomRuleRemark remark : ruleRemarks) {
+        for (CustomRuleRemark remark : ruleRemarks) {
             customRemarks.addRemark(fieldNameAndPath.getLeft(), remark);
         }
         return this;
     }
 
-    public DtoGeneratorBuilder<T> addRuleRemark(@NonNull ICustomRuleRemark ruleRemarks) {
+    public DtoGeneratorBuilder<T> addRuleRemark(@NonNull CustomRuleRemark ruleRemarks) {
         getRemarksHolder()
                 .getCustomRemarks()
                 .addRemarkForAnyField(ruleRemarks);

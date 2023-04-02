@@ -1,7 +1,6 @@
 package org.laoruga.dtogenerator.generator.config.dto.datetime;
 
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.constants.RuleRemark;
 
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalUnit;
@@ -36,7 +35,7 @@ public class ChronoUnitConfig implements ChronoConfig {
         if (shift != 0) {
             return temporal.plus(shift, unit);
         }
-        long shiftValue = selectShift((RuleRemark) ruleRemark, leftBound, rightBound);
+        long shiftValue = selectShift((org.laoruga.dtogenerator.constants.RuleRemark) ruleRemark, leftBound, rightBound);
         return temporal.plus(shiftValue, unit);
     }
 

@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.generator.executors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.ErrorsHolder;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
@@ -22,13 +22,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BatchExecutor {
 
-    private final Map<Field, IGenerator<?>> fieldGeneratorMap;
-    private final ThreadLocal<Map<Field, IGenerator<?>>> generatorsNotExecutedDueToError;
+    private final Map<Field, Generator<?>> fieldGeneratorMap;
+    private final ThreadLocal<Map<Field, Generator<?>>> generatorsNotExecutedDueToError;
     private final AbstractExecutor executorsChain;
     private final ErrorsHolder errorsHolder;
     private int maxAttempts;
 
-    public BatchExecutor(AbstractExecutor executorsChain, Map<Field, IGenerator<?>> generatorMap) {
+    public BatchExecutor(AbstractExecutor executorsChain, Map<Field, Generator<?>> generatorMap) {
         this.fieldGeneratorMap = generatorMap;
         this.generatorsNotExecutedDueToError = new ThreadLocal<>();
         this.executorsChain = executorsChain;
@@ -48,7 +48,7 @@ public class BatchExecutor {
 
             while (!success && maxAttempts > attempt.get()) {
 
-                Map<Field, IGenerator<?>> failedGeneratorsMap = generatorsNotExecutedDueToError.get();
+                Map<Field, Generator<?>> failedGeneratorsMap = generatorsNotExecutedDueToError.get();
 
                 if (failedGeneratorsMap == null || failedGeneratorsMap.isEmpty()) {
                     success = executeEachGenerator(attempt);
@@ -73,13 +73,13 @@ public class BatchExecutor {
 
         boolean allGeneratorExecutedSuccessfully = true;
 
-        Iterator<Map.Entry<Field, IGenerator<?>>> generatorsIterator = fieldGeneratorMap.entrySet().iterator();
+        Iterator<Map.Entry<Field, Generator<?>>> generatorsIterator = fieldGeneratorMap.entrySet().iterator();
 
         while (generatorsIterator.hasNext() && maxAttempts >= attempt.get()) {
-            Map.Entry<Field, IGenerator<?>> nextGenerator = generatorsIterator.next();
+            Map.Entry<Field, Generator<?>> nextGenerator = generatorsIterator.next();
 
             Field field = nextGenerator.getKey();
-            IGenerator<?> generator = nextGenerator.getValue();
+            Generator<?> generator = nextGenerator.getValue();
 
             boolean generatorExecutedSuccessfully = false;
             try {
@@ -100,16 +100,16 @@ public class BatchExecutor {
 
     private boolean executeEachRemainingGenerator(AtomicInteger attempt) {
 
-        Map<Field, IGenerator<?>> fieldGeneratorMapNotExecutedDueToError = generatorsNotExecutedDueToError.get();
+        Map<Field, Generator<?>> fieldGeneratorMapNotExecutedDueToError = generatorsNotExecutedDueToError.get();
 
-        Iterator<Map.Entry<Field, IGenerator<?>>> generatorsIterator =
+        Iterator<Map.Entry<Field, Generator<?>>> generatorsIterator =
                 fieldGeneratorMapNotExecutedDueToError.entrySet().iterator();
 
         while (generatorsIterator.hasNext() && maxAttempts >= attempt.get()) {
-            Map.Entry<Field, IGenerator<?>> nextGenerator = generatorsIterator.next();
+            Map.Entry<Field, Generator<?>> nextGenerator = generatorsIterator.next();
 
             Field field = nextGenerator.getKey();
-            IGenerator<?> generator = nextGenerator.getValue();
+            Generator<?> generator = nextGenerator.getValue();
 
             boolean generatorExecutedSuccessfully = false;
             try {
@@ -130,8 +130,8 @@ public class BatchExecutor {
         return fieldGeneratorMapNotExecutedDueToError.isEmpty();
     }
 
-    private void addGeneratorToReExecution(Field field, IGenerator<?> generator) {
-        Map<Field, IGenerator<?>> generatorsToReExecution = generatorsNotExecutedDueToError.get();
+    private void addGeneratorToReExecution(Field field, Generator<?> generator) {
+        Map<Field, Generator<?>> generatorsToReExecution = generatorsNotExecutedDueToError.get();
         if (generatorsToReExecution == null) {
             generatorsToReExecution = new HashMap<>();
             generatorsNotExecutedDueToError.set(generatorsToReExecution);
@@ -141,7 +141,7 @@ public class BatchExecutor {
 
 
     private void logErrorInfo() {
-        Map<Field, IGenerator<?>> fieldIGeneratorMap = generatorsNotExecutedDueToError.get();
+        Map<Field, Generator<?>> fieldIGeneratorMap = generatorsNotExecutedDueToError.get();
         AtomicInteger counter = new AtomicInteger(0);
         String leftGenerators = fieldIGeneratorMap.entrySet()
                 .stream()

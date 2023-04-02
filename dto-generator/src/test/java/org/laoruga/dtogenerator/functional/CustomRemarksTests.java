@@ -10,10 +10,10 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorDtoDependent;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkableArgs;
-import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
-import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemarkArgs;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorDtoDependent;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkableArgs;
+import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkArgs;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.generator.config.dto.MapConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
@@ -110,7 +110,7 @@ public class CustomRemarksTests {
         Integer petalCount;
     }
 
-    enum FlowerProperty implements ICustomRuleRemarkArgs {
+    enum FlowerProperty implements CustomRuleRemarkArgs {
         REGION,
         PETAL_COUNT;
 
@@ -308,10 +308,10 @@ public class CustomRemarksTests {
     private static final String[] COUNTRIES = {"Italy", "USA", "Ukraine"};
 
     static class FlowerGenerator implements
-            ICustomGeneratorRemarkableArgs<Flower>,
-            ICustomGeneratorDtoDependent<Flower, Dto> {
+            CustomGeneratorRemarkableArgs<Flower>,
+            CustomGeneratorDtoDependent<Flower, Dto> {
 
-        Map<ICustomRuleRemark, ICustomRuleRemarkArgs> ruleRemarks;
+        Map<CustomRuleRemark, CustomRuleRemarkArgs> ruleRemarks;
         Supplier<Dto> generatedDto;
 
         @Override
@@ -342,7 +342,7 @@ public class CustomRemarksTests {
         }
 
         @Override
-        public void setRuleRemarks(Map<ICustomRuleRemark, ICustomRuleRemarkArgs> ruleRemarks) {
+        public void setRuleRemarks(Map<CustomRuleRemark, CustomRuleRemarkArgs> ruleRemarks) {
             this.ruleRemarks = ruleRemarks;
         }
 

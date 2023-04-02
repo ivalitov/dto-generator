@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.generator.config.dto;
 
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.MapRule;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
@@ -25,8 +25,8 @@ public class MapConfig implements ConfigDto {
     private Integer minSize;
     private Integer maxSize;
     private Supplier<Map<Object, Object>> mapInstanceSupplier;
-    private IGenerator<Object> keyGenerator;
-    private IGenerator<Object> valueGenerator;
+    private Generator<Object> keyGenerator;
+    private Generator<Object> valueGenerator;
     private IRuleRemark ruleRemark;
 
     public MapConfig(MapRule rule) {

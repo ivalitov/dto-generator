@@ -10,8 +10,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorRemarkable;
-import org.laoruga.dtogenerator.api.remarks.ICustomRuleRemark;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkable;
+import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.functional.data.customgenerator.RemarkNonArgs;
 import org.laoruga.dtogenerator.functional.data.customgenerator.RemarkUniversal;
@@ -162,9 +162,9 @@ class CustomDtoGenerationTests {
     static class Foo {
     }
 
-    static class FooGenerator implements ICustomGeneratorRemarkable<Foo> {
+    static class FooGenerator implements CustomGeneratorRemarkable<Foo> {
 
-        Set<ICustomRuleRemark> ruleRemarks;
+        Set<CustomRuleRemark> ruleRemarks;
 
         @Override
         public Foo generate() {
@@ -176,7 +176,7 @@ class CustomDtoGenerationTests {
         }
 
         @Override
-        public void setRuleRemarks(Set<ICustomRuleRemark> ruleRemarks) {
+        public void setRuleRemarks(Set<CustomRuleRemark> ruleRemarks) {
             this.ruleRemarks = ruleRemarks;
         }
     }

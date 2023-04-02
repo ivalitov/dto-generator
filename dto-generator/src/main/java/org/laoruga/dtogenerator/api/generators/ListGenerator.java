@@ -5,7 +5,7 @@ package org.laoruga.dtogenerator.api.generators;
  * Created on 28.04.2022
  */
 
-public interface ICollectionGenerator extends IGenerator<Object> {
+public interface ListGenerator extends Generator<Object> {
 
-    IGenerator<?> getElementGenerator();
+    Generator<?> getElementGenerator();
 }

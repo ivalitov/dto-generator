@@ -52,10 +52,10 @@ public class RulesInfoExtractor {
      *
      * @param fieldToInspect - field containing {@link Rule} and/or {@link Rules} annotations
      * @return - an empty Optional if Rules excluded by group filter {@link FieldFilter},
-     * otherwise {@link IRuleInfo} object containing rules information.
+     * otherwise {@link RuleInfo} object containing rules information.
      * @throws DtoGeneratorValidationException - if rules annotations quantity check failed.
      */
-    public synchronized Optional<IRuleInfo> extractRulesInfo(Field fieldToInspect) throws DtoGeneratorValidationException {
+    public synchronized Optional<RuleInfo> extractRulesInfo(Field fieldToInspect) throws DtoGeneratorValidationException {
 
         this.field = fieldToInspect;
 
@@ -66,7 +66,7 @@ public class RulesInfoExtractor {
             return Optional.empty();
         }
 
-        IRuleInfo ruleInfo = null;
+        RuleInfo ruleInfo = null;
 
         switch (RulesInfoHelper.getHelperType(annotation)) {
 
@@ -150,11 +150,11 @@ public class RulesInfoExtractor {
         return Optional.ofNullable(ruleInfo);
     }
 
-    private RuleInfo buildRuleInfo(Annotation rule, Class<?> requiredType, String groupName, boolean isMultipleRules) {
+    private RuleInfoSimple buildRuleInfo(Annotation rule, Class<?> requiredType, String groupName, boolean isMultipleRules) {
 
         validateType(requiredType, rule);
 
-        return RuleInfo.builder()
+        return RuleInfoSimple.builder()
                 .field(field)
                 .requiredType(requiredType)
                 .rule(rule)
@@ -174,9 +174,9 @@ public class RulesInfoExtractor {
         validateType(elementType, elementRule);
         validateType(field.getType(), collectionRule);
 
-        RuleInfo collectionElementInfo = buildRuleInfo(elementRule, elementType, groupName, false);
+        RuleInfoSimple collectionElementInfo = buildRuleInfo(elementRule, elementType, groupName, false);
 
-        RuleInfo collectionInfo = RuleInfo.builder()
+        RuleInfoSimple collectionInfo = RuleInfoSimple.builder()
                 .rule(collectionRule)
                 .ruleType(RuleType.getType(collectionRule))
                 .multipleRules(isMultipleRules)
@@ -193,7 +193,7 @@ public class RulesInfoExtractor {
 
     }
 
-    private IRuleInfo buildArrayRuleInfo(ArrayRule arrayRule, String groupName, boolean isMultipleRules) {
+    private RuleInfo buildArrayRuleInfo(ArrayRule arrayRule, String groupName, boolean isMultipleRules) {
 
         Class<?> elementType = ReflectionUtils.getArrayElementType(field.getType());
         Annotation elementRule = ReflectionUtils.getSingleRuleFromEntry(arrayRule.element(), elementType);
@@ -201,9 +201,9 @@ public class RulesInfoExtractor {
         validateType(elementType, elementRule);
         validateType(field.getType(), arrayRule);
 
-        RuleInfo arrayElementInfo = buildRuleInfo(elementRule, elementType, groupName, false);
+        RuleInfoSimple arrayElementInfo = buildRuleInfo(elementRule, elementType, groupName, false);
 
-        RuleInfo arrayInfo = RuleInfo.builder()
+        RuleInfoSimple arrayInfo = RuleInfoSimple.builder()
                 .rule(arrayRule)
                 .ruleType(RuleType.getType(arrayRule))
                 .multipleRules(isMultipleRules)
@@ -230,13 +230,13 @@ public class RulesInfoExtractor {
         validateType(keyValueTypes[0], keyRule);
         validateType(keyValueTypes[1], valueRule);
 
-        RuleInfo mapKeyRuleInfo =
+        RuleInfoSimple mapKeyRuleInfo =
                 buildRuleInfo(keyRule, keyValueTypes[0], groupName, false);
 
-        RuleInfo mapValueRuleInfo =
+        RuleInfoSimple mapValueRuleInfo =
                 buildRuleInfo(valueRule, keyValueTypes[1], groupName, false);
 
-        RuleInfo mapRuleInfo = RuleInfo.builder()
+        RuleInfoSimple mapRuleInfo = RuleInfoSimple.builder()
                 .rule(mapRule)
                 .ruleType(RuleType.getType(mapRule))
                 .multipleRules(isMultipleRules)

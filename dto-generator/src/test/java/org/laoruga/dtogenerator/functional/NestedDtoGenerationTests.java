@@ -10,7 +10,7 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorDtoDependent;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.constants.RulesInstance;
@@ -270,7 +270,7 @@ class NestedDtoGenerationTests {
         String value;
     }
 
-    static class CustomTypeGenerator implements ICustomGeneratorDtoDependent<CustomType, Object> {
+    static class CustomTypeGenerator implements CustomGeneratorDtoDependent<CustomType, Object> {
         Supplier<Object> generatedDtoSupplier;
         Object generatedDto;
 

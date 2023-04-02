@@ -2,9 +2,9 @@ package org.laoruga.dtogenerator.generator.config;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorDtoDependent;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.util.Arrays;
@@ -21,13 +21,13 @@ public class CustomGeneratorConfigurator {
     private String[] args;
     private Supplier<?> dtoInstanceSupplier;
 
-    public void configure(ICustomGenerator<?> generatorInstance) {
+    public void configure(CustomGenerator<?> generatorInstance) {
         try {
-            if (generatorInstance instanceof ICustomGeneratorArgs) {
+            if (generatorInstance instanceof CustomGeneratorArgs) {
                 log.debug("Custom generator args: ' " + Arrays.asList(args) + " ' have been obtained.");
-                ((ICustomGeneratorArgs<?>) generatorInstance).setArgs(args);
+                ((CustomGeneratorArgs<?>) generatorInstance).setArgs(args);
             }
-            if (generatorInstance instanceof ICustomGeneratorDtoDependent) {
+            if (generatorInstance instanceof CustomGeneratorDtoDependent) {
                 setDto(generatorInstance);
             }
         } catch (Exception e) {
@@ -38,7 +38,7 @@ public class CustomGeneratorConfigurator {
     @SuppressWarnings("unchecked")
     private void setDto(Object generatorInstance) {
         try {
-            ((ICustomGeneratorDtoDependent) generatorInstance).setDtoSupplier(dtoInstanceSupplier);
+            ((CustomGeneratorDtoDependent) generatorInstance).setDtoSupplier(dtoInstanceSupplier);
         } catch (ClassCastException e) {
             throw new DtoGeneratorException("ClassCastException while trying to set basic DTO into " +
                     "DTO dependent custom generator. Perhaps there is wrong argument type is passing into " +

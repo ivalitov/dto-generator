@@ -1,8 +1,8 @@
 package org.laoruga.dtogenerator.generator.providers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.CustomGeneratorConfigurator;
 
@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 @Slf4j
 public class GeneratorsProviderByField {
 
-    private final Map<String, IGenerator<?>> overriddenGeneratorsForFields;
+    private final Map<String, Generator<?>> overriddenGeneratorsForFields;
     private final Supplier<?> rootDtoInstanceSupplier;
 
     public GeneratorsProviderByField(Supplier<?> rootDtoInstanceSupplier) {
@@ -26,7 +26,7 @@ public class GeneratorsProviderByField {
         this.overriddenGeneratorsForFields = new HashMap<>();
     }
 
-    synchronized IGenerator<?> getGenerator(Field field) {
+    synchronized Generator<?> getGenerator(Field field) {
         return overriddenGeneratorsForFields.get(field.getName());
     }
 
@@ -34,17 +34,17 @@ public class GeneratorsProviderByField {
         return overriddenGeneratorsForFields.containsKey(fieldName);
     }
 
-    synchronized void setGeneratorBuilderForField(String fieldName, IGenerator<?> generator, String... args) {
+    synchronized void setGeneratorBuilderForField(String fieldName, Generator<?> generator, String... args) {
         if (overriddenGeneratorsForFields.containsKey(fieldName)) {
             throw new DtoGeneratorException(
                     "Generator has already been added explicitly for the field: '" + fieldName + "'");
         }
-        if (generator instanceof ICustomGenerator) {
+        if (generator instanceof CustomGenerator) {
             CustomGeneratorConfigurator.builder()
                     .args(args)
                     .dtoInstanceSupplier(rootDtoInstanceSupplier)
                     .build()
-                    .configure((ICustomGenerator<?>) generator);
+                    .configure((CustomGenerator<?>) generator);
         }
         overriddenGeneratorsForFields.put(fieldName, generator);
     }

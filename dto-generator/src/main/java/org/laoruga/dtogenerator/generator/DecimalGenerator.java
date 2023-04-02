@@ -1,9 +1,8 @@
 package org.laoruga.dtogenerator.generator;
 
 import lombok.AllArgsConstructor;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.generator.config.dto.DecimalConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
@@ -13,7 +12,7 @@ import org.laoruga.dtogenerator.util.RandomUtils;
  */
 
 @AllArgsConstructor
-public class DecimalGenerator implements IGenerator<Number> {
+public class DecimalGenerator implements Generator<Number> {
 
     private final Number maxValue;
     private final Number minValue;
@@ -29,7 +28,7 @@ public class DecimalGenerator implements IGenerator<Number> {
 
     @Override
     public Number generate() {
-        switch ((RuleRemark) ruleRemark) {
+        switch ((org.laoruga.dtogenerator.constants.RuleRemark) ruleRemark) {
 
             case MIN_VALUE:
                 return minValue;

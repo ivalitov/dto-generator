@@ -2,9 +2,8 @@ package org.laoruga.dtogenerator.generator;
 
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.EnumConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
@@ -18,7 +17,7 @@ import java.util.Comparator;
  */
 
 @AllArgsConstructor
-public class EnumGenerator implements IGenerator<Enum> {
+public class EnumGenerator implements Generator<Enum> {
 
     private final String[] possibleEnumNames;
     private final Class<? extends Enum<?>> enumClass;
@@ -45,7 +44,7 @@ public class EnumGenerator implements IGenerator<Enum> {
                 .sorted(Comparator.comparing(String::length))
                 .toArray(String[]::new);
         String enumInstanceName;
-        switch ((RuleRemark) ruleRemark) {
+        switch ((org.laoruga.dtogenerator.constants.RuleRemark) ruleRemark) {
 
             case MIN_VALUE:
                 enumInstanceName = sortedEnumNames[0];

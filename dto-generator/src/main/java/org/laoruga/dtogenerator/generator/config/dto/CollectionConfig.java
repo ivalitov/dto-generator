@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.generator.config.dto;
 
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
@@ -24,7 +24,7 @@ public class CollectionConfig implements ConfigDto {
     private Integer minSize;
     private Integer maxSize;
     private Supplier<?> collectionInstanceSupplier;
-    private IGenerator<?> elementGenerator;
+    private Generator<?> elementGenerator;
     private IRuleRemark ruleRemark;
 
     public CollectionConfig(CollectionRule rule) {

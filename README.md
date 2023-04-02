@@ -464,7 +464,7 @@ Example of custom generator with args:
 
 ```java
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import java.util.Map;
 

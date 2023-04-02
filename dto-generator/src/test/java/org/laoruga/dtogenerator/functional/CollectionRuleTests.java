@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.api.rules.Entry;
@@ -478,7 +478,7 @@ public class CollectionRuleTests {
         String argument;
     }
 
-    static class CustomGenerator implements ICustomGeneratorArgs<CustomDto> {
+    static class CustomGenerator implements CustomGeneratorArgs<CustomDto> {
 
         String arg;
 

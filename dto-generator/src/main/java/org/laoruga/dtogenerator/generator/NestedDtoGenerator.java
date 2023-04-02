@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
+import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.NestedConfig;
@@ -15,7 +15,7 @@ import org.laoruga.dtogenerator.generator.config.dto.NestedConfig;
  */
 @AllArgsConstructor
 @Slf4j
-public class NestedDtoGenerator implements IGenerator<Object> {
+public class NestedDtoGenerator implements Generator<Object> {
 
     private final DtoGenerator<?> dtoGenerator;
 

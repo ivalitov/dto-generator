@@ -4,7 +4,7 @@ import com.google.common.primitives.Primitives;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.RemarksHolder;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
@@ -127,7 +127,7 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
 
                 CustomRule customRule = (CustomRule) rules;
 
-                ICustomGenerator<?> generatorInstance = createInstance(customRule.generatorClass());
+                CustomGenerator<?> generatorInstance = createInstance(customRule.generatorClass());
 
                 CustomGeneratorConfigurator.builder()
                         .args(customRule.args())

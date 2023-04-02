@@ -1,8 +1,8 @@
 package org.laoruga.dtogenerator.generator.executors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.IGenerator;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorDtoDependent;
+import org.laoruga.dtogenerator.api.generators.Generator;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.CustomGenerator;
 
@@ -22,7 +22,7 @@ public class ExecutorOfDtoDependentGenerator extends ExecutorOfGenerator {
     }
 
     @Override
-    public boolean execute(Field field, IGenerator<?> generator) {
+    public boolean execute(Field field, Generator<?> generator) {
         if (isItDtoDependentGenerator(generator)) {
             if (isDtoReadyForFieldGeneration(generator)) {
                 return super.execute(field, generator);
@@ -40,23 +40,23 @@ public class ExecutorOfDtoDependentGenerator extends ExecutorOfGenerator {
      * @return - doesn't DTO ready?
      * @throws DtoGeneratorException - throws if all attempts are spent
      */
-    protected boolean isDtoReadyForFieldGeneration(IGenerator<?> generator) throws DtoGeneratorException {
-        ICustomGeneratorDtoDependent<?, ?> usersGeneratorInstance;
+    protected boolean isDtoReadyForFieldGeneration(Generator<?> generator) throws DtoGeneratorException {
+        CustomGeneratorDtoDependent<?, ?> usersGeneratorInstance;
         if (generator instanceof CustomGenerator) {
-            usersGeneratorInstance = (ICustomGeneratorDtoDependent<?, ?>) ((CustomGenerator) generator).getUsersGeneratorInstance();
+            usersGeneratorInstance = (CustomGeneratorDtoDependent<?, ?>) ((CustomGenerator) generator).getUsersGeneratorInstance();
         } else {
-            usersGeneratorInstance = (ICustomGeneratorDtoDependent<?, ?>) generator;
+            usersGeneratorInstance = (CustomGeneratorDtoDependent<?, ?>) generator;
         }
         boolean dtoReady = usersGeneratorInstance.isDtoReady();
         log.debug("Object " + (dtoReady ? "is" : "isn't") + " ready to generate dependent field value");
         return dtoReady;
     }
 
-    protected boolean isItDtoDependentGenerator(IGenerator<?> generator) {
+    protected boolean isItDtoDependentGenerator(Generator<?> generator) {
         if (generator instanceof CustomGenerator) {
             return ((CustomGenerator) generator).getUsersGeneratorInstance()
-                    instanceof ICustomGeneratorDtoDependent;
+                    instanceof CustomGeneratorDtoDependent;
         }
-        return generator instanceof ICustomGeneratorDtoDependent;
+        return generator instanceof CustomGeneratorDtoDependent;
     }
 }

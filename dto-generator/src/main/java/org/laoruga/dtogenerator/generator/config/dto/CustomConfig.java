@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 
 /**
@@ -17,7 +17,7 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 @Slf4j
 public class CustomConfig implements ConfigDto {
 
-    private ICustomGenerator<?> customGenerator;
+    private CustomGenerator<?> customGenerator;
 
     private static final RuntimeException NOT_IMPLEMENTED =
             new NotImplementedException(

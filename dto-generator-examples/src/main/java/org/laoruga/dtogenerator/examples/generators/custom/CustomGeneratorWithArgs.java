@@ -1,6 +1,6 @@
 package org.laoruga.dtogenerator.examples.generators.custom;
 
-import org.laoruga.dtogenerator.api.generators.custom.ICustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
 import lombok.AllArgsConstructor;
 import org.apache.commons.text.RandomStringGenerator;
 
@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
  * @author Il'dar Valitov
  * Created on 15.11.2022
  */
-public class CustomGeneratorWithArgs implements ICustomGeneratorArgs<List<String>> {
+public class CustomGeneratorWithArgs implements CustomGeneratorArgs<List<String>> {
 
     Args args;
 

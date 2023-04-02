@@ -2,7 +2,6 @@ package org.laoruga.dtogenerator;
 
 import lombok.NonNull;
 import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.util.HashMap;
@@ -42,7 +41,7 @@ public class RemarksHolderBasic {
      */
 
     void setBasicRuleRemarkForField(@NonNull String filedName,
-                                    @NonNull RuleRemark ruleRemark) {
+                                    @NonNull org.laoruga.dtogenerator.constants.RuleRemark ruleRemark) {
         if (basicRuleRemarksMapByField.containsKey(filedName)) {
             throw new DtoGeneratorException("Attempt to overwrite remark from: '" + getBasicRuleRemarkOrNull(filedName) + "'" +
                     " to: '" + ruleRemark + "' for field '" + filedName + "'.");
@@ -50,7 +49,7 @@ public class RemarksHolderBasic {
         basicRuleRemarksMapByField.put(filedName, ruleRemark);
     }
 
-    void setBasicRuleRemarkForAnyField(RuleRemark basicRuleRemark) {
+    void setBasicRuleRemarkForAnyField(org.laoruga.dtogenerator.constants.RuleRemark basicRuleRemark) {
         if (basicRuleRemarkForAnyField.get() != null && basicRuleRemarkForAnyField.get() != basicRuleRemark) {
             throw new DtoGeneratorException("Attempt to overwrite remark for all fields from: '"
                     + basicRuleRemarkForAnyField.get() + "' to: '" + basicRuleRemark + "'.");
