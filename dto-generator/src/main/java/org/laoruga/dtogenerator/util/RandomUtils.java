@@ -110,6 +110,13 @@ public final class RandomUtils {
         return items[nextInt(0, items.length - 1)];
     }
 
+    public static int getRandomItem(int... items) {
+        if (items.length == 0) {
+            throw new IllegalArgumentException("Empty int array passed");
+        }
+        return items[nextInt(0, items.length - 1)];
+    }
+
     public static synchronized long nextLong(long minNumber, long maxNumber) {
         if (minNumber == maxNumber) {
             return minNumber;

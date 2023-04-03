@@ -3,6 +3,7 @@ package laoruga.dto.generator.examples;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.examples.Utils;
 import org.laoruga.dtogenerator.examples.dto.Office;
 import org.laoruga.dtogenerator.examples.dto.SolarSystem;
 import org.laoruga.dtogenerator.examples.dto.TwoFields;

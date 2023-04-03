@@ -9,16 +9,18 @@
 
 ## Description
 
-DTO Generator is a Java library that makes it easy to get Java objects filled with random data generated according to given rules.
+DTO Generator is a Java library that makes it easy to get Java objects filled with random data generated according to
+given rules.
 
 There are various ways to provide configuration:
+
 - directly on the DTO fields via annotations ;
 - by configuring DtoGenerator instance;
 - by updating common default configuration;
 - do not set anything relying on default configuration;
 - use all the above approaches together.
 
-This can be useful for test automation, when high variability of data is required.
+This is useful for a test automation when high variability of data is required.
 
 ## Documentation
 
@@ -26,24 +28,27 @@ Description of all features, examples, configurations is still in progress.
 
 ## Generation API
 
-So-called "@Rules" annotations are used to provide configuration on the field:
+So-called `@Rule` annotations are used to provide configuration on the field:
 
-- *@StringRule*
-- *@IntegerRule*
-- *@LongRule*
-- *@DoubleRule*
-- *@LocalDateTimeRule*
-- *@EnumRule*
-- *@ListRule*
-- *@SetRule*
+- `@StringRule`
+- `@NumberRule`
+- `@DecimalRule`
+- `@DoubleRule`
+- `@DateTimeRule`
+- `@BooleanRule`
+- `@EnumRule`
+- `@CollectionRule`
+- `@ArrayRule`
+- `@MapRule`
 
-If a DTO class contains within its fields another DTOs, which fields must to be generated as well, the following annotation is used to tell the generator about it [see more below](#nested_dto):
+If a DTO class contains within its fields another DTOs, which fields must be generated as well,
+the following annotation is used to tell to the generator about it [see more below](#nested_dto):
 
-- *@NestedDtoRule*
+- `@NestedDtoRule`
 
 If you want to create your own generator of specific type, next annotation is used [see more below](#custom_rule):
 
-- *@CustomRule*
+- `@CustomRule`
 
 ## Usage
 
@@ -52,7 +57,7 @@ If you want to create your own generator of specific type, next annotation is us
 3. [Known Type's Generation](#known_types_generation)
 4. [Configuration management](#config_management)
 5. [Rule's Remarks](#rules_remarks)
-6. [User's Builders](#users_builder)
+6. [User's Builders](#user_generators)
 7. [Nested DTO](#nested_dto)
 8. [Custom Rules](#custom_rule)
 9. [Requirements for POJO classes](#pojo_requirements)
@@ -65,36 +70,31 @@ If you want to create your own generator of specific type, next annotation is us
 For example, if we're using next rules:
 
 ```java
-import org.laoruga.dtogenerator.api.rules.*;
-
-import java.time.LocalDateTime;
-
 public class Dto {
 
     @StringRule(words = {"Kate", "John", "Garcia"})
-    private String name;
+    public String name;
 
-    @IntegerRule(minValue = 18, maxValue = 45)
-    private Integer age;
+    @NumberRule(minInt = 18, maxInt = 45)
+    public Integer age;
 
     @EnumRule(possibleEnumNames = {"DRIVER_LICENCE", "PASSPORT"})
-    private DocType docType;
+    public DocType docType;
 
-    @LocalDateTimeRule(rightShiftDays = 0)
-    private LocalDateTime lastVisit;
+    @DateTimeRule(chronoUnitShift = @ChronoUnitShift(unit = DAYS, leftBound = -100, rightBound = -10))
+    public LocalDateTime lastVisit;
 
 }
 ```
 
-In order to generate an object filled with random data, just create a **DtoGeneratorBuilder** instance and call  **generateDto()** method:
+In order to generate an object filled with random data, just create a **DtoGeneratorBuilder** instance and call  **
+generateDto()** method:
 
 ```java
-import org.laoruga.dtogenerator.DtoGenerator;
-
 public class Foo {
     void bar() {
-        // 1. You can pass class of DTO
-        // and every call of generateDto method will provide new instance with random data
+        // 1. You can pass a DTO class
+        // and every call of generateDto() method will provide new instance with random data
         DtoGenerator<Dto> dtoGenerator = DtoGenerator.builder(Dto.class).build();
         Dto dtoInstance = dtoGenerator.generateDto();
 
@@ -111,36 +111,40 @@ As the result we'll have an object containing random data, generated based on ge
 {
   "name": "John",
   "age": 33,
-  "docType": "DRIVER_LICENCE",
-  "lastVisit": "2022-08-13T16:55:44.365"
+  "docType": "PASSPORT",
+  "lastVisit": [
+    2023,
+    2,
+    7,
+    18,
+    32,
+    55,
+    209000000
+  ]
 }
 ```
-
 
 <a name="rules_grouping"></a>
 
 ### 2. Grouping of Rules
 
-You may put multiple **@Rule** annotations on the one field, then you should mark them with different groups.
-Then you have to select which group you prefer to use for DTO generation.
+You may put multiple `@Rule` annotations on the one field, each one has to belong to different group.
+Then you have to select which group or groups do you prefer to use for DTO generation.
 
 For example, next config:
 
 ```java
-import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.*;
-
 public class Example7 {
 
     public static class Dto7 {
 
         @StringRule(words = {"Alice", "Maria"}, group = "GIRL")
         @StringRule(words = {"Peter", "Clint"}, group = "BOY")
-        private String name;
+        public String name;
 
-        @IntegerRule(minValue = 18, maxValue = 30, group = "YOUNG")
-        @IntegerRule(minValue = 31, maxValue = 60, group = "MATURE")
-        private Integer age;
+        @NumberRule(minInt = 18, maxInt = 30, group = "YOUNG")
+        @NumberRule(minInt = 31, maxInt = 60, group = "MATURE")
+        public Integer age;
 
     }
 
@@ -164,23 +168,29 @@ will produce, for instance:
 
 <a name="known_types_generation"></a>
 
-### 3. Known Type's Generation
+### 3. Known Types Generation
 
-Configuration parameter **generateAllKnownTypes** allows to generate field values of known types, without the need
-to put *@Rules* annotation on them.
-Known types are those types for which *@Rules* annotations exists.
+Configuration parameter `generateAllKnownTypes` allows to generate field values of known types, without the need
+to put *@Rules* annotation on fields.
+Known types are:
 
-There are several ways to configuring of generation, one of them is using of static configuration:
+- types for which `@Rule` annotations exists or type';
+- types for which generator was specified via `setGenerator()` method of `DtoGeneratorBuilder`;
+
+There are several ways to configure generators, one of them is - static configuration:
 
 ```java
-DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
+        // static configuration instance is accessible this way 
+        DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
+
+                // and the same static configuration instance is available directly from DtoGeneratorBuilder instance
+                DtoGenerator.builder(Dto.class).getStaticConfig();
 ```
 
 For example, if we use next DTO class:
 
 ```java
 public class Dto2 {
-
     String name;
     Integer age;
     DocType docType;
@@ -189,7 +199,8 @@ public class Dto2 {
 }
 ```
 
-As the result we'll have an object containing random data, based on default or overridden generation rules parameters:
+As the result we'll have an object containing random data, based on default or overridden generation rules
+configuration:
 
 ```json
 {
@@ -212,28 +223,24 @@ As the result we'll have an object containing random data, based on default or o
 There are 4 configuration levels, each next configuration level overrides previous ones:
 
 1. Annotation config -
-    1. parameters provided from **@Rules** annotation of the DTO field
-    2. for known types only, if DTO field not annotated with **@Rules**, is used default parameters provided from **
-       @Rules**
-2. Static config - one configuration for all **DtoGeneratorBuilders**
-3. User's config - each **DtoGeneratorBuilder** instance's own configuration
-4. User's type generator config - if generator field type is set by
-   user [see below about builders overriding](#users_builder)
+    1. parameters provided from `@Rule` annotation of the DTO field
+    2. when known type is generating without `@Rule` annotation, default values from corresponding `@Rule` annotation
+       are using
+2. Static config - one static configuration for all and every `DtoGeneratorBuilder`
+3. User's config - each `DtoGeneratorBuilder` instance has its own configuration:
+    1. Config related to type
+    2. Config related to field by its name
 
 For example:
 
 ```java
-import org.laoruga.dtogenerator.*;
-import org.laoruga.dtogenerator.api.rules.*;
-import org.laoruga.dtogenerator.config.DtoGeneratorStaticConfig;
-
 public class Example3 {
 
     public static class Dto3 {
 
         // annotation config
-        @StringRule(minLength = 5)
-        String exampleString;
+        @StringRule(minLength = 1)
+        public String exampleString;
 
     }
 
@@ -241,18 +248,29 @@ public class Example3 {
 
         DtoGeneratorBuilder<Dto3> builder = DtoGenerator.builder(Dto3.class);
 
-        // user config
-        builder.getTypeGeneratorsConfig().getStringConfig().setMaxLength(5);
-
         // static config
-        DtoGeneratorStaticConfig.getInstance().getTypeGeneratorsConfig().getStringConfig().setChars("x");
+        builder.getStaticConfig().getTypeGeneratorsConfig().getStringConfig().setMaxLength(5);
 
-        Dto3 dtoInstance = builder.build().generateDto();
+        // one of the ways to override instance config of "String" type - directly set a config instance
+        builder.setTypeGeneratorConfig(
+                String.class,
+                StringConfig.builder().minLength(5).chars("z").build());
+
+        // each known type also has the lazy getter for retrieving config instance
+        // if config for this type has already been set, we are updating it, otherwise getting config instance lazily
+        builder.getConfig().getTypeGeneratorsConfig()
+                .getStringConfig()
+                .setChars("x");
+
+        // instance config for the field
+        builder.setTypeGeneratorConfig("exampleString", StringConfig.builder().minLength(5).build());
+
+        Dto3 dto = builder.build().generateDto();
     }
 }
 ```
 
-The result string will be next:
+The result string due to configuration will always be the next:
 
 ```json
 {
@@ -262,9 +280,9 @@ The result string will be next:
 
 <a name="rules_remarks"></a>
 
-### 5. Rule's Remarks
+### 5. Rule Remarks
 
-Rule's remarks - refinements for known type generators, to generate boundary values.
+Rule remarks - refinements for known type generators, to generate boundary values.
 It is possible to assign remark either to the entire DTO or only to certain fields.
 
 Rule's remarks:
@@ -277,26 +295,19 @@ Rule's remarks:
 For example:
 
 ```java
-import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.*;
-
-import java.util.List;
-
-import static org.laoruga.dtogenerator.constants.BasicRuleRemark.*;
-
 public class Example4 {
 
-    public static class Dto4 {
+    static class Dto4 {
 
         @StringRule(minLength = 1, maxLength = 150)
-        private String name;
+        public String name;
 
-        @IntegerRule(minValue = 18, maxValue = 45)
-        private Integer age;
+        @NumberRule(minInt = 18, maxInt = 45)
+        public Integer age;
 
-        @ListRule(minSize = 1, maxSize = 20)
-        @StringRule(minLength = 2, maxLength = 15)
-        private List<String> children;
+        @CollectionRule(minSize = 1, maxSize = 20, element = @Entry(stringRule =
+        @StringRule(minLength = 5, maxLength = 10)))
+        public List<String> children;
 
     }
 
@@ -315,39 +326,34 @@ The result dto will look like:
 
 ```json
 {
-  "name": "i",
+  "name": "d",
   "age": 45,
   "children": [
-    "lL"
+    "i,+Ct"
   ]
 }
 ```
 
-<a name="users_builder"></a>
+<a name="user_generators"></a>
 
-### 6. User's Builders of Known Types
+### 6. User Generator of Any Type
 
-You may override generators of known types:
+You may override generators of known types or set generator for any type you want:
 
-1. Override generator linked with **@Rules** annotation by default (will apply to every field of appropriate type within DTO)
-2. Override generator of certain field
+1. Override/set generator of specified type
+2. Override/set for specified field by its name
 
-For overriding you can use:
+In order to have more control on your custom generators, your generator may implement
+interfaces [see more below](#custom_rule):
 
-1. default type's generator builders (in this case the only thing that may be changed is generator's params)
-2. your own generator builder or even lambda function
+- `CustomGeneratorArgs`
+- `CustomGeneratorDtoDependent`
+- `CustomGeneratorRemarkable`
 
 ```java
-import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.*;
-import org.laoruga.dtogenerator.generator.supplier.GeneratorBuildersFactory;
-import org.laoruga.dtogenerator.util.RandomUtils;
-
-import java.util.List;
-
 public class Example5 {
 
-    public static class Dto5 {
+    static class Dto5 {
 
         @StringRule(minLength = 1, maxLength = 150)
         String name;
@@ -355,24 +361,41 @@ public class Example5 {
         @StringRule
         String secondName;
 
-        @ListRule(minSize = 1, maxSize = 1)
-        @StringRule
+        @CollectionRule(minSize = 1, maxSize = 1)
         List<String> children;
+
+        WhoKnowsWhatType whoKnowsWhatType;
+    }
+
+    // Any type, for example
+    static class WhoKnowsWhatType {
+
+        public WhoKnowsWhatType(int mysteryNumber) {
+            this.mysteryNumber = mysteryNumber;
+        }
+
+        int mysteryNumber;
+    }
+
+    // Generator have to implement `Generator` interface or be lambda expression
+    static class MyStringGenerator implements Generator<String> {
+        @Override
+        public String generate() {
+            return "Here can be your generation logic";
+        }
     }
 
     public static void main(String[] args) {
 
         Dto5 dto = DtoGenerator.builder(Dto5.class)
                 // default type's generator builder is used to override generator for all fields annotated with @StringRule
-                .setGeneratorBuilder(StringRule.class, GeneratorBuildersFactory.stringBuilder()
-                        .minLength(5)
-                        .maxLength(5))
-                // lambda expression is used to override generator of the exact field
-                .setGeneratorBuilder("secondName", () -> RandomUtils.getRandomItem("Smith", "Claus"))
+                .setGenerator(String.class, new MyStringGenerator())
+                // lambda expressions can be used
+                .setGenerator(WhoKnowsWhatType.class, () -> new WhoKnowsWhatType(RandomUtils.nextInt(-23, 23)))
+                // generator may be set for specific field
+                .setGenerator("secondName", () -> RandomUtils.getRandomItem("Smith", "Claus"))
                 .build()
                 .generateDto();
-
-        System.out.println(Main.toJson(dto));
     }
 }
 ```
@@ -381,11 +404,14 @@ The result dto may look like:
 
 ```json
 {
-  "name": "QPvXB",
-  "secondName": "Smith",
+  "name": "Here can be your generation logic",
+  "secondName": "Claus",
   "children": [
-    "ZEeI7"
-  ]
+    "Here can be your generation logic"
+  ],
+  "whoKnowsWhatType": {
+    "mysteryNumber": -10
+  }
 }
 ```
 
@@ -398,19 +424,15 @@ In order to override or remark fields within nested DTO, use path to DTO separat
 For example:
 
 ```java
-import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.*;
-import org.laoruga.dtogenerator.constants.BasicRuleRemark;
-
 public class Example6 {
 
-    public static class Dto6 {
+    static class Dto6 {
 
         @NestedDtoRule
-        Dto7 nestedDto;
+        DtoNested nestedDto;
     }
 
-    public static class Dto6 {
+    static class DtoNested {
 
         @StringRule(regexp = "[+]89 [(]\\d{3}[)] \\d{3}[-]\\d{2}-\\d{2}")
         String phoneNumber;
@@ -437,7 +459,7 @@ Will result something like:
 ```json
 {
   "nestedDto": {
-    "phoneNumber": "+89 (905) 545-60-48",
+    "phoneNumber": "+89 (082) 948-90-10",
     "phoneType": "Other",
     "comment": null
   }
@@ -449,79 +471,72 @@ Will result something like:
 ### 8. Custom Rules
 
 ```diff
-- This is an experimental feature, it will be significantly changed in future releases
+- This is an experimental feature, the way of passing configuration into generators may be changed in the future version
 ```
 
 You may design your custom generator for any type you want. To do this, you need to implement one or more
-`ICustomGenerator*` interfaces:
+`CustomGenerator*` interfaces:
 
-- `ICustomGenerator`             
-- `ICustomGeneratorArgs`         
-- `ICustomGeneratorDtoDependent` 
-- `ICustomGeneratorRemarkable`   
+| Interface                     | Feature                                                                                                                                                   |
+|-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `CustomGenerator`             | base interface, allows to create non configurable type generators                                                                                         |
+| `CustomGeneratorArgs`         | allows to pass array of arguments to generator                                                                                                            |
+| `CustomGeneratorDtoDependent` | provides a reference to the generating DTO instance to the generator<br/>(to check if the DTO fields required for generation have been already filled in) |
+| `CustomGeneratorRemarkable`   | allows to pass objects to a custom type generator as remarks                                                                                              |
+
+There are two possible options to provide generator:
+
+- via `@CustomRule` annotation on the field
+- via `setGenerator()` method of `DtoGeneratorBuilder`, [linkig generator directly for the generated type](#user_generators)
+
+More info and usage examples you may see in the project with
+examples: [Dto Generator Examples project](dto-generator-examples/README.md)
 
 Example of custom generator with args:
 
 ```java
-import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
-import org.laoruga.dtogenerator.api.rules.CustomRule;
-import java.util.Map;
-
 public class Example8 {
 
     /**
      * Dto to generate
      */
     static class Dto8 {
+
+        @CustomRule(generatorClass = FlowerGenerator.class, args = {"10", "15", "50"})
+        private Flower flower;
+    }
+
+    /**
+     * Type we want to generate via custom generator
+     */
+    static class Flower {
         
-        @CustomRule(generatorClass = DocumentGenerator.class, args = "PASSPORT")
-        private Document document;
+        int petalsNumber;
+        
+        public Flower(int petalsNumber) {
+            this.petalsNumber = petalsNumber;
+        }
     }
 
     /**
-     * Type that we want to generate via custom generator
+     * Custom generator requires of passing of arguments
      */
-    static class Document {
-        Map<String, String> attributes;
-    }
+    static class FlowerGenerator implements CustomGeneratorArgs<Flower> {
 
-    /**
-     * Custom generator which requires of passing of arguments
-     */
-    static class DocumentGenerator implements ICustomGeneratorArgs<Document> {
-
-        private String docType;
+        private int[] docType;
 
         @Override
         public void setArgs(String... args) {
-            this.docType = args[0];
+            this.docType = Arrays.stream(args).mapToInt(Integer::parseInt).toArray();
         }
 
         @Override
-        public Document generate() {
-            Document document = new Document();
-            switch (docType) {
-                case "PASSPORT":
-                    document.attributes = generatePassportAttributes();
-                case "DRIVER_LICENSE":
-                    document.attributes = generateDriverLicenseAttributes();
-            }
-            return document;
-        }
-
-        public Map<String, String> generatePassportAttributes() {
-            // generation logic
-        }
-
-        public Map<String, String> generateDriverLicenseAttributes() {
-            // generation logic
+        public Flower generate() {
+            return new Flower(RandomUtils.getRandomItem(docType));
         }
     }
 }
 ```
-
-More info and more examples of usage you may see in the project with examples: [Dto Generator Examples project](dto-generator-examples/README.md)
 
 <a name="pojo_requirements"></a>
 
@@ -531,14 +546,17 @@ Requirements, when using DTO instantiation via class:
 
 ``` DtoGenerator.builder(Foo.class).build().generateDto(); ```
 
-1. DTO class must have declared no-args constructor with any visibility or don't have any constructors
+1. DTO class must have default constructor (don't have any constructors) or declared no-args constructor with any
+   visibility
 2. DTO class cannot be an inner class (non-static nested class)
 
 Supported:
+
 1. DTO classes may extend abstract or concrete classes via inheritance
 2. DTO class may be static nested class
 
 <a name="more_examples"></a>
 
 ### 10. More Examples
+
 More examples you can find in the: [Dto Generator Examples project](dto-generator-examples/README.md)
