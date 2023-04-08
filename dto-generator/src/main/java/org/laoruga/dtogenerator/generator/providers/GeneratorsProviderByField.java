@@ -2,14 +2,11 @@ package org.laoruga.dtogenerator.generator.providers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.Generator;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.config.CustomGeneratorConfigurator;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * @author Il'dar Valitov
@@ -19,10 +16,8 @@ import java.util.function.Supplier;
 public class GeneratorsProviderByField {
 
     private final Map<String, Generator<?>> overriddenGeneratorsForFields;
-    private final Supplier<?> rootDtoInstanceSupplier;
 
-    public GeneratorsProviderByField(Supplier<?> rootDtoInstanceSupplier) {
-        this.rootDtoInstanceSupplier = rootDtoInstanceSupplier;
+    public GeneratorsProviderByField() {
         this.overriddenGeneratorsForFields = new HashMap<>();
     }
 
@@ -34,17 +29,10 @@ public class GeneratorsProviderByField {
         return overriddenGeneratorsForFields.containsKey(fieldName);
     }
 
-    synchronized void setGeneratorBuilderForField(String fieldName, Generator<?> generator, String... args) {
+    synchronized void setGeneratorForField(String fieldName, Generator<?> generator) {
         if (overriddenGeneratorsForFields.containsKey(fieldName)) {
             throw new DtoGeneratorException(
                     "Generator has already been added explicitly for the field: '" + fieldName + "'");
-        }
-        if (generator instanceof CustomGenerator) {
-            CustomGeneratorConfigurator.builder()
-                    .args(args)
-                    .dtoInstanceSupplier(rootDtoInstanceSupplier)
-                    .build()
-                    .configure((CustomGenerator<?>) generator);
         }
         overriddenGeneratorsForFields.put(fieldName, generator);
     }

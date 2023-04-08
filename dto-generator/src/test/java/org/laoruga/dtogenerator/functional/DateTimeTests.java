@@ -226,22 +226,22 @@ public class DateTimeTests {
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         builder
-                .setTypeGeneratorConfig("localDateTime", DateTimeConfig.builder()
+                .setGeneratorConfig("localDateTime", DateTimeConfig.builder()
                         .addChronoConfig(ChronoUnitConfig.newAbsolute(1, DAYS)).build())
 
-                .setTypeGeneratorConfig("localDate", DateTimeConfig.builder()
+                .setGeneratorConfig("localDate", DateTimeConfig.builder()
                         .addChronoConfig(ChronoFieldConfig.newAbsolute(2, ChronoField.DAY_OF_MONTH)).build())
 
-                .setTypeGeneratorConfig("localTime", DateTimeConfig.builder()
+                .setGeneratorConfig("localTime", DateTimeConfig.builder()
                         .addChronoConfig(ChronoUnitConfig.newAbsolute(3, HOURS)).build())
 
-                .setTypeGeneratorConfig("year", DateTimeConfig.builder()
+                .setGeneratorConfig("year", DateTimeConfig.builder()
                         .addChronoConfig(ChronoFieldConfig.newAbsolute(2004, ChronoField.YEAR)).build())
 
-                .setTypeGeneratorConfig("yearMonth", DateTimeConfig.builder()
+                .setGeneratorConfig("yearMonth", DateTimeConfig.builder()
                         .addChronoConfig(ChronoUnitConfig.newBounds(5, 5, MONTHS)).build())
 
-                .setTypeGeneratorConfig("instant", DateTimeConfig.builder()
+                .setGeneratorConfig("instant", DateTimeConfig.builder()
                         .addChronoConfig(ChronoFieldConfig.newBounds(6, 6, ChronoField.INSTANT_SECONDS)).build());
 
         Dto dto = builder.build().generateDto();
@@ -448,7 +448,7 @@ public class DateTimeTests {
 
         instanceConfig.getDateTimeConfig(LocalDateTime.class)
                 .addChronoConfig(ChronoUnitConfig.newBounds(-100, 100, DAYS));
-        builder.setTypeGeneratorConfig(
+        builder.setGeneratorConfig(
                 LocalDate.class,
                 DateTimeConfig.builder().addChronoConfig(ChronoUnitConfig.newBounds(-200, 200, DAYS)).build()
         );
@@ -460,9 +460,9 @@ public class DateTimeTests {
 
 
         // field
-        builder.setTypeGeneratorConfig("localDate", DateTimeConfig.builder().ruleRemark(MIN_VALUE).build());
-        builder.setTypeGeneratorConfig("localTime", DateTimeConfig.builder().ruleRemark(MAX_VALUE).build());
-        builder.setTypeGeneratorConfig("year", DateTimeConfig.builder().addChronoConfig(
+        builder.setGeneratorConfig("localDate", DateTimeConfig.builder().ruleRemark(MIN_VALUE).build());
+        builder.setGeneratorConfig("localTime", DateTimeConfig.builder().ruleRemark(MAX_VALUE).build());
+        builder.setGeneratorConfig("year", DateTimeConfig.builder().addChronoConfig(
                 ChronoUnitConfig.newAbsolute(3, YEARS)).build()
         );
 

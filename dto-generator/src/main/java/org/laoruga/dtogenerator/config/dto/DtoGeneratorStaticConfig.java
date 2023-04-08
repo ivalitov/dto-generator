@@ -19,11 +19,13 @@ public final class DtoGeneratorStaticConfig {
 
     private static final ConfigurationHolder INSTANCE;
 
+    // TODO null
     static {
         INSTANCE = new ConfigurationHolder(
                 new DtoGeneratorFileConfig("dtogenerator.properties"),
                 new TypeGeneratorsConfigLazy(),
-                new TypeGeneratorsConfigForFiled()
+                new TypeGeneratorsConfigForFiled(),
+                null
         );
     }
 

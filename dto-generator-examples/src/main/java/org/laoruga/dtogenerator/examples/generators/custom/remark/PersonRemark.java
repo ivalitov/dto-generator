@@ -28,7 +28,7 @@ public enum PersonRemark implements CustomRuleRemarkArgs {
     }
 
     @Override
-    public int requiredArgsNumber() {
+    public int minimumArgsNumber() {
         return argsCount;
     }
 }

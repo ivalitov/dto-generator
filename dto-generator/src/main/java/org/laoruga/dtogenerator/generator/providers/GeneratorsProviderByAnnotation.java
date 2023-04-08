@@ -3,22 +3,25 @@ package org.laoruga.dtogenerator.generator.providers;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.Generator;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkable;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkableArgs;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
+import org.laoruga.dtogenerator.api.rules.CustomRule;
+import org.laoruga.dtogenerator.config.CustomGeneratorsConfigurationHolder;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.generator.CustomGenerator;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorByAnnotation;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSupplierInfo;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliers;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliersDefault;
+import org.laoruga.dtogenerator.generator.providers.suppliers.UserGeneratorSuppliers;
 import org.laoruga.dtogenerator.rule.RuleInfo;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.function.Function;
+
+import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 
 /**
  * @author Il'dar Valitov
@@ -30,12 +33,12 @@ public class GeneratorsProviderByAnnotation {
     @Getter
     private final GeneratorConfiguratorByAnnotation configuratorByAnnotation;
     private final GeneratorsProviderByType generatorsProviderByType;
-    private final GeneratorSuppliers userGeneratorSuppliers;
+    private final UserGeneratorSuppliers userGeneratorSuppliers;
     private final GeneratorSuppliers defaultGeneratorSuppliers;
 
     public GeneratorsProviderByAnnotation(GeneratorConfiguratorByAnnotation configuratorByAnnotation,
                                           GeneratorsProviderByType generatorsProviderByType,
-                                          GeneratorSuppliers userGeneratorSuppliers) {
+                                          UserGeneratorSuppliers userGeneratorSuppliers) {
         this.configuratorByAnnotation = configuratorByAnnotation;
         this.generatorsProviderByType = generatorsProviderByType;
         this.userGeneratorSuppliers = userGeneratorSuppliers;
@@ -47,11 +50,27 @@ public class GeneratorsProviderByAnnotation {
         String fieldName = ruleInfo.getField().getName();
         Class<?> requiredType = ruleInfo.getRequiredType();
 
-        Optional<Function<ConfigDto, Generator<?>>> maybeUserGeneratorSupplier = getUserGeneratorSupplier(requiredType);
+        Optional<Generator<?>> maybeUserGenerator =
+                userGeneratorSuppliers.getGenerator(requiredType);
 
-        if (maybeUserGeneratorSupplier.isPresent()) {
-            // user generators are not configurable yet
-            return maybeUserGeneratorSupplier.get().apply(null);
+        if (maybeUserGenerator.isPresent()) {
+
+            Generator<?> generator = maybeUserGenerator.get();
+
+            // FIXME config
+            if (generator instanceof CustomGenerator) {
+                configuratorByAnnotation.getConfiguration()
+                        .getCustomGeneratorsConfigurators()
+                        .getBuilder(ruleInfo.getField().getName(), (Class<? extends CustomGenerator<?>>) generator.getClass())
+                        .build()
+                        .configure((CustomGenerator<?>) generator);
+            }
+
+            return generator;
+        }
+
+        if (CustomRule.class == ruleInfo.getRule().annotationType()) {
+            return createCustomGenerator((CustomRule) ruleInfo.getRule(), fieldName);
         }
 
         ConfigDto config = configuratorByAnnotation.createGeneratorConfig(
@@ -60,11 +79,26 @@ public class GeneratorsProviderByAnnotation {
                 fieldName
         );
 
-        Generator<?> generator = getDefaultGeneratorSupplier(ruleInfo.getRule(), requiredType).apply(config);
+        return getDefaultGeneratorSupplier(ruleInfo.getRule(), requiredType)
+                .apply(config);
+    }
 
-        prepareCustomRemarks(generator, fieldName);
+    Generator<?> createCustomGenerator(CustomRule customRule, String fieldName) {
 
-        return generator;
+        CustomGeneratorsConfigurationHolder configurators = configuratorByAnnotation
+                .getConfiguration()
+                .getCustomGeneratorsConfigurators();
+
+        Class<? extends CustomGenerator<?>> generatorClass = customRule.generatorClass();
+
+        CustomGenerator<?> generatorInstance = createInstance(generatorClass);
+
+        // FIXME config
+        configurators.getBuilder(fieldName, generatorClass, customRule.args())
+                .build()
+                .configure(generatorInstance);
+
+        return generatorInstance;
     }
 
     Function<ConfigDto, Generator<?>> getDefaultGeneratorSupplier(Annotation rules, Class<?> generatedType) {
@@ -87,37 +121,6 @@ public class GeneratorsProviderByAnnotation {
                 new DtoGeneratorException("General generator builder not found. Rules: '"
                         + rules.annotationType().getName() + "', Genrated type: '" + generatedType.getName() + "'")
         );
-    }
-
-    Optional<Function<ConfigDto, Generator<?>>> getUserGeneratorSupplier(Class<?> generatedType) {
-        return userGeneratorSuppliers
-                .getGeneratorSupplierInfo(generatedType)
-                .map(GeneratorSupplierInfo::getGeneratorSupplier);
-    }
-
-
-    void prepareCustomRemarks(Generator<?> generator, String fieldName) {
-        if (generator instanceof CustomGenerator) {
-            Generator<?> usersGeneratorInstance = ((CustomGenerator) generator).getUsersGeneratorInstance();
-
-            if (usersGeneratorInstance instanceof CustomGeneratorRemarkableArgs) {
-
-                ((CustomGeneratorRemarkableArgs<?>) usersGeneratorInstance).setRuleRemarks(
-                        configuratorByAnnotation.getRemarksHolder()
-                                .getCustomRemarks()
-                                .getRemarksWithArgs(fieldName, usersGeneratorInstance.getClass()));
-
-            } else if (usersGeneratorInstance instanceof CustomGeneratorRemarkable) {
-
-                ((CustomGeneratorRemarkable<?>) usersGeneratorInstance).setRuleRemarks(
-                        configuratorByAnnotation.getRemarksHolder()
-                                .getCustomRemarks()
-                                .getRemarks(fieldName, usersGeneratorInstance.getClass())
-                );
-
-            }
-        }
-
     }
 
     Generator<?> getGeneratorByType(Field field, Class<?> generatedType) {

@@ -5,11 +5,16 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
 import org.laoruga.dtogenerator.api.generators.Generator;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkable;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkableArgs;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkArgs;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
+import org.laoruga.dtogenerator.config.CustomGeneratorsConfigurationHolder;
 import org.laoruga.dtogenerator.config.TypeGeneratorsConfigForFiled;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
@@ -17,6 +22,7 @@ import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
+import org.laoruga.dtogenerator.util.dummy.DummyCustomGenerator;
 
 import java.util.function.Supplier;
 
@@ -52,20 +58,26 @@ public class DtoGeneratorBuilder<T> {
     }
 
     private DtoGeneratorBuilder(Supplier<?> dtoInstanceSupplier) {
-        this.configuration = new ConfigurationHolder(
+        RemarksHolder remarksHolder = new RemarksHolder();
+        ConfigurationHolder configurationHolder = new ConfigurationHolder(
                 new DtoGeneratorInstanceConfig(),
                 new TypeGeneratorsConfigLazy(),
-                new TypeGeneratorsConfigForFiled()
+                new TypeGeneratorsConfigForFiled(),
+                new CustomGeneratorsConfigurationHolder(
+                        dtoInstanceSupplier,
+                        remarksHolder
+                )
         );
-        this.remarksHolder = new RemarksHolder();
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
-                configuration,
+                configurationHolder,
                 remarksHolder,
                 new FieldFilter(),
                 new String[]{ROOT},
                 this::getDtoGeneratorBuildersTree,
                 dtoInstanceSupplier
         );
+        this.configuration = configurationHolder;
+        this.remarksHolder = remarksHolder;
         this.dtoGeneratorBuildersTree = new DtoGeneratorBuildersTree(this);
     }
 
@@ -79,16 +91,34 @@ public class DtoGeneratorBuilder<T> {
     protected DtoGeneratorBuilder(DtoGeneratorBuilder<?> copyFrom,
                                   String[] pathFromRootDto,
                                   Supplier<?> dtoInstanceSupplier) {
-        final ConfigurationHolder configurationCopy = new ConfigurationHolder(copyFrom.getConfiguration());
-        this.remarksHolder = new RemarksHolder(copyFrom.getRemarksHolder());
+        final DtoGeneratorBuildersTree dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
+        final RemarksHolder remarksHolder = new RemarksHolder(copyFrom.getRemarksHolder());
+        final Supplier<?> rootDtoInstanceSupplier = dtoGeneratorBuildersTree
+                .getBuilderLazy(ROOT)
+                .getFieldGeneratorsProvider()
+                .getDtoInstanceSupplier();
+        final ConfigurationHolder configurationCopy = new ConfigurationHolder(
+                copyFrom.getConfiguration().getDtoGeneratorConfig(),
+                copyFrom.getConfiguration().getTypeGeneratorsConfig(),
+                new CustomGeneratorsConfigurationHolder(
+                        rootDtoInstanceSupplier,
+                        remarksHolder,
+                        copyFrom.getConfiguration()
+                                .getCustomGeneratorsConfigurators()
+                                .getByGeneratorType()
+                )
+        );
+
+        this.remarksHolder = remarksHolder;
         this.configuration = configurationCopy;
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
                 copyFrom.getFieldGeneratorsProvider(),
                 remarksHolder,
                 pathFromRootDto,
                 dtoInstanceSupplier,
-                configurationCopy);
-        this.dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
+                configurationCopy
+        );
+        this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
     }
 
 
@@ -112,11 +142,25 @@ public class DtoGeneratorBuilder<T> {
      * @return - this
      */
 
+    @SuppressWarnings("unchecked")
     public <U> DtoGeneratorBuilder<T> setGenerator(@NonNull Class<U> generatedType,
                                                    @NonNull Generator<? super U> typeGenerator,
                                                    String... args) {
-        fieldGeneratorsProvider.setGenerator(generatedType, typeGenerator, args);
+        fieldGeneratorsProvider.setGenerator(generatedType, typeGenerator);
+
+        if (typeGenerator instanceof CustomGenerator) {
+            setGeneratorArgs(
+                    (Class<? extends CustomGenerator<?>>) typeGenerator.getClass(),
+                    args
+            );
+        }
+
         return this;
+    }
+
+    public <U> DtoGeneratorBuilder<T> setGenerator(@NonNull Class<U> generatedType,
+                                                   @NonNull Generator<? super U> typeGenerator) {
+        return setGenerator(generatedType, typeGenerator, (String[]) null);
     }
 
     /**
@@ -135,9 +179,55 @@ public class DtoGeneratorBuilder<T> {
                                                @NonNull Generator<?> typeGenerator,
                                                String... args) {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
+
+        dtoGeneratorBuildersTree
+                .getBuilderLazy(fieldNameAndPath.getRight())
+                .getFieldGeneratorsProvider()
+                .setGeneratorBuilderForField(fieldNameAndPath.getLeft(), typeGenerator);
+
+        if (typeGenerator instanceof CustomGenerator) {
+            setGeneratorArgs(fieldName, args);
+        }
+
+        return this;
+    }
+
+    public DtoGeneratorBuilder<T> setGenerator(@NonNull String fieldName,
+                                               @NonNull Generator<?> typeGenerator) {
+        return setGenerator(fieldName, typeGenerator, (String[]) null);
+    }
+
+
+    public DtoGeneratorBuilder<T> setGeneratorConfig(@NonNull String fieldName,
+                                                     @NonNull ConfigDto generatorConfig) {
+        Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
                 .getFieldGeneratorsProvider()
-                .setGeneratorBuilderForField(fieldNameAndPath.getLeft(), typeGenerator, args);
+                .setGeneratorConfigForField(fieldNameAndPath.getLeft(), generatorConfig);
+        return this;
+    }
+
+    public <U> DtoGeneratorBuilder<T> setGeneratorConfig(@NonNull Class<U> generatedType,
+                                                         @NonNull ConfigDto configDto) {
+        fieldGeneratorsProvider.setGeneratorConfigForType(generatedType, configDto);
+        return this;
+    }
+
+    public DtoGeneratorBuilder<T> setGeneratorArgs(String fieldName, String... args) {
+        Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
+        dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
+                .getConfiguration()
+                .getCustomGeneratorsConfigurators()
+                .setArgs(fieldNameAndPath.getLeft(), args);
+        return this;
+    }
+
+    public DtoGeneratorBuilder<T> setGeneratorArgs(@NonNull Class<? extends CustomGenerator<?>> customGeneratorClass,
+                                                   String... args) {
+        configuration.getCustomGeneratorsConfigurators().setArgs(
+                customGeneratorClass,
+                args
+        );
         return this;
     }
 
@@ -180,10 +270,43 @@ public class DtoGeneratorBuilder<T> {
         return this;
     }
 
-    public DtoGeneratorBuilder<T> addRuleRemark(@NonNull CustomRuleRemark ruleRemarks) {
-        getRemarksHolder()
-                .getCustomRemarks()
-                .addRemarkForAnyField(ruleRemarks);
+    /**
+     * Adding remarks to any custom generator.
+     * Any implementation of {@link CustomGeneratorRemarkable} or {@link CustomGeneratorRemarkableArgs}
+     * will have passed remarks
+     *
+     * @param customRuleRemarks - remarks to add
+     * @return this
+     */
+    public DtoGeneratorBuilder<T> addRuleRemark(@NonNull CustomRuleRemark... customRuleRemarks) {
+        addRuleRemark(DummyCustomGenerator.class, customRuleRemarks);
+        return this;
+    }
+
+    /**
+     * Adding remarks to specified custom generator.
+     *
+     * @param customGeneratorClass - generator of this type will have passed remarks
+     * @param ruleRemarks          - remarks to add
+     * @return this
+     */
+    public DtoGeneratorBuilder<T> addRuleRemark(Class<? extends CustomGenerator<?>> customGeneratorClass,
+                                                CustomRuleRemark... ruleRemarks) {
+        RemarksHolderCustom customRemarks = getRemarksHolder().getCustomRemarks();
+
+        for (CustomRuleRemark ruleRemark : ruleRemarks) {
+
+            if (ruleRemark instanceof CustomRuleRemarkArgs) {
+                CustomRuleRemarkArgs ruleRemarkArgs = (CustomRuleRemarkArgs) ruleRemark;
+                if (ruleRemarkArgs.getArgs().length < ruleRemarkArgs.minimumArgsNumber()) {
+                    throw new DtoGeneratorException("Remark '" + ruleRemark + "'" +
+                            " expected at least '" + ruleRemarkArgs.minimumArgsNumber() + "' arg(s)." +
+                            " Passed '" + ruleRemarkArgs.getArgs().length + "' arg(s).");
+                }
+            }
+
+            customRemarks.addRemarkForAnyField(customGeneratorClass, ruleRemark);
+        }
         return this;
     }
 
@@ -219,21 +342,6 @@ public class DtoGeneratorBuilder<T> {
 
     public Configuration getStaticConfig() {
         return DtoGeneratorStaticConfig.getInstance();
-    }
-
-    public DtoGeneratorBuilder<T> setTypeGeneratorConfig(@NonNull String fieldName,
-                                                         @NonNull ConfigDto generatorConfig) {
-        Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
-        dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
-                .getFieldGeneratorsProvider()
-                .setGeneratorConfigForField(fieldNameAndPath.getLeft(), generatorConfig);
-        return this;
-    }
-
-    public <U> DtoGeneratorBuilder<T> setTypeGeneratorConfig(@NonNull Class<U> generatedType,
-                                                             @NonNull ConfigDto configDto) {
-        fieldGeneratorsProvider.setGeneratorConfigForType(generatedType, configDto);
-        return this;
     }
 
     public DtoGeneratorBuilder<T> generateKnownTypes() {

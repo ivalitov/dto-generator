@@ -127,26 +127,26 @@ class ArrayTests {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
-        builder.setTypeGeneratorConfig("strings",
+        builder.setGeneratorConfig("strings",
                         ArrayConfig.builder()
                                 .minSize(1)
                                 .ruleRemark(MIN_VALUE)
                                 .elementGenerator(() -> "OASIS")
                                 .build())
-                .setTypeGeneratorConfig("integers",
+                .setGeneratorConfig("integers",
                         ArrayConfig.builder()
                                 .elementGenerator(() -> 2)
                                 .ruleRemark(MAX_VALUE).build())
-                .setTypeGeneratorConfig("ints",
+                .setGeneratorConfig("ints",
                         ArrayConfig.builder().minSize(6).maxSize(6).build())
-                .setTypeGeneratorConfig("longsObjects",
+                .setGeneratorConfig("longsObjects",
                         ArrayConfig.builder().minSize(8).maxSize(8).build())
-                .setTypeGeneratorConfig("longs",
+                .setGeneratorConfig("longs",
                         ArrayConfig.builder()
                                 .minSize(3)
                                 .maxSize(3)
                                 .elementGenerator(() -> 7L).build())
-                .setTypeGeneratorConfig("enums",
+                .setGeneratorConfig("enums",
                         ArrayConfig.builder().maxSize(11).ruleRemark(MAX_VALUE).build());
 
         Dto dto = builder.build().generateDto();
@@ -186,15 +186,15 @@ class ArrayTests {
         instanceConfig.getArrayConfig(ClientType[].class).setMinSize(0).setMaxSize(0);
 
         // field
-        builder.setTypeGeneratorConfig("strings",
+        builder.setGeneratorConfig("strings",
                         ArrayConfig.builder().elementGenerator(() -> "PUSHKIN").build())
-                .setTypeGeneratorConfig("integers",
+                .setGeneratorConfig("integers",
                         ArrayConfig.builder().ruleRemark(MAX_VALUE).build())
-                .setTypeGeneratorConfig("ints",
+                .setGeneratorConfig("ints",
                         ArrayConfig.builder().maxSize(6).ruleRemark(MIN_VALUE).build())
-                .setTypeGeneratorConfig("longs",
+                .setGeneratorConfig("longs",
                         ArrayConfig.builder().elementGenerator(() -> 88L).build())
-                .setTypeGeneratorConfig("enums",
+                .setGeneratorConfig("enums",
                         ArrayConfig.builder().ruleRemark(RANDOM_VALUE).build());
 
         Dto dto = builder.build().generateDto();
@@ -347,15 +347,15 @@ class ArrayTests {
         instanceConfig.getArrayConfig(ClientType[].class).setMinSize(0).setMaxSize(0);
 
         // field
-        builder.setTypeGeneratorConfig("strings",
+        builder.setGeneratorConfig("strings",
                         ArrayConfig.builder().elementGenerator(() -> "PUSHKIN").build())
-                .setTypeGeneratorConfig("integers",
+                .setGeneratorConfig("integers",
                         ArrayConfig.builder().ruleRemark(MAX_VALUE).build())
-                .setTypeGeneratorConfig("ints",
+                .setGeneratorConfig("ints",
                         ArrayConfig.builder().maxSize(6).ruleRemark(MIN_VALUE).build())
-                .setTypeGeneratorConfig("longs",
+                .setGeneratorConfig("longs",
                         ArrayConfig.builder().elementGenerator(() -> 88L).build())
-                .setTypeGeneratorConfig("enums",
+                .setGeneratorConfig("enums",
                         ArrayConfig.builder().ruleRemark(RANDOM_VALUE).build());
 
         Dto_2 dto = builder.build().generateDto();

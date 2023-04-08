@@ -16,8 +16,8 @@ public interface CustomRuleRemarkArgs extends CustomRuleRemark {
      * @return wrapper of 'remark', containing params and generator's class
      */
     default CustomRuleRemarkWithArgs setArgs(String... args) {
-        if (args.length != requiredArgsNumber()) {
-            throw new DtoGeneratorException("Remark '" + this + "' expected '" + requiredArgsNumber() +
+        if (args.length < minimumArgsNumber()) {
+            throw new DtoGeneratorException("Remark '" + this + "' expected at least'" + minimumArgsNumber() +
                     "' args. Passed '" + args.length + " args'");
         }
         return new CustomRuleRemarkWithArgs(this, args);
@@ -33,7 +33,7 @@ public interface CustomRuleRemarkArgs extends CustomRuleRemark {
      *
      * @return required number of args
      */
-    int requiredArgsNumber();
+    int minimumArgsNumber();
 
     default CustomRuleRemark getRemarkInstance() {
         return this;

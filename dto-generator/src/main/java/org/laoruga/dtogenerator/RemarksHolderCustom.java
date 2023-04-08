@@ -62,9 +62,10 @@ public class RemarksHolderCustom {
         customRuleRemarksMapByField.get(filedName).add(ruleRemark);
     }
 
-    void addRemarkForAnyField(@NonNull CustomRuleRemark ruleRemarks) {
-        customRuleRemarksMapByGenerator.putIfAbsent(ruleRemarks.getGeneratorClass(), new HashSet<>());
-        customRuleRemarksMapByGenerator.get(ruleRemarks.getGeneratorClass()).add(ruleRemarks);
+    void addRemarkForAnyField(@NonNull Class<? extends CustomGenerator<?>> generatorClass,
+                              @NonNull CustomRuleRemark ruleRemarks) {
+        customRuleRemarksMapByGenerator.putIfAbsent(generatorClass, new HashSet<>());
+        customRuleRemarksMapByGenerator.get(generatorClass).add(ruleRemarks);
     }
 
     public Set<CustomRuleRemark> getRemarks(String fieldName,
@@ -157,25 +158,17 @@ public class RemarksHolderCustom {
 
     private void addToMap(Map<CustomRuleRemark, CustomRuleRemarkArgs> remarksMap, Set<CustomRuleRemark> remarksSet) {
         for (CustomRuleRemark remark : remarksSet) {
-            if (!(remark instanceof CustomRuleRemarkArgs)) {
-                final CustomRuleRemark remarkFinal = remark;
-                final CustomRuleRemarkArgs wrappedRemark = new CustomRuleRemarkArgs() {
-                    @Override
-                    public int requiredArgsNumber() {
-                        return 0;
-                    }
 
-                    @Override
-                    public Class<? extends CustomGenerator<?>> getGeneratorClass() {
-                        return remarkFinal.getGeneratorClass();
-                    }
-                };
-                remarksMap.put(remarkFinal, wrappedRemark);
-            } else {
+            if (remark instanceof CustomRuleRemarkArgs) {
+
                 remarksMap.put(
                         ((CustomRuleRemarkArgs) remark).getRemarkInstance(),
                         ((CustomRuleRemarkArgs) remark));
+            } else {
+
+                remarksMap.put(remark, () -> 0);
             }
+
         }
     }
 

@@ -1,6 +1,5 @@
 package org.laoruga.dtogenerator.functional.data.customgenerator;
 
-import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkArgs;
 
 /**
@@ -19,12 +18,7 @@ public enum ClientRemark implements CustomRuleRemarkArgs {
     }
 
     @Override
-    public Class<? extends CustomGenerator<?>> getGeneratorClass() {
-        return ClientInfoGenerator.class;
-    }
-
-    @Override
-    public int requiredArgsNumber() {
+    public int minimumArgsNumber() {
         return reqArgsNumber;
     }
 

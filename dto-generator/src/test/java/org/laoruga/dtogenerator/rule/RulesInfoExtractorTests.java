@@ -136,9 +136,9 @@ class RulesInfoExtractorTests {
         Optional<RuleInfo> iRuleInfo = rulesInfoExtractor.extractRulesInfo(field);
 
         assertTrue(iRuleInfo.isPresent());
-        assertInstanceOf(RuleInfoCollection.class, iRuleInfo.get());
+        assertInstanceOf(RuleInfoList.class, iRuleInfo.get());
 
-        RuleInfoCollection ruleInfo = (RuleInfoCollection) iRuleInfo.get();
+        RuleInfoList ruleInfo = (RuleInfoList) iRuleInfo.get();
 
         assertAll(
                 () -> assertThat(ruleInfo.getRule().annotationType(), equalTo(collectionRuleClass)),

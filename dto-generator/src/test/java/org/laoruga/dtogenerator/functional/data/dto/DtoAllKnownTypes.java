@@ -38,7 +38,8 @@ public class DtoAllKnownTypes {
     @DecimalRule
     Double aDouble;
 
-    @BooleanRule Boolean aBoolean;
+    @BooleanRule
+    Boolean aBoolean;
 
     @DateTimeRule
     LocalDateTime localDateTime;

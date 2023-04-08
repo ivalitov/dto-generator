@@ -48,6 +48,18 @@ class AnyTypeGeneratingTests {
 
     }
 
+    static class Dto_2 {
+
+        Tomato tomato;
+        List<Tomato> tomatoArray;
+
+        // known types
+
+        String stringAsKnownType;
+        List<Integer> listOfIntegerAsKnownType;
+
+    }
+
     @EqualsAndHashCode
     @RequiredArgsConstructor
     @AllArgsConstructor
@@ -59,6 +71,20 @@ class AnyTypeGeneratingTests {
 
     enum Color {
         RED, GREEN, BLUE
+    }
+
+    @Test
+    void doNotGenerateUnknownType() {
+
+        DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class).generateKnownTypes();
+        Dto_2 dto = builder.build().generateDto();
+
+        assertAll(
+                () -> assertThat(dto.tomatoArray, nullValue()),
+                () -> assertThat(dto.tomato, nullValue()),
+                () -> assertThat(dto.stringAsKnownType, notNullValue()),
+                () -> assertThat(dto.listOfIntegerAsKnownType, notNullValue())
+        );
     }
 
     @Test

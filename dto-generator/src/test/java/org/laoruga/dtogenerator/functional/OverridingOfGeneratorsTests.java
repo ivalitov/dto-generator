@@ -260,7 +260,7 @@ class OverridingOfGeneratorsTests {
                 .setGenerator(Long.class, () -> 2L)
                 .setGenerator(Double.class, () -> 3D)
                 .setGenerator(LocalDateTime.class, LocalDateTime::now)
-                .setGenerator(Enum.class, () -> ClientType.ORG)
+                .setGenerator(ClientType.class, () -> ClientType.ORG)
                 .setGenerator(LinkedList.class, LinkedList::new)
                 .setGenerator(List.class, LinkedList::new)
                 .setGenerator(Set.class, HashSet::new);
@@ -525,7 +525,6 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto_4.getADouble(), equalTo(0D))
 
         );
-
     }
 
 }

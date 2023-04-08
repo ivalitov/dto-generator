@@ -6,7 +6,7 @@ import org.laoruga.dtogenerator.api.rules.ArrayRule;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.generator.config.dto.ArrayConfig;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
-import org.laoruga.dtogenerator.rule.RuleInfoCollection;
+import org.laoruga.dtogenerator.rule.RuleInfoList;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 
 /**
@@ -20,7 +20,7 @@ public class GeneratorConfiguratorForArray extends GeneratorConfiguratorForList 
     }
 
     @Override
-    public ConfigDto createGeneratorConfig(RuleInfoCollection arrayRule,
+    public ConfigDto createGeneratorConfig(RuleInfoList arrayRule,
                                            Generator<?> elementGenerator,
                                            Class<?> fieldType,
                                            String fieldName) {

@@ -9,16 +9,14 @@ import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorByAnnotati
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForArray;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForList;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForMap;
-import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliers;
+import org.laoruga.dtogenerator.generator.providers.suppliers.UserGeneratorSuppliers;
 import org.laoruga.dtogenerator.rule.RuleInfo;
-import org.laoruga.dtogenerator.rule.RuleInfoCollection;
+import org.laoruga.dtogenerator.rule.RuleInfoList;
 import org.laoruga.dtogenerator.rule.RuleInfoMap;
 
 import java.lang.reflect.Field;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * @author Il'dar Valitov
@@ -34,51 +32,50 @@ public class GeneratorProvidersMediator {
     private final GeneratorsProviderByAnnotationForList generatorsProviderByAnnotationForArray;
 
     public GeneratorProvidersMediator(ConfigurationHolder configuration,
-                                      GeneratorSuppliers userGenBuildersMapping,
+                                      UserGeneratorSuppliers userGeneratorSuppliers,
                                       RemarksHolder remarksHolder,
-                                      Supplier<?> rootDtoInstanceSupplier,
                                       Function<String, DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier) {
+
         GeneratorConfiguratorByAnnotation configuratorByAnnotation =
                 new GeneratorConfiguratorByAnnotation(
                         configuration,
                         remarksHolder,
-                        rootDtoInstanceSupplier,
                         nestedDtoGeneratorBuilderSupplier);
 
-        this.generatorProviderOverriddenForField = new GeneratorsProviderByField(
-                rootDtoInstanceSupplier
-        );
+        this.generatorProviderOverriddenForField = new GeneratorsProviderByField();
 
         this.generatorsProviderByType = new GeneratorsProviderByType(
                 configuration,
                 configuratorByAnnotation,
-                userGenBuildersMapping,
-                rootDtoInstanceSupplier
+                userGeneratorSuppliers
         );
 
         this.generatorsProviderByAnnotation =
                 new GeneratorsProviderByAnnotation(
                         configuratorByAnnotation,
                         generatorsProviderByType,
-                        userGenBuildersMapping
+                        userGeneratorSuppliers
                 );
 
         this.generatorsProviderByAnnotationForMap =
                 new GeneratorsProviderByAnnotationForMap(
                         generatorsProviderByAnnotation,
-                        new GeneratorConfiguratorForMap(configuration, remarksHolder)
+                        new GeneratorConfiguratorForMap(configuration, remarksHolder),
+                        userGeneratorSuppliers
                 );
 
         this.generatorsProviderByAnnotationForCollection =
                 new GeneratorsProviderByAnnotationForList(
                         generatorsProviderByAnnotation,
-                        new GeneratorConfiguratorForList(configuration, remarksHolder)
+                        new GeneratorConfiguratorForList(configuration, remarksHolder),
+                        userGeneratorSuppliers
                 );
 
         this.generatorsProviderByAnnotationForArray =
                 new GeneratorsProviderByAnnotationForList(
                         generatorsProviderByAnnotation,
-                        new GeneratorConfiguratorForArray(configuration, remarksHolder)
+                        new GeneratorConfiguratorForArray(configuration, remarksHolder),
+                        userGeneratorSuppliers
                 );
     }
 
@@ -86,16 +83,15 @@ public class GeneratorProvidersMediator {
      * By field
      */
 
-    public synchronized boolean isGeneratorOverridden(String fieldName) {
-        return generatorProviderOverriddenForField.isGeneratorOverridden(fieldName);
+    public synchronized void setGeneratorForField(String fieldName, Generator<?> generator) {
+        generatorProviderOverriddenForField.setGeneratorForField(
+                fieldName,
+                generator
+        );
     }
 
-    public synchronized void setGeneratorForField(String fieldName, Generator<?> generator, String... args) {
-        generatorProviderOverriddenForField.setGeneratorBuilderForField(fieldName, generator, args);
-    }
-
-    public synchronized Generator<?> getGeneratorOverriddenForField(Field field) {
-        return generatorProviderOverriddenForField.getGenerator(field);
+    public synchronized Optional<Generator<?>> getGeneratorOverriddenForField(Field field) {
+        return Optional.ofNullable(generatorProviderOverriddenForField.getGenerator(field));
     }
 
     /*
@@ -104,8 +100,12 @@ public class GeneratorProvidersMediator {
 
     public Optional<Generator<?>> getGeneratorByType(Field field, Class<?> generatedType) {
         return generatorsProviderByType
-                .getGenerator(field, generatedType)
-                .map(Objects::requireNonNull);
+                .getGenerator(field, generatedType);
+    }
+
+    public void setGeneratorByType(Class<?> field, Generator<?> generatedType) {
+        generatorsProviderByType
+                .setGenerator(field, generatedType);
     }
 
     /*
@@ -117,11 +117,11 @@ public class GeneratorProvidersMediator {
 
         if (ruleInfo.isTypesEqual(RuleType.COLLECTION)) {
 
-            generator = generatorsProviderByAnnotationForCollection.getGenerator((RuleInfoCollection) ruleInfo);
+            generator = generatorsProviderByAnnotationForCollection.getGenerator((RuleInfoList) ruleInfo);
 
         } else if (ruleInfo.isTypesEqual(RuleType.ARRAY)) {
 
-            generator = generatorsProviderByAnnotationForArray.getGenerator((RuleInfoCollection) ruleInfo);
+            generator = generatorsProviderByAnnotationForArray.getGenerator((RuleInfoList) ruleInfo);
 
         } else if (ruleInfo.isTypesEqual(RuleType.MAP)) {
 

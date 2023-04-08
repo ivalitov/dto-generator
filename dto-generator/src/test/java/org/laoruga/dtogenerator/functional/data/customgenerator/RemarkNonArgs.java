@@ -1,6 +1,5 @@
 package org.laoruga.dtogenerator.functional.data.customgenerator;
 
-import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
 
 /**
@@ -10,8 +9,4 @@ import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
 public enum RemarkNonArgs implements CustomRuleRemark {
     NULL_VALUE;
 
-    @Override
-    public Class<? extends CustomGenerator<?>> getGeneratorClass() {
-        return ClientInfoGenerator.class;
-    }
 }

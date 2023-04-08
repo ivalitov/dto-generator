@@ -10,11 +10,13 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkableArgs;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkArgs;
 import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.constants.CharSet;
 import org.laoruga.dtogenerator.generator.config.dto.MapConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
@@ -27,8 +29,8 @@ import java.util.function.Supplier;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.laoruga.dtogenerator.functional.CustomRemarksTests.FlowerMatcher.flowerMatcher;
-import static org.laoruga.dtogenerator.functional.CustomRemarksTests.FlowerMatcher.flowerMatcherAnyPart;
+import static org.laoruga.dtogenerator.functional.CustomGeneratorsWithRemarksDtoDependentTests.FlowerMatcher.flowerMatcher;
+import static org.laoruga.dtogenerator.functional.CustomGeneratorsWithRemarksDtoDependentTests.FlowerMatcher.flowerMatcherAnyPart;
 
 /**
  * @author Il'dar Valitov
@@ -36,7 +38,7 @@ import static org.laoruga.dtogenerator.functional.CustomRemarksTests.FlowerMatch
  */
 @Epic("CUSTOM_RULES")
 @Feature("CUSTOM_REMARKS")
-public class CustomRemarksTests {
+public class CustomGeneratorsWithRemarksDtoDependentTests {
 
     interface IDto {
         String getLot();
@@ -53,7 +55,7 @@ public class CustomRemarksTests {
     @Getter
     static class Dto implements IDto {
 
-        @StringRule(minLength = 1, maxLength = 5)
+        @StringRule(minLength = 1, maxLength = 5, chars = CharSet.ENG + CharSet.NUM)
         String lot;
 
         @CustomRule(generatorClass = FlowerGenerator.class)
@@ -115,7 +117,7 @@ public class CustomRemarksTests {
         PETAL_COUNT;
 
         @Override
-        public int requiredArgsNumber() {
+        public int minimumArgsNumber() {
             return 1;
         }
     }
@@ -130,7 +132,7 @@ public class CustomRemarksTests {
                 .build()
                 .generateDto();
 
-        Matcher<Flower> matcher = flowerMatcher(99, "Japan");
+        Matcher<Flower> matcher = flowerMatcher(99, generatedDto.lot, "Japan");
 
         Consumer<IDto> assertions = dto ->
                 assertAll(
@@ -171,7 +173,7 @@ public class CustomRemarksTests {
                 .addRuleRemark("flowerBouquetMap",
                         FlowerProperty.PETAL_COUNT.setArgs("4, 5, 6, 7, 8, 9"),
                         FlowerProperty.REGION.setArgs(countries))
-                .setTypeGeneratorConfig("flowerBouquetMap", MapConfig.builder().minSize(5).maxSize(5).build())
+                .setGeneratorConfig("flowerBouquetMap", MapConfig.builder().minSize(5).maxSize(5).build())
 
                 // nested
                 .addRuleRemark("nestedDto.singleFlower",
@@ -249,7 +251,7 @@ public class CustomRemarksTests {
                         FlowerProperty.PETAL_COUNT.setArgs("2"))
                 .addRuleRemark("flowerBouquetMap",
                         FlowerProperty.REGION.setArgs(countries))
-                .setTypeGeneratorConfig("flowerBouquetMap", MapConfig.builder().minSize(5).maxSize(5).build())
+                .setGeneratorConfig("flowerBouquetMap", MapConfig.builder().minSize(5).maxSize(5).build())
 
                 .addRuleRemark("nestedDto.singleFlower",
                         FlowerProperty.PETAL_COUNT.setArgs("10"))
@@ -308,11 +310,14 @@ public class CustomRemarksTests {
     private static final String[] COUNTRIES = {"Italy", "USA", "Ukraine"};
 
     static class FlowerGenerator implements
+            CustomGeneratorArgs<Flower>,
             CustomGeneratorRemarkableArgs<Flower>,
             CustomGeneratorDtoDependent<Flower, Dto> {
 
         Map<CustomRuleRemark, CustomRuleRemarkArgs> ruleRemarks;
         Supplier<Dto> generatedDto;
+
+        String[] args;
 
         @Override
         public Flower generate() {
@@ -354,6 +359,11 @@ public class CustomRemarksTests {
         @Override
         public boolean isDtoReady() {
             return generatedDto.get().lot != null;
+        }
+
+        @Override
+        public void setArgs(String... args) {
+            this.args = args;
         }
     }
 

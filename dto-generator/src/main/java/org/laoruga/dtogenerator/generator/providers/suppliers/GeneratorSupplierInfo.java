@@ -21,17 +21,14 @@ public class GeneratorSupplierInfo {
     private Class<? extends Annotation> rules;
     private Class<?> generatedType;
     private Function<ConfigDto, Generator<?>> generatorSupplier;
-    private String[] customGeneratorArgs;
 
     static GeneratorSupplierInfo createInstance(Class<? extends Annotation> rules,
                                                 Class<?> generatedType,
-                                                Function<ConfigDto, Generator<?>> builderSupplier,
-                                                String... customGeneratorArgs) {
+                                                Function<ConfigDto, Generator<?>> builderSupplier) {
         GeneratorSupplierInfo genBuilderInfo = new GeneratorSupplierInfo();
         genBuilderInfo.rules = rules;
         genBuilderInfo.generatedType = generatedType;
         genBuilderInfo.generatorSupplier = builderSupplier;
-        genBuilderInfo.customGeneratorArgs = customGeneratorArgs;
         return genBuilderInfo;
     }
 

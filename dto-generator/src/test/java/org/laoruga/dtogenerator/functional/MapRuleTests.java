@@ -268,15 +268,15 @@ public class MapRuleTests {
         LinkedHashMap<Object, Object> objectObjectLinkedHashMap = new LinkedHashMap<>();
 
         builder
-                .setTypeGeneratorConfig("stringIntegerMap",
+                .setGeneratorConfig("stringIntegerMap",
                         MapConfig.builder().maxSize(10).build())
-                .setTypeGeneratorConfig("enumLongHashMap",
+                .setGeneratorConfig("enumLongHashMap",
                         MapConfig.builder().minSize(1).maxSize(1).build())
-                .setTypeGeneratorConfig("doubleLocalDateTimeTreeMap",
+                .setGeneratorConfig("doubleLocalDateTimeTreeMap",
                         MapConfig.builder().ruleRemark(MAX_VALUE).build())
-                .setTypeGeneratorConfig("yearBooleanMap",
+                .setGeneratorConfig("yearBooleanMap",
                         MapConfig.builder().mapInstanceSupplier(() -> objectObjectLinkedHashMap).build())
-                .setTypeGeneratorConfig("customDtoOfCustomDto",
+                .setGeneratorConfig("customDtoOfCustomDto",
                         MapConfig.builder().minSize(0).maxSize(0).build());
 
         Dto dto = builder.build().generateDto();
@@ -331,16 +331,16 @@ public class MapRuleTests {
 
         // field
         builder
-                .setTypeGeneratorConfig("stringIntegerMap",
+                .setGeneratorConfig("stringIntegerMap",
                         MapConfig.builder().maxSize(15).build())
 
-                .setTypeGeneratorConfig("enumLongHashMap",
+                .setGeneratorConfig("enumLongHashMap",
                         MapConfig.builder().valueGenerator(() -> 1L).build())
 
-                .setTypeGeneratorConfig("doubleLocalDateTimeTreeMap",
+                .setGeneratorConfig("doubleLocalDateTimeTreeMap",
                         MapConfig.builder().minSize(1).maxSize(1).build())
 
-                .setTypeGeneratorConfig("yearBooleanMap",
+                .setGeneratorConfig("yearBooleanMap",
                         MapConfig.builder().minSize(20).ruleRemark(RANDOM_VALUE).valueGenerator(() -> TRUE).build())
 
                 .setGenerator("customDtoOfCustomDto",
@@ -482,16 +482,16 @@ public class MapRuleTests {
 
         // field
         builder
-                .setTypeGeneratorConfig("stringIntegerMap",
+                .setGeneratorConfig("stringIntegerMap",
                         MapConfig.builder().maxSize(15).build())
 
-                .setTypeGeneratorConfig("enumLongHashMap",
+                .setGeneratorConfig("enumLongHashMap",
                         MapConfig.builder().valueGenerator(() -> 1L).build())
 
-                .setTypeGeneratorConfig("doubleLocalDateTimeTreeMap",
+                .setGeneratorConfig("doubleLocalDateTimeTreeMap",
                         MapConfig.builder().minSize(1).maxSize(1).build())
 
-                .setTypeGeneratorConfig("yearBooleanMap",
+                .setGeneratorConfig("yearBooleanMap",
                         MapConfig.builder().minSize(20).ruleRemark(RANDOM_VALUE).valueGenerator(() -> TRUE).build());
 
 

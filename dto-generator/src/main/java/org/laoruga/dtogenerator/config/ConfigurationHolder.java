@@ -12,19 +12,24 @@ import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
 @AllArgsConstructor
 public class ConfigurationHolder implements Configuration {
 
-    /**
-     * @param source constructor to copy
-     */
-    public ConfigurationHolder(ConfigurationHolder source) {
-        this.dtoGeneratorConfig = source.getDtoGeneratorConfig();
-        this.typeGeneratorsConfig = source.getTypeGeneratorsConfig();
-        this.typeGeneratorsConfigForField = new TypeGeneratorsConfigForFiled();
-    }
-
     @Getter
     private DtoGeneratorConfig dtoGeneratorConfig;
     @Getter
     private TypeGeneratorsConfigLazy typeGeneratorsConfig;
     @Getter
     private TypeGeneratorsConfigForFiled typeGeneratorsConfigForField;
+    @Getter
+    private final CustomGeneratorsConfigurationHolder customGeneratorsConfigurators;
+
+    /**
+     * Constructor to copy
+     */
+    public ConfigurationHolder(DtoGeneratorConfig dtoGeneratorConfig,
+                               TypeGeneratorsConfigLazy typeGeneratorsConfig,
+                               CustomGeneratorsConfigurationHolder customGeneratorsConfigurators) {
+        this.dtoGeneratorConfig = dtoGeneratorConfig;
+        this.typeGeneratorsConfig = typeGeneratorsConfig;
+        this.typeGeneratorsConfigForField = new TypeGeneratorsConfigForFiled();
+        this.customGeneratorsConfigurators = customGeneratorsConfigurators;
+    }
 }
