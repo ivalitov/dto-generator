@@ -35,8 +35,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DtoGenerator<T> {
 
-    private final Supplier<?> dtoInstanceSupplier;
-    private final boolean classBasedInstanceSupplier;
     private final FieldGeneratorsProvider fieldGeneratorsProvider;
     @Getter(AccessLevel.PACKAGE)
     private final ErrorsHolder errorsHolder;
@@ -44,8 +42,6 @@ public class DtoGenerator<T> {
 
     DtoGenerator(FieldGeneratorsProvider fieldGeneratorsProvider) {
         this.fieldGeneratorsProvider = fieldGeneratorsProvider;
-        this.dtoInstanceSupplier = fieldGeneratorsProvider.getDtoInstanceSupplier();
-        this.classBasedInstanceSupplier = dtoInstanceSupplier instanceof DtoInstanceSupplier;
         this.errorsHolder = new ErrorsHolder();
     }
 
@@ -63,7 +59,9 @@ public class DtoGenerator<T> {
     @SuppressWarnings("unchecked")
     public T generateDto() {
 
-        if (classBasedInstanceSupplier) {
+        Supplier<?> dtoInstanceSupplier = fieldGeneratorsProvider.getDtoInstanceSupplier();
+
+        if (dtoInstanceSupplier instanceof DtoInstanceSupplier) {
             ((DtoInstanceSupplier) dtoInstanceSupplier).updateInstance();
         }
 
@@ -97,7 +95,7 @@ public class DtoGenerator<T> {
         } catch (Exception e) {
             throw new DtoGeneratorException(e);
         } finally {
-            if (classBasedInstanceSupplier) {
+            if (dtoInstanceSupplier instanceof DtoInstanceSupplier) {
                 ((DtoInstanceSupplier) dtoInstanceSupplier).remove();
             }
         }
