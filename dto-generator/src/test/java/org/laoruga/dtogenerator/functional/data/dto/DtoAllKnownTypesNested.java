@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
-import org.laoruga.dtogenerator.functional.data.customgenerator.CustomIntegerGenerator;
+import org.laoruga.dtogenerator.functional.data.generator.CustomIntegerGenerator;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
 
 import java.beans.Transient;

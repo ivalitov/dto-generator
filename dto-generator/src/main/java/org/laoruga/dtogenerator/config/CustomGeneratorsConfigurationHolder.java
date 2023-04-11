@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
+import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class CustomGeneratorsConfigurationHolder {
     }
 
     /**
-     *  Constructor to copy
+     * Constructor to copy
      */
     public CustomGeneratorsConfigurationHolder(Supplier<?> dtoInstanceSupplier,
                                                RemarksHolder remarksHolder,
@@ -42,14 +43,21 @@ public class CustomGeneratorsConfigurationHolder {
         this.byFieldName = new HashMap<>();
     }
 
-    // TODO to add overridden check?
-    public void setConfiguratorBuilder(String fieldName,
-                                       CustomGeneratorConfigurator.Builder configuratorBuilder) {
+    public synchronized void setConfiguratorBuilder(String fieldName,
+                                                    CustomGeneratorConfigurator.Builder configuratorBuilder) {
+        if (byFieldName.containsKey(fieldName)) {
+            throw new DtoGeneratorException("Custom generator configurator already set for the field: " +
+                    "'" + fieldName + "'");
+        }
         byFieldName.put(fieldName, configuratorBuilder);
     }
 
-    public void setConfiguratorBuilder(Class<? extends CustomGenerator<?>> customGeneratorClass,
+    public synchronized void setConfiguratorBuilder(Class<? extends CustomGenerator<?>> customGeneratorClass,
                                        CustomGeneratorConfigurator.Builder configuratorBuilder) {
+        if (byGeneratorType.containsKey(customGeneratorClass)) {
+            throw new DtoGeneratorException("Custom generator configurator already set for generator: " +
+                    "'" + customGeneratorClass + "'");
+        }
         byGeneratorType.put(customGeneratorClass, configuratorBuilder);
     }
 

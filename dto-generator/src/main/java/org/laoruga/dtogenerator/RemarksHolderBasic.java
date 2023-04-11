@@ -58,7 +58,7 @@ public class RemarksHolderBasic {
         basicRuleRemarkForAnyField.set(basicRuleRemark);
     }
 
-    public IRuleRemark getBasicRuleRemarkOrNull(String fieldName) throws NullPointerException {
+    public IRuleRemark getBasicRuleRemarkOrNull(String fieldName) {
         if (basicRuleRemarksMapByField.containsKey(fieldName)) {
             return basicRuleRemarksMapByField.get(fieldName);
         }

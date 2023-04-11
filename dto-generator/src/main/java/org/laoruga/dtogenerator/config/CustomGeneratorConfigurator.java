@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.custom.*;
+import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.util.Arrays;
@@ -20,12 +22,14 @@ public class CustomGeneratorConfigurator {
     private String[] args;
     private Supplier<?> dtoInstanceSupplier;
     private RemarksHolder remarksHolder;
+    private RuleRemark ruleRemark;
     private String fieldName;
 
     public static class Builder {
 
         public Builder merge(Builder builder) {
             if (builder.args != null) this.args = builder.args;
+            if (builder.ruleRemark != null) this.ruleRemark = builder.ruleRemark;
             return this;
         }
 
@@ -40,23 +44,28 @@ public class CustomGeneratorConfigurator {
             if (generatorInstance instanceof CustomGeneratorDtoDependent) {
                 setDto(generatorInstance);
             }
-            if (generatorInstance instanceof CustomGeneratorRemarkableArgs) {
+            if (generatorInstance instanceof CustomGeneratorConfigMap) {
 
-                ((CustomGeneratorRemarkableArgs<?>) generatorInstance).setRuleRemarks(
+
+                ((CustomGeneratorConfigMap<?>) generatorInstance).setConfigMap(
                         remarksHolder
                                 .getCustomRemarks()
-                                .getRemarksWithArgs(fieldName, generatorInstance.getClass())
+                                .getConfigMap(fieldName, generatorInstance.getClass())
                 );
 
-            } else if (generatorInstance instanceof CustomGeneratorRemarkable) {
 
-                ((CustomGeneratorRemarkable<?>) generatorInstance).setRuleRemarks(
-                        remarksHolder
-                                .getCustomRemarks()
-                                .getRemarks(fieldName, generatorInstance.getClass())
+            } else if (generatorInstance instanceof CustomGeneratorRemarks) {
+
+                IRuleRemark maybeRuleRemark = remarksHolder
+                        .getBasicRemarks()
+                        .getBasicRuleRemarkOrNull(fieldName);
+
+                ((CustomGeneratorRemarks<?>) generatorInstance).setRuleRemark(
+                        maybeRuleRemark != null ? maybeRuleRemark : ruleRemark
                 );
 
             }
+
         } catch (Exception e) {
             throw new DtoGeneratorException("Error while preparing custom generator.", e);
         }

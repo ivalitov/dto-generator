@@ -7,10 +7,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkable;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkableArgs;
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkArgs;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarks;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorConfigMap;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
@@ -24,6 +22,7 @@ import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.util.dummy.DummyCustomGenerator;
 
+import java.util.Arrays;
 import java.util.function.Supplier;
 
 import static org.laoruga.dtogenerator.DtoGeneratorBuildersTree.ROOT;
@@ -256,32 +255,15 @@ public class DtoGeneratorBuilder<T> {
      * Custom Rule Remarks
      */
 
-    public DtoGeneratorBuilder<T> addRuleRemark(@NonNull String fieldName,
-                                                @NonNull CustomRuleRemark ruleRemark,
-                                                CustomRuleRemark... ruleRemarks) {
-        Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
-        RemarksHolderCustom customRemarks = dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
-                .getRemarksHolder()
-                .getCustomRemarks();
-        customRemarks.addRemark(fieldNameAndPath.getLeft(), ruleRemark);
-        for (CustomRuleRemark remark : ruleRemarks) {
-            customRemarks.addRemark(fieldNameAndPath.getLeft(), remark);
-        }
-        return this;
-    }
-
     /**
      * Adding remarks to any custom generator.
-     * Any implementation of {@link CustomGeneratorRemarkable} or {@link CustomGeneratorRemarkableArgs}
+     * Any implementation of {@link CustomGeneratorRemarks} or {@link CustomGeneratorConfigMap}
      * will have passed remarks
      *
      * @param customRuleRemarks - remarks to add
      * @return this
      */
-    public DtoGeneratorBuilder<T> addRuleRemark(@NonNull CustomRuleRemark... customRuleRemarks) {
-        addRuleRemark(DummyCustomGenerator.class, customRuleRemarks);
-        return this;
-    }
+
 
     /**
      * Adding remarks to specified custom generator.
@@ -290,23 +272,50 @@ public class DtoGeneratorBuilder<T> {
      * @param ruleRemarks          - remarks to add
      * @return this
      */
-    public DtoGeneratorBuilder<T> addRuleRemark(Class<? extends CustomGenerator<?>> customGeneratorClass,
-                                                CustomRuleRemark... ruleRemarks) {
+
+    public DtoGeneratorBuilder<T> addGeneratorParameter(@NonNull Class<? extends CustomGenerator<?>> customGeneratorClass,
+                                                        @NonNull String parameterName,
+                                                        @NonNull String parameterValue) {
+
         RemarksHolderCustom customRemarks = getRemarksHolder().getCustomRemarks();
 
-        for (CustomRuleRemark ruleRemark : ruleRemarks) {
+        customRemarks.addParameterForGeneratorType(
+                customGeneratorClass,
+                parameterName,
+                parameterValue
+        );
 
-            if (ruleRemark instanceof CustomRuleRemarkArgs) {
-                CustomRuleRemarkArgs ruleRemarkArgs = (CustomRuleRemarkArgs) ruleRemark;
-                if (ruleRemarkArgs.getArgs().length < ruleRemarkArgs.minimumArgsNumber()) {
-                    throw new DtoGeneratorException("Remark '" + ruleRemark + "'" +
-                            " expected at least '" + ruleRemarkArgs.minimumArgsNumber() + "' arg(s)." +
-                            " Passed '" + ruleRemarkArgs.getArgs().length + "' arg(s).");
-                }
-            }
+        return this;
+    }
 
-            customRemarks.addRemarkForAnyField(customGeneratorClass, ruleRemark);
+    public DtoGeneratorBuilder<T> addGeneratorParameter(@NonNull String fieldName,
+                                                        @NonNull String parameterName,
+                                                        @NonNull String parameterValue,
+                                                        @NonNull String... nameValuePairs) {
+
+        if (nameValuePairs.length % 2 > 0) {
+            throw new IllegalArgumentException("Name and value pairs expected for parameters, but passed not even value: " +
+                    Arrays.asList(nameValuePairs)
+            );
         }
+
+        Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
+
+        RemarksHolderCustom customRemarks = dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
+                .getRemarksHolder()
+                .getCustomRemarks();
+
+        customRemarks.addParameterForField(fieldNameAndPath.getLeft(), parameterName, parameterValue);
+
+        for (int i = 0; i < nameValuePairs.length; i = i + 2) {
+            customRemarks.addParameterForField(fieldNameAndPath.getLeft(), nameValuePairs[i], nameValuePairs[i + 1]);
+        }
+
+        return this;
+    }
+
+    public DtoGeneratorBuilder<T> addGeneratorParameter(@NonNull String name, @NonNull String value) {
+        addGeneratorParameter(DummyCustomGenerator.class, name, value);
         return this;
     }
 

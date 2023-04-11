@@ -1,25 +1,27 @@
 package org.laoruga.dtogenerator.functional;
 
-import com.google.common.collect.Sets;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkable;
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
-import org.laoruga.dtogenerator.api.rules.CustomRule;
-import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
-import org.laoruga.dtogenerator.api.rules.StringRule;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarks;
+import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.constants.RuleRemark;
+import org.laoruga.dtogenerator.util.RandomUtils;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.laoruga.dtogenerator.functional.CustomGeneratorWIthRemarksTests.OctopusMatcher.*;
 
 /**
  * @author Il'dar Valitov
@@ -34,19 +36,36 @@ public class CustomGeneratorWIthRemarksTests {
      * Test Data
      */
 
+    static final String KIND_MIN = "Oct";
+    static final String KIND_MAX = "Octopus";
+
     static class Dto {
 
-        @StringRule(words = {"Leila", "Hazel"})
-        String witchName;
+        @CustomRule(generatorClass = OctopusKindGenerator.class)
+        String octopusKind;
 
-        @CustomRule(generatorClass = WitchDescriptionGenerator.class)
-        String witchDescription;
+        @CustomRule(generatorClass = OctopusKindGenerator.class, ruleRemark = RuleRemark.NULL_VALUE)
+        String octopusKindSecond;
 
-        @CustomRule(generatorClass = WitchesBrewGenerator.class)
-        WitchesBrew witchesBrew;
+        @CustomRule(generatorClass = OctopusGenerator.class)
+        Octopus octopus;
 
-        @CustomRule(generatorClass = WitchesBrewGenerator.class)
-        WitchesBrew witchesBrewSecond;
+        @CustomRule(generatorClass = OctopusGenerator.class, ruleRemark = RuleRemark.MAX_VALUE)
+        Octopus octopusSecond;
+
+        @CollectionRule(minSize = 10, element =
+        @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class, ruleRemark = RuleRemark.MAX_VALUE)))
+        List<Octopus> octopusList;
+
+        @ArrayRule(minSize = 10, element =
+        @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class)))
+        Octopus[] octopusArray;
+
+        @MapRule(maxSize = 1,
+                key = @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class)),
+                value = @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class))
+        )
+        Map<Octopus, Octopus> octopusMap;
 
         @NestedDtoRule
         NestedDto nestedDto;
@@ -55,183 +74,202 @@ public class CustomGeneratorWIthRemarksTests {
 
     static class NestedDto {
 
-        @StringRule(words = {"Cruelly", "Monalisa"})
-        String witchName;
+        @CustomRule(generatorClass = OctopusKindGenerator.class, ruleRemark = RuleRemark.MIN_VALUE)
+        String octopusKind;
 
-        @CustomRule(generatorClass = WitchDescriptionGenerator.class)
-        String witchDescription;
+        @CustomRule(generatorClass = OctopusKindGenerator.class)
+        String octopusKindSecond;
 
-        @CustomRule(generatorClass = WitchesBrewGenerator.class)
-        WitchesBrew witchesBrew;
+        @CustomRule(generatorClass = OctopusGenerator.class, ruleRemark = RuleRemark.MIN_VALUE)
+        Octopus octopus;
 
-        @CustomRule(generatorClass = WitchesBrewGenerator.class)
-        WitchesBrew witchesBrewSecond;
+        @CustomRule(generatorClass = OctopusGenerator.class)
+        Octopus octopusSecond;
+
+        @CollectionRule(minSize = 10, element =
+        @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class)))
+        List<Octopus> octopusList;
+
+        @ArrayRule(minSize = 10, element =
+        @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class, ruleRemark = RuleRemark.MIN_VALUE)))
+        Octopus[] octopusArray;
+
+        @MapRule(maxSize = 1,
+                key = @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class)),
+                value = @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class))
+        )
+        Map<Octopus, Octopus> octopusMap;
 
     }
 
-    static class WitchesBrew {
+    static class Octopus {
+        int tentaclesNumber;
 
-        Set<String> ingredients;
-
-        public WitchesBrew(Collection<String> ingredients) {
-            this.ingredients = new HashSet<>(ingredients);
+        public Octopus(int tentaclesNumber) {
+            this.tentaclesNumber = tentaclesNumber;
         }
     }
 
-    static class WitchesBrewGenerator implements CustomGeneratorRemarkable<WitchesBrew> {
+    static class OctopusGenerator implements CustomGeneratorRemarks<Octopus> {
 
-        Set<CustomRuleRemark> ruleRemarks;
+        IRuleRemark ruleRemark;
 
         @Override
-        public WitchesBrew generate() {
-            Set<String> ingredients = new HashSet<>();
-            for (CustomRuleRemark ruleRemark : ruleRemarks) {
-                if (ruleRemark.getClass() == BrewFeature.class) {
-
-                    switch ((BrewFeature) ruleRemark) {
-                        case AGING:
-                            ingredients.add("leaves");
-                            break;
-                        case YOUTH:
-                            ingredients.add("breath");
-                            break;
-                        case MADNESS:
-                            ingredients.add("cactus");
-                            break;
-                        case BERRY_FLAVOURED:
-                            ingredients.add("blueberry");
-                            break;
-                    }
+        public Octopus generate() {
+            int tentacles = 0;
+            if (ruleRemark.getClass() == RuleRemark.class) {
+                switch ((RuleRemark) ruleRemark) {
+                    case MIN_VALUE:
+                        tentacles = 1;
+                        break;
+                    case MAX_VALUE:
+                        tentacles = 8;
+                        break;
+                    case RANDOM_VALUE:
+                    case NOT_DEFINED:
+                        tentacles = RandomUtils.nextInt(2, 7);
+                        break;
+                    case NULL_VALUE:
+                        return null;
+                    default:
+                        throw new IllegalStateException("Unexpected value: " + (RuleRemark) ruleRemark);
                 }
             }
-            return new WitchesBrew(ingredients);
+            return new Octopus(tentacles);
         }
 
         @Override
-        public void setRuleRemarks(Set<CustomRuleRemark> ruleRemarks) {
-            this.ruleRemarks = ruleRemarks;
+        public void setRuleRemark(IRuleRemark ruleRemark) {
+            this.ruleRemark = ruleRemark;
         }
     }
 
-    static class WitchDescriptionGenerator implements CustomGeneratorRemarkable<String> {
+    static class OctopusKindGenerator implements CustomGeneratorRemarks<String> {
 
-        Set<CustomRuleRemark> ruleRemarks;
+        IRuleRemark ruleRemark;
 
         @Override
         public String generate() {
-            String brewFeatures = ruleRemarks.stream()
-                    .filter(r -> r.getClass() == BrewFeature.class)
-                    .map(Object::toString)
-                    .collect(Collectors.joining(", "));
 
-            String witchFeature = ruleRemarks.stream()
-                    .filter(r -> r.getClass() == WitchFeature.class)
-                    .map(Object::toString)
-                    .collect(Collectors.joining(", "));
+            String kind = "";
 
-            return "The witch is: '" + (witchFeature.isEmpty() ? "UNKNOWN_WITCH" : witchFeature) + "'" +
-                    ", she brews: '" + (brewFeatures.isEmpty() ? "UNKNOWN_BREW" : brewFeatures) + "'";
+            if (ruleRemark.getClass() == RuleRemark.class) {
+                switch ((RuleRemark) ruleRemark) {
+                    case MIN_VALUE:
+                        kind = KIND_MIN;
+                        break;
+                    case MAX_VALUE:
+                        kind = KIND_MAX;
+                        break;
+                    case NOT_DEFINED:
+                    case RANDOM_VALUE:
+                        kind = RandomUtils.nextString(10);
+                        break;
+                    case NULL_VALUE:
+                        kind = null;
+                }
+            }
+            return kind;
         }
 
         @Override
-        public void setRuleRemarks(Set<CustomRuleRemark> ruleRemarks) {
-            this.ruleRemarks = ruleRemarks;
+        public void setRuleRemark(IRuleRemark ruleRemark) {
+            this.ruleRemark = ruleRemark;
         }
     }
 
-    enum BrewFeature implements CustomRuleRemark {
-        AGING,
-        YOUTH,
-        MADNESS,
-        BERRY_FLAVOURED
-    }
-
-    enum WitchFeature implements CustomRuleRemark {
-        TERRIBLE,
-        GRUMPY
-    }
 
     /*
      * Tests
      */
 
+    static class OctopusMatcher extends TypeSafeMatcher<Octopus> {
+
+        Integer tentaclesExpected;
+
+        public OctopusMatcher(Integer expected) {
+            this.tentaclesExpected = expected;
+        }
+
+        @Override
+        protected boolean matchesSafely(Octopus item) {
+            if (tentaclesExpected != null) {
+                return item.tentaclesNumber == tentaclesExpected;
+            }
+            return item.tentaclesNumber > 1 && item.tentaclesNumber < 8;
+        }
+
+        @Override
+        public void describeTo(Description description) {
+        }
+
+        public static OctopusMatcher octopusMatcher(int tentacles) {
+            return new OctopusMatcher(tentacles);
+        }
+
+        public static OctopusMatcher maxOctopusMatcher() {
+            return octopusMatcher(8);
+        }
+
+        public static OctopusMatcher minOctopusMatcher() {
+            return octopusMatcher(1);
+        }
+
+        public static OctopusMatcher randomOctopusMatcher() {
+            return new OctopusMatcher(null);
+        }
+    }
 
     @Test
     void customGeneratorWithRemarksAsIs() {
         Dto dto = DtoGenerator.builder(Dto.class).build().generateDto();
 
         assertAll(
-                () -> assertThat(dto.witchName, notNullValue()),
-                () -> assertThat(dto.witchDescription,
-                        both(containsString("UNKNOWN_BREW")).and(containsString("UNKNOWN_WITCH"))
-                ),
-                () -> assertThat(dto.witchesBrew.ingredients, empty()),
-                () -> assertThat(dto.witchesBrewSecond.ingredients, empty()),
+                () -> assertThat(dto.octopusKind, hasLength(10)),
+                () -> assertThat(dto.octopusKindSecond, nullValue()),
+                () -> assertThat(dto.octopus, randomOctopusMatcher()),
+                () -> assertThat(dto.octopusSecond, maxOctopusMatcher()),
+                () -> assertThat(dto.octopusList, everyItem(maxOctopusMatcher())),
+                () -> assertThat(Arrays.asList(dto.octopusArray), everyItem(randomOctopusMatcher())),
+                () -> assertThat(dto.octopusMap.keySet(), everyItem(randomOctopusMatcher())),
+                () -> assertThat(dto.octopusMap.values(), everyItem(randomOctopusMatcher())),
 
-                () -> assertThat(dto.nestedDto.witchName, notNullValue()),
-                () -> assertThat(dto.nestedDto.witchDescription,
-                        both(containsString("UNKNOWN_BREW")).and(containsString("UNKNOWN_WITCH"))
-                ),
-                () -> assertThat(dto.nestedDto.witchesBrew.ingredients, empty()),
-                () -> assertThat(dto.nestedDto.witchesBrewSecond.ingredients, empty())
+                () -> assertThat(dto.nestedDto.octopusKind, equalTo(KIND_MIN)),
+                () -> assertThat(dto.nestedDto.octopusKindSecond, hasLength(10)),
+                () -> assertThat(dto.nestedDto.octopus, minOctopusMatcher()),
+                () -> assertThat(dto.nestedDto.octopusSecond, randomOctopusMatcher()),
+                () -> assertThat(dto.nestedDto.octopusList, everyItem(randomOctopusMatcher())),
+                () -> assertThat(Arrays.asList(dto.nestedDto.octopusArray), everyItem(minOctopusMatcher())),
+                () -> assertThat(dto.nestedDto.octopusMap.keySet(), everyItem(randomOctopusMatcher())),
+                () -> assertThat(dto.nestedDto.octopusMap.values(), everyItem(randomOctopusMatcher()))
         );
     }
 
     @Test
-    void customGeneratorWithRemarksAddedForAnyField() {
+    void customGeneratorWithRemarkAddedForAnyField() {
 
         Dto dto = DtoGenerator.builder(Dto.class)
-                .addRuleRemark(BrewFeature.BERRY_FLAVOURED)
-                .addRuleRemark(BrewFeature.YOUTH)
+                .setRuleRemark(RuleRemark.MAX_VALUE)
                 .build().generateDto();
 
-        Set<String> ingredients = Sets.newHashSet("blueberry", "breath");
-
         assertAll(
-                () -> assertThat(dto.witchName, notNullValue()),
-                () -> assertThat(dto.witchDescription, allOf(
-                        containsString("YOUTH"),
-                        containsString("BERRY_FLAVOURED"),
-                        containsString("UNKNOWN_WITCH")
-                )),
-                () -> assertThat(dto.witchesBrew.ingredients, equalTo(ingredients)),
-                () -> assertThat(dto.witchesBrewSecond.ingredients, equalTo(ingredients)),
+                () -> assertThat(dto.octopusKind, equalTo(KIND_MAX)),
+                () -> assertThat(dto.octopusKindSecond, equalTo(KIND_MAX)),
+                () -> assertThat(dto.octopus, maxOctopusMatcher()),
+                () -> assertThat(dto.octopusSecond, maxOctopusMatcher()),
+                () -> assertThat(dto.octopusList, everyItem(maxOctopusMatcher())),
+                () -> assertThat(Arrays.asList(dto.octopusArray), everyItem(maxOctopusMatcher())),
+                () -> assertThat(dto.octopusMap.keySet(), everyItem(maxOctopusMatcher())),
+                () -> assertThat(dto.octopusMap.values(), everyItem(maxOctopusMatcher())),
 
-                () -> assertThat(dto.nestedDto.witchName, notNullValue()),
-                () -> assertThat(dto.nestedDto.witchDescription, allOf(
-                        containsString("YOUTH"),
-                        containsString("BERRY_FLAVOURED"),
-                        containsString("UNKNOWN_WITCH")
-                )),
-                () -> assertThat(dto.nestedDto.witchesBrew.ingredients, equalTo(ingredients)),
-                () -> assertThat(dto.nestedDto.witchesBrewSecond.ingredients, equalTo(ingredients))
-        );
-    }
-
-    @Test
-    void customGeneratorWithRemarksAddedForGeneratorType() {
-
-        Dto dto = DtoGenerator.builder(Dto.class)
-                .addRuleRemark(WitchesBrewGenerator.class, BrewFeature.BERRY_FLAVOURED)
-                .addRuleRemark(WitchDescriptionGenerator.class, WitchFeature.GRUMPY, BrewFeature.MADNESS)
-                .build().generateDto();
-
-        Set<String> ingredients = Sets.newHashSet("blueberry");
-
-        assertAll(
-                () -> assertThat(dto.witchName, notNullValue()),
-                () -> assertThat(dto.witchDescription,
-                        both(containsString("GRUMPY")).and(containsString("MADNESS"))
-                ),
-                () -> assertThat(dto.witchesBrew.ingredients, equalTo(ingredients)),
-                () -> assertThat(dto.witchesBrewSecond.ingredients, equalTo(ingredients)),
-
-                () -> assertThat(dto.nestedDto.witchName, notNullValue()),
-                () -> assertThat(dto.nestedDto.witchDescription,
-                        both(containsString("GRUMPY")).and(containsString("MADNESS"))
-                ),
-                () -> assertThat(dto.nestedDto.witchesBrew.ingredients, equalTo(ingredients)),
-                () -> assertThat(dto.nestedDto.witchesBrewSecond.ingredients, equalTo(ingredients))
+                () -> assertThat(dto.nestedDto.octopusKind, equalTo(KIND_MAX)),
+                () -> assertThat(dto.nestedDto.octopusKindSecond, equalTo(KIND_MAX)),
+                () -> assertThat(dto.nestedDto.octopus, maxOctopusMatcher()),
+                () -> assertThat(dto.nestedDto.octopusSecond, maxOctopusMatcher()),
+                () -> assertThat(dto.nestedDto.octopusList, everyItem(maxOctopusMatcher())),
+                () -> assertThat(Arrays.asList(dto.nestedDto.octopusArray), everyItem(maxOctopusMatcher())),
+                () -> assertThat(dto.nestedDto.octopusMap.keySet(), everyItem(maxOctopusMatcher())),
+                () -> assertThat(dto.nestedDto.octopusMap.values(), everyItem(maxOctopusMatcher()))
         );
     }
 
@@ -241,96 +279,104 @@ public class CustomGeneratorWIthRemarksTests {
         // remarks set for root dto only
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class)
-                .addRuleRemark("witchDescription", WitchFeature.TERRIBLE)
-                .addRuleRemark("witchesBrew", BrewFeature.AGING)
-                .addRuleRemark("witchesBrewSecond", BrewFeature.MADNESS);
+                .setRuleRemark("octopusKind", RuleRemark.MAX_VALUE)
+                .setRuleRemark("octopusKindSecond", RuleRemark.MIN_VALUE)
+                .setRuleRemark("octopus", RuleRemark.MAX_VALUE)
+                .setRuleRemark("octopusSecond", RuleRemark.MIN_VALUE)
+                .setRuleRemark("octopusList", RuleRemark.MIN_VALUE)
+                .setRuleRemark("octopusArray", RuleRemark.MAX_VALUE)
+                .setRuleRemark("octopusMap", RuleRemark.MIN_VALUE);
+
+        Consumer<Dto> roodDtoAssertions = dto ->
+                assertAll(
+                        () -> assertThat(dto.octopusKind, equalTo(KIND_MAX)),
+                        () -> assertThat(dto.octopusKindSecond, equalTo(KIND_MIN)),
+                        () -> assertThat(dto.octopus.tentaclesNumber, equalTo(8)),
+                        () -> assertThat(dto.octopusSecond.tentaclesNumber, equalTo(1)),
+                        () -> assertThat(dto.octopusList, everyItem(minOctopusMatcher())),
+                        () -> assertThat(Arrays.asList(dto.octopusArray), everyItem(maxOctopusMatcher())),
+                        () -> assertThat(dto.octopusMap.keySet(), everyItem(minOctopusMatcher())),
+                        () -> assertThat(dto.octopusMap.values(), everyItem(minOctopusMatcher()))
+                );
+
         Dto dto = builder.build().generateDto();
 
-        Set<String> ingredientsWitchesBrew = Sets.newHashSet("leaves");
-        Set<String> ingredientsWitchesBrewSecond = Sets.newHashSet("cactus");
+        // root dto assertions
+        roodDtoAssertions.accept(dto);
 
+        // nested dto assertions
         assertAll(
-                () -> assertThat(dto.witchName, notNullValue()),
-                () -> assertThat(dto.witchDescription, allOf(
-                        containsString("TERRIBLE"),
-                        containsString("UNKNOWN_BREW")
-                )),
-                () -> assertThat(dto.witchesBrew.ingredients, equalTo(ingredientsWitchesBrew)),
-                () -> assertThat(dto.witchesBrewSecond.ingredients, equalTo(ingredientsWitchesBrewSecond)),
-
-                () -> assertThat(dto.nestedDto.witchName, notNullValue()),
-                () -> assertThat(dto.nestedDto.witchDescription, allOf(
-                        containsString("UNKNOWN_WITCH"),
-                        containsString("UNKNOWN_BREW")
-                )),
-                () -> assertThat(dto.nestedDto.witchesBrew.ingredients, empty()),
-                () -> assertThat(dto.nestedDto.witchesBrewSecond.ingredients, empty())
+                () -> assertThat(dto.nestedDto.octopusKind, equalTo(KIND_MIN)),
+                () -> assertThat(dto.nestedDto.octopusKindSecond, hasLength(10)),
+                () -> assertThat(dto.nestedDto.octopus.tentaclesNumber, equalTo(1)),
+                () -> assertThat(dto.nestedDto.octopusSecond, randomOctopusMatcher()),
+                () -> assertThat(dto.nestedDto.octopusList, everyItem(randomOctopusMatcher())),
+                () -> assertThat(Arrays.asList(dto.nestedDto.octopusArray), everyItem(minOctopusMatcher())),
+                () -> assertThat(dto.nestedDto.octopusMap.keySet(), everyItem(randomOctopusMatcher())),
+                () -> assertThat(dto.nestedDto.octopusMap.values(), everyItem(randomOctopusMatcher()))
         );
 
         // remarks set for root dto and nested dto
 
-        Set<String> ingredientsWitchesBrewNested = Sets.newHashSet("blueberry");
-        Set<String> ingredientsWitchesBrewSecondNested = Sets.newHashSet("breath");
-
         builder
-                .addRuleRemark("nestedDto.witchDescription", BrewFeature.MADNESS)
-                .addRuleRemark("nestedDto.witchesBrew", BrewFeature.BERRY_FLAVOURED)
-                .addRuleRemark("nestedDto.witchesBrewSecond", BrewFeature.YOUTH);
+                .setRuleRemark("nestedDto.octopusKind", RuleRemark.MAX_VALUE)
+                .setRuleRemark("nestedDto.octopusKindSecond", RuleRemark.MIN_VALUE)
+                .setRuleRemark("nestedDto.octopus", RuleRemark.MAX_VALUE)
+                .setRuleRemark("nestedDto.octopusSecond", RuleRemark.MIN_VALUE)
+                .setRuleRemark("nestedDto.octopusList", RuleRemark.MIN_VALUE)
+                .setRuleRemark("nestedDto.octopusArray", RuleRemark.MAX_VALUE)
+                .setRuleRemark("nestedDto.octopusMap", RuleRemark.MIN_VALUE);
 
         Dto dto_2 = builder.build().generateDto();
 
-        assertAll(
-                () -> assertThat(dto_2.witchName, notNullValue()),
-                () -> assertThat(dto.witchDescription, allOf(
-                        containsString("TERRIBLE"),
-                        containsString("UNKNOWN_BREW")
-                )),
-                () -> assertThat(dto_2.witchesBrew.ingredients, equalTo(ingredientsWitchesBrew)),
-                () -> assertThat(dto_2.witchesBrewSecond.ingredients, equalTo(ingredientsWitchesBrewSecond)),
+        // root dto assertions
+        roodDtoAssertions.accept(dto_2);
 
-                () -> assertThat(dto_2.nestedDto.witchName, notNullValue()),
-                () -> assertThat(dto_2.nestedDto.witchDescription, allOf(
-                        containsString("UNKNOWN_WITCH"),
-                        containsString("MADNESS")
-                )),
-                () -> assertThat(dto_2.nestedDto.witchesBrew.ingredients, equalTo(ingredientsWitchesBrewNested)),
-                () -> assertThat(dto_2.nestedDto.witchesBrewSecond.ingredients, equalTo(ingredientsWitchesBrewSecondNested))
+        // nested dto assertions
+        assertAll(
+                () -> assertThat(dto_2.nestedDto.octopusKind, equalTo(KIND_MAX)),
+                () -> assertThat(dto_2.nestedDto.octopusKindSecond, equalTo(KIND_MIN)),
+                () -> assertThat(dto_2.nestedDto.octopus.tentaclesNumber, equalTo(8)),
+                () -> assertThat(dto_2.nestedDto.octopusSecond.tentaclesNumber, equalTo(1)),
+                () -> assertThat(dto_2.nestedDto.octopusList, everyItem(minOctopusMatcher())),
+                () -> assertThat(Arrays.asList(dto_2.nestedDto.octopusArray), everyItem(maxOctopusMatcher())),
+                () -> assertThat(dto_2.nestedDto.octopusMap.keySet(), everyItem(minOctopusMatcher())),
+                () -> assertThat(dto_2.nestedDto.octopusMap.values(), everyItem(minOctopusMatcher()))
         );
     }
 
     @Test
-    void customGeneratorWithRemarksOverriddenByTypeAndAnyAndSpecifiedField() {
+    void customGeneratorWithRemarksOverriddenByAnyAndSpecificFields() {
 
-        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class)
-                .addRuleRemark(BrewFeature.BERRY_FLAVOURED)
-                .addRuleRemark(WitchesBrewGenerator.class, BrewFeature.YOUTH)
-                .addRuleRemark("witchesBrew", BrewFeature.MADNESS)
-                .addRuleRemark("witchDescription", WitchFeature.GRUMPY)
-                .addRuleRemark("nestedDto.witchesBrew", BrewFeature.AGING)
-                .addRuleRemark("nestedDto.witchDescription", WitchFeature.TERRIBLE);
-
-        Dto dto = builder.build().generateDto();
+        Dto dto = DtoGenerator.builder(Dto.class)
+                .setRuleRemark(RuleRemark.MAX_VALUE)
+                .setRuleRemark("octopusKindSecond", RuleRemark.MIN_VALUE)
+                .setRuleRemark("octopusSecond", RuleRemark.MIN_VALUE)
+                .setRuleRemark("nestedDto.octopusArray", RuleRemark.MIN_VALUE)
+                .setRuleRemark("nestedDto.octopusKindSecond", RuleRemark.MIN_VALUE)
+                .setRuleRemark("nestedDto.octopus", RuleRemark.NULL_VALUE)
+                .setRuleRemark("nestedDto.octopusSecond", RuleRemark.MIN_VALUE)
+                .setRuleRemark("nestedDto.octopusMap", RuleRemark.NULL_VALUE)
+                .build().generateDto();
 
         assertAll(
-                () -> assertThat(dto.witchName, notNullValue()),
-                () -> assertThat(dto.witchDescription, allOf(
-                        containsString("BERRY_FLAVOURED"),
-                        containsString("GRUMPY"),
-                        not(containsString("YOUTH"))
-                )),
-                () -> assertThat(dto.witchesBrew.ingredients, equalTo(Sets.newHashSet("blueberry", "breath", "cactus"))),
-                () -> assertThat(dto.witchesBrewSecond.ingredients, equalTo(Sets.newHashSet("blueberry", "breath"))),
+                () -> assertThat(dto.octopusKind, equalTo(KIND_MAX)),
+                () -> assertThat(dto.octopusKindSecond, equalTo(KIND_MIN)),
+                () -> assertThat(dto.octopus.tentaclesNumber, equalTo(8)),
+                () -> assertThat(dto.octopusSecond.tentaclesNumber, equalTo(1)),
+                () -> assertThat(dto.octopusList, everyItem(maxOctopusMatcher())),
+                () -> assertThat(Arrays.asList(dto.octopusArray), everyItem(maxOctopusMatcher())),
+                () -> assertThat(dto.octopusMap.keySet(), everyItem(maxOctopusMatcher())),
+                () -> assertThat(dto.octopusMap.values(), everyItem(maxOctopusMatcher())),
 
-                () -> assertThat(dto.nestedDto.witchName, notNullValue()),
-                () -> assertThat(dto.nestedDto.witchDescription, allOf(
-                        containsString("BERRY_FLAVOURED"),
-                        containsString("TERRIBLE"),
-                        not(containsString("YOUTH"))
-                )),
-                () -> assertThat(dto.nestedDto.witchesBrew.ingredients, equalTo(Sets.newHashSet("blueberry", "breath", "leaves"))),
-                () -> assertThat(dto.nestedDto.witchesBrewSecond.ingredients, equalTo(Sets.newHashSet("blueberry", "breath")))
+                () -> assertThat(dto.nestedDto.octopusKind, equalTo(KIND_MAX)),
+                () -> assertThat(dto.nestedDto.octopusKindSecond, equalTo(KIND_MIN)),
+                () -> assertThat(dto.nestedDto.octopus, nullValue()),
+                () -> assertThat(dto.nestedDto.octopusSecond.tentaclesNumber, equalTo(1)),
+                () -> assertThat(dto.nestedDto.octopusList, everyItem(maxOctopusMatcher())),
+                () -> assertThat(Arrays.asList(dto.nestedDto.octopusArray), everyItem(minOctopusMatcher())),
+                () -> assertThat(dto.nestedDto.octopusMap, nullValue())
         );
-
     }
 
 }

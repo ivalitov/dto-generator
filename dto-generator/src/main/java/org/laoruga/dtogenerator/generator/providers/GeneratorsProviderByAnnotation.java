@@ -95,6 +95,7 @@ public class GeneratorsProviderByAnnotation {
 
         // FIXME config
         configurators.getBuilder(fieldName, generatorClass, customRule.args())
+                .ruleRemark(customRule.ruleRemark())
                 .build()
                 .configure(generatorInstance);
 

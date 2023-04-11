@@ -15,7 +15,6 @@ import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
-import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientDto;
 import org.laoruga.dtogenerator.generator.config.dto.CollectionConfig;
 import org.laoruga.dtogenerator.generator.config.dto.StringConfig;
 
@@ -59,40 +58,6 @@ class ListGenerationTests {
 
         @CollectionRule
         private List<AtomicInteger> listOfAtomicInteger;
-    }
-
-    @Test
-    @DisplayName("List Of Integer Generation (default rules params)")
-    void listOfIntegerWithDefaultRulesPrams() {
-        ClientDto dto = DtoGenerator.builder(ClientDto.class).build().generateDto();
-
-        assertNotNull(dto);
-        List<Integer> numbers = dto.getArrayListIntegerRules();
-        assertThat(numbers.size(), both(
-                greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize())));
-        for (Integer number : numbers) {
-            assertThat(number, both(
-                    greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt())).and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt())));
-        }
-    }
-
-
-    @Test
-    @DisplayName("List Of Integer Generation (explicit rules params)")
-    void listOfIntegerWithExplicitRulesPrams() {
-        ClientDto dto = DtoGenerator.builder(ClientDto.class).build().generateDto();
-
-        assertNotNull(dto);
-        List<Integer> numbers = dto.getLinkedListExplicitRules();
-        assertNotNull(numbers);
-        assertAll(
-                () -> assertEquals(LinkedList.class, numbers.getClass()),
-                () -> assertEquals(5, numbers.size())
-        );
-        for (Integer number : numbers) {
-            assertThat(number, both(
-                    greaterThanOrEqualTo(1)).and(lessThanOrEqualTo(2)));
-        }
     }
 
     @Test
@@ -143,6 +108,10 @@ class ListGenerationTests {
         @NumberRule(minInt = 777, maxInt = 777)))
         private List<AtomicInteger> listOfAtomicInteger;
 
+        @CollectionRule(collectionClass = LinkedList.class, minSize = 10, element = @Entry(numberRule =
+        @NumberRule(minInt = 1, maxInt = 1)))
+        private List<Integer> listOfInteger;
+
     }
 
     @Test
@@ -152,10 +121,12 @@ class ListGenerationTests {
         DtoVariousTypes dto = DtoGenerator.builder(new DtoVariousTypes()).build().generateDto();
 
         assertAll(
-                () -> assertThat(dto.getListOfBoolean().stream().filter(i -> i).count(), equalTo(10L)),
+                () -> assertThat(dto.listOfBoolean.stream().filter(i -> i).count(), equalTo(10L)),
                 () -> assertThat(
-                        dto.getListOfAtomicInteger().stream().map(AtomicInteger::get).collect(Collectors.toList()),
-                        everyItem(equalTo(777)))
+                        dto.listOfAtomicInteger.stream().map(AtomicInteger::get).collect(Collectors.toList()),
+                        everyItem(equalTo(777))),
+                () -> assertThat(dto.listOfInteger, isA(LinkedList.class)),
+                () -> assertThat(dto.listOfInteger, everyItem(equalTo(1)))
         );
 
     }

@@ -1,8 +1,6 @@
 package org.laoruga.dtogenerator.examples.generators.custom.remark;
 
-import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkArgs;
-import org.laoruga.dtogenerator.examples.generators.custom.CustomGeneratorRemarkable;
 
 /**
  * @author Il'dar Valitov
@@ -10,21 +8,19 @@ import org.laoruga.dtogenerator.examples.generators.custom.CustomGeneratorRemark
  */
 public enum PersonRemark implements CustomRuleRemarkArgs {
 
-    AGE_RANGE(2),
+    MIN_AGE(2),
+    MAX_AGE(2),
     GENDER(1),
-    WEIGHT_RANGE(2),
-    GROWTH_RANGE(2),
+    MIN_WEIGHT(2),
+    MAX_WEIGHT(2),
+    MIN_GROWTH(2),
+    MAX_GROWTH(2),
     ;
 
     private final int argsCount;
 
     PersonRemark(int argsCount) {
         this.argsCount = argsCount;
-    }
-
-    @Override
-    public Class<? extends CustomGenerator<?>> getGeneratorClass() {
-        return CustomGeneratorRemarkable.class;
     }
 
     @Override

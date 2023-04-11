@@ -6,24 +6,19 @@ import io.qameta.allure.Feature;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkableArgs;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorConfigMap;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkArgs;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
-import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Il'dar Valitov
@@ -31,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 
 @Epic("CUSTOM_RULES")
-@Feature("CUSTOM_GENERATOR_WITH_REMARKS_ARGS")
-public class CustomGeneratorWIthRemarksArgsTests {
+@Feature("CUSTOM_GENERATOR_WITH_CONFIG_MAP")
+public class CustomGeneratorWithWithConfigMapTests {
 
     /*
      * Test Data
@@ -82,17 +77,18 @@ public class CustomGeneratorWIthRemarksArgsTests {
         }
     }
 
-    static class WitchesBrewGenerator implements CustomGeneratorRemarkableArgs<WitchesBrew> {
+    static class WitchesBrewGenerator implements CustomGeneratorConfigMap<WitchesBrew> {
 
         Map<CustomRuleRemark, CustomRuleRemarkArgs> ruleRemarks;
+        Map<String, String> configMap;
 
         @Override
         public WitchesBrew generate() {
             Set<String> ingredients = new HashSet<>();
 
-            for (Map.Entry<CustomRuleRemark, CustomRuleRemarkArgs> entry : ruleRemarks.entrySet()) {
-                if (entry.getKey().getClass() == BrewFeature.class) {
-                    ingredients.add(entry.getKey() + " " + entry.getValue().getArgs()[0]);
+            for (Map.Entry<String, String> entry : configMap.entrySet()) {
+                if (BrewFeature.isItBrewFeature(entry.getKey())) {
+                    ingredients.add(entry.getKey() + " " + entry.getValue());
                 }
             }
 
@@ -100,25 +96,27 @@ public class CustomGeneratorWIthRemarksArgsTests {
         }
 
         @Override
-        public void setRuleRemarks(Map<CustomRuleRemark, CustomRuleRemarkArgs> ruleRemarks) {
-            this.ruleRemarks = ruleRemarks;
+        public void setConfigMap(Map<String, String> configMap) {
+            this.configMap = configMap;
         }
     }
 
-    static class WitchDescriptionGenerator implements CustomGeneratorRemarkableArgs<String> {
+    static class WitchDescriptionGenerator implements CustomGeneratorConfigMap<String> {
 
         Map<CustomRuleRemark, CustomRuleRemarkArgs> ruleRemarks;
+        Map<String, String> configMap;
+
 
         @Override
         public String generate() {
-            String brewFeatures = ruleRemarks.entrySet().stream()
-                    .filter(r -> r.getKey().getClass() == BrewFeature.class)
-                    .map(r -> r.getKey() + " " + String.join(" ", r.getValue().getArgs()))
+            String brewFeatures = configMap.entrySet().stream()
+                    .filter(r -> BrewFeature.isItBrewFeature(r.getKey()))
+                    .map(r -> r.getKey() + " " + String.join(" ", r.getValue()))
                     .collect(Collectors.joining(", "));
 
-            String witchFeature = ruleRemarks.entrySet().stream()
-                    .filter(r -> r.getKey().getClass() == WitchFeature.class)
-                    .map(r -> r.getKey() + " " + String.join(" ", r.getValue().getArgs()))
+            String witchFeature = configMap.entrySet().stream()
+                    .filter(r -> WitchFeature.isItWitchFeature(r.getKey()))
+                    .map(r -> r.getKey() + " " + String.join(" ", r.getValue()))
                     .collect(Collectors.joining(", "));
 
             return "The witch is: '" + (witchFeature.isEmpty() ? "UNKNOWN_WITCH" : witchFeature) + "'" +
@@ -126,8 +124,8 @@ public class CustomGeneratorWIthRemarksArgsTests {
         }
 
         @Override
-        public void setRuleRemarks(Map<CustomRuleRemark, CustomRuleRemarkArgs> ruleRemarks) {
-            this.ruleRemarks = ruleRemarks;
+        public void setConfigMap(Map<String, String> configMap) {
+            this.configMap = configMap;
         }
     }
 
@@ -141,6 +139,10 @@ public class CustomGeneratorWIthRemarksArgsTests {
         public int minimumArgsNumber() {
             return 1;
         }
+
+        public static boolean isItBrewFeature(String value) {
+            return Arrays.stream(BrewFeature.values()).map(Enum::name).anyMatch(n -> n.equals(value));
+        }
     }
 
     enum WitchFeature implements CustomRuleRemarkArgs {
@@ -150,6 +152,10 @@ public class CustomGeneratorWIthRemarksArgsTests {
         @Override
         public int minimumArgsNumber() {
             return 1;
+        }
+
+        public static boolean isItWitchFeature(String value) {
+            return Arrays.stream(WitchFeature.values()).map(Enum::name).anyMatch(n -> n.equals(value));
         }
     }
 
@@ -183,9 +189,9 @@ public class CustomGeneratorWIthRemarksArgsTests {
     void customGeneratorWithRemarksArgsAddedForAnyField() {
 
         Dto dto = DtoGenerator.builder(Dto.class)
-                .addRuleRemark(WitchFeature.TERRIBLE.setArgs("as hell"))
-                .addRuleRemark(BrewFeature.BERRY_FLAVOURED.setArgs("blueberry"))
-                .addRuleRemark(BrewFeature.YOUTH.setArgs("best years"))
+                .addGeneratorParameter(WitchFeature.TERRIBLE.name(), "as hell")
+                .addGeneratorParameter(BrewFeature.BERRY_FLAVOURED.name(), "blueberry")
+                .addGeneratorParameter(BrewFeature.YOUTH.name(), "best years")
                 .build().generateDto();
 
         Set<String> ingredients = Sets.newHashSet("YOUTH best years", "BERRY_FLAVOURED blueberry");
@@ -211,17 +217,18 @@ public class CustomGeneratorWIthRemarksArgsTests {
         );
     }
 
+
     @Test
     void customGeneratorWithRemarksArgsAddedForGeneratorType() {
 
         Dto dto = DtoGenerator.builder(Dto.class)
-                .addRuleRemark(WitchesBrewGenerator.class,
-                        BrewFeature.BERRY_FLAVOURED.setArgs("strawberry")
+                .addGeneratorParameter(WitchesBrewGenerator.class,
+                        "BERRY_FLAVOURED", "strawberry"
                 )
-                .addRuleRemark(WitchDescriptionGenerator.class,
-                        WitchFeature.GRUMPY.setArgs("always"),
-                        BrewFeature.MADNESS.setArgs("fast", "slow")
-                )
+                .addGeneratorParameter(WitchDescriptionGenerator.class,
+                        "GRUMPY", "always")
+                .addGeneratorParameter(WitchDescriptionGenerator.class,
+                        "MADNESS", "fast")
                 .build().generateDto();
 
         Set<String> ingredients = Sets.newHashSet("BERRY_FLAVOURED strawberry");
@@ -229,14 +236,14 @@ public class CustomGeneratorWIthRemarksArgsTests {
         assertAll(
                 () -> assertThat(dto.witchName, notNullValue()),
                 () -> assertThat(dto.witchDescription,
-                        both(containsString("GRUMPY always")).and(containsString("MADNESS fast slow"))
+                        both(containsString("GRUMPY always")).and(containsString("MADNESS fast"))
                 ),
                 () -> assertThat(dto.witchesBrew.ingredients, equalTo(ingredients)),
                 () -> assertThat(dto.witchesBrewSecond.ingredients, equalTo(ingredients)),
 
                 () -> assertThat(dto.nestedDto.witchName, notNullValue()),
                 () -> assertThat(dto.nestedDto.witchDescription,
-                        both(containsString("GRUMPY always")).and(containsString("MADNESS fast slow"))
+                        both(containsString("GRUMPY always")).and(containsString("MADNESS fast"))
                 ),
                 () -> assertThat(dto.nestedDto.witchesBrew.ingredients, equalTo(ingredients)),
                 () -> assertThat(dto.nestedDto.witchesBrewSecond.ingredients, equalTo(ingredients))
@@ -249,9 +256,9 @@ public class CustomGeneratorWIthRemarksArgsTests {
         // remarks set for root dto only
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class)
-                .addRuleRemark("witchDescription", WitchFeature.TERRIBLE.setArgs("a little"))
-                .addRuleRemark("witchesBrew", BrewFeature.AGING.setArgs("wisdom"))
-                .addRuleRemark("witchesBrewSecond", BrewFeature.MADNESS.setArgs("onion"));
+                .addGeneratorParameter("witchDescription", WitchFeature.TERRIBLE.name(), "a little")
+                .addGeneratorParameter("witchesBrew", BrewFeature.AGING.name(), "wisdom")
+                .addGeneratorParameter("witchesBrewSecond", BrewFeature.MADNESS.name(), "onion");
         Dto dto = builder.build().generateDto();
 
         Set<String> ingredientsWitchesBrew = Sets.newHashSet("AGING wisdom");
@@ -281,9 +288,9 @@ public class CustomGeneratorWIthRemarksArgsTests {
         Set<String> ingredientsWitchesBrewSecondNested = Sets.newHashSet("YOUTH lemon");
 
         builder
-                .addRuleRemark("nestedDto.witchDescription", BrewFeature.MADNESS.setArgs("garlic"))
-                .addRuleRemark("nestedDto.witchesBrew", BrewFeature.BERRY_FLAVOURED.setArgs("cherry"))
-                .addRuleRemark("nestedDto.witchesBrewSecond", BrewFeature.YOUTH.setArgs("lemon"));
+                .addGeneratorParameter("nestedDto.witchDescription", BrewFeature.MADNESS.name(), "garlic")
+                .addGeneratorParameter("nestedDto.witchesBrew", BrewFeature.BERRY_FLAVOURED.name(), "cherry")
+                .addGeneratorParameter("nestedDto.witchesBrewSecond", BrewFeature.YOUTH.name(), "lemon");
 
         Dto dto_2 = builder.build().generateDto();
 
@@ -310,12 +317,12 @@ public class CustomGeneratorWIthRemarksArgsTests {
     void customGeneratorWithRemarksOverriddenByTypeAndAnyAndSpecifiedField() {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class)
-                .addRuleRemark(BrewFeature.BERRY_FLAVOURED.setArgs("blueberry"))
-                .addRuleRemark(WitchesBrewGenerator.class, BrewFeature.YOUTH.setArgs("sun"))
-                .addRuleRemark("witchesBrew", BrewFeature.MADNESS.setArgs("aloe"))
-                .addRuleRemark("witchDescription", WitchFeature.GRUMPY.setArgs("as heck"))
-                .addRuleRemark("nestedDto.witchesBrew", BrewFeature.AGING.setArgs("watermelon"))
-                .addRuleRemark("nestedDto.witchDescription", WitchFeature.TERRIBLE.setArgs("as devil"));
+                .addGeneratorParameter(BrewFeature.BERRY_FLAVOURED.name(), "blueberry")
+                .addGeneratorParameter(WitchesBrewGenerator.class, BrewFeature.YOUTH.name(), "sun")
+                .addGeneratorParameter("witchesBrew", BrewFeature.MADNESS.name(), "aloe")
+                .addGeneratorParameter("witchDescription", WitchFeature.GRUMPY.name(), "as heck")
+                .addGeneratorParameter("nestedDto.witchesBrew", BrewFeature.AGING.name(), "watermelon")
+                .addGeneratorParameter("nestedDto.witchDescription", WitchFeature.TERRIBLE.name(), "as devil");
 
         Dto dto = builder.build().generateDto();
 
@@ -347,16 +354,16 @@ public class CustomGeneratorWIthRemarksArgsTests {
         );
     }
 
-    @Test
-    @Feature("NEGATIVE_TEST")
-    void violationOfNumberOfRemarkArgs() {
-
-        assertThrows(
-                DtoGeneratorException.class,
-                () -> DtoGenerator.builder(Dto.class).addRuleRemark(BrewFeature.BERRY_FLAVOURED),
-                "Remark 'BERRY_FLAVOURED' expected at least '1' arg(s). Passed '0' arg(s)."
-        );
-
-    }
+//    @Test
+//    @Feature("NEGATIVE_TEST")
+//    void violationOfNumberOfRemarkArgs() {
+//
+//        assertThrows(
+//                DtoGeneratorException.class,
+//                () -> DtoGenerator.builder(Dto.class).addRuleRemark(BrewFeature.BERRY_FLAVOURED),
+//                "Remark 'BERRY_FLAVOURED' expected at least '1' arg(s). Passed '0' arg(s)."
+//        );
+//
+//    }
 
 }
