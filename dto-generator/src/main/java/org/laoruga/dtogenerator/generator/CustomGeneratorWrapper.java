@@ -3,8 +3,6 @@ package org.laoruga.dtogenerator.generator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.laoruga.dtogenerator.api.generators.Generator;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
-import org.laoruga.dtogenerator.generator.config.dto.CustomConfig;
 
 /**
  * @author Il'dar Valitov

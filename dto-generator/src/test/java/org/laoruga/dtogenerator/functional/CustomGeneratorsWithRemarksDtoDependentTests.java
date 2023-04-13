@@ -11,8 +11,8 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorConfigMap;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
 import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkArgs;
 import org.laoruga.dtogenerator.api.rules.*;
@@ -122,8 +122,6 @@ public class CustomGeneratorsWithRemarksDtoDependentTests {
         }
     }
 
-
-    // TODO check this test - execution errors
     @Test
     void remarkForAllFields() {
 

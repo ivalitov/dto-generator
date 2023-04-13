@@ -7,8 +7,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarks;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorConfigMap;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarks;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
 import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
@@ -36,6 +36,7 @@ import static org.laoruga.dtogenerator.util.StringUtils.splitPath;
  *
  * @author Il'dar Valitov
  * Created on 16.04.2022
+ * TODO to fix Java docs
  */
 public class DtoGeneratorBuilder<T> {
 
@@ -47,16 +48,20 @@ public class DtoGeneratorBuilder<T> {
     private final DtoGeneratorBuildersTree dtoGeneratorBuildersTree;
     @Getter(AccessLevel.PROTECTED)
     private final RemarksHolder remarksHolder;
+    private final Class<?> dtoType;
+    private final Supplier<?> dtoInstanceSupplier;
 
     DtoGeneratorBuilder(Class<T> dtoClass) {
-        this(new DtoInstanceSupplier(dtoClass));
+        this(new DtoInstanceSupplier(dtoClass), dtoClass);
     }
 
     DtoGeneratorBuilder(T dtoInstance) {
-        this(() -> dtoInstance);
+        this(() -> dtoInstance, dtoInstance.getClass());
     }
 
-    private DtoGeneratorBuilder(Supplier<?> dtoInstanceSupplier) {
+    private DtoGeneratorBuilder(Supplier<?> dtoInstanceSupplier, Class<?> dtoType) {
+        this.dtoInstanceSupplier = dtoInstanceSupplier;
+        this.dtoType = dtoType;
         RemarksHolder remarksHolder = new RemarksHolder();
         ConfigurationHolder configurationHolder = new ConfigurationHolder(
                 new DtoGeneratorInstanceConfig(),
@@ -89,7 +94,8 @@ public class DtoGeneratorBuilder<T> {
 
     protected DtoGeneratorBuilder(DtoGeneratorBuilder<?> copyFrom,
                                   String[] pathFromRootDto,
-                                  Supplier<?> dtoInstanceSupplier) {
+                                  Supplier<?> dtoInstanceSupplier,
+                                  Class<?> dtoType) {
         final DtoGeneratorBuildersTree dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
         final RemarksHolder remarksHolder = new RemarksHolder(copyFrom.getRemarksHolder());
         final Supplier<?> rootDtoInstanceSupplier = dtoGeneratorBuildersTree
@@ -118,6 +124,8 @@ public class DtoGeneratorBuilder<T> {
                 configurationCopy
         );
         this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
+        this.dtoType = dtoType;
+        this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
 
@@ -125,7 +133,13 @@ public class DtoGeneratorBuilder<T> {
      * @return {@link DtoGenerator} instance
      */
     public DtoGenerator<T> build() {
-        return new DtoGenerator<>(fieldGeneratorsProvider);
+
+        FieldGeneratorsPreparer fieldGeneratorsPreparer = new FieldGeneratorsPreparer();
+        fieldGeneratorsPreparer.prepareGenerators(dtoType, fieldGeneratorsProvider);
+
+        return new DtoGenerator<>(
+                fieldGeneratorsPreparer.getFiledGenerators(), dtoInstanceSupplier
+        );
     }
 
     /*
@@ -269,7 +283,7 @@ public class DtoGeneratorBuilder<T> {
      * Adding remarks to specified custom generator.
      *
      * @param customGeneratorClass - generator of this type will have passed remarks
-     * @param ruleRemarks          - remarks to add
+//     * @param ruleRemarks          - remarks to add
      * @return this
      */
 

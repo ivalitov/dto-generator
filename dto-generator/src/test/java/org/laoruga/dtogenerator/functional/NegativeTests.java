@@ -6,7 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
@@ -51,11 +50,12 @@ class NegativeTests {
     @MethodSource("unappropriatedDataSet")
     @DisplayName("Wrong rule annotation")
     void wrongRule(String fieldName, Class<?> dtoClass, String errMsgPart) {
-        DtoGenerator<?> generator = DtoGenerator.builder(dtoClass).build();
-        assertThrows(DtoGeneratorException.class, generator::generateDto);
-        Throwable exception = UtilsRoot.getErrorsMap(generator).get(fieldName);
-        assertThat(exception.getCause().getMessage(),
-                containsString(errMsgPart));
+        DtoGeneratorException dtoGeneratorException =
+                assertThrows(DtoGeneratorException.class, () -> DtoGenerator.builder(dtoClass).build());
+
+        String errorsDetails = dtoGeneratorException.getMessage();
+
+        assertThat(errorsDetails, containsString(errMsgPart));
     }
 
 }

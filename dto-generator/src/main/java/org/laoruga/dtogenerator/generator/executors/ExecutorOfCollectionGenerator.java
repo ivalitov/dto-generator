@@ -12,24 +12,24 @@ import java.util.function.Supplier;
  */
 
 public class ExecutorOfCollectionGenerator extends ExecutorOfDtoDependentGenerator {
-    public ExecutorOfCollectionGenerator(Supplier<?> dtoInstanceSupplier,
-                                         AbstractExecutor nextGenerator) {
-        super(dtoInstanceSupplier, nextGenerator);
+
+    public ExecutorOfCollectionGenerator(AbstractExecutor nextGenerator) {
+        super(nextGenerator);
     }
 
     @Override
-    public boolean execute(Field field, Generator<?> generator) {
+    public boolean execute(Field field, Generator<?> generator, Supplier<?> dtoInstanceSupplier) {
         if (generator instanceof ListGenerator) {
 
             Generator<?> innerGenerator = ((ListGenerator) generator).getElementGenerator();
 
             if (isItDtoDependentGenerator(innerGenerator)) {
-                return super.execute(field, generator);
+                return super.execute(field, generator, dtoInstanceSupplier);
             }
 
-            return super.execute(field, generator);
+            return super.execute(field, generator, dtoInstanceSupplier);
         }
 
-        return executeNextInstead(field, generator);
+        return executeNextInstead(field, generator, dtoInstanceSupplier);
     }
 }

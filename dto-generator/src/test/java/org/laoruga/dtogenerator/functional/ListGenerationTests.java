@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
-import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
@@ -20,6 +19,7 @@ import org.laoruga.dtogenerator.generator.config.dto.StringConfig;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -195,48 +195,49 @@ class ListGenerationTests {
     @Feature("NEGATIVE_TESTS")
     @DisplayName("Wildcard generic type")
     void wildcardGenericType() {
-        DtoGenerator<DtoWithWildcardList> generator = DtoGenerator.builder(DtoWithWildcardList.class).build();
-        assertThrows(DtoGeneratorException.class, generator::generateDto);
+        DtoGeneratorException dtoGeneratorException =
+                assertThrows(DtoGeneratorException.class, () -> DtoGenerator.builder(DtoWithWildcardList.class).build());
 
-        Map<String, Exception> errorsMap = UtilsRoot.getErrorsMap(generator);
+        String errorMessage = dtoGeneratorException.getMessage();
 
-        assertEquals(1, errorsMap.size());
-        assertTrue(errorsMap.containsKey("wildCardList"));
-        assertThat(errorsMap.get("wildCardList").getCause().getMessage(),
-                containsString("Next type must have single generic type: 'java.util.List<?>'"));
+        assertAll(
+                () -> assertThat(errorMessage, containsString("'1' error(s)")),
+                () -> assertThat(errorMessage, containsString("Next type must have single generic type: 'java.util.List<?>'"))
+        );
     }
 
     @Test
     @Feature("NEGATIVE_TESTS")
     @DisplayName("Raw list")
     void rawList() {
-        DtoGenerator<DtoWithRawList> generator = DtoGenerator.builder(DtoWithRawList.class).build();
-        assertThrows(DtoGeneratorException.class, generator::generateDto);
+        DtoGeneratorException dtoGeneratorException = assertThrows(DtoGeneratorException.class,
+                () -> DtoGenerator.builder(DtoWithRawList.class).build());
 
-        Map<String, Exception> errorsMap = UtilsRoot.getErrorsMap(generator);
+        String errorMessage = dtoGeneratorException.getMessage();
 
-        assertEquals(1, errorsMap.size());
-        assertTrue(errorsMap.containsKey("rawList"));
-        assertThat(errorsMap.get("rawList").getCause().getMessage(),
-                containsString("Next type must have single generic type: 'java.util.List'"));
+        assertAll(
+                () -> assertThat(errorMessage, containsString("'1' error(s)")),
+                () -> assertThat(errorMessage, containsString("Next type must have single generic type: 'java.util.List'"))
+        );
     }
 
     @Test
     @Feature("NEGATIVE_TESTS")
     @DisplayName("List Of Collection")
     void listOfCollection() {
-        DtoGenerator<DtoWithListOfCollections> generator = DtoGenerator.builder(DtoWithListOfCollections.class).build();
-        assertThrows(DtoGeneratorException.class, generator::generateDto);
+        AtomicReference<DtoGenerator<DtoWithListOfCollections>> generator = new AtomicReference<>();
 
-        Map<String, Exception> errorsMap = UtilsRoot.getErrorsMap(generator);
+        DtoGeneratorException dtoGeneratorException = assertThrows(DtoGeneratorException.class, () ->
+                generator.set(DtoGenerator.builder(DtoWithListOfCollections.class).build())
+        );
 
-        assertEquals(2, errorsMap.size());
-        assertTrue(errorsMap.containsKey("listOfSet"));
-        assertThat(errorsMap.get("listOfSet").getCause().getMessage(),
-                containsString("is repeating for field"));
-        assertTrue(errorsMap.containsKey("listOfString"));
-        assertThat(errorsMap.get("listOfString").getCause().getMessage(),
-                containsString("failed to select @Rules annotation by type"));
+        String errorsDetails = dtoGeneratorException.getMessage();
+
+        assertAll(
+                () -> assertThat(errorsDetails, containsString("'2' error(s)")),
+                () -> assertThat(errorsDetails, containsString("is repeating for field")),
+                () -> assertThat(errorsDetails, containsString("failed to select @Rules annotation by type"))
+        );
     }
 
     static class Dto3 {
@@ -252,15 +253,14 @@ class ListGenerationTests {
     @DisplayName("Wrong Element Rule Annotation")
     void wrongElementRuleAnnotation() {
 
-        DtoGenerator<Dto3> generator = DtoGenerator.builder(Dto3.class).build();
+        DtoGeneratorException dtoGeneratorException =
+                assertThrows(DtoGeneratorException.class, () -> DtoGenerator.builder(Dto3.class).build());
 
-        assertThrows(DtoGeneratorException.class, generator::generateDto);
+        String errorMessage = dtoGeneratorException.getMessage();
 
-        Map<String, Exception> errorsMap = UtilsRoot.getErrorsMap(generator);
-
-        assertThat(errorsMap.size(), equalTo(1));
-        assertThat(errorsMap.get("some").getCause().getMessage(),
-                stringContainsInOrder("'class java.lang.String' does not match to rules annotation: '@NumberRule'"));
+        assertThat(errorMessage, containsString("'1' error(s)"));
+        assertThat(errorMessage,
+                containsString("'class java.lang.String' does not match to rules annotation: '@NumberRule'"));
     }
 
     @Getter

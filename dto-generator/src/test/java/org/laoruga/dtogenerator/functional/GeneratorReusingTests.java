@@ -29,9 +29,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * Created on 11.12.2022
  */
 @DisplayName("Builder reuse")
-@Epic("BUILDER_REUSE")
+@Epic("GENERATOR_REUSE")
 @Slf4j
-class BuilderReuseTests {
+class GeneratorReusingTests {
 
     @Test
     @DisplayName("Generating of two DTO instances")
@@ -53,7 +53,8 @@ class BuilderReuseTests {
                 () -> assertNotEquals(dto_1, dto_2),
                 () -> assertNotEquals(dto_1.hashCode(), dto_2.hashCode()),
                 () -> assertNotEquals(dto_1.getString(), dto_2.getString()),
-                () -> assertNotEquals(dto_1.getALong(), dto_2.getALong())
+                () -> assertNotEquals(dto_1.getALong(), dto_2.getALong()),
+                () -> assertNotEquals(dto_1.getNestedDto(), dto_2.getNestedDto())
         );
 
     }
@@ -149,7 +150,7 @@ class BuilderReuseTests {
                         greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
                         lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
 
-                () -> assertThat(dto.getInnerDto(), notNullValue()),
+                () -> assertThat(dto.getNestedDto(), notNullValue()),
                 () -> assertThat(dto.getStringIntegerMap(), nullValue()),
 
                 () -> assertThat(dto.getCustomInteger(), equalTo(888))
@@ -182,9 +183,9 @@ class BuilderReuseTests {
                         greaterThanOrEqualTo(RulesInstance.COLLECTION_RULE.minSize())).and(
                         lessThanOrEqualTo(RulesInstance.COLLECTION_RULE.maxSize()))),
 
-                () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue()),
+                () -> assertThat(dto.getNestedDto().getStringIntegerMap(), nullValue()),
 
-                () -> assertThat(dto.getInnerDto().getCustomInteger(), equalTo(999))
+                () -> assertThat(dto.getNestedDto().getCustomInteger(), equalTo(999))
         );
     }
 

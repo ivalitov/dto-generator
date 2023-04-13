@@ -200,11 +200,10 @@ class RulesInfoExtractorTests {
     @MethodSource("unappropriatedDataSet")
     @DisplayName("Unappropriated rule annotation")
     void unappropriatedRule(String fieldName, Class<?> dtoClass, String errMsgPart) {
-        DtoGenerator<?> generator = DtoGenerator.builder(dtoClass).build();
-        assertThrows(DtoGeneratorException.class, generator::generateDto);
-        Throwable exception = UtilsRoot.getErrorsMap(generator).get(fieldName);
-        assertThat(exception.getCause().getMessage(),
-                containsString(errMsgPart));
+        DtoGeneratorException dtoGeneratorException =
+                assertThrows(DtoGeneratorException.class, () -> DtoGenerator.builder(dtoClass).build());
+
+        assertThat(dtoGeneratorException.getMessage(), containsString(errMsgPart));
     }
 
 }

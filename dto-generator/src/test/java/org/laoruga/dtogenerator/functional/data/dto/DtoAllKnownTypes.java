@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
-import org.laoruga.dtogenerator.functional.data.generator.CustomIntegerGenerator;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
+import org.laoruga.dtogenerator.functional.data.generator.CustomIntegerGenerator;
 
 import java.beans.Transient;
 import java.time.LocalDateTime;
@@ -57,7 +57,7 @@ public class DtoAllKnownTypes {
     LinkedList<ClientType> linkedListOfEnum;
 
     @NestedDtoRule
-    DtoAllKnownTypesNested innerDto;
+    DtoAllKnownTypesNested nestedDto;
 
     @CustomRule(generatorClass = CustomIntegerGenerator.class, args = "888")
     Integer customInteger;

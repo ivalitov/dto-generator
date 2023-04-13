@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.functional.util;
+package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Epic;
 import lombok.Getter;

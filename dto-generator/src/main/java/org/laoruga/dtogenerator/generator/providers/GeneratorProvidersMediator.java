@@ -1,6 +1,6 @@
 package org.laoruga.dtogenerator.generator.providers;
 
-import org.laoruga.dtogenerator.DtoGeneratorBuilder;
+import org.laoruga.dtogenerator.DtoGeneratorBuildersTree;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
@@ -34,7 +34,7 @@ public class GeneratorProvidersMediator {
     public GeneratorProvidersMediator(ConfigurationHolder configuration,
                                       UserGeneratorSuppliers userGeneratorSuppliers,
                                       RemarksHolder remarksHolder,
-                                      Function<String, DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier) {
+                                      Function<String, DtoGeneratorBuildersTree.Node> nestedDtoGeneratorBuilderSupplier) {
 
         GeneratorConfiguratorByAnnotation configuratorByAnnotation =
                 new GeneratorConfiguratorByAnnotation(

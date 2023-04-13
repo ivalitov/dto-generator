@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.generator.config;
 
 import com.google.common.primitives.Primitives;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.DtoGeneratorBuilder;
+import org.laoruga.dtogenerator.DtoGeneratorBuildersTree;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
@@ -22,11 +22,11 @@ import java.util.function.Function;
 @Slf4j
 public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
 
-    private final Function<String, DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier;
+    private final Function<String, DtoGeneratorBuildersTree.Node> nestedDtoGeneratorBuilderSupplier;
 
     public GeneratorConfiguratorByAnnotation(ConfigurationHolder configuration,
                                              RemarksHolder remarksHolder,
-                                             Function<String, DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier) {
+                                             Function<String, DtoGeneratorBuildersTree.Node> nestedDtoGeneratorBuilderSupplier) {
         super(configuration, remarksHolder);
         this.nestedDtoGeneratorBuilderSupplier = nestedDtoGeneratorBuilderSupplier;
     }
@@ -122,7 +122,7 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
 
                 return NestedConfig.builder()
                         .ruleRemark(nestedRule.ruleRemark())
-                        .dtoGeneratorBuilder(nestedDtoGeneratorBuilderSupplier.apply(fieldName))
+                        .dtoGeneratorBuilderTreeNode(nestedDtoGeneratorBuilderSupplier.apply(fieldName))
                         .build();
 
             } else {

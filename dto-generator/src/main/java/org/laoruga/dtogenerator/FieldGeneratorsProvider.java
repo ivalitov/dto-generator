@@ -30,6 +30,7 @@ import java.util.function.Supplier;
 public class FieldGeneratorsProvider {
 
     private final ConfigurationHolder configuration;
+    @Getter(AccessLevel.PUBLIC)
     private final Supplier<?> dtoInstanceSupplier;
     private final String[] pathFromDtoRoot;
     private final Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree;
@@ -141,14 +142,14 @@ public class FieldGeneratorsProvider {
         rulesInfoExtractor.getFieldsGroupFilter().includeGroups(groups);
     }
 
-    private Function<String, DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier() {
+    private Function<String, DtoGeneratorBuildersTree.Node> nestedDtoGeneratorBuilderSupplier() {
         return fieldName -> {
             String[] pathToNestedDtoField =
                     Arrays.copyOf(pathFromDtoRoot, pathFromDtoRoot.length + 1);
 
             pathToNestedDtoField[pathFromDtoRoot.length] = fieldName;
 
-            return dtoGeneratorBuildersTree.get().getBuilderLazy(pathToNestedDtoField);
+            return dtoGeneratorBuildersTree.get().getNodeLazy(pathToNestedDtoField);
         };
     }
 

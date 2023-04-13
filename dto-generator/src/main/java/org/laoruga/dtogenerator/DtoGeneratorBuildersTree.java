@@ -37,6 +37,14 @@ public class DtoGeneratorBuildersTree {
         return getBuilderLazy(fields, 0, tree).getDtoGeneratorBuilder();
     }
 
+    public Node getNodeLazy(String... fields) {
+        if (fields.length < 1) {
+            throw new IllegalArgumentException(
+                    "Path must contain at least 1 element, but was: " + Arrays.asList(fields));
+        }
+        return getBuilderLazy(fields, 0, tree);
+    }
+
     private Node getBuilderLazy(String[] fields, int idx, Node node) {
 
         if (fields.length - 1 == idx) {
@@ -51,25 +59,27 @@ public class DtoGeneratorBuildersTree {
             }
         }
 
-        Node newNode = initNewNode(fields, idx);
+        Node newNode = newNestedNode(fields, idx);
 
         node.getChildren().add(newNode);
 
         return newNode;
     }
 
-    private Node initNewNode(String[] fields, int idx) {
+    private Node newNestedNode(String[] fields, int idx) {
         Class<?> rootType = tree.dtoGeneratorBuilder
                 .getFieldGeneratorsProvider()
                 .getDtoInstanceSupplier().get()
                 .getClass();
 
+        Class<?> nestedDtoType = ReflectionUtils.getFieldType(fields, 1, rootType);
+
         DtoInstanceSupplier dtoInstanceSupplier = new DtoInstanceSupplier(
-                ReflectionUtils.getFieldType(fields, 1, rootType)
+                nestedDtoType
         );
 
         return new Node(
-                new DtoGeneratorBuilder<>(tree.getDtoGeneratorBuilder(), fields, dtoInstanceSupplier),
+                new DtoGeneratorBuilder<>(tree.getDtoGeneratorBuilder(), fields, dtoInstanceSupplier, nestedDtoType),
                 fields[idx]
         );
     }
@@ -81,7 +91,7 @@ public class DtoGeneratorBuildersTree {
      * @author Il'dar Valitov
      * Created on 31.01.2023
      */
-    private static class Node {
+    public static class Node {
 
         @Getter
         private final String fieldName;
@@ -89,10 +99,13 @@ public class DtoGeneratorBuildersTree {
         private final DtoGeneratorBuilder<?> dtoGeneratorBuilder;
         @Getter
         private final List<Node> children = new LinkedList<>();
+        @Getter
+        private final FieldGeneratorsProvider fieldGeneratorsProvider;
 
         private Node(DtoGeneratorBuilder<?> generatorBuilder, String fieldName) {
             this.dtoGeneratorBuilder = generatorBuilder;
             this.fieldName = fieldName;
+            this.fieldGeneratorsProvider = generatorBuilder.getFieldGeneratorsProvider();
         }
     }
 

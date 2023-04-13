@@ -272,6 +272,10 @@ public final class ReflectionUtils {
             return initialType;
         }
 
-        return getFieldType(fields, initialIdx + 1, ReflectionUtils.getField(initialType, fields[initialIdx]).getType());
+        return getFieldType(
+                fields,
+                initialIdx + 1,
+                ReflectionUtils.getField(initialType, fields[initialIdx]).getType()
+        );
     }
 }

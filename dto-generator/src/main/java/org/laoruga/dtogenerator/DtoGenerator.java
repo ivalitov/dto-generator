@@ -3,21 +3,13 @@ package org.laoruga.dtogenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.executors.BatchExecutor;
 import org.laoruga.dtogenerator.generator.executors.ExecutorOfCollectionGenerator;
 import org.laoruga.dtogenerator.generator.executors.ExecutorOfDtoDependentGenerator;
 import org.laoruga.dtogenerator.generator.executors.ExecutorOfGenerator;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * DtoGenerator generates random field values:
@@ -35,14 +27,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DtoGenerator<T> {
 
-    private final FieldGeneratorsProvider fieldGeneratorsProvider;
     @Getter(AccessLevel.PACKAGE)
     private final ErrorsHolder errorsHolder;
     private BatchExecutor batchExecutor;
+    private final Supplier<?> dtoInstanceSupplier;
 
-    DtoGenerator(FieldGeneratorsProvider fieldGeneratorsProvider) {
-        this.fieldGeneratorsProvider = fieldGeneratorsProvider;
+    private final FieldGenerators fieldGenerators;
+
+    public DtoGenerator(FieldGenerators fieldGenerators, Supplier<?> dtoInstanceSupplier) {
         this.errorsHolder = new ErrorsHolder();
+        this.fieldGenerators = fieldGenerators;
+        this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
     public static <T> DtoGeneratorBuilder<T> builder(Class<T> dtoClass) {
@@ -59,15 +54,13 @@ public class DtoGenerator<T> {
     @SuppressWarnings("unchecked")
     public T generateDto() {
 
-        Supplier<?> dtoInstanceSupplier = fieldGeneratorsProvider.getDtoInstanceSupplier();
-
-        if (dtoInstanceSupplier instanceof DtoInstanceSupplier) {
-            ((DtoInstanceSupplier) dtoInstanceSupplier).updateInstance();
-        }
-
         Object dtoInstance;
 
         try {
+
+            if (dtoInstanceSupplier instanceof DtoInstanceSupplier) {
+                ((DtoInstanceSupplier) dtoInstanceSupplier).updateInstance();
+            }
 
             dtoInstance = dtoInstanceSupplier.get();
 
@@ -75,17 +68,17 @@ public class DtoGenerator<T> {
                 if (batchExecutor == null) {
 
                     ExecutorOfGenerator generalGeneratorExecutor =
-                            new ExecutorOfGenerator(dtoInstanceSupplier);
+                            new ExecutorOfGenerator();
 
                     ExecutorOfCollectionGenerator collectionGeneratorExecutor =
-                            new ExecutorOfCollectionGenerator(dtoInstanceSupplier, generalGeneratorExecutor);
+                            new ExecutorOfCollectionGenerator(generalGeneratorExecutor);
 
                     ExecutorOfDtoDependentGenerator dtoDependentGeneratorExecutor =
-                            new ExecutorOfDtoDependentGenerator(dtoInstanceSupplier, collectionGeneratorExecutor);
+                            new ExecutorOfDtoDependentGenerator(collectionGeneratorExecutor);
 
                     batchExecutor = new BatchExecutor(
                             dtoDependentGeneratorExecutor,
-                            prepareGenerators(dtoInstance.getClass(), new HashMap<>())
+                            fieldGenerators
                     );
                 }
             }
@@ -93,56 +86,18 @@ public class DtoGenerator<T> {
             batchExecutor.execute();
 
         } catch (Exception e) {
-            throw new DtoGeneratorException(e);
+
+            throw new DtoGeneratorException("Error during generators execution", e);
+
         } finally {
+
             if (dtoInstanceSupplier instanceof DtoInstanceSupplier) {
                 ((DtoInstanceSupplier) dtoInstanceSupplier).remove();
             }
+
         }
 
         return (T) dtoInstance;
-    }
-
-    private Map<Field, Generator<?>> prepareGenerators(Class<?> dtoClass, Map<Field, Generator<?>> generatorMap) {
-
-        if (dtoClass.getSuperclass() != null && dtoClass.getSuperclass() != Object.class) {
-            prepareGenerators(dtoClass.getSuperclass(), generatorMap);
-        }
-
-        for (Field field : dtoClass.getDeclaredFields()) {
-
-            if (Modifier.isFinal(field.getModifiers())) {
-                log.info("Skipping final field '" + field.getType() + " " + field.getName() + "'");
-                continue;
-            }
-
-            Optional<Generator<?>> generator = Optional.empty();
-            try {
-                generator = fieldGeneratorsProvider.getGenerator(field);
-            } catch (Exception e) {
-                errorsHolder.put(field, e);
-            }
-            generator.ifPresent(typeGeneratorInstance ->
-                    generatorMap.put(field, typeGeneratorInstance));
-        }
-
-        if (!errorsHolder.isEmpty()) {
-            log.error("{} error(s) while generators preparation. See problems below:\n"
-                    + errorsHolder, errorsHolder.getErrorsNumber());
-            throw new DtoGeneratorException("Error while generators preparation (see log above)");
-        }
-
-        if (generatorMap.isEmpty()) {
-            log.debug("Generators not found");
-        } else {
-            final AtomicInteger idx = new AtomicInteger(0);
-            log.debug(generatorMap.size() + " generators created for fields: \n" +
-                    generatorMap.keySet().stream()
-                            .map(i -> idx.incrementAndGet() + ". " + i)
-                            .collect(Collectors.joining("\n")));
-        }
-
-        return generatorMap;
     }
 
 }

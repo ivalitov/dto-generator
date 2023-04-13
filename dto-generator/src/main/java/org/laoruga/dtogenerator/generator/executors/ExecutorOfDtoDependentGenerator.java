@@ -20,20 +20,19 @@ import java.util.function.Supplier;
 @Slf4j
 public class ExecutorOfDtoDependentGenerator extends ExecutorOfGenerator {
 
-    public ExecutorOfDtoDependentGenerator(Supplier<?> dtoInstanceSupplier,
-                                           AbstractExecutor nextGenerator) {
-        super(dtoInstanceSupplier, nextGenerator);
+    public ExecutorOfDtoDependentGenerator(AbstractExecutor nextGenerator) {
+        super(nextGenerator);
     }
 
     @Override
-    public boolean execute(Field field, Generator<?> generator) {
+    public boolean execute(Field field, Generator<?> generator, Supplier<?> dtoInstanceSupplier) {
         if (isItDtoDependentGenerator(generator)) {
             if (isDtoReadyForFieldGeneration(generator)) {
-                return super.execute(field, generator);
+                return super.execute(field, generator, dtoInstanceSupplier);
             }
             return false;
         }
-        return executeNextInstead(field, generator);
+        return executeNextInstead(field, generator, dtoInstanceSupplier);
     }
 
     /**
@@ -95,7 +94,8 @@ public class ExecutorOfDtoDependentGenerator extends ExecutorOfGenerator {
                 return result;
             }
 
-        } if (generator instanceof CustomGeneratorWrapper) {
+        }
+        if (generator instanceof CustomGeneratorWrapper) {
 
             return getDtoDependentGeneratorsOrNull(((CustomGeneratorWrapper) generator).getUsersGeneratorInstance());
 
