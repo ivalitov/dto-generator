@@ -401,7 +401,7 @@ public class DtoGeneratorBuilder<T> {
             );
         }
 
-        RemarksHolderCustom customRemarks = getRemarksHolder().getCustomRemarks();
+        CustomGeneratorConfigMapHolder customRemarks = getRemarksHolder().getCustomRemarks();
 
         customRemarks.addParameterForGeneratorType(
                 customGeneratorClass,
@@ -445,7 +445,7 @@ public class DtoGeneratorBuilder<T> {
 
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
 
-        RemarksHolderCustom customRemarks = dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
+        CustomGeneratorConfigMapHolder customRemarks = dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
                 .getRemarksHolder()
                 .getCustomRemarks();
 

@@ -10,10 +10,10 @@ import lombok.Getter;
 public class RemarksHolder {
 
     private final RemarksHolderBasic basicRemarks;
-    private final RemarksHolderCustom customRemarks;
+    private final CustomGeneratorConfigMapHolder customRemarks;
 
     public RemarksHolder() {
-        this(new RemarksHolderBasic(), new RemarksHolderCustom());
+        this(new RemarksHolderBasic(), new CustomGeneratorConfigMapHolder());
     }
 
     /**
@@ -23,10 +23,10 @@ public class RemarksHolder {
      */
     RemarksHolder(RemarksHolder toCopy) {
         this(new RemarksHolderBasic(toCopy.getBasicRemarks()),
-                new RemarksHolderCustom(toCopy.getCustomRemarks()));
+                new CustomGeneratorConfigMapHolder(toCopy.getCustomRemarks()));
     }
 
-    private RemarksHolder(RemarksHolderBasic basicRemarks, RemarksHolderCustom customRemarks) {
+    private RemarksHolder(RemarksHolderBasic basicRemarks, CustomGeneratorConfigMapHolder customRemarks) {
         this.basicRemarks = basicRemarks;
         this.customRemarks = customRemarks;
     }

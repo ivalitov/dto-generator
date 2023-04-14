@@ -25,11 +25,6 @@ public class CustomRuleRemarkWithArgs implements CustomRuleRemarkArgs {
         return customRuleRemark.minimumArgsNumber();
     }
 
-//    @Override
-//    public Class<? extends CustomGenerator<?>> getGeneratorClass() {
-//        return customRuleRemark.getGeneratorClass();
-//    }
-
     @Override
     public CustomRuleRemarkArgs getRemarkInstance() {
         return customRuleRemark;
