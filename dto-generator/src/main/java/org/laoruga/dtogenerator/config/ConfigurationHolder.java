@@ -21,7 +21,7 @@ public class ConfigurationHolder implements Configuration {
     @Getter
     private final CustomGeneratorsConfigurationHolder customGeneratorsConfigurators;
 
-    /**
+    /*
      * Constructor to copy
      */
     public ConfigurationHolder(DtoGeneratorConfig dtoGeneratorConfig,

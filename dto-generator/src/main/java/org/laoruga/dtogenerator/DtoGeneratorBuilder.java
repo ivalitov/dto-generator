@@ -104,8 +104,10 @@ public class DtoGeneratorBuilder<T> {
     /**
      * Constructor for copying a builder for nested DTO generation.
      *
-     * @param copyFrom        source builder
-     * @param pathFromRootDto path to nested dto
+     * @param copyFrom            source builder
+     * @param pathFromRootDto     path to nested dto
+     * @param dtoInstanceSupplier dto instance supplier
+     * @param dtoType             dto type
      */
 
     protected DtoGeneratorBuilder(DtoGeneratorBuilder<?> copyFrom,
@@ -169,8 +171,9 @@ public class DtoGeneratorBuilder<T> {
     /**
      * Overrides generator related to generated type.
      *
-     * @param generatedType - type of generated class
-     * @param typeGenerator - generator of provided generated type
+     * @param generatedType type of generated class
+     * @param typeGenerator generator of provided generated type
+     * @param <U>           generated type
      * @return - this
      */
 
@@ -184,9 +187,10 @@ public class DtoGeneratorBuilder<T> {
     /**
      * Overrides {@link CustomGeneratorArgs} generator related to generated type.
      *
-     * @param generatedType - type of generated class
-     * @param typeGenerator - generator of provided generated type
-     * @param args          - params for custom generators with args {@link CustomGeneratorArgs}
+     * @param generatedType type of generated class
+     * @param typeGenerator generator of provided generated type
+     * @param args          params for custom generators with args {@link CustomGeneratorArgs}
+     * @param <U>           generated type
      * @return - this
      */
 
@@ -207,7 +211,7 @@ public class DtoGeneratorBuilder<T> {
     /**
      * Overrides generator for the provided field only.
      * <p>
-     * If the field is in a nested object, {@param fieldName} has to have a "path" leads
+     * If the field is in a nested object, 'fieldName' argument has to have a "path" leads
      * to the field - dots separated sequence of field names.
      * <p>
      * For example, if DTO contains 'person' object, path to the person's 'age' field
@@ -233,7 +237,7 @@ public class DtoGeneratorBuilder<T> {
     /**
      * Overrides {@link CustomGeneratorArgs} generator for the provided field only.
      * <p>
-     * If the field is in a nested object, {@param fieldName} has to have a "path" leads
+     * If the field is in a nested object, 'fieldName' argument has to have a "path" leads
      * to the field - dots separated sequence of field names.
      * <p>
      * For example, if DTO contains 'person' object, path to the person's 'age' field
@@ -273,7 +277,7 @@ public class DtoGeneratorBuilder<T> {
     /**
      * Changes default generators configuration.
      * <p>
-     * If the field is in a nested object, {@param fieldName} has to have a "path" leads
+     * If the field is in a nested object, 'fieldName' argument has to have a "path" leads
      * to the field - dots separated sequence of field names.
      * <p>
      * Configuration {@link ConfigDto} instance may contain null values,
@@ -322,11 +326,11 @@ public class DtoGeneratorBuilder<T> {
     /**
      * Sets boundary configuration parameter for specific field
      * <p>
-     * If the field is in a nested object, {@param fieldName} has to have a "path" leads
+     * If the field is in a nested object, 'fieldName' argument has to have a "path" leads
      * to the field - dots separated sequence of field names.
      *
-     * @param fieldName      name of the field or path to the field separated by dots
-     * @param boundary parameter to set
+     * @param fieldName name of the field or path to the field separated by dots
+     * @param boundary  parameter to set
      * @return this
      * @throws DtoGeneratorException throws when trying to overwrite boundaryConfig
      */
@@ -366,7 +370,7 @@ public class DtoGeneratorBuilder<T> {
     /**
      * Injects arguments array to generator for specific field.
      * <p>
-     * If the field is in a nested object, {@param fieldName} has to have a "path" leads
+     * If the field is in a nested object, 'fieldName' argument has to have a "path" leads
      * to the field - dots separated sequence of field names.
      *
      * @param fieldName name of the field or path to the field separated by dots
@@ -428,7 +432,7 @@ public class DtoGeneratorBuilder<T> {
     /**
      * Adds key-value parameters to {@link CustomGeneratorConfigMap} of specific field.
      * <p>
-     * If the field is in a nested object, {@param fieldName} has to have a "path" leads
+     * If the field is in a nested object, 'fieldName' argument has to have a "path" leads
      * to the field - dots separated sequence of field names.
      *
      * @param fieldName      name of the field or path to the field separated by dots

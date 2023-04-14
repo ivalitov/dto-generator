@@ -35,7 +35,7 @@ public class CustomGeneratorsConfigurationHolder {
         this.byGeneratorType = new HashMap<>();
     }
 
-    /**
+    /*
      * Constructor to copy
      */
     public CustomGeneratorsConfigurationHolder(Supplier<?> dtoInstanceSupplier,
