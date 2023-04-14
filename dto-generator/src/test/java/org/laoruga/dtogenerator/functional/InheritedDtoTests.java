@@ -5,8 +5,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -103,11 +105,26 @@ class InheritedDtoTests {
         Boolean nestedBoolean;
     }
 
+    static class DtoNestedAncestor {
+
+        @ArrayRule
+        Integer[] nestedAncestorIntArray;
+        @BooleanRule
+        String nestedAncestorString;
+    }
+
+    // TODO inheritance and nested DTOs
     @Disabled
     @Test
     @DisplayName("Generation WithInheritance And Nested DTOs")
     void generationWithInheritanceAndNestedDTOs() {
-        Dto_2 dto = DtoGenerator.builder(Dto_2.class).build().generateDto();
+        final LocalDateTime NOW = LocalDateTime.now();
+        DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
+        builder.setGenerator("-superDateTime", () -> NOW);
+        builder.setGenerator("-superDtoNested.nestedArray", () -> NOW);
+        builder.setGenerator("--superDtoNested.nestedArray", () -> NOW);
+        builder.setGenerator("--superDtoNested.-nestedAncestor", () -> NOW);
+        Dto_2 dto = builder.build().generateDto();
 
         assertNotNull(dto);
         assertAll(
