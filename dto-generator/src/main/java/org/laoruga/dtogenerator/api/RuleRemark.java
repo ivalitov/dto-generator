@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.api.remarks;
+package org.laoruga.dtogenerator.api;
 
 /**
  * @author Il'dar Valitov

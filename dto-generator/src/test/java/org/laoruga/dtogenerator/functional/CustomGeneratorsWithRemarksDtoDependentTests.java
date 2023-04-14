@@ -13,8 +13,6 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorConfigMap;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorDtoDependent;
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkArgs;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.CharSet;
 import org.laoruga.dtogenerator.generator.config.dto.MapConfig;
@@ -112,14 +110,10 @@ public class CustomGeneratorsWithRemarksDtoDependentTests {
         Integer petalCount;
     }
 
-    enum FlowerProperty implements CustomRuleRemarkArgs {
+    enum FlowerProperty {
         REGION,
         PETAL_COUNT;
 
-        @Override
-        public int minimumArgsNumber() {
-            return 1;
-        }
     }
 
     @Test
@@ -311,8 +305,6 @@ public class CustomGeneratorsWithRemarksDtoDependentTests {
             CustomGeneratorArgs<Flower>,
             CustomGeneratorConfigMap<Flower>,
             CustomGeneratorDtoDependent<Flower, Dto> {
-
-        Map<CustomRuleRemark, CustomRuleRemarkArgs> ruleRemarks;
         Map<String, String> configMap;
         Supplier<Dto> generatedDto;
 

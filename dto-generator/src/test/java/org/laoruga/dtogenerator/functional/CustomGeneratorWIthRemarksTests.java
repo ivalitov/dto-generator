@@ -7,8 +7,8 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarks;
-import org.laoruga.dtogenerator.api.remarks.RuleRemark;
+import org.laoruga.dtogenerator.api.RuleRemark;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemark;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.BoundaryConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
@@ -110,7 +110,7 @@ public class CustomGeneratorWIthRemarksTests {
         }
     }
 
-    static class OctopusGenerator implements CustomGeneratorRemarks<Octopus> {
+    static class OctopusGenerator implements CustomGeneratorRemark<Octopus> {
 
         RuleRemark ruleRemark;
 
@@ -144,7 +144,7 @@ public class CustomGeneratorWIthRemarksTests {
         }
     }
 
-    static class OctopusKindGenerator implements CustomGeneratorRemarks<String> {
+    static class OctopusKindGenerator implements CustomGeneratorRemark<String> {
 
         RuleRemark ruleRemark;
 

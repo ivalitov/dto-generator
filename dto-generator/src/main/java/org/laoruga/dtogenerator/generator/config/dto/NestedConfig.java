@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator.config.dto;
 import lombok.Builder;
 import lombok.Getter;
 import org.laoruga.dtogenerator.DtoGeneratorBuildersTree;
-import org.laoruga.dtogenerator.api.remarks.RuleRemark;
+import org.laoruga.dtogenerator.api.RuleRemark;
 
 /**
  * @author Il'dar Valitov

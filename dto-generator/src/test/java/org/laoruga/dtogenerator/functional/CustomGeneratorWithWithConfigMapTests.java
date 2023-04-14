@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorConfigMap;
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkArgs;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
@@ -79,7 +77,6 @@ public class CustomGeneratorWithWithConfigMapTests {
 
     static class WitchesBrewGenerator implements CustomGeneratorConfigMap<WitchesBrew> {
 
-        Map<CustomRuleRemark, CustomRuleRemarkArgs> ruleRemarks;
         Map<String, String> configMap;
 
         @Override
@@ -103,7 +100,6 @@ public class CustomGeneratorWithWithConfigMapTests {
 
     static class WitchDescriptionGenerator implements CustomGeneratorConfigMap<String> {
 
-        Map<CustomRuleRemark, CustomRuleRemarkArgs> ruleRemarks;
         Map<String, String> configMap;
 
 
@@ -129,30 +125,21 @@ public class CustomGeneratorWithWithConfigMapTests {
         }
     }
 
-    enum BrewFeature implements CustomRuleRemarkArgs {
+    enum BrewFeature {
         AGING,
         YOUTH,
         MADNESS,
         BERRY_FLAVOURED;
 
-        @Override
-        public int minimumArgsNumber() {
-            return 1;
-        }
 
         public static boolean isItBrewFeature(String value) {
             return Arrays.stream(BrewFeature.values()).map(Enum::name).anyMatch(n -> n.equals(value));
         }
     }
 
-    enum WitchFeature implements CustomRuleRemarkArgs {
+    enum WitchFeature {
         TERRIBLE,
         GRUMPY;
-
-        @Override
-        public int minimumArgsNumber() {
-            return 1;
-        }
 
         public static boolean isItWitchFeature(String value) {
             return Arrays.stream(WitchFeature.values()).map(Enum::name).anyMatch(n -> n.equals(value));

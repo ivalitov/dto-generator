@@ -1,8 +1,8 @@
 package org.laoruga.dtogenerator.generator;
 
 import lombok.AllArgsConstructor;
+import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.generators.Generator;
-import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 import org.laoruga.dtogenerator.constants.BoundaryConfig;
 import org.laoruga.dtogenerator.generator.config.dto.NumberConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;

@@ -1,7 +1,7 @@
 package org.laoruga.dtogenerator;
 
 import lombok.NonNull;
-import org.laoruga.dtogenerator.api.remarks.RuleRemark;
+import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.util.HashMap;

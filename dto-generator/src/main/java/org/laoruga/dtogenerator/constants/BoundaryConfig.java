@@ -1,6 +1,6 @@
 package org.laoruga.dtogenerator.constants;
 
-import org.laoruga.dtogenerator.api.remarks.RuleRemark;
+import org.laoruga.dtogenerator.api.RuleRemark;
 
 /**
  * @author Il'dar Valitov

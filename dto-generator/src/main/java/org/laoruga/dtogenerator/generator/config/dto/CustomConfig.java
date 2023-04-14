@@ -4,8 +4,8 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
+import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
-import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 
 import java.util.function.Supplier;
 

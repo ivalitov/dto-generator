@@ -7,7 +7,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorConfigMap;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarks;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemark;
 import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.CustomGeneratorsConfigurationHolder;
@@ -297,7 +297,7 @@ public class DtoGeneratorBuilder<T> {
      */
 
     /**
-     * Sets boundary configuration parameter for all supported generators and all user's {@link CustomGeneratorRemarks}.
+     * Sets boundary configuration parameter for all supported generators and all user's {@link CustomGeneratorRemark}.
      * <p>
      * BoundaryConfig parameters:
      * <ul>

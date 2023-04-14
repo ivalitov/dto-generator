@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator.config.dto;
 import com.google.common.primitives.Primitives;
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.remarks.RuleRemark;
+import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 
 import java.math.BigInteger;
