@@ -306,7 +306,7 @@ public class DtoGeneratorBuilder<T> {
 
         getRemarksHolder()
                 .getBasicRemarks()
-                .setBasicRuleRemarkForAnyField(boundaryConfig);
+                .setRuleRemarkForAnyField(boundaryConfig);
 
         return this;
     }
@@ -330,7 +330,7 @@ public class DtoGeneratorBuilder<T> {
         dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
                 .getRemarksHolder()
                 .getBasicRemarks()
-                .setBasicRuleRemarkForField(fieldNameAndPath.getLeft(), boundaryConfig);
+                .setRuleRemarkForField(fieldNameAndPath.getLeft(), boundaryConfig);
 
         return this;
     }

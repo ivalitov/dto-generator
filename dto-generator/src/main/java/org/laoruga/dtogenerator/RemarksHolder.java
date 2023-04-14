@@ -22,8 +22,10 @@ public class RemarksHolder {
      * @param toCopy - source
      */
     RemarksHolder(RemarksHolder toCopy) {
-        this(new RemarksHolderBasic(toCopy.getBasicRemarks()),
-                new CustomGeneratorConfigMapHolder(toCopy.getCustomRemarks()));
+        this(
+                new RemarksHolderBasic(toCopy.getBasicRemarks()),
+                new CustomGeneratorConfigMapHolder(toCopy.getCustomRemarks())
+        );
     }
 
     private RemarksHolder(RemarksHolderBasic basicRemarks, CustomGeneratorConfigMapHolder customRemarks) {

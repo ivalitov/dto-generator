@@ -56,9 +56,10 @@ public class CustomGeneratorConfigurator {
 
             } else if (generatorInstance instanceof CustomGeneratorRemarks) {
 
-                RuleRemark maybeRuleRemark = remarksHolder
-                        .getBasicRemarks()
-                        .getBasicRuleRemarkOrNull(fieldName);
+                RuleRemark maybeRuleRemark =
+                        remarksHolder
+                                .getBasicRemarks()
+                                .getRuleRemarkOrNull(fieldName);
 
                 ((CustomGeneratorRemarks<?>) generatorInstance).setRuleRemark(
                         maybeRuleRemark != null ? maybeRuleRemark : boundaryConfig
