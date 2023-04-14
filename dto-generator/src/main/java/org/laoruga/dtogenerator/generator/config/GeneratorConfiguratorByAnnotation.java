@@ -2,7 +2,6 @@ package org.laoruga.dtogenerator.generator.config;
 
 import com.google.common.primitives.Primitives;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.DtoGeneratorBuildersTree;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
@@ -13,7 +12,6 @@ import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 
 import java.lang.annotation.Annotation;
 import java.time.temporal.Temporal;
-import java.util.function.Function;
 
 /**
  * @author Il'dar Valitov
@@ -22,13 +20,10 @@ import java.util.function.Function;
 @Slf4j
 public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
 
-    private final Function<String, DtoGeneratorBuildersTree.Node> nestedDtoGeneratorBuilderSupplier;
 
     public GeneratorConfiguratorByAnnotation(ConfigurationHolder configuration,
-                                             RemarksHolder remarksHolder,
-                                             Function<String, DtoGeneratorBuildersTree.Node> nestedDtoGeneratorBuilderSupplier) {
+                                             RemarksHolder remarksHolder) {
         super(configuration, remarksHolder);
-        this.nestedDtoGeneratorBuilderSupplier = nestedDtoGeneratorBuilderSupplier;
     }
 
     public ConfigDto createGeneratorConfig(Annotation rules,
@@ -115,15 +110,6 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
                 }
 
                 throw new IllegalArgumentException("Unexpected state. Field type '" + fieldType + "' is not Temporal");
-
-            } else if (NestedDtoRule.class == rulesClass) {
-
-                NestedDtoRule nestedRule = (NestedDtoRule) rules;
-
-                return NestedConfig.builder()
-                        .ruleRemark(nestedRule.ruleRemark())
-                        .dtoGeneratorBuilderTreeNode(nestedDtoGeneratorBuilderSupplier.apply(fieldName))
-                        .build();
 
             } else {
 

@@ -39,8 +39,8 @@ public class GeneratorProvidersMediator {
         GeneratorConfiguratorByAnnotation configuratorByAnnotation =
                 new GeneratorConfiguratorByAnnotation(
                         configuration,
-                        remarksHolder,
-                        nestedDtoGeneratorBuilderSupplier);
+                        remarksHolder
+                );
 
         this.generatorProviderOverriddenForField = new GeneratorsProviderByField();
 
@@ -54,7 +54,8 @@ public class GeneratorProvidersMediator {
                 new GeneratorsProviderByAnnotation(
                         configuratorByAnnotation,
                         generatorsProviderByType,
-                        userGeneratorSuppliers
+                        userGeneratorSuppliers,
+                        nestedDtoGeneratorBuilderSupplier
                 );
 
         this.generatorsProviderByAnnotationForMap =

@@ -2,14 +2,18 @@ package org.laoruga.dtogenerator.generator.providers;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.laoruga.dtogenerator.DtoGeneratorBuildersTree;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.api.rules.CustomRule;
+import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.config.CustomGeneratorsConfigurationHolder;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
+import org.laoruga.dtogenerator.generator.NestedDtoGenerator;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorByAnnotation;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
+import org.laoruga.dtogenerator.generator.config.dto.NestedConfig;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSupplierInfo;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliers;
 import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliersDefault;
@@ -36,13 +40,18 @@ public class GeneratorsProviderByAnnotation {
     private final UserGeneratorSuppliers userGeneratorSuppliers;
     private final GeneratorSuppliers defaultGeneratorSuppliers;
 
+    private final Function<String, DtoGeneratorBuildersTree.Node> nestedDtoGeneratorBuilderSupplier;
+
+
     public GeneratorsProviderByAnnotation(GeneratorConfiguratorByAnnotation configuratorByAnnotation,
                                           GeneratorsProviderByType generatorsProviderByType,
-                                          UserGeneratorSuppliers userGeneratorSuppliers) {
+                                          UserGeneratorSuppliers userGeneratorSuppliers,
+                                          Function<String, DtoGeneratorBuildersTree.Node> nestedDtoGeneratorBuilderSupplier) {
         this.configuratorByAnnotation = configuratorByAnnotation;
         this.generatorsProviderByType = generatorsProviderByType;
         this.userGeneratorSuppliers = userGeneratorSuppliers;
         this.defaultGeneratorSuppliers = GeneratorSuppliersDefault.getInstance();
+        this.nestedDtoGeneratorBuilderSupplier = nestedDtoGeneratorBuilderSupplier;
     }
 
     Generator<?> getGenerator(RuleInfo ruleInfo) {
@@ -69,17 +78,23 @@ public class GeneratorsProviderByAnnotation {
             return generator;
         }
 
-        if (CustomRule.class == ruleInfo.getRule().annotationType()) {
-            return createCustomGenerator((CustomRule) ruleInfo.getRule(), fieldName);
+        Annotation rule = ruleInfo.getRule();
+
+        if (CustomRule.class == rule.annotationType()) {
+            return createCustomGenerator((CustomRule) rule, fieldName);
+        }
+
+        if (NestedDtoRule.class == rule.annotationType()) {
+            return createNestedGenerator((NestedDtoRule) rule, fieldName);
         }
 
         ConfigDto config = configuratorByAnnotation.createGeneratorConfig(
-                ruleInfo.getRule(),
+                rule,
                 requiredType,
                 fieldName
         );
 
-        return getDefaultGeneratorSupplier(ruleInfo.getRule(), requiredType)
+        return getDefaultGeneratorSupplier(rule, requiredType)
                 .apply(config);
     }
 
@@ -101,6 +116,16 @@ public class GeneratorsProviderByAnnotation {
 
         return generatorInstance;
     }
+
+    Generator<?> createNestedGenerator(NestedDtoRule nestedRule, String fieldName) {
+        return new NestedDtoGenerator(
+                NestedConfig.builder()
+                        .ruleRemark(nestedRule.ruleRemark())
+                        .dtoGeneratorBuilderTreeNode(nestedDtoGeneratorBuilderSupplier.apply(fieldName))
+                        .build()
+        );
+    }
+
 
     Function<ConfigDto, Generator<?>> getDefaultGeneratorSupplier(Annotation rules, Class<?> generatedType) {
         Optional<Function<ConfigDto, Generator<?>>> maybeBuilder;

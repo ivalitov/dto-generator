@@ -79,11 +79,6 @@ public final class GeneratorSuppliersDefault {
                         ArrayRule.class,
                         config -> new ArrayGenerator((ArrayConfig) config)));
 
-        generatorSuppliers.addSuppliersInfo(
-                GeneratorSupplierInfo.createInstances(
-                        NestedDtoRule.class,
-                        config -> new NestedDtoGenerator((NestedConfig) config)));
-
         return generatorSuppliers;
     }
 
