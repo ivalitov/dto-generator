@@ -54,6 +54,7 @@ public class GeneratorsProviderByAnnotation {
         this.nestedDtoGeneratorBuilderSupplier = nestedDtoGeneratorBuilderSupplier;
     }
 
+    @SuppressWarnings("unchecked")
     Generator<?> getGenerator(RuleInfo ruleInfo) {
 
         String fieldName = ruleInfo.getField().getName();
@@ -66,11 +67,13 @@ public class GeneratorsProviderByAnnotation {
 
             Generator<?> generator = maybeUserGenerator.get();
 
-            // FIXME config
             if (generator instanceof CustomGenerator) {
                 configuratorByAnnotation.getConfiguration()
                         .getCustomGeneratorsConfigurators()
-                        .getBuilder(ruleInfo.getField().getName(), (Class<? extends CustomGenerator<?>>) generator.getClass())
+                        .getBuilder(
+                                ruleInfo.getField().getName(),
+                                (Class<? extends CustomGenerator<?>>) generator.getClass()
+                        )
                         .build()
                         .configure((CustomGenerator<?>) generator);
             }
@@ -108,9 +111,8 @@ public class GeneratorsProviderByAnnotation {
 
         CustomGenerator<?> generatorInstance = createInstance(generatorClass);
 
-        // FIXME config
         configurators.getBuilder(fieldName, generatorClass, customRule.args())
-                .ruleRemark(customRule.ruleRemark())
+                .boundaryConfig(customRule.ruleRemark())
                 .build()
                 .configure(generatorInstance);
 

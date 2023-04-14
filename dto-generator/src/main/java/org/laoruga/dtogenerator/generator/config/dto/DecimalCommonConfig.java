@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.NotImplementedException;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.math.BigDecimal;
@@ -22,7 +22,7 @@ public class DecimalCommonConfig implements ConfigDto {
     @Getter
     @Setter
     @Accessors(chain = true)
-    private IRuleRemark ruleRemark;
+    private RuleRemark ruleRemark;
 
     private final Map<Class<?>, DecimalConfig> map = new HashMap<>();
 
@@ -38,7 +38,7 @@ public class DecimalCommonConfig implements ConfigDto {
         return setMinValue(Double.class, value);
     }
 
-    public DecimalCommonConfig setRuleRemarkDouble(IRuleRemark value) {
+    public DecimalCommonConfig setRuleRemarkDouble(RuleRemark value) {
         return setRuleRemark(Double.class, value);
     }
 
@@ -54,7 +54,7 @@ public class DecimalCommonConfig implements ConfigDto {
         return setMinValue(Float.class, value);
     }
 
-    public DecimalCommonConfig setRuleRemarkFloat(IRuleRemark value) {
+    public DecimalCommonConfig setRuleRemarkFloat(RuleRemark value) {
         return setRuleRemark(Float.class, value);
     }
 
@@ -86,7 +86,7 @@ public class DecimalCommonConfig implements ConfigDto {
         }
     }
 
-    public DecimalCommonConfig setRuleRemarkBigDecimal(IRuleRemark value) {
+    public DecimalCommonConfig setRuleRemarkBigDecimal(RuleRemark value) {
         return setRuleRemark(BigDecimal.class, value);
     }
 
@@ -106,7 +106,7 @@ public class DecimalCommonConfig implements ConfigDto {
         return this;
     }
 
-    private DecimalCommonConfig setRuleRemark(Class<?> type, IRuleRemark ruleRemark) {
+    private DecimalCommonConfig setRuleRemark(Class<?> type, RuleRemark ruleRemark) {
         map.putIfAbsent(type, new DecimalConfig());
         map.get(type).setRuleRemark(ruleRemark);
         return this;

@@ -51,6 +51,7 @@ public class GeneratorsProviderByType {
         this.userGeneratorSuppliers = userGeneratorSuppliers;
     }
 
+    @SuppressWarnings("unchecked")
     public Optional<Generator<?>> getGenerator(Field field, Class<?> generatedType) {
 
         generatedType = Primitives.wrap(generatedType);
@@ -61,11 +62,13 @@ public class GeneratorsProviderByType {
         if (maybeUserGenerator.isPresent()) {
             Generator<?> generator = maybeUserGenerator.get();
 
-            // FIXME config
             if (generator instanceof CustomGenerator) {
                 configuration
                         .getCustomGeneratorsConfigurators()
-                        .getBuilder(field.getName(), (Class<? extends CustomGenerator<?>>) generator.getClass())
+                        .getBuilder(
+                                field.getName(),
+                                (Class<? extends CustomGenerator<?>>) generator.getClass()
+                        )
                         .build()
                         .configure((CustomGenerator<?>) generator);
             }

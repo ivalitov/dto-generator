@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.generator;
 
 import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.Generator;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 import org.laoruga.dtogenerator.generator.config.dto.datetime.ChronoConfig;
 import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
@@ -19,7 +19,7 @@ import java.util.List;
 public class DateTimeGenerator implements Generator<Temporal> {
 
     private final List<ChronoConfig> chronoUnitConfigList;
-    private final IRuleRemark ruleRemark;
+    private final RuleRemark ruleRemark;
     private final Class<? extends Temporal> generatedType;
 
     public DateTimeGenerator(DateTimeConfig config) {

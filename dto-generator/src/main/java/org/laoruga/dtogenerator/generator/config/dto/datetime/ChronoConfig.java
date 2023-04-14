@@ -1,6 +1,7 @@
 package org.laoruga.dtogenerator.generator.config.dto.datetime;
 
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
+import org.laoruga.dtogenerator.constants.BoundaryConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.time.temporal.Temporal;
@@ -10,10 +11,10 @@ import java.time.temporal.Temporal;
  * Created on 15.03.2023
  */
 public interface ChronoConfig {
-    Temporal adjust(Temporal temporal, IRuleRemark ruleRemark);
+    Temporal adjust(Temporal temporal, RuleRemark ruleRemark);
 
-    default long selectShift(org.laoruga.dtogenerator.constants.RuleRemark ruleRemark, long leftBound, long rightBound) {
-        switch (ruleRemark) {
+    default long selectShift(BoundaryConfig boundaryValue, long leftBound, long rightBound) {
+        switch (boundaryValue) {
             case MIN_VALUE:
                 return leftBound;
             case MAX_VALUE:
@@ -22,7 +23,7 @@ public interface ChronoConfig {
             case NOT_DEFINED:
                 return RandomUtils.nextLong(leftBound, rightBound);
             default:
-                throw new IllegalStateException("Unexpected value " + ruleRemark);
+                throw new IllegalStateException("Unexpected value " + boundaryValue);
         }
     }
 }

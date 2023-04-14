@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.DtoGeneratorBuildersTree;
 import org.laoruga.dtogenerator.DtoInstanceSupplier;
 import org.laoruga.dtogenerator.api.generators.Generator;
-import org.laoruga.dtogenerator.constants.RuleRemark;
+import org.laoruga.dtogenerator.constants.BoundaryConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.NestedConfig;
 
@@ -27,11 +27,11 @@ public class NestedDtoGenerator implements Generator<Object> {
     public NestedDtoGenerator(NestedConfig config) {
         dtoGeneratorBuilderTreeNode = config.getDtoGeneratorBuilderTreeNode();
         try {
-            RuleRemark ruleRemark = (RuleRemark) config.getRuleRemark();
-            if (ruleRemark != RuleRemark.NOT_DEFINED) {
+            BoundaryConfig boundaryValue = (BoundaryConfig) config.getRuleRemark();
+            if (boundaryValue != BoundaryConfig.NOT_DEFINED) {
                 dtoGeneratorBuilderTreeNode
                         .getDtoGeneratorBuilder()
-                        .setRuleRemark(ruleRemark);
+                        .setBoundaryConfig(boundaryValue);
             }
         } catch (DtoGeneratorException e) {
             if (e.getMessage().contains("Attempt to overwrite remark")) {

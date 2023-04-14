@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator.config.dto;
 import com.google.common.primitives.Primitives;
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 
 import java.math.BigInteger;
@@ -30,7 +30,7 @@ public class NumberConfig implements ConfigDto {
     private Class<? extends Number> fieldType;
 
     private boolean isAtomic;
-    private IRuleRemark ruleRemark;
+    private RuleRemark ruleRemark;
 
     public NumberConfig(NumberRule rules, Class<? extends Number> fieldType) {
         fieldType = Primitives.wrap(fieldType);

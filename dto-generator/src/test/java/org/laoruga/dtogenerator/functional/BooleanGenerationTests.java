@@ -11,7 +11,7 @@ import org.laoruga.dtogenerator.api.rules.BooleanRule;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.laoruga.dtogenerator.constants.RuleRemark.*;
+import static org.laoruga.dtogenerator.constants.BoundaryConfig.*;
 
 /**
  * @author Il'dar Valitov
@@ -108,7 +108,7 @@ public class BooleanGenerationTests {
     @DisplayName("Boolean Rule Remark")
     void booleanRuleRemark() {
 
-        Dto dto = DtoGenerator.builder(Dto.class).setRuleRemark(MIN_VALUE).build().generateDto();
+        Dto dto = DtoGenerator.builder(Dto.class).setBoundaryConfig(MIN_VALUE).build().generateDto();
 
         assertAll(
                 () -> assertThat(dto.getBooleanObjectDefaultRule(), notNullValue()),
@@ -120,8 +120,8 @@ public class BooleanGenerationTests {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
-        builder.setRuleRemark(MAX_VALUE);
-        builder.setRuleRemark("booleanObjectDefaultRule", NULL_VALUE);
+        builder.setBoundaryConfig(MAX_VALUE);
+        builder.setBoundaryConfig("booleanObjectDefaultRule", NULL_VALUE);
 
         Dto dto_2 = builder.build().generateDto();
 

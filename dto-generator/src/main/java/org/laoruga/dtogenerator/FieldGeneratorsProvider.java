@@ -91,6 +91,7 @@ public class FieldGeneratorsProvider {
      * - no explicit generators attached for the field
      * else generator instance
      */
+    @SuppressWarnings("unchecked")
     Optional<Generator<?>> getGenerator(Field field) {
 
         Optional<Generator<?>> maybeGeneratorForField =
@@ -101,11 +102,13 @@ public class FieldGeneratorsProvider {
 
             Generator<?> generatorForField = maybeGeneratorForField.get();
 
-            // FIXME config
             if (generatorForField instanceof CustomGenerator) {
                 configuration
                         .getCustomGeneratorsConfigurators()
-                        .getBuilder(field.getName(), (Class<? extends CustomGenerator<?>>) generatorForField.getClass())
+                        .getBuilder(
+                                field.getName(),
+                                (Class<? extends CustomGenerator<?>>) generatorForField.getClass()
+                        )
                         .build()
                         .configure((CustomGenerator<?>) generatorForField);
             }

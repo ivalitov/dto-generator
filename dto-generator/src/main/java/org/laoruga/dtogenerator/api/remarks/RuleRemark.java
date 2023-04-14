@@ -5,5 +5,5 @@ package org.laoruga.dtogenerator.api.remarks;
  * Created on 16.04.2022
  */
 
-public interface IRuleRemark {
+public interface RuleRemark {
 }

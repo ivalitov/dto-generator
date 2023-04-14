@@ -72,12 +72,6 @@ public class RemarksHolderCustom {
         customRuleRemarksMapByField_.get(filedName).put(remarkName, remarkValue);
     }
 
-    void addRemarkForAnyField(@NonNull Class<? extends CustomGenerator<?>> generatorClass,
-                              @NonNull CustomRuleRemark ruleRemarks) {
-//        customRuleRemarksMapByGenerator.putIfAbsent(generatorClass, new HashSet<>());
-//        customRuleRemarksMapByGenerator.get(generatorClass).add(ruleRemarks);
-    }
-
     void addParameterForGeneratorType(@NonNull Class<? extends CustomGenerator<?>> generatorClass,
                                       @NonNull String key,
                                       @NonNull String value) {

@@ -1,6 +1,6 @@
 package org.laoruga.dtogenerator.api.generators.custom;
 
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 
 /**
  * @author Il'dar Valitov
@@ -9,5 +9,5 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 
 public interface CustomGeneratorRemarks<T> extends CustomGenerator<T> {
 
-    void setRuleRemark(IRuleRemark ruleRemark);
+    void setRuleRemark(RuleRemark ruleRemark);
 }

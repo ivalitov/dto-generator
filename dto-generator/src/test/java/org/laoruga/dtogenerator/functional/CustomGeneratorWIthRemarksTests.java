@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarks;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 import org.laoruga.dtogenerator.api.rules.*;
-import org.laoruga.dtogenerator.constants.RuleRemark;
+import org.laoruga.dtogenerator.constants.BoundaryConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Arrays;
@@ -44,17 +44,17 @@ public class CustomGeneratorWIthRemarksTests {
         @CustomRule(generatorClass = OctopusKindGenerator.class)
         String octopusKind;
 
-        @CustomRule(generatorClass = OctopusKindGenerator.class, ruleRemark = RuleRemark.NULL_VALUE)
+        @CustomRule(generatorClass = OctopusKindGenerator.class, ruleRemark = BoundaryConfig.NULL_VALUE)
         String octopusKindSecond;
 
         @CustomRule(generatorClass = OctopusGenerator.class)
         Octopus octopus;
 
-        @CustomRule(generatorClass = OctopusGenerator.class, ruleRemark = RuleRemark.MAX_VALUE)
+        @CustomRule(generatorClass = OctopusGenerator.class, ruleRemark = BoundaryConfig.MAX_VALUE)
         Octopus octopusSecond;
 
         @CollectionRule(minSize = 10, element =
-        @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class, ruleRemark = RuleRemark.MAX_VALUE)))
+        @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class, ruleRemark = BoundaryConfig.MAX_VALUE)))
         List<Octopus> octopusList;
 
         @ArrayRule(minSize = 10, element =
@@ -74,13 +74,13 @@ public class CustomGeneratorWIthRemarksTests {
 
     static class NestedDto {
 
-        @CustomRule(generatorClass = OctopusKindGenerator.class, ruleRemark = RuleRemark.MIN_VALUE)
+        @CustomRule(generatorClass = OctopusKindGenerator.class, ruleRemark = BoundaryConfig.MIN_VALUE)
         String octopusKind;
 
         @CustomRule(generatorClass = OctopusKindGenerator.class)
         String octopusKindSecond;
 
-        @CustomRule(generatorClass = OctopusGenerator.class, ruleRemark = RuleRemark.MIN_VALUE)
+        @CustomRule(generatorClass = OctopusGenerator.class, ruleRemark = BoundaryConfig.MIN_VALUE)
         Octopus octopus;
 
         @CustomRule(generatorClass = OctopusGenerator.class)
@@ -91,7 +91,7 @@ public class CustomGeneratorWIthRemarksTests {
         List<Octopus> octopusList;
 
         @ArrayRule(minSize = 10, element =
-        @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class, ruleRemark = RuleRemark.MIN_VALUE)))
+        @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class, ruleRemark = BoundaryConfig.MIN_VALUE)))
         Octopus[] octopusArray;
 
         @MapRule(maxSize = 1,
@@ -112,13 +112,13 @@ public class CustomGeneratorWIthRemarksTests {
 
     static class OctopusGenerator implements CustomGeneratorRemarks<Octopus> {
 
-        IRuleRemark ruleRemark;
+        RuleRemark ruleRemark;
 
         @Override
         public Octopus generate() {
             int tentacles = 0;
-            if (ruleRemark.getClass() == RuleRemark.class) {
-                switch ((RuleRemark) ruleRemark) {
+            if (ruleRemark.getClass() == BoundaryConfig.class) {
+                switch ((BoundaryConfig) ruleRemark) {
                     case MIN_VALUE:
                         tentacles = 1;
                         break;
@@ -132,29 +132,29 @@ public class CustomGeneratorWIthRemarksTests {
                     case NULL_VALUE:
                         return null;
                     default:
-                        throw new IllegalStateException("Unexpected value: " + (RuleRemark) ruleRemark);
+                        throw new IllegalStateException("Unexpected value: " + (BoundaryConfig) ruleRemark);
                 }
             }
             return new Octopus(tentacles);
         }
 
         @Override
-        public void setRuleRemark(IRuleRemark ruleRemark) {
+        public void setRuleRemark(RuleRemark ruleRemark) {
             this.ruleRemark = ruleRemark;
         }
     }
 
     static class OctopusKindGenerator implements CustomGeneratorRemarks<String> {
 
-        IRuleRemark ruleRemark;
+        RuleRemark ruleRemark;
 
         @Override
         public String generate() {
 
             String kind = "";
 
-            if (ruleRemark.getClass() == RuleRemark.class) {
-                switch ((RuleRemark) ruleRemark) {
+            if (ruleRemark.getClass() == BoundaryConfig.class) {
+                switch ((BoundaryConfig) ruleRemark) {
                     case MIN_VALUE:
                         kind = KIND_MIN;
                         break;
@@ -173,7 +173,7 @@ public class CustomGeneratorWIthRemarksTests {
         }
 
         @Override
-        public void setRuleRemark(IRuleRemark ruleRemark) {
+        public void setRuleRemark(RuleRemark ruleRemark) {
             this.ruleRemark = ruleRemark;
         }
     }
@@ -249,7 +249,7 @@ public class CustomGeneratorWIthRemarksTests {
     void customGeneratorWithRemarkAddedForAnyField() {
 
         Dto dto = DtoGenerator.builder(Dto.class)
-                .setRuleRemark(RuleRemark.MAX_VALUE)
+                .setBoundaryConfig(BoundaryConfig.MAX_VALUE)
                 .build().generateDto();
 
         assertAll(
@@ -279,13 +279,13 @@ public class CustomGeneratorWIthRemarksTests {
         // remarks set for root dto only
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class)
-                .setRuleRemark("octopusKind", RuleRemark.MAX_VALUE)
-                .setRuleRemark("octopusKindSecond", RuleRemark.MIN_VALUE)
-                .setRuleRemark("octopus", RuleRemark.MAX_VALUE)
-                .setRuleRemark("octopusSecond", RuleRemark.MIN_VALUE)
-                .setRuleRemark("octopusList", RuleRemark.MIN_VALUE)
-                .setRuleRemark("octopusArray", RuleRemark.MAX_VALUE)
-                .setRuleRemark("octopusMap", RuleRemark.MIN_VALUE);
+                .setBoundaryConfig("octopusKind", BoundaryConfig.MAX_VALUE)
+                .setBoundaryConfig("octopusKindSecond", BoundaryConfig.MIN_VALUE)
+                .setBoundaryConfig("octopus", BoundaryConfig.MAX_VALUE)
+                .setBoundaryConfig("octopusSecond", BoundaryConfig.MIN_VALUE)
+                .setBoundaryConfig("octopusList", BoundaryConfig.MIN_VALUE)
+                .setBoundaryConfig("octopusArray", BoundaryConfig.MAX_VALUE)
+                .setBoundaryConfig("octopusMap", BoundaryConfig.MIN_VALUE);
 
         Consumer<Dto> roodDtoAssertions = dto ->
                 assertAll(
@@ -319,13 +319,13 @@ public class CustomGeneratorWIthRemarksTests {
         // remarks set for root dto and nested dto
 
         builder
-                .setRuleRemark("nestedDto.octopusKind", RuleRemark.MAX_VALUE)
-                .setRuleRemark("nestedDto.octopusKindSecond", RuleRemark.MIN_VALUE)
-                .setRuleRemark("nestedDto.octopus", RuleRemark.MAX_VALUE)
-                .setRuleRemark("nestedDto.octopusSecond", RuleRemark.MIN_VALUE)
-                .setRuleRemark("nestedDto.octopusList", RuleRemark.MIN_VALUE)
-                .setRuleRemark("nestedDto.octopusArray", RuleRemark.MAX_VALUE)
-                .setRuleRemark("nestedDto.octopusMap", RuleRemark.MIN_VALUE);
+                .setBoundaryConfig("nestedDto.octopusKind", BoundaryConfig.MAX_VALUE)
+                .setBoundaryConfig("nestedDto.octopusKindSecond", BoundaryConfig.MIN_VALUE)
+                .setBoundaryConfig("nestedDto.octopus", BoundaryConfig.MAX_VALUE)
+                .setBoundaryConfig("nestedDto.octopusSecond", BoundaryConfig.MIN_VALUE)
+                .setBoundaryConfig("nestedDto.octopusList", BoundaryConfig.MIN_VALUE)
+                .setBoundaryConfig("nestedDto.octopusArray", BoundaryConfig.MAX_VALUE)
+                .setBoundaryConfig("nestedDto.octopusMap", BoundaryConfig.MIN_VALUE);
 
         Dto dto_2 = builder.build().generateDto();
 
@@ -349,14 +349,14 @@ public class CustomGeneratorWIthRemarksTests {
     void customGeneratorWithRemarksOverriddenByAnyAndSpecificFields() {
 
         Dto dto = DtoGenerator.builder(Dto.class)
-                .setRuleRemark(RuleRemark.MAX_VALUE)
-                .setRuleRemark("octopusKindSecond", RuleRemark.MIN_VALUE)
-                .setRuleRemark("octopusSecond", RuleRemark.MIN_VALUE)
-                .setRuleRemark("nestedDto.octopusArray", RuleRemark.MIN_VALUE)
-                .setRuleRemark("nestedDto.octopusKindSecond", RuleRemark.MIN_VALUE)
-                .setRuleRemark("nestedDto.octopus", RuleRemark.NULL_VALUE)
-                .setRuleRemark("nestedDto.octopusSecond", RuleRemark.MIN_VALUE)
-                .setRuleRemark("nestedDto.octopusMap", RuleRemark.NULL_VALUE)
+                .setBoundaryConfig(BoundaryConfig.MAX_VALUE)
+                .setBoundaryConfig("octopusKindSecond", BoundaryConfig.MIN_VALUE)
+                .setBoundaryConfig("octopusSecond", BoundaryConfig.MIN_VALUE)
+                .setBoundaryConfig("nestedDto.octopusArray", BoundaryConfig.MIN_VALUE)
+                .setBoundaryConfig("nestedDto.octopusKindSecond", BoundaryConfig.MIN_VALUE)
+                .setBoundaryConfig("nestedDto.octopus", BoundaryConfig.NULL_VALUE)
+                .setBoundaryConfig("nestedDto.octopusSecond", BoundaryConfig.MIN_VALUE)
+                .setBoundaryConfig("nestedDto.octopusMap", BoundaryConfig.NULL_VALUE)
                 .build().generateDto();
 
         assertAll(

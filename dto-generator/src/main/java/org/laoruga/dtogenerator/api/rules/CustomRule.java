@@ -2,8 +2,8 @@ package org.laoruga.dtogenerator.api.rules;
 
 import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
+import org.laoruga.dtogenerator.constants.BoundaryConfig;
 import org.laoruga.dtogenerator.constants.Group;
-import org.laoruga.dtogenerator.constants.RuleRemark;
 
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -26,5 +26,5 @@ public @interface CustomRule {
 
     String group() default Group.DEFAULT;
 
-    RuleRemark ruleRemark() default RuleRemark.NOT_DEFINED;
+    BoundaryConfig ruleRemark() default BoundaryConfig.NOT_DEFINED;
 }

@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator.config.dto;
 import lombok.Builder;
 import lombok.Getter;
 import org.laoruga.dtogenerator.DtoGeneratorBuildersTree;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 
 /**
  * @author Il'dar Valitov
@@ -14,7 +14,7 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 public class NestedConfig implements ConfigDto {
 
     private DtoGeneratorBuildersTree.Node dtoGeneratorBuilderTreeNode;
-    private IRuleRemark ruleRemark;
+    private RuleRemark ruleRemark;
 
     @Override
     public void merge(ConfigDto from) {
@@ -24,13 +24,13 @@ public class NestedConfig implements ConfigDto {
     }
 
     @Override
-    public ConfigDto setRuleRemark(IRuleRemark ruleRemark) {
+    public ConfigDto setRuleRemark(RuleRemark ruleRemark) {
         this.ruleRemark = ruleRemark;
         return this;
     }
 
     @Override
-    public IRuleRemark getRuleRemark() {
+    public RuleRemark getRuleRemark() {
         return ruleRemark;
     }
 }

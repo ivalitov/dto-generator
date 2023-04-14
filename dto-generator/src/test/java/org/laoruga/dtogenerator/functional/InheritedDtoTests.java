@@ -8,7 +8,6 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
-import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 
 import java.time.LocalDateTime;
 import java.util.List;

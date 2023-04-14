@@ -6,7 +6,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 
 import java.util.function.Supplier;
 
@@ -52,7 +52,7 @@ public class CustomConfig implements ConfigDto {
      */
     @Override
     @Deprecated
-    public ConfigDto setRuleRemark(IRuleRemark ruleRemark) {
+    public ConfigDto setRuleRemark(RuleRemark ruleRemark) {
         throw NOT_IMPLEMENTED;
     }
 
@@ -61,7 +61,7 @@ public class CustomConfig implements ConfigDto {
      */
     @Override
     @Deprecated
-    public IRuleRemark getRuleRemark() {
+    public RuleRemark getRuleRemark() {
         throw NOT_IMPLEMENTED;
     }
 

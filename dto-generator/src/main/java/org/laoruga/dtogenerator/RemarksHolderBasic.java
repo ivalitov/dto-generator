@@ -1,8 +1,8 @@
 package org.laoruga.dtogenerator;
 
 import lombok.NonNull;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
-import org.laoruga.dtogenerator.constants.RuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
+import org.laoruga.dtogenerator.constants.BoundaryConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.util.HashMap;
@@ -16,8 +16,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class RemarksHolderBasic {
 
-    private final Map<String, IRuleRemark> basicRuleRemarksMapByField;
-    private final AtomicReference<IRuleRemark> basicRuleRemarkForAnyField;
+    private final Map<String, RuleRemark> basicRuleRemarksMapByField;
+    private final AtomicReference<RuleRemark> basicRuleRemarkForAnyField;
 
     public RemarksHolderBasic() {
         this(new AtomicReference<>());
@@ -32,7 +32,7 @@ public class RemarksHolderBasic {
         this(new AtomicReference<>(toCopy.basicRuleRemarkForAnyField.get()));
     }
 
-    private RemarksHolderBasic(AtomicReference<IRuleRemark> basicRuleRemarkForAnyField) {
+    private RemarksHolderBasic(AtomicReference<RuleRemark> basicRuleRemarkForAnyField) {
         this.basicRuleRemarksMapByField = new HashMap<>();
         this.basicRuleRemarkForAnyField = basicRuleRemarkForAnyField;
     }
@@ -42,23 +42,23 @@ public class RemarksHolderBasic {
      */
 
     void setBasicRuleRemarkForField(@NonNull String filedName,
-                                    @NonNull RuleRemark ruleRemark) {
+                                    @NonNull BoundaryConfig boundaryConfig) {
         if (basicRuleRemarksMapByField.containsKey(filedName)) {
             throw new DtoGeneratorException("Attempt to overwrite remark from: '" + getBasicRuleRemarkOrNull(filedName) + "'" +
-                    " to: '" + ruleRemark + "' for field '" + filedName + "'.");
+                    " to: '" + boundaryConfig + "' for field '" + filedName + "'.");
         }
-        basicRuleRemarksMapByField.put(filedName, ruleRemark);
+        basicRuleRemarksMapByField.put(filedName, boundaryConfig);
     }
 
-    void setBasicRuleRemarkForAnyField(RuleRemark basicRuleRemark) {
-        if (basicRuleRemarkForAnyField.get() != null && basicRuleRemarkForAnyField.get() != basicRuleRemark) {
+    void setBasicRuleRemarkForAnyField(BoundaryConfig boundaryConfig) {
+        if (basicRuleRemarkForAnyField.get() != null && basicRuleRemarkForAnyField.get() != boundaryConfig) {
             throw new DtoGeneratorException("Attempt to overwrite remark for all fields from: '"
-                    + basicRuleRemarkForAnyField.get() + "' to: '" + basicRuleRemark + "'.");
+                    + basicRuleRemarkForAnyField.get() + "' to: '" + boundaryConfig + "'.");
         }
-        basicRuleRemarkForAnyField.set(basicRuleRemark);
+        basicRuleRemarkForAnyField.set(boundaryConfig);
     }
 
-    public IRuleRemark getBasicRuleRemarkOrNull(String fieldName) {
+    public RuleRemark getBasicRuleRemarkOrNull(String fieldName) {
         if (basicRuleRemarksMapByField.containsKey(fieldName)) {
             return basicRuleRemarksMapByField.get(fieldName);
         }

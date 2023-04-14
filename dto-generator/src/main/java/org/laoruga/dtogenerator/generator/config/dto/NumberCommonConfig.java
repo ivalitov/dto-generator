@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.NotImplementedException;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public class NumberCommonConfig implements ConfigDto {
     @Getter
     @Setter
     @Accessors(chain = true)
-    private IRuleRemark ruleRemark;
+    private RuleRemark ruleRemark;
 
     /*
      * Integer
@@ -39,7 +39,7 @@ public class NumberCommonConfig implements ConfigDto {
         return setMinValue(Integer.class, AtomicInteger.class, value);
     }
 
-    public NumberCommonConfig setRuleRemarkInt(IRuleRemark value) {
+    public NumberCommonConfig setRuleRemarkInt(RuleRemark value) {
         return setRuleRemark(Integer.class, AtomicInteger.class, value);
     }
 
@@ -55,7 +55,7 @@ public class NumberCommonConfig implements ConfigDto {
         return setMinValue(Long.class, AtomicLong.class, value);
     }
 
-    public NumberCommonConfig setRuleRemarkLong(IRuleRemark value) {
+    public NumberCommonConfig setRuleRemarkLong(RuleRemark value) {
         return setRuleRemark(Long.class, AtomicLong.class, value);
     }
 
@@ -72,7 +72,7 @@ public class NumberCommonConfig implements ConfigDto {
         return setMinValue(Short.class, value);
     }
 
-    public NumberCommonConfig setRuleRemarkShort(IRuleRemark value) {
+    public NumberCommonConfig setRuleRemarkShort(RuleRemark value) {
         return setRuleRemark(Short.class, value);
     }
 
@@ -88,7 +88,7 @@ public class NumberCommonConfig implements ConfigDto {
         return setMinValue(Byte.class, value);
     }
 
-    public NumberCommonConfig setRuleRemarkByte(IRuleRemark value) {
+    public NumberCommonConfig setRuleRemarkByte(RuleRemark value) {
         return setRuleRemark(Byte.class, value);
     }
 
@@ -112,7 +112,7 @@ public class NumberCommonConfig implements ConfigDto {
         return setMinBigIntValue(new BigInteger(value));
     }
 
-    public NumberCommonConfig setRuleRemarkBigInteger(IRuleRemark value) {
+    public NumberCommonConfig setRuleRemarkBigInteger(RuleRemark value) {
         return setRuleRemark(BigInteger.class, value);
     }
 
@@ -132,7 +132,7 @@ public class NumberCommonConfig implements ConfigDto {
         return this;
     }
 
-    private NumberCommonConfig setRuleRemark(Class<?> type, IRuleRemark ruleRemark) {
+    private NumberCommonConfig setRuleRemark(Class<?> type, RuleRemark ruleRemark) {
         map.putIfAbsent(type, new NumberConfig());
         map.get(type).setRuleRemark(ruleRemark);
         return this;
@@ -162,7 +162,7 @@ public class NumberCommonConfig implements ConfigDto {
         return this;
     }
 
-    public NumberCommonConfig setRuleRemark(Class<?> type, Class<?> secondType, IRuleRemark ruleRemark) {
+    public NumberCommonConfig setRuleRemark(Class<?> type, Class<?> secondType, RuleRemark ruleRemark) {
         if (!map.containsKey(type)) {
             NumberConfig configDto = new NumberConfig();
             map.putIfAbsent(type, configDto);

@@ -1,9 +1,9 @@
 package org.laoruga.dtogenerator.api.rules;
 
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
+import org.laoruga.dtogenerator.constants.BoundaryConfig;
 import org.laoruga.dtogenerator.constants.Bounds;
 import org.laoruga.dtogenerator.constants.Group;
-import org.laoruga.dtogenerator.constants.RuleRemark;
 
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -35,7 +35,7 @@ public @interface DecimalRule {
 
     String minBigDecimal() default Bounds.BIG_DECIMAL_MIN_VALUE;
 
-    RuleRemark ruleRemark() default RuleRemark.RANDOM_VALUE;
+    BoundaryConfig ruleRemark() default BoundaryConfig.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 

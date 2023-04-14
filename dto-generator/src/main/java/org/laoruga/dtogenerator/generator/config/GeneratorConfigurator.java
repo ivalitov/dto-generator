@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.Generator;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
@@ -19,8 +19,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static org.laoruga.dtogenerator.constants.RuleRemark.MIN_VALUE;
-import static org.laoruga.dtogenerator.constants.RuleRemark.NULL_VALUE;
+import static org.laoruga.dtogenerator.constants.BoundaryConfig.MIN_VALUE;
+import static org.laoruga.dtogenerator.constants.BoundaryConfig.NULL_VALUE;
 import static org.laoruga.dtogenerator.constants.RulesInstance.NUMBER_RULE_ZEROS;
 import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 
@@ -45,7 +45,7 @@ public class GeneratorConfigurator {
         this.remarksHolder = remarksHolder;
     }
 
-    public IRuleRemark getRuleRemarkOrNull(String fieldName) {
+    public RuleRemark getRuleRemarkOrNull(String fieldName) {
         return remarksHolder.getBasicRemarks().getBasicRuleRemarkOrNull(fieldName);
     }
 

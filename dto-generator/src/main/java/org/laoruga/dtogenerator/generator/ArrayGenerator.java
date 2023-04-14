@@ -3,7 +3,8 @@ package org.laoruga.dtogenerator.generator;
 import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.generators.ListGenerator;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
+import org.laoruga.dtogenerator.constants.BoundaryConfig;
 import org.laoruga.dtogenerator.generator.config.dto.ArrayConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
@@ -22,7 +23,7 @@ public class ArrayGenerator implements ListGenerator {
     private int maxSize;
     private Class<?> elementType;
     private Generator<?> elementGenerator;
-    private IRuleRemark ruleRemark;
+    private RuleRemark ruleRemark;
 
     public ArrayGenerator(ArrayConfig config) {
         minSize = config.getMinSize();
@@ -35,7 +36,7 @@ public class ArrayGenerator implements ListGenerator {
     @Override
     public Object generate() {
         int size;
-        switch ((org.laoruga.dtogenerator.constants.RuleRemark) ruleRemark) {
+        switch ((BoundaryConfig) ruleRemark) {
 
             case MIN_VALUE:
                 size = minSize;

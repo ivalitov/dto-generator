@@ -3,8 +3,9 @@ package org.laoruga.dtogenerator.generator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.laoruga.dtogenerator.api.generators.Generator;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
+import org.laoruga.dtogenerator.constants.BoundaryConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.MapConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
@@ -26,7 +27,7 @@ public class MapGenerator implements Generator<Map<Object, Object>> {
     private Supplier<Map<Object, Object>> mapInstanceSupplier;
     private Generator<Object> keyGenerator;
     private Generator<Object> valueGenerator;
-    private IRuleRemark ruleRemark;
+    private RuleRemark ruleRemark;
 
     public MapGenerator(MapConfig config) {
         minSize = config.getMinSize();
@@ -44,7 +45,7 @@ public class MapGenerator implements Generator<Map<Object, Object>> {
         int maxAttempts = DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().getMaxCollectionGenerationCycles();
         int size;
 
-        switch ((org.laoruga.dtogenerator.constants.RuleRemark) ruleRemark) {
+        switch ((BoundaryConfig) ruleRemark) {
 
             case MIN_VALUE:
                 size = minSize;

@@ -1,6 +1,6 @@
 package org.laoruga.dtogenerator.generator.config.dto;
 
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 
 /**
  * @author Il'dar Valitov
@@ -12,7 +12,7 @@ public interface ConfigDto {
      * @param configDto - non-null values from that object replaces current (this) values
      */
     void merge(ConfigDto configDto);
-    ConfigDto setRuleRemark(IRuleRemark ruleRemark);
-    IRuleRemark getRuleRemark();
+    ConfigDto setRuleRemark(RuleRemark ruleRemark);
+    RuleRemark getRuleRemark();
 
 }

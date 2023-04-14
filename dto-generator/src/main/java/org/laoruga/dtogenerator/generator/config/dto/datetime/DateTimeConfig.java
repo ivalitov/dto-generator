@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.generator.config.dto.datetime;
 
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 import org.laoruga.dtogenerator.api.rules.datetime.ChronoFieldShift;
 import org.laoruga.dtogenerator.api.rules.datetime.ChronoUnitShift;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
@@ -26,7 +26,7 @@ import java.util.List;
 public class DateTimeConfig implements ConfigDto {
 
     private List<ChronoConfig> chronoUnitConfigList;
-    private IRuleRemark ruleRemark;
+    private RuleRemark ruleRemark;
     private Class<? extends Temporal> generatedType;
 
     public DateTimeConfig(DateTimeRule rule) {

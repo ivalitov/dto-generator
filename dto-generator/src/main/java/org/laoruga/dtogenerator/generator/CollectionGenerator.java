@@ -3,8 +3,9 @@ package org.laoruga.dtogenerator.generator;
 import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.generators.ListGenerator;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
+import org.laoruga.dtogenerator.constants.BoundaryConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.CollectionConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
@@ -25,7 +26,7 @@ public class CollectionGenerator implements ListGenerator {
     private final int maxSize;
     private final Supplier<Collection<Object>> collectionInstanceSupplier;
     private final Generator<Object> elementGenerator;
-    private final IRuleRemark ruleRemark;
+    private final RuleRemark ruleRemark;
 
     @SuppressWarnings("unchecked")
     public CollectionGenerator(CollectionConfig collectionConfig) {
@@ -41,7 +42,7 @@ public class CollectionGenerator implements ListGenerator {
         Collection<Object> collectionInstance = collectionInstanceSupplier.get();
         int maxAttempts = DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().getMaxCollectionGenerationCycles();
         int size;
-        switch ((org.laoruga.dtogenerator.constants.RuleRemark) ruleRemark) {
+        switch ((BoundaryConfig) ruleRemark) {
 
             case MIN_VALUE:
                 size = minSize;
