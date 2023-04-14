@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.generator.config.dto;
 
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.rules.BooleanRule;
 
 /**
@@ -18,11 +18,11 @@ import org.laoruga.dtogenerator.api.rules.BooleanRule;
 public class BooleanConfig implements ConfigDto {
 
     private Double trueProbability;
-    private IRuleRemark ruleRemark;
+    private RuleRemark ruleRemark;
 
     public BooleanConfig(BooleanRule rule) {
         this.trueProbability = rule.trueProbability();
-        this.ruleRemark = rule.ruleRemark();
+        this.ruleRemark = rule.boundary();
     }
 
     public void merge(ConfigDto from) {

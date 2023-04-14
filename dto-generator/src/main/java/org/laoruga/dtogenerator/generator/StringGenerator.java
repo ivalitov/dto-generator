@@ -3,8 +3,9 @@ package org.laoruga.dtogenerator.generator;
 import com.mifmif.common.regex.Generex;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.generators.Generator;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.generator.config.dto.StringConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
@@ -23,7 +24,7 @@ public class StringGenerator implements Generator<String> {
     private final int minLength;
     private final char[] chars;
     private final String[] words;
-    private final IRuleRemark ruleRemark;
+    private final RuleRemark ruleRemark;
     private final String regexp;
 
     public StringGenerator(StringConfig config) {
@@ -39,7 +40,7 @@ public class StringGenerator implements Generator<String> {
     public String generate() {
         int length;
 
-        switch ((org.laoruga.dtogenerator.constants.RuleRemark) ruleRemark) {
+        switch ((Boundary) ruleRemark) {
 
             case MIN_VALUE:
                 length = minLength;

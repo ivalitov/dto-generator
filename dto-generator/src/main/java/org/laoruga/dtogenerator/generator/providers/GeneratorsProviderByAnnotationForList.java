@@ -6,7 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForList;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
-import org.laoruga.dtogenerator.rule.RuleInfoCollection;
+import org.laoruga.dtogenerator.generator.providers.suppliers.UserGeneratorSuppliers;
+import org.laoruga.dtogenerator.rule.RuleInfoList;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -23,46 +24,50 @@ public class GeneratorsProviderByAnnotationForList {
 
     protected final GeneratorConfiguratorForList generatorConfiguratorForList;
     protected final GeneratorsProviderByAnnotation generatorsProvider;
+    private final UserGeneratorSuppliers userGeneratorSuppliers;
+
 
     public GeneratorsProviderByAnnotationForList(GeneratorsProviderByAnnotation generatorsProvider,
-                                                 GeneratorConfiguratorForList generatorConfiguratorForList) {
+                                                 GeneratorConfiguratorForList generatorConfiguratorForList,
+                                                 UserGeneratorSuppliers userGeneratorSuppliers) {
         this.generatorsProvider = generatorsProvider;
         this.generatorConfiguratorForList = generatorConfiguratorForList;
+        this.userGeneratorSuppliers = userGeneratorSuppliers;
     }
 
-    Generator<?> getGenerator(RuleInfoCollection collectionRuleInfo) {
+    Generator<?> getGenerator(RuleInfoList listRuleInfo) {
 
-        final Field field = collectionRuleInfo.getField();
+        final Field field = listRuleInfo.getField();
         final Class<?> fieldType = field.getType();
         final String fieldName = field.getName();
 
-        Class<?> collectionElementType = collectionRuleInfo.getElementType();
+        Class<?> listElementType = listRuleInfo.getElementType();
 
-        // Collection element generator builder
+        // List generator builder
 
-        Generator<?> elementGenerator = collectionRuleInfo.isElementRulesExist() ?
-                generatorsProvider.getGenerator(collectionRuleInfo.getElementRuleInfo()) :
-                generatorsProvider.getGeneratorByType(field, collectionElementType);
+        Optional<Generator<?>> maybeUserGenerator =
+                userGeneratorSuppliers.getGenerator(fieldType);
 
-        // Collection generator builder
-
-        Optional<Function<ConfigDto, Generator<?>>> maybeUserCollectionGenerator =
-                generatorsProvider.getUserGeneratorSupplier(fieldType);
-
-        if (maybeUserCollectionGenerator.isPresent()) {
-            // user generators are not configurable yet
-            return maybeUserCollectionGenerator.get().apply(null);
+        if (maybeUserGenerator.isPresent()) {
+            return maybeUserGenerator.get();
         }
 
+        Function<ConfigDto, Generator<?>> listGeneratorSupplier = generatorsProvider
+                .getDefaultGeneratorSupplier(listRuleInfo.getRule(), fieldType);
+
+        // List element generator builder
+
+        Generator<?> elementGenerator = listRuleInfo.isElementRulesExist() ?
+                generatorsProvider.getGenerator(listRuleInfo.getElementRuleInfo()) :
+                generatorsProvider.getGeneratorByType(field, listElementType);
+
         ConfigDto listGeneratorConfig = generatorConfiguratorForList.createGeneratorConfig(
-                collectionRuleInfo,
+                listRuleInfo,
                 elementGenerator,
                 fieldType,
                 fieldName
         );
 
-        return generatorsProvider
-                .getDefaultGeneratorSupplier(collectionRuleInfo.getRule(), fieldType)
-                .apply(listGeneratorConfig);
+        return listGeneratorSupplier.apply(listGeneratorConfig);
     }
 }

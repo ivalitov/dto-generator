@@ -18,7 +18,7 @@ public class TypeGeneratorsConfigForFiled {
         this.userConfigForField = new HashMap<>();
     }
 
-    public void setGeneratorConfigForField(String fieldName, ConfigDto generatorConfig) {
+    public synchronized void setGeneratorConfigForField(String fieldName, ConfigDto generatorConfig) {
         Class<? extends ConfigDto> configClass = generatorConfig.getClass();
         userConfigForField.putIfAbsent(fieldName, new HashMap<>());
         if (userConfigForField.get(fieldName).containsKey(configClass)) {
@@ -29,10 +29,10 @@ public class TypeGeneratorsConfigForFiled {
     }
 
     public ConfigDto getOrNull(String fieldName, Class<? extends ConfigDto> configClass) {
-        return userConfigForField.containsKey(fieldName) ?
-                userConfigForField.get(fieldName).get(configClass) :
-                null;
+        if (userConfigForField.containsKey(fieldName)) {
+            return userConfigForField.get(fieldName).get(configClass);
+        }
+        return null;
     }
-
 
 }

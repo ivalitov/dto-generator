@@ -1,13 +1,17 @@
 package org.laoruga.dtogenerator.generator;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.DtoGeneratorBuilder;
+import org.laoruga.dtogenerator.DtoGeneratorBuildersTree;
+import org.laoruga.dtogenerator.DtoInstanceSupplier;
 import org.laoruga.dtogenerator.api.generators.Generator;
-import org.laoruga.dtogenerator.constants.RuleRemark;
+import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.NestedConfig;
+
+import java.util.function.Supplier;
 
 /**
  * @author Il'dar Valitov
@@ -15,16 +19,19 @@ import org.laoruga.dtogenerator.generator.config.dto.NestedConfig;
  */
 @AllArgsConstructor
 @Slf4j
+@Getter(AccessLevel.PUBLIC)
 public class NestedDtoGenerator implements Generator<Object> {
 
-    private final DtoGenerator<?> dtoGenerator;
+    private final DtoGeneratorBuildersTree.Node dtoGeneratorBuilderTreeNode;
 
     public NestedDtoGenerator(NestedConfig config) {
-        DtoGeneratorBuilder<?> dtoGeneratorBuilder = config.getDtoGeneratorBuilder();
+        dtoGeneratorBuilderTreeNode = config.getDtoGeneratorBuilderTreeNode();
         try {
-            RuleRemark ruleRemark = (RuleRemark) config.getRuleRemark();
-            if (ruleRemark != RuleRemark.NOT_DEFINED) {
-                dtoGeneratorBuilder.setRuleRemark(ruleRemark);
+            Boundary boundaryValue = (Boundary) config.getRuleRemark();
+            if (boundaryValue != Boundary.NOT_DEFINED) {
+                dtoGeneratorBuilderTreeNode
+                        .getDtoGeneratorBuilder()
+                        .setBoundary(boundaryValue);
             }
         } catch (DtoGeneratorException e) {
             if (e.getMessage().contains("Attempt to overwrite remark")) {
@@ -33,12 +40,17 @@ public class NestedDtoGenerator implements Generator<Object> {
                 throw e;
             }
         }
-        this.dtoGenerator = dtoGeneratorBuilder.build();
     }
 
     @Override
     public Object generate() {
-        return dtoGenerator.generateDto();
+        Supplier<?> dtoInstanceSupplier = dtoGeneratorBuilderTreeNode
+                .getFieldGeneratorsProvider()
+                .getDtoInstanceSupplier();
+        if (dtoInstanceSupplier instanceof DtoInstanceSupplier) {
+            ((DtoInstanceSupplier) dtoInstanceSupplier).updateInstance();
+        }
+        return dtoInstanceSupplier.get();
     }
 
 }

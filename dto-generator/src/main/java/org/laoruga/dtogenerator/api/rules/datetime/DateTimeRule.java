@@ -1,8 +1,8 @@
 package org.laoruga.dtogenerator.api.rules.datetime;
 
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
+import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.constants.Group;
-import org.laoruga.dtogenerator.constants.RuleRemark;
 
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -40,7 +40,7 @@ public @interface DateTimeRule {
 
     ChronoFieldShift[] chronoFieldShift() default {};
 
-    RuleRemark ruleRemark() default RuleRemark.RANDOM_VALUE;
+    Boundary boundary() default Boundary.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 

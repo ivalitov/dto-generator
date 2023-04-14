@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
-import org.laoruga.dtogenerator.constants.RuleRemark;
+import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -77,7 +77,7 @@ class IntegerGenerationTests {
     @Feature("ALL_FIELDS_REMARK")
     @DisplayName("MIN Values Integer Generation")
     void minIntegerGeneration() {
-        DtoInteger dto = DtoGenerator.builder(DtoInteger.class).setRuleRemark(RuleRemark.MIN_VALUE).build().generateDto();
+        DtoInteger dto = DtoGenerator.builder(DtoInteger.class).setBoundary(Boundary.MIN_VALUE).build().generateDto();
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getIntDefaultRules(), equalTo(RulesInstance.NUMBER_RULE.minInt())),
@@ -94,7 +94,7 @@ class IntegerGenerationTests {
     @Feature("ALL_FIELDS_REMARK")
     @DisplayName("MAX Values Integer Generation")
     void maxIntegerGeneration() {
-        DtoInteger dto = DtoGenerator.builder(DtoInteger.class).setRuleRemark(RuleRemark.MAX_VALUE).build().generateDto();
+        DtoInteger dto = DtoGenerator.builder(DtoInteger.class).setBoundary(Boundary.MAX_VALUE).build().generateDto();
         assertNotNull(dto);
         assertAll(
                 () -> assertThat(dto.getIntDefaultRules(), equalTo(RulesInstance.NUMBER_RULE.maxInt())),
@@ -112,11 +112,11 @@ class IntegerGenerationTests {
     @DisplayName("Integer Generation with field remarks")
     void integerGenerationExplicitFields() {
         DtoInteger dto = DtoGenerator.builder(DtoInteger.class)
-                .setRuleRemark("intDefaultRules", RuleRemark.NULL_VALUE)
-                .setRuleRemark("intPrimitiveDefaultRules", RuleRemark.NULL_VALUE)
-                .setRuleRemark("intLeftBound", RuleRemark.MIN_VALUE)
-                .setRuleRemark("intRightBound", RuleRemark.MAX_VALUE)
-                .setRuleRemark("intLeftAndRightBounds", RuleRemark.RANDOM_VALUE)
+                .setBoundary("intDefaultRules", Boundary.NULL_VALUE)
+                .setBoundary("intPrimitiveDefaultRules", Boundary.NULL_VALUE)
+                .setBoundary("intLeftBound", Boundary.MIN_VALUE)
+                .setBoundary("intRightBound", Boundary.MAX_VALUE)
+                .setBoundary("intLeftAndRightBounds", Boundary.RANDOM_VALUE)
                 .build().generateDto();
         assertNotNull(dto);
         assertAll(
@@ -136,10 +136,10 @@ class IntegerGenerationTests {
     @DisplayName("Integer Generation with field remarks and all fields remarks")
     void maxIntegerGenerationExplicitFields() {
         DtoInteger dto = DtoGenerator.builder(DtoInteger.class)
-                .setRuleRemark(RuleRemark.MIN_VALUE)
-                .setRuleRemark("intDefaultRules", RuleRemark.NULL_VALUE)
-                .setRuleRemark("intLeftBound", RuleRemark.MAX_VALUE)
-                .setRuleRemark("intLeftAndRightBounds", RuleRemark.RANDOM_VALUE)
+                .setBoundary(Boundary.MIN_VALUE)
+                .setBoundary("intDefaultRules", Boundary.NULL_VALUE)
+                .setBoundary("intLeftBound", Boundary.MAX_VALUE)
+                .setBoundary("intLeftAndRightBounds", Boundary.RANDOM_VALUE)
                 .build().generateDto();
         assertNotNull(dto);
         assertAll(

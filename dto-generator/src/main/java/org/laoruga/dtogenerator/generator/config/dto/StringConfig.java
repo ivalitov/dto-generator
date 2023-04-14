@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.generator.config.dto;
 
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 
 /**
@@ -21,7 +21,7 @@ public class StringConfig implements ConfigDto {
     private Integer minLength;
     private String[] words;
     private String chars;
-    private IRuleRemark ruleRemark;
+    private RuleRemark ruleRemark;
     private String regexp;
 
     public StringConfig(StringRule stringRule) {
@@ -29,7 +29,7 @@ public class StringConfig implements ConfigDto {
         this.minLength = stringRule.minLength();
         this.words = stringRule.words();
         this.chars = stringRule.chars();
-        this.ruleRemark = stringRule.ruleRemark();
+        this.ruleRemark = stringRule.boundary();
         this.regexp = stringRule.regexp();
     }
 

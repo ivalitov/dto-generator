@@ -31,9 +31,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.laoruga.dtogenerator.Constants.RESTORE_STATIC_CONFIG;
+import static org.laoruga.dtogenerator.constants.Boundary.MAX_VALUE;
+import static org.laoruga.dtogenerator.constants.Boundary.MIN_VALUE;
 import static org.laoruga.dtogenerator.constants.Group.*;
-import static org.laoruga.dtogenerator.constants.RuleRemark.MAX_VALUE;
-import static org.laoruga.dtogenerator.constants.RuleRemark.MIN_VALUE;
 import static org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType.ORG;
 import static org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType.PERSON;
 
@@ -65,15 +65,15 @@ class OverridingOfGeneratorsTests {
                 .setGenerator("setOfLong", () -> new HashSet<>(Arrays.asList(2L)))
                 .setGenerator("linkedListOfEnum", () -> new LinkedList<>(Arrays.asList(ClientType.LEGAL_PERSON)))
 
-                .setGenerator("innerDto.integer", () -> 123)
-                .setGenerator("innerDto.string", () -> "fff")
-                .setGenerator("innerDto.aLong", () -> 4L)
-                .setGenerator("innerDto.aDouble", () -> 5D)
-                .setGenerator("innerDto.localDateTime", () -> LocalDateTime.now().minusDays(1))
-                .setGenerator("innerDto.clientType", () -> ORG)
-                .setGenerator("innerDto.listOfDouble", () -> new CopyOnWriteArrayList<>(Arrays.asList(99.99D)))
-                .setGenerator("innerDto.setOfInteger", () -> new LinkedHashSet<>(Arrays.asList(12345)))
-                .setGenerator("innerDto.linkedListOfEnum", () -> new LinkedList<>(Arrays.asList(ClientType.ORG)));
+                .setGenerator("nestedDto.integer", () -> 123)
+                .setGenerator("nestedDto.string", () -> "fff")
+                .setGenerator("nestedDto.aLong", () -> 4L)
+                .setGenerator("nestedDto.aDouble", () -> 5D)
+                .setGenerator("nestedDto.localDateTime", () -> LocalDateTime.now().minusDays(1))
+                .setGenerator("nestedDto.clientType", () -> ORG)
+                .setGenerator("nestedDto.listOfDouble", () -> new CopyOnWriteArrayList<>(Arrays.asList(99.99D)))
+                .setGenerator("nestedDto.setOfInteger", () -> new LinkedHashSet<>(Arrays.asList(12345)))
+                .setGenerator("nestedDto.linkedListOfEnum", () -> new LinkedList<>(Arrays.asList(ClientType.ORG)));
 
         DtoAllKnownTypes dto = builder.build().generateDto();
 
@@ -92,27 +92,27 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto.getSetOfLong(), equalTo(new HashSet<>(Arrays.asList(2L)))),
                 () -> assertThat(dto.getLinkedListOfEnum(), equalTo(new LinkedList<>(Arrays.asList(ClientType.LEGAL_PERSON)))),
 
-                () -> assertThat(dto.getInnerDto(), notNullValue()),
+                () -> assertThat(dto.getNestedDto(), notNullValue()),
                 () -> assertThat(dto.getStringIntegerMap(), nullValue()),
 
                 () -> assertThat(dto.getCustomInteger(), equalTo(888))
         );
 
         assertAll(
-                () -> assertThat(dto.getInnerDto().getInteger(), equalTo(123)),
-                () -> assertThat(dto.getInnerDto().getString(), equalTo("fff")),
-                () -> assertThat(dto.getInnerDto().getALong(), equalTo(4L)),
-                () -> assertThat(dto.getInnerDto().getADouble(), equalTo(5D)),
-                () -> assertThat(dto.getInnerDto().getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now().minusDays(1))),
-                () -> assertThat(dto.getInnerDto().getClientType(), equalTo(ClientType.ORG)),
+                () -> assertThat(dto.getNestedDto().getInteger(), equalTo(123)),
+                () -> assertThat(dto.getNestedDto().getString(), equalTo("fff")),
+                () -> assertThat(dto.getNestedDto().getALong(), equalTo(4L)),
+                () -> assertThat(dto.getNestedDto().getADouble(), equalTo(5D)),
+                () -> assertThat(dto.getNestedDto().getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now().minusDays(1))),
+                () -> assertThat(dto.getNestedDto().getClientType(), equalTo(ClientType.ORG)),
 
-                () -> assertThat(dto.getInnerDto().getListOfDouble(), equalTo(new CopyOnWriteArrayList<>(Arrays.asList(99.99D)))),
-                () -> assertThat(dto.getInnerDto().getSetOfInteger(), equalTo(new LinkedHashSet<>(Arrays.asList(12345)))),
-                () -> assertThat(dto.getInnerDto().getLinkedListOfEnum(), equalTo(new LinkedList<>(Arrays.asList(ClientType.ORG)))),
+                () -> assertThat(dto.getNestedDto().getListOfDouble(), equalTo(new CopyOnWriteArrayList<>(Arrays.asList(99.99D)))),
+                () -> assertThat(dto.getNestedDto().getSetOfInteger(), equalTo(new LinkedHashSet<>(Arrays.asList(12345)))),
+                () -> assertThat(dto.getNestedDto().getLinkedListOfEnum(), equalTo(new LinkedList<>(Arrays.asList(ClientType.ORG)))),
 
-                () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue()),
+                () -> assertThat(dto.getNestedDto().getStringIntegerMap(), nullValue()),
 
-                () -> assertThat(dto.getInnerDto().getCustomInteger(), equalTo(999))
+                () -> assertThat(dto.getNestedDto().getCustomInteger(), equalTo(999))
         );
 
     }
@@ -225,7 +225,7 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto.getSetOfLong(), equalTo(new HashSet<>(Arrays.asList(3L)))),
                 () -> assertThat(dto.getLinkedListOfEnum(), equalTo(new LinkedList<>(Arrays.asList(ClientType.ORG)))),
 
-                () -> assertThat(dto.getInnerDto(), notNullValue()),
+                () -> assertThat(dto.getNestedDto(), notNullValue()),
                 () -> assertThat(dto.getStringIntegerMap(), nullValue()),
 
                 () -> assertThat(dto.getCustomInteger(), equalTo(888))
@@ -233,20 +233,20 @@ class OverridingOfGeneratorsTests {
         );
 
         assertAll(
-                () -> assertThat(dto.getInnerDto().getString(), equalTo("x")),
-                () -> assertThat(dto.getInnerDto().getInteger(), equalTo(1)),
-                () -> assertThat(dto.getInnerDto().getADouble(), equalTo(2D)),
-                () -> assertThat(dto.getInnerDto().getALong(), equalTo(3L)),
-                () -> assertThat(dto.getInnerDto().getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now().minusDays(1))),
-                () -> assertThat(dto.getInnerDto().getClientType(), equalTo(ClientType.ORG)),
+                () -> assertThat(dto.getNestedDto().getString(), equalTo("x")),
+                () -> assertThat(dto.getNestedDto().getInteger(), equalTo(1)),
+                () -> assertThat(dto.getNestedDto().getADouble(), equalTo(2D)),
+                () -> assertThat(dto.getNestedDto().getALong(), equalTo(3L)),
+                () -> assertThat(dto.getNestedDto().getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now().minusDays(1))),
+                () -> assertThat(dto.getNestedDto().getClientType(), equalTo(ClientType.ORG)),
 
-                () -> assertThat(dto.getInnerDto().getListOfDouble(), equalTo(new LinkedList<>(Arrays.asList(2D)))),
-                () -> assertThat(dto.getInnerDto().getSetOfInteger(), equalTo(new HashSet<>(Arrays.asList(1)))),
-                () -> assertThat(dto.getInnerDto().getLinkedListOfEnum(), equalTo(new LinkedList<>(Arrays.asList(ClientType.ORG)))),
+                () -> assertThat(dto.getNestedDto().getListOfDouble(), equalTo(new LinkedList<>(Arrays.asList(2D)))),
+                () -> assertThat(dto.getNestedDto().getSetOfInteger(), equalTo(new HashSet<>(Arrays.asList(1)))),
+                () -> assertThat(dto.getNestedDto().getLinkedListOfEnum(), equalTo(new LinkedList<>(Arrays.asList(ClientType.ORG)))),
 
-                () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue()),
+                () -> assertThat(dto.getNestedDto().getStringIntegerMap(), nullValue()),
 
-                () -> assertThat(dto.getInnerDto().getCustomInteger(), equalTo(999))
+                () -> assertThat(dto.getNestedDto().getCustomInteger(), equalTo(999))
         );
     }
 
@@ -260,7 +260,7 @@ class OverridingOfGeneratorsTests {
                 .setGenerator(Long.class, () -> 2L)
                 .setGenerator(Double.class, () -> 3D)
                 .setGenerator(LocalDateTime.class, LocalDateTime::now)
-                .setGenerator(Enum.class, () -> ClientType.ORG)
+                .setGenerator(ClientType.class, () -> ClientType.ORG)
                 .setGenerator(LinkedList.class, LinkedList::new)
                 .setGenerator(List.class, LinkedList::new)
                 .setGenerator(Set.class, HashSet::new);
@@ -281,27 +281,27 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto.getSetOfLong(), empty()),
                 () -> assertThat(dto.getLinkedListOfEnum(), empty()),
 
-                () -> assertThat(dto.getInnerDto(), notNullValue()),
+                () -> assertThat(dto.getNestedDto(), notNullValue()),
                 () -> assertThat(dto.getStringIntegerMap(), nullValue()),
 
                 () -> assertThat(dto.getCustomInteger(), equalTo(1))
         );
 
         assertAll(
-                () -> assertThat(dto.getInnerDto().getString(), equalTo("string")),
-                () -> assertThat(dto.getInnerDto().getInteger(), equalTo(1)),
-                () -> assertThat(dto.getInnerDto().getALong(), equalTo(2L)),
-                () -> assertThat(dto.getInnerDto().getADouble(), equalTo(3D)),
-                () -> assertThat(dto.getInnerDto().getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now())),
-                () -> assertThat(dto.getInnerDto().getClientType(), equalTo(ClientType.ORG)),
+                () -> assertThat(dto.getNestedDto().getString(), equalTo("string")),
+                () -> assertThat(dto.getNestedDto().getInteger(), equalTo(1)),
+                () -> assertThat(dto.getNestedDto().getALong(), equalTo(2L)),
+                () -> assertThat(dto.getNestedDto().getADouble(), equalTo(3D)),
+                () -> assertThat(dto.getNestedDto().getLocalDateTimeAsIs().toLocalDate(), equalTo(LocalDate.now())),
+                () -> assertThat(dto.getNestedDto().getClientType(), equalTo(ClientType.ORG)),
 
-                () -> assertThat(dto.getInnerDto().getListOfDouble(), empty()),
-                () -> assertThat(dto.getInnerDto().getSetOfInteger(), empty()),
-                () -> assertThat(dto.getInnerDto().getLinkedListOfEnum(), empty()),
+                () -> assertThat(dto.getNestedDto().getListOfDouble(), empty()),
+                () -> assertThat(dto.getNestedDto().getSetOfInteger(), empty()),
+                () -> assertThat(dto.getNestedDto().getLinkedListOfEnum(), empty()),
 
-                () -> assertThat(dto.getInnerDto().getStringIntegerMap(), nullValue()),
+                () -> assertThat(dto.getNestedDto().getStringIntegerMap(), nullValue()),
 
-                () -> assertThat(dto.getInnerDto().getCustomInteger(), equalTo(1))
+                () -> assertThat(dto.getNestedDto().getCustomInteger(), equalTo(1))
         );
     }
 
@@ -310,7 +310,7 @@ class OverridingOfGeneratorsTests {
         @StringRule
         String stringWithEmptyRule;
 
-        @StringRule(minLength = 3, maxLength = 3, ruleRemark = MIN_VALUE)
+        @StringRule(minLength = 3, maxLength = 3, boundary = MIN_VALUE)
         String stringWithFullRule;
 
         String stringWithoutRule;
@@ -525,7 +525,6 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto_4.getADouble(), equalTo(0D))
 
         );
-
     }
 
 }

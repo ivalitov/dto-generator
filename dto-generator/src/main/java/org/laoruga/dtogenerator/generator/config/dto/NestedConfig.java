@@ -2,8 +2,8 @@ package org.laoruga.dtogenerator.generator.config.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.DtoGeneratorBuildersTree;
+import org.laoruga.dtogenerator.api.RuleRemark;
 
 /**
  * @author Il'dar Valitov
@@ -13,24 +13,24 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 @Getter
 public class NestedConfig implements ConfigDto {
 
-    private DtoGeneratorBuilder<?> dtoGeneratorBuilder;
-    private IRuleRemark ruleRemark;
+    private DtoGeneratorBuildersTree.Node dtoGeneratorBuilderTreeNode;
+    private RuleRemark ruleRemark;
 
     @Override
     public void merge(ConfigDto from) {
         NestedConfig nestedConfigFrom = (NestedConfig) from;
-        if (nestedConfigFrom.dtoGeneratorBuilder != null) dtoGeneratorBuilder = nestedConfigFrom.dtoGeneratorBuilder;
+        if (nestedConfigFrom.dtoGeneratorBuilderTreeNode != null) dtoGeneratorBuilderTreeNode = nestedConfigFrom.dtoGeneratorBuilderTreeNode;
         if (nestedConfigFrom.ruleRemark != null) ruleRemark = nestedConfigFrom.ruleRemark;
     }
 
     @Override
-    public ConfigDto setRuleRemark(IRuleRemark ruleRemark) {
+    public ConfigDto setRuleRemark(RuleRemark ruleRemark) {
         this.ruleRemark = ruleRemark;
         return this;
     }
 
     @Override
-    public IRuleRemark getRuleRemark() {
+    public RuleRemark getRuleRemark() {
         return ruleRemark;
     }
 }

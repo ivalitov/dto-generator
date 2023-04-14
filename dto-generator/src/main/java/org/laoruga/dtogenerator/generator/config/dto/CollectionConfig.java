@@ -2,8 +2,8 @@ package org.laoruga.dtogenerator.generator.config.dto;
 
 import lombok.*;
 import lombok.experimental.Accessors;
+import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.generators.Generator;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.util.ReflectionUtils;
 import org.laoruga.dtogenerator.util.dummy.DummyCollectionClass;
@@ -25,7 +25,7 @@ public class CollectionConfig implements ConfigDto {
     private Integer maxSize;
     private Supplier<?> collectionInstanceSupplier;
     private Generator<?> elementGenerator;
-    private IRuleRemark ruleRemark;
+    private RuleRemark ruleRemark;
 
     public CollectionConfig(CollectionRule rule) {
         this.minSize = rule.minSize();
@@ -33,7 +33,7 @@ public class CollectionConfig implements ConfigDto {
         this.collectionInstanceSupplier = rule.collectionClass() != DummyCollectionClass.class
                 ? () -> ReflectionUtils.createInstance(rule.collectionClass())
                 : null;
-        this.ruleRemark = rule.ruleRemark();
+        this.ruleRemark = rule.boundary();
     }
 
     public void merge(CollectionConfig from) {

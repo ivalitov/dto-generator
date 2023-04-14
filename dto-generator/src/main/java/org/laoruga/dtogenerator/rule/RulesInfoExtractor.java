@@ -164,9 +164,9 @@ public class RulesInfoExtractor {
                 .build();
     }
 
-    private RuleInfoCollection buildCollectionRuleInfo(CollectionRule collectionRule,
-                                                       String groupName,
-                                                       boolean isMultipleRules) {
+    private RuleInfoList buildCollectionRuleInfo(CollectionRule collectionRule,
+                                                 String groupName,
+                                                 boolean isMultipleRules) {
 
         Class<?> elementType = ReflectionUtils.getSingleGenericType(field);
         Annotation elementRule = ReflectionUtils.getSingleRuleFromEntry(collectionRule.element(), elementType);
@@ -183,7 +183,7 @@ public class RulesInfoExtractor {
                 .group(groupName)
                 .build();
 
-        return RuleInfoCollection.builder()
+        return RuleInfoList.builder()
                 .collectionRuleInfo(collectionInfo)
                 .elementRuleInfo(collectionElementInfo)
                 .field(field)
@@ -210,7 +210,7 @@ public class RulesInfoExtractor {
                 .group(groupName)
                 .build();
 
-        return RuleInfoCollection.builder()
+        return RuleInfoList.builder()
                 .collectionRuleInfo(arrayInfo)
                 .elementRuleInfo(arrayElementInfo)
                 .field(field)

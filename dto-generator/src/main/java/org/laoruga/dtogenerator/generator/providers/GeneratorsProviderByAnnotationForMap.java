@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.generator.config.GeneratorConfiguratorForMap;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
+import org.laoruga.dtogenerator.generator.providers.suppliers.UserGeneratorSuppliers;
 import org.laoruga.dtogenerator.rule.RuleInfo;
 import org.laoruga.dtogenerator.rule.RuleInfoMap;
 
@@ -24,11 +25,15 @@ public class GeneratorsProviderByAnnotationForMap {
 
     private final GeneratorsProviderByAnnotation generatorsProvider;
     private final GeneratorConfiguratorForMap configuratorForMap;
+    private final UserGeneratorSuppliers userGeneratorSuppliers;
+
 
     public GeneratorsProviderByAnnotationForMap(GeneratorsProviderByAnnotation generatorsProvider,
-                                                GeneratorConfiguratorForMap configuratorForMap) {
+                                                GeneratorConfiguratorForMap configuratorForMap,
+                                                UserGeneratorSuppliers userGeneratorSuppliers) {
         this.generatorsProvider = generatorsProvider;
         this.configuratorForMap = configuratorForMap;
+        this.userGeneratorSuppliers = userGeneratorSuppliers;
     }
 
     Generator<?> getGenerator(RuleInfoMap mapRruleInfo) {
@@ -39,13 +44,18 @@ public class GeneratorsProviderByAnnotationForMap {
 
         // Map generator builder
 
-        Optional<Function<ConfigDto, Generator<?>>> maybeUsersMapGenBuilder =
-                generatorsProvider.getUserGeneratorSupplier(fieldType);
+        Optional<Generator<?>> maybeUserGenerator =
+                userGeneratorSuppliers.getGenerator(fieldType);
 
-        if (maybeUsersMapGenBuilder.isPresent()) {
-            // user generators are not configurable yet
-            return maybeUsersMapGenBuilder.get().apply(null);
+        if (maybeUserGenerator.isPresent()) {
+            return maybeUserGenerator.get();
         }
+
+        Function<ConfigDto, Generator<?>> mapGenBuilder =
+                generatorsProvider.getDefaultGeneratorSupplier(
+                        mapRruleInfo.getRule(),
+                        fieldType
+                );
 
         // Map key generator builder
 
@@ -60,12 +70,6 @@ public class GeneratorsProviderByAnnotationForMap {
         Generator<?> valueGenerator = mapRruleInfo.isValueRulesExist() ?
                 generatorsProvider.getGenerator(valueRule) :
                 generatorsProvider.getGeneratorByType(field, valueRule.getRequiredType());
-
-        Function<ConfigDto, Generator<?>> mapGenBuilder =
-                generatorsProvider.getDefaultGeneratorSupplier(
-                        mapRruleInfo.getRule(),
-                        fieldType
-                );
 
         ConfigDto configDto = configuratorForMap.createGeneratorConfig(
                 mapRruleInfo,

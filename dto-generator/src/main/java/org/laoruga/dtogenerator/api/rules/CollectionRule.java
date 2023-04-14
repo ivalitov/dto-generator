@@ -1,8 +1,8 @@
 package org.laoruga.dtogenerator.api.rules;
 
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
+import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.constants.Group;
-import org.laoruga.dtogenerator.constants.RuleRemark;
 import org.laoruga.dtogenerator.constants.RuleType;
 import org.laoruga.dtogenerator.util.dummy.DummyCollectionClass;
 
@@ -30,7 +30,7 @@ public @interface CollectionRule {
 
     int minSize() default 1;
 
-    RuleRemark ruleRemark() default RuleRemark.RANDOM_VALUE;
+    Boundary boundary() default Boundary.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 

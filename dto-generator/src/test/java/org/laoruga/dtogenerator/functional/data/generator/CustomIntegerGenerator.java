@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.functional.data.customgenerator;
+package org.laoruga.dtogenerator.functional.data.generator;
 
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
 

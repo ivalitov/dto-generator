@@ -262,7 +262,7 @@ public final class ReflectionUtils {
         try {
             return from.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
-            throw new DtoGeneratorException("Field not found.", e);
+            throw new DtoGeneratorException("Field '" + fieldName + "' not found in the class: '" + from.getName() + "'", e);
         }
     }
 
@@ -272,6 +272,10 @@ public final class ReflectionUtils {
             return initialType;
         }
 
-        return getFieldType(fields, initialIdx + 1, ReflectionUtils.getField(initialType, fields[initialIdx]).getType());
+        return getFieldType(
+                fields,
+                initialIdx + 1,
+                ReflectionUtils.getField(initialType, fields[initialIdx]).getType()
+        );
     }
 }

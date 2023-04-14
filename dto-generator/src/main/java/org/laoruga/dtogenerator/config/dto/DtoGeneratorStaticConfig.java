@@ -23,7 +23,8 @@ public final class DtoGeneratorStaticConfig {
         INSTANCE = new ConfigurationHolder(
                 new DtoGeneratorFileConfig("dtogenerator.properties"),
                 new TypeGeneratorsConfigLazy(),
-                new TypeGeneratorsConfigForFiled()
+                new TypeGeneratorsConfigForFiled(),
+                null
         );
     }
 

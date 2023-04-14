@@ -1,4 +1,4 @@
-package org.laoruga.dtogenerator.functional.util;
+package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Epic;
 import lombok.Getter;
@@ -73,8 +73,8 @@ class DtoInheritanceTests {
     void dtoWithInheritance() {
 
         Dto dto = DtoGenerator.builder(Dto.class)
-                .setTypeGeneratorConfig("stringAbstract", StringConfig.builder().words(new String[]{"stringAbstract_2"}).build())
-                .setTypeGeneratorConfig("dtoNested.stringNested", StringConfig.builder().words(new String[]{"stringNested_2"}).build())
+                .setGeneratorConfig("stringAbstract", StringConfig.builder().words(new String[]{"stringAbstract_2"}).build())
+                .setGeneratorConfig("dtoNested.stringNested", StringConfig.builder().words(new String[]{"stringNested_2"}).build())
                 .build().generateDto();
         assertAll(
                 () -> assertThat(dto.getString(), equalTo("string")),

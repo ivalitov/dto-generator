@@ -18,7 +18,7 @@ import java.util.Objects;
 @Setter(AccessLevel.PACKAGE)
 @Getter
 @Builder
-public class RuleInfoCollection implements RuleInfo {
+public class RuleInfoList implements RuleInfo {
     private RuleInfoSimple collectionRuleInfo;
     private RuleInfoSimple elementRuleInfo;
     private Field field;

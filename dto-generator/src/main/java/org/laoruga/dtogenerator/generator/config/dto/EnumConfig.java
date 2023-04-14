@@ -2,7 +2,7 @@ package org.laoruga.dtogenerator.generator.config.dto;
 
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.rules.EnumRule;
 
 /**
@@ -18,11 +18,11 @@ import org.laoruga.dtogenerator.api.rules.EnumRule;
 public class EnumConfig implements ConfigDto {
     private String[] possibleEnumNames;
     private Class<? extends Enum<?>> enumClass;
-    private IRuleRemark ruleRemark;
+    private RuleRemark ruleRemark;
 
     public EnumConfig(EnumRule enumRule) {
         possibleEnumNames = enumRule.possibleEnumNames();
-        ruleRemark = enumRule.ruleRemark();
+        ruleRemark = enumRule.boundary();
     }
 
     public void merge(ConfigDto from) {

@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.RemarksHolder;
+import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.generators.Generator;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
@@ -19,8 +19,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static org.laoruga.dtogenerator.constants.RuleRemark.MIN_VALUE;
-import static org.laoruga.dtogenerator.constants.RuleRemark.NULL_VALUE;
+import static org.laoruga.dtogenerator.constants.Boundary.MIN_VALUE;
+import static org.laoruga.dtogenerator.constants.Boundary.NULL_VALUE;
 import static org.laoruga.dtogenerator.constants.RulesInstance.NUMBER_RULE_ZEROS;
 import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 
@@ -31,57 +31,24 @@ import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 @Slf4j
 public class GeneratorConfigurator {
 
-    @Getter(AccessLevel.PROTECTED)
-    private final ConfigurationHolder configuration;
     @Getter(AccessLevel.PUBLIC)
-    private final RemarksHolder remarksHolder;
+    private final ConfigurationHolder configuration;
+
+    @Getter(AccessLevel.PUBLIC)
+    RemarksHolder remarksHolder;
 
     public static final Consumer<ConfigDto> EMPTY_SPECIFIC_CONFIG = configDto -> {
         log.debug("Specific config is absent.");
     };
 
-    protected GeneratorConfigurator(ConfigurationHolder configuration, RemarksHolder remarksHolder) {
+    protected GeneratorConfigurator(ConfigurationHolder configuration,
+                                    RemarksHolder remarksHolder) {
         this.configuration = configuration;
         this.remarksHolder = remarksHolder;
     }
 
-    @SuppressWarnings("unchecked")
-    static Consumer<ConfigDto> integerGeneratorSpecificConfig(Class<?> fieldType,
-                                                              String fieldName) {
-        return (config) -> {
-            if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
-                reportPrimitiveCannotBeNull(fieldName);
-                config.merge(new NumberConfig(NUMBER_RULE_ZEROS, (Class<? extends Number>) fieldType)
-                        .setRuleRemark(MIN_VALUE));
-            }
-        };
-    }
-
-    static Consumer<ConfigDto> decimalGeneratorSpecificConfig(Class<?> fieldType,
-                                                              String fieldName) {
-        return (config) -> {
-            if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
-                reportPrimitiveCannotBeNull(fieldName);
-                ((DecimalConfig) config)
-                        .setMinValue(0D)
-                        .setMaxValue(0D)
-                        .setRuleRemark(MIN_VALUE);
-            }
-        };
-    }
-
-    static Consumer<ConfigDto> booleanGeneratorSpecificConfig(Class<?> fieldType,
-                                                              String fieldName) {
-        return config -> {
-            if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
-                reportPrimitiveCannotBeNull(fieldName);
-                ((BooleanConfig) config).setTrueProbability(0D).setRuleRemark(MIN_VALUE);
-            }
-        };
-    }
-
-    public IRuleRemark getRuleRemarkOrNull(String fieldName) {
-        return remarksHolder.getBasicRemarks().getBasicRuleRemarkOrNull(fieldName);
+    public RuleRemark getRuleRemarkOrNull(String fieldName) {
+        return remarksHolder.getRuleRemarkOrNull(fieldName);
     }
 
     protected ConfigDto mergeGeneratorConfigurations(Supplier<ConfigDto> newConfigInstanceSupplier,
@@ -203,6 +170,42 @@ public class GeneratorConfigurator {
             }
             if (mapConfig.getValueGenerator() == null) {
                 mapConfig.setValueGenerator((Generator<Object>) valueGenerator);
+            }
+        };
+    }
+
+
+    @SuppressWarnings("unchecked")
+    static Consumer<ConfigDto> integerGeneratorSpecificConfig(Class<?> fieldType,
+                                                              String fieldName) {
+        return (config) -> {
+            if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
+                reportPrimitiveCannotBeNull(fieldName);
+                config.merge(new NumberConfig(NUMBER_RULE_ZEROS, (Class<? extends Number>) fieldType)
+                        .setRuleRemark(MIN_VALUE));
+            }
+        };
+    }
+
+    static Consumer<ConfigDto> decimalGeneratorSpecificConfig(Class<?> fieldType,
+                                                              String fieldName) {
+        return (config) -> {
+            if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
+                reportPrimitiveCannotBeNull(fieldName);
+                ((DecimalConfig) config)
+                        .setMinValue(0D)
+                        .setMaxValue(0D)
+                        .setRuleRemark(MIN_VALUE);
+            }
+        };
+    }
+
+    static Consumer<ConfigDto> booleanGeneratorSpecificConfig(Class<?> fieldType,
+                                                              String fieldName) {
+        return config -> {
+            if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
+                reportPrimitiveCannotBeNull(fieldName);
+                ((BooleanConfig) config).setTrueProbability(0D).setRuleRemark(MIN_VALUE);
             }
         };
     }

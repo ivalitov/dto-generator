@@ -113,6 +113,7 @@ class AllKnownTypesGeneratingTests {
                 () -> assertThat(dto.listOfString.size(), equalTo(1)),
                 () -> assertThat(dto.setOfLong.size(), equalTo(1)),
                 () -> assertThat(dto.aDouble, notNullValue()),
+                () -> assertThat(dto.aBoolean, notNullValue()),
                 () -> assertThat(dto.date, nullValue())
         );
 
@@ -136,6 +137,7 @@ class AllKnownTypesGeneratingTests {
                 () -> assertThat(innerDto.listOfString.size(), equalTo(1)),
                 () -> assertThat(innerDto.setOfLong.size(), equalTo(1)),
                 () -> assertThat(innerDto.aDouble, notNullValue()),
+                () -> assertThat(innerDto.aBoolean, notNullValue()),
                 () -> assertThat(innerDto.date, nullValue())
 
         );

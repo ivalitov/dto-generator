@@ -20,7 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.laoruga.dtogenerator.Constants.RESTORE_STATIC_CONFIG;
-import static org.laoruga.dtogenerator.constants.RuleRemark.*;
+import static org.laoruga.dtogenerator.constants.Boundary.*;
 
 /**
  * @author Il'dar Valitov
@@ -171,27 +171,27 @@ public class NumberTests {
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
         builder
-                .setTypeGeneratorConfig("intObject",
+                .setGeneratorConfig("intObject",
                         NumberConfig.builder().minValue(1).maxValue(101).ruleRemark(MAX_VALUE).build())
-                .setTypeGeneratorConfig("intPrimitive",
+                .setGeneratorConfig("intPrimitive",
                         NumberConfig.builder().minValue(-1).maxValue(-1).ruleRemark(RANDOM_VALUE).build())
-                .setTypeGeneratorConfig("longObject",
+                .setGeneratorConfig("longObject",
                         NumberConfig.builder().minValue(11_999_999_999L).maxValue(111_999_999_999L).ruleRemark(MAX_VALUE).build())
-                .setTypeGeneratorConfig("longPrimitive",
+                .setGeneratorConfig("longPrimitive",
                         NumberConfig.builder().minValue(0L).maxValue(0L).ruleRemark(RANDOM_VALUE).build())
-                .setTypeGeneratorConfig("shortObject",
+                .setGeneratorConfig("shortObject",
                         NumberConfig.builder().minValue((short) 111).maxValue(new Short("111")).ruleRemark(RANDOM_VALUE).build())
-                .setTypeGeneratorConfig("shortPrimitive",
+                .setGeneratorConfig("shortPrimitive",
                         NumberConfig.builder().minValue(new Short("0")).maxValue((short) 0).ruleRemark(MIN_VALUE).build())
-                .setTypeGeneratorConfig("byteObject",
+                .setGeneratorConfig("byteObject",
                         NumberConfig.builder().minValue(new Byte("-12")).maxValue((byte) -11).ruleRemark(MIN_VALUE).build())
-                .setTypeGeneratorConfig("bytePrimitive",
+                .setGeneratorConfig("bytePrimitive",
                         NumberConfig.builder().minValue((byte) 11).maxValue(new Byte("12")).ruleRemark(MAX_VALUE).build())
-                .setTypeGeneratorConfig("atomicInteger",
+                .setGeneratorConfig("atomicInteger",
                         NumberConfig.builder().minValue(2).maxValue(new Integer("2")).ruleRemark(RANDOM_VALUE).build())
-                .setTypeGeneratorConfig("atomicLong",
+                .setGeneratorConfig("atomicLong",
                         NumberConfig.builder().minValue(3L).maxValue(new Long("3")).ruleRemark(RANDOM_VALUE).build())
-                .setTypeGeneratorConfig("bigInteger",
+                .setGeneratorConfig("bigInteger",
                         NumberConfig.builder().minValue(new BigInteger("0")).maxValue(new BigInteger("0")).ruleRemark(MIN_VALUE).build());
 
 
@@ -233,12 +233,12 @@ public class NumberTests {
         numberConfigInstance.setMaxShortValue((short) 222);
 
         // field
-        builder.setTypeGeneratorConfig("intObject", NumberConfig.builder().ruleRemark(MIN_VALUE).build());
-        builder.setTypeGeneratorConfig("intPrimitive", NumberConfig.builder().ruleRemark(MAX_VALUE).build());
-        builder.setTypeGeneratorConfig("longObject", NumberConfig.builder().ruleRemark(MAX_VALUE).build());
-        builder.setTypeGeneratorConfig("longPrimitive", NumberConfig.builder().ruleRemark(MIN_VALUE).build());
-        builder.setTypeGeneratorConfig("shortObject", NumberConfig.builder().ruleRemark(MAX_VALUE).build());
-        builder.setTypeGeneratorConfig("shortPrimitive", NumberConfig.builder().minValue((short) -100).build());
+        builder.setGeneratorConfig("intObject", NumberConfig.builder().ruleRemark(MIN_VALUE).build());
+        builder.setGeneratorConfig("intPrimitive", NumberConfig.builder().ruleRemark(MAX_VALUE).build());
+        builder.setGeneratorConfig("longObject", NumberConfig.builder().ruleRemark(MAX_VALUE).build());
+        builder.setGeneratorConfig("longPrimitive", NumberConfig.builder().ruleRemark(MIN_VALUE).build());
+        builder.setGeneratorConfig("shortObject", NumberConfig.builder().ruleRemark(MAX_VALUE).build());
+        builder.setGeneratorConfig("shortPrimitive", NumberConfig.builder().minValue((short) -100).build());
 
         Dto dto = builder.build().generateDto();
 
@@ -422,11 +422,11 @@ public class NumberTests {
                 .setMinBigIntValue("5");
 
         // next lines override parts of previous configs
-        builder.setTypeGeneratorConfig("intPrimitive", NumberConfig.builder().minValue(-1).build())
-                .setTypeGeneratorConfig("longObject", NumberConfig.builder().ruleRemark(MAX_VALUE).build())
-                .setTypeGeneratorConfig("shortPrimitive", NumberConfig.builder().minValue((short) -3).build())
-                .setTypeGeneratorConfig("byteObject", NumberConfig.builder().minValue(new Byte("-4")).build())
-                .setTypeGeneratorConfig("bigInteger", NumberConfig.builder().minValue(new BigInteger("-5")).build());
+        builder.setGeneratorConfig("intPrimitive", NumberConfig.builder().minValue(-1).build())
+                .setGeneratorConfig("longObject", NumberConfig.builder().ruleRemark(MAX_VALUE).build())
+                .setGeneratorConfig("shortPrimitive", NumberConfig.builder().minValue((short) -3).build())
+                .setGeneratorConfig("byteObject", NumberConfig.builder().minValue(new Byte("-4")).build())
+                .setGeneratorConfig("bigInteger", NumberConfig.builder().minValue(new BigInteger("-5")).build());
 
         Dto_2 dto = builder.build().generateDto();
 

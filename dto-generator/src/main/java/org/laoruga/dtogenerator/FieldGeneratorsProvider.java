@@ -5,11 +5,12 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.Generator;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.generator.providers.GeneratorProvidersMediator;
-import org.laoruga.dtogenerator.generator.providers.suppliers.GeneratorSuppliers;
+import org.laoruga.dtogenerator.generator.providers.suppliers.UserGeneratorSuppliers;
 import org.laoruga.dtogenerator.rule.RuleInfo;
 import org.laoruga.dtogenerator.rule.RulesInfoExtractor;
 
@@ -18,8 +19,6 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import static org.laoruga.dtogenerator.DtoGeneratorBuildersTree.ROOT;
 
 /**
  * @author Il'dar Valitov
@@ -31,31 +30,37 @@ import static org.laoruga.dtogenerator.DtoGeneratorBuildersTree.ROOT;
 public class FieldGeneratorsProvider {
 
     private final ConfigurationHolder configuration;
+    @Getter(AccessLevel.PUBLIC)
     private final Supplier<?> dtoInstanceSupplier;
     private final String[] pathFromDtoRoot;
     private final Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree;
-    private final GeneratorSuppliers userGenBuildersMapping;
+    private final UserGeneratorSuppliers userGeneratorSuppliers;
     private final RulesInfoExtractor rulesInfoExtractor;
     private final GeneratorProvidersMediator generatorProvidersMediator;
+    private final RemarksHolder remarksHolder;
+    private final CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder;
 
     FieldGeneratorsProvider(ConfigurationHolder configuration,
-                            RemarksHolder remarksProvider,
+                            RemarksHolder remarksHolder,
+                            CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder,
                             FieldFilter fieldsFilter,
                             String[] pathFromDtoRoot,
                             Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree,
                             Supplier<?> dtoInstanceSupplier) {
         this.configuration = configuration;
-        this.userGenBuildersMapping = new GeneratorSuppliers();
+        this.userGeneratorSuppliers = new UserGeneratorSuppliers();
         this.pathFromDtoRoot = pathFromDtoRoot;
         this.rulesInfoExtractor = new RulesInfoExtractor(fieldsFilter);
         this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
         this.generatorProvidersMediator = new GeneratorProvidersMediator(
                 configuration,
-                userGenBuildersMapping,
-                remarksProvider,
-                dtoInstanceSupplier,
-                nestedDtoGeneratorBuilderSupplier());
+                userGeneratorSuppliers,
+                remarksHolder,
+                nestedDtoGeneratorBuilderSupplier()
+        );
         this.dtoInstanceSupplier = dtoInstanceSupplier;
+        this.remarksHolder = remarksHolder;
+        this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
     }
 
     /**
@@ -63,25 +68,24 @@ public class FieldGeneratorsProvider {
      */
     FieldGeneratorsProvider(FieldGeneratorsProvider copyFrom,
                             RemarksHolder remarksHolder,
+                            CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder,
                             String[] pathFromDtoRoot,
                             Supplier<?> dtoInstanceSupplier,
                             ConfigurationHolder configurationCopy) {
         this.configuration = configurationCopy;
-        this.userGenBuildersMapping = copyFrom.getUserGenBuildersMapping();
+        this.userGeneratorSuppliers = copyFrom.getUserGeneratorSuppliers();
         this.pathFromDtoRoot = pathFromDtoRoot;
         this.rulesInfoExtractor = copyFrom.getRulesInfoExtractor();
         this.dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
         this.dtoInstanceSupplier = dtoInstanceSupplier;
-        Supplier<?> rootDtoInstanceSupplier = dtoGeneratorBuildersTree.get()
-                .getBuilderLazy(ROOT)
-                .getFieldGeneratorsProvider()
-                .getDtoInstanceSupplier();
         this.generatorProvidersMediator = new GeneratorProvidersMediator(
                 configurationCopy,
-                copyFrom.getUserGenBuildersMapping(),
+                userGeneratorSuppliers,
                 remarksHolder,
-                rootDtoInstanceSupplier,
-                nestedDtoGeneratorBuilderSupplier());
+                nestedDtoGeneratorBuilderSupplier()
+        );
+        this.remarksHolder = remarksHolder;
+        this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
     }
 
     /**
@@ -94,13 +98,29 @@ public class FieldGeneratorsProvider {
      * - no explicit generators attached for the field
      * else generator instance
      */
+    @SuppressWarnings("unchecked")
     Optional<Generator<?>> getGenerator(Field field) {
 
-        // generator was set explicitly
-        if (generatorProvidersMediator.isGeneratorOverridden(field.getName())) {
-            return Optional.of(
-                    generatorProvidersMediator.getGeneratorOverriddenForField(field)
-            );
+        Optional<Generator<?>> maybeGeneratorForField =
+                generatorProvidersMediator.getGeneratorOverriddenForField(field);
+
+        // generator set explicitly
+        if (maybeGeneratorForField.isPresent()) {
+
+            Generator<?> generatorForField = maybeGeneratorForField.get();
+
+            if (generatorForField instanceof CustomGenerator) {
+                configuration
+                        .getCustomGeneratorsConfigurators()
+                        .getBuilder(
+                                field.getName(),
+                                (Class<? extends CustomGenerator<?>>) generatorForField.getClass()
+                        )
+                        .build()
+                        .configure((CustomGenerator<?>) generatorForField);
+            }
+
+            return Optional.of(generatorForField);
         }
 
         Optional<RuleInfo> maybeRulesInfo = getRuleInfo(field);
@@ -112,7 +132,7 @@ public class FieldGeneratorsProvider {
             );
         }
 
-        // attempt to generate value by field type
+        // attempt to generate value using field type
         if (getConfiguration().getDtoGeneratorConfig().getGenerateAllKnownTypes()) {
             return generatorProvidersMediator.getGeneratorByType(field, field.getType());
         }
@@ -120,26 +140,26 @@ public class FieldGeneratorsProvider {
         return Optional.empty();
     }
 
-    void setGeneratorBuilderForField(String fieldName, Generator<?> generator, String... args) throws DtoGeneratorException {
-        generatorProvidersMediator.setGeneratorForField(fieldName, generator, args);
+    void setGeneratorBuilderForField(String fieldName, Generator<?> generator) throws DtoGeneratorException {
+        generatorProvidersMediator.setGeneratorForField(fieldName, generator);
     }
 
-    void setGenerator(Class<?> generatedType, @NonNull Generator<?> generator, String[] args) {
-        userGenBuildersMapping.addSuppliersInfo(generatedType, generator, args);
+    void setGenerator(Class<?> generatedType, @NonNull Generator<?> generator) {
+        generatorProvidersMediator.setGeneratorByType(generatedType, generator);
     }
 
     void addGroups(String[] groups) {
         rulesInfoExtractor.getFieldsGroupFilter().includeGroups(groups);
     }
 
-    private Function<String, DtoGeneratorBuilder<?>> nestedDtoGeneratorBuilderSupplier() {
+    private Function<String, DtoGeneratorBuildersTree.Node> nestedDtoGeneratorBuilderSupplier() {
         return fieldName -> {
             String[] pathToNestedDtoField =
                     Arrays.copyOf(pathFromDtoRoot, pathFromDtoRoot.length + 1);
 
             pathToNestedDtoField[pathFromDtoRoot.length] = fieldName;
 
-            return dtoGeneratorBuildersTree.get().getBuilderLazy(pathToNestedDtoField);
+            return dtoGeneratorBuildersTree.get().getNodeLazy(pathToNestedDtoField);
         };
     }
 

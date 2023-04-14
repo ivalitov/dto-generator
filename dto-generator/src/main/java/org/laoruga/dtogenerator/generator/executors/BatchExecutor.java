@@ -2,16 +2,16 @@ package org.laoruga.dtogenerator.generator.executors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.ErrorsHolder;
+import org.laoruga.dtogenerator.FieldGenerators;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
 /**
  * Thread safe batch generators executor.
@@ -22,14 +22,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BatchExecutor {
 
-    private final Map<Field, Generator<?>> fieldGeneratorMap;
-    private final ThreadLocal<Map<Field, Generator<?>>> generatorsNotExecutedDueToError;
+    private final FieldGenerators fieldGenerators;
+    private final ThreadLocal<FieldGenerators> generatorsNotExecutedDueToError;
     private final AbstractExecutor executorsChain;
     private final ErrorsHolder errorsHolder;
     private int maxAttempts;
 
-    public BatchExecutor(AbstractExecutor executorsChain, Map<Field, Generator<?>> generatorMap) {
-        this.fieldGeneratorMap = generatorMap;
+    public BatchExecutor(AbstractExecutor executorsChain, FieldGenerators fieldGenerators) {
+        this.fieldGenerators = fieldGenerators;
         this.generatorsNotExecutedDueToError = new ThreadLocal<>();
         this.executorsChain = executorsChain;
         this.errorsHolder = new ErrorsHolder();
@@ -42,15 +42,15 @@ public class BatchExecutor {
                     .getDtoGeneratorConfig()
                     .getMaxDependentGenerationCycles();
 
-            boolean success = fieldGeneratorMap.isEmpty();
+            boolean success = fieldGenerators.isEmpty();
 
             AtomicInteger attempt = new AtomicInteger(1);
 
             while (!success && maxAttempts > attempt.get()) {
 
-                Map<Field, Generator<?>> failedGeneratorsMap = generatorsNotExecutedDueToError.get();
+                FieldGenerators failedGenerators = generatorsNotExecutedDueToError.get();
 
-                if (failedGeneratorsMap == null || failedGeneratorsMap.isEmpty()) {
+                if (failedGenerators == null || failedGenerators.isEmpty()) {
                     success = executeEachGenerator(attempt);
                 } else {
                     success = executeEachRemainingGenerator(attempt);
@@ -67,32 +67,52 @@ public class BatchExecutor {
         } finally {
             generatorsNotExecutedDueToError.remove();
         }
+
     }
 
     private boolean executeEachGenerator(AtomicInteger attempt) {
 
         boolean allGeneratorExecutedSuccessfully = true;
 
-        Iterator<Map.Entry<Field, Generator<?>>> generatorsIterator = fieldGeneratorMap.entrySet().iterator();
+        if (fieldGenerators.isNestedFieldsExist()) {
+            executeNestedDtoGenerators();
+        }
 
-        while (generatorsIterator.hasNext() && maxAttempts >= attempt.get()) {
-            Map.Entry<Field, Generator<?>> nextGenerator = generatorsIterator.next();
+        Iterator<Map.Entry<Supplier<?>, FieldGenerators.GeneratorEntry>> filedGeneratorsIterator =
+                fieldGenerators.getFieldGeneratorsMap().entrySet().iterator();
 
-            Field field = nextGenerator.getKey();
-            Generator<?> generator = nextGenerator.getValue();
+        while (filedGeneratorsIterator.hasNext() && maxAttempts >= attempt.get()) {
 
-            boolean generatorExecutedSuccessfully = false;
-            try {
-                generatorExecutedSuccessfully = executorsChain.execute(field, generator);
-            } catch (Exception e) {
-                errorsHolder.put(field, e);
-            } finally {
-                if (!generatorExecutedSuccessfully) {
-                    allGeneratorExecutedSuccessfully = false;
-                    attempt.incrementAndGet();
-                    addGeneratorToReExecution(field, generator);
+            Map.Entry<Supplier<?>, FieldGenerators.GeneratorEntry> nextGenerator = filedGeneratorsIterator.next();
+
+            Iterator<Map.Entry<Field, Generator<?>>> fieldGeneratorsIterator = nextGenerator.getValue()
+                    .getFieldGeneratorMap().entrySet().iterator();
+
+            Supplier<?> dtoInstanceSupplier = nextGenerator.getKey();
+
+            while (fieldGeneratorsIterator.hasNext() && maxAttempts >= attempt.get()) {
+
+                boolean generatorExecutedSuccessfully = false;
+
+                Map.Entry<Field, Generator<?>> next = fieldGeneratorsIterator.next();
+
+                Field field = next.getKey();
+                Generator<?> generator = next.getValue();
+
+                try {
+                    generatorExecutedSuccessfully = executorsChain.execute(field, generator, dtoInstanceSupplier);
+                } catch (Exception e) {
+                    errorsHolder.put(field, e);
+                } finally {
+                    if (!generatorExecutedSuccessfully) {
+                        allGeneratorExecutedSuccessfully = false;
+                        attempt.incrementAndGet();
+                        addGeneratorToReExecution(field, generator, dtoInstanceSupplier);
+                    }
                 }
+
             }
+
         }
 
         return allGeneratorExecutedSuccessfully;
@@ -100,56 +120,86 @@ public class BatchExecutor {
 
     private boolean executeEachRemainingGenerator(AtomicInteger attempt) {
 
-        Map<Field, Generator<?>> fieldGeneratorMapNotExecutedDueToError = generatorsNotExecutedDueToError.get();
+        FieldGenerators failedGenerators = generatorsNotExecutedDueToError.get();
 
-        Iterator<Map.Entry<Field, Generator<?>>> generatorsIterator =
-                fieldGeneratorMapNotExecutedDueToError.entrySet().iterator();
+        Iterator<Map.Entry<Supplier<?>, FieldGenerators.GeneratorEntry>> generatorsIterator =
+                failedGenerators.getFieldGeneratorsMap().entrySet().iterator();
 
         while (generatorsIterator.hasNext() && maxAttempts >= attempt.get()) {
-            Map.Entry<Field, Generator<?>> nextGenerator = generatorsIterator.next();
+            Map.Entry<Supplier<?>, FieldGenerators.GeneratorEntry> nextGenerator = generatorsIterator.next();
 
-            Field field = nextGenerator.getKey();
-            Generator<?> generator = nextGenerator.getValue();
+            Iterator<Map.Entry<Field, Generator<?>>> fieldGeneratorsIterator = nextGenerator.getValue()
+                    .getFieldGeneratorMap().entrySet().iterator();
 
-            boolean generatorExecutedSuccessfully = false;
-            try {
-                generatorExecutedSuccessfully = executorsChain.execute(field, generator);
-            } catch (Exception e) {
-                errorsHolder.put(field, e);
-            } finally {
+            Supplier<?> dtoInstanceSupplier = nextGenerator.getKey();
 
-                if (generatorExecutedSuccessfully) {
-                    generatorsIterator.remove();
-                } else {
-                    attempt.incrementAndGet();
+            boolean layerGeneratorsExecutedSuccessfully = true;
+
+            while (fieldGeneratorsIterator.hasNext() && maxAttempts >= attempt.get()) {
+
+                boolean generatorExecutedSuccessfully = false;
+
+                Map.Entry<Field, Generator<?>> next = fieldGeneratorsIterator.next();
+
+                Field field = next.getKey();
+                Generator<?> generator = next.getValue();
+
+                try {
+                    generatorExecutedSuccessfully = executorsChain.execute(field, generator, dtoInstanceSupplier);
+                } catch (Exception e) {
+                    errorsHolder.put(field, e);
+                } finally {
+
+                    layerGeneratorsExecutedSuccessfully &= generatorExecutedSuccessfully;
+
+                    if (generatorExecutedSuccessfully) {
+                        fieldGeneratorsIterator.remove();
+                    } else {
+                        attempt.incrementAndGet();
+                    }
+
                 }
 
             }
+
+            if (layerGeneratorsExecutedSuccessfully) {
+                generatorsIterator.remove();
+            }
         }
 
-        return fieldGeneratorMapNotExecutedDueToError.isEmpty();
+        return failedGenerators.isEmpty();
     }
 
-    private void addGeneratorToReExecution(Field field, Generator<?> generator) {
-        Map<Field, Generator<?>> generatorsToReExecution = generatorsNotExecutedDueToError.get();
+    private void executeNestedDtoGenerators() {
+        try {
+            for (FieldGenerators.NestedGeneratorEntry nestedEntry : fieldGenerators.getNestedDtoGenerators()) {
+                executorsChain.execute(
+                        nestedEntry.getField(),
+                        nestedEntry.getNestedDtoGenerator(),
+                        nestedEntry.getDtoInstanceSupplier()
+                );
+            }
+        } catch (Exception e) {
+            throw new DtoGeneratorException("Unexpected error during creating instances of nested DTO.", e);
+        }
+    }
+
+    private void addGeneratorToReExecution(Field field, Generator<?> generator, Supplier<?> dtoInstanceSupplier) {
+        FieldGenerators generatorsToReExecution = generatorsNotExecutedDueToError.get();
         if (generatorsToReExecution == null) {
-            generatorsToReExecution = new HashMap<>();
+            generatorsToReExecution = new FieldGenerators();
             generatorsNotExecutedDueToError.set(generatorsToReExecution);
         }
-        generatorsToReExecution.put(field, generator);
+        generatorsToReExecution.addGenerator(field, generator, dtoInstanceSupplier);
     }
 
 
     private void logErrorInfo() {
-        Map<Field, Generator<?>> fieldIGeneratorMap = generatorsNotExecutedDueToError.get();
-        AtomicInteger counter = new AtomicInteger(0);
-        String leftGenerators = fieldIGeneratorMap.entrySet()
-                .stream()
-                .map((i) -> counter.incrementAndGet() + ". Field: '" + i.getKey() + "', generator: '" + i.getValue() + "'")
-                .collect(Collectors.joining("\n"));
+        log.error("Unsuccessful generation. {} error(s) while generators execution. See problems below:\n{}",
+                errorsHolder.getErrorsNumber(), errorsHolder);
 
-        log.error("Unsuccessful generation. {} error(s) while generators execution. See problems below:\n{}", errorsHolder.getErrorsNumber(), errorsHolder);
+        FieldGenerators fieldIGeneratorMap = generatorsNotExecutedDueToError.get();
 
-        log.error("Unexpected state. There {} unused generator(s) left:\n{}", fieldIGeneratorMap.size(), leftGenerators);
+        log.error("Unexpected state. There {} unused generator(s) left:\n{}", fieldIGeneratorMap.size(), fieldIGeneratorMap);
     }
 }

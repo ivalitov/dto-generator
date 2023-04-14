@@ -14,20 +14,16 @@ import java.util.function.Supplier;
 @Slf4j
 public class ExecutorOfGenerator extends AbstractExecutor {
 
-    private final Supplier<?> dtoInstanceSupplier;
-
-    public ExecutorOfGenerator(Supplier<?> dtoInstanceSupplier) {
-        this.dtoInstanceSupplier = dtoInstanceSupplier;
+    public ExecutorOfGenerator() {
+        super();
     }
 
-    public ExecutorOfGenerator(Supplier<?> dtoInstanceSupplier,
-                               AbstractExecutor nextExecutor) {
+    public ExecutorOfGenerator(AbstractExecutor nextExecutor) {
         super(nextExecutor);
-        this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
     @Override
-    public boolean execute(Field field, Generator<?> generator) {
+    public boolean execute(Field field, Generator<?> generator, Supplier<?> dtoInstanceSupplier) {
         Object result;
         try {
             result = generator.generate();

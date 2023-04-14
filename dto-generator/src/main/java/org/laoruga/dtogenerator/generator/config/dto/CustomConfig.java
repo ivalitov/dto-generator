@@ -1,12 +1,13 @@
 package org.laoruga.dtogenerator.generator.config.dto;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
+import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+
+import java.util.function.Supplier;
 
 /**
  * @author Il'dar Valitov
@@ -14,24 +15,34 @@ import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
  */
 @Builder
 @Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Slf4j
 public class CustomConfig implements ConfigDto {
 
     private CustomGenerator<?> customGenerator;
+    private Supplier<?> rootDtoInstanceSupplier;
+    private String[] args;
+    private String fieldName;
 
-    private static final RuntimeException NOT_IMPLEMENTED =
-            new NotImplementedException(
-                    "Remarks for custom rules are set via " + DtoGeneratorBuilder.class + " methods." +
-                            " CustomConfig isn't supposed to be merged."
-            );
+    private static final RuntimeException NOT_IMPLEMENTED = new NotImplementedException(
+            "Remarks for custom rules are set via " + DtoGeneratorBuilder.class + " methods." +
+                    " CustomConfig isn't supposed to be merged."
+    );
 
-    /**
-     * @deprecated - configs are not applicable for Custom generators for today
-     */
     @Override
-    @Deprecated
     public void merge(ConfigDto from) {
-        throw NOT_IMPLEMENTED;
+        if (from.getClass() == CustomConfig.class) {
+            CustomConfig customConfigFrom = (CustomConfig) from;
+            if (customConfigFrom.customGenerator != null) this.customGenerator = ((CustomConfig) from).customGenerator;
+            if (customConfigFrom.rootDtoInstanceSupplier != null)
+                this.rootDtoInstanceSupplier = ((CustomConfig) from).rootDtoInstanceSupplier;
+            if (customConfigFrom.args != null) this.args = ((CustomConfig) from).args;
+            if (customConfigFrom.fieldName != null) this.fieldName = ((CustomConfig) from).fieldName;
+        } else {
+            log.debug("Custom config wasn't merged with: '" + from.getClass().getSimpleName() + "'");
+        }
     }
 
 
@@ -40,7 +51,7 @@ public class CustomConfig implements ConfigDto {
      */
     @Override
     @Deprecated
-    public ConfigDto setRuleRemark(IRuleRemark ruleRemark) {
+    public ConfigDto setRuleRemark(RuleRemark ruleRemark) {
         throw NOT_IMPLEMENTED;
     }
 
@@ -49,8 +60,22 @@ public class CustomConfig implements ConfigDto {
      */
     @Override
     @Deprecated
-    public IRuleRemark getRuleRemark() {
+    public RuleRemark getRuleRemark() {
         throw NOT_IMPLEMENTED;
     }
 
+    public CustomConfig setArgs(String[] args) {
+        this.args = args;
+        return this;
+    }
+
+    public CustomConfig setDtoInstanceSupplier(Supplier<?> rootDtoInstanceSupplier) {
+        this.rootDtoInstanceSupplier = rootDtoInstanceSupplier;
+        return this;
+    }
+
+    public CustomConfig setFieldName(String fieldName) {
+        this.fieldName = fieldName;
+        return this;
+    }
 }

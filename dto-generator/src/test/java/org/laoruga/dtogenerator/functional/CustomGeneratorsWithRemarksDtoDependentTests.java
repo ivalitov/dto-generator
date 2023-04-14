@@ -10,11 +10,11 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorConfigMap;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorDtoDependent;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemarkableArgs;
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemark;
-import org.laoruga.dtogenerator.api.remarks.CustomRuleRemarkArgs;
 import org.laoruga.dtogenerator.api.rules.*;
+import org.laoruga.dtogenerator.constants.CharSet;
 import org.laoruga.dtogenerator.generator.config.dto.MapConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
@@ -27,8 +27,8 @@ import java.util.function.Supplier;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.laoruga.dtogenerator.functional.CustomRemarksTests.FlowerMatcher.flowerMatcher;
-import static org.laoruga.dtogenerator.functional.CustomRemarksTests.FlowerMatcher.flowerMatcherAnyPart;
+import static org.laoruga.dtogenerator.functional.CustomGeneratorsWithRemarksDtoDependentTests.FlowerMatcher.flowerMatcher;
+import static org.laoruga.dtogenerator.functional.CustomGeneratorsWithRemarksDtoDependentTests.FlowerMatcher.flowerMatcherAnyPart;
 
 /**
  * @author Il'dar Valitov
@@ -36,7 +36,7 @@ import static org.laoruga.dtogenerator.functional.CustomRemarksTests.FlowerMatch
  */
 @Epic("CUSTOM_RULES")
 @Feature("CUSTOM_REMARKS")
-public class CustomRemarksTests {
+public class CustomGeneratorsWithRemarksDtoDependentTests {
 
     interface IDto {
         String getLot();
@@ -53,7 +53,7 @@ public class CustomRemarksTests {
     @Getter
     static class Dto implements IDto {
 
-        @StringRule(minLength = 1, maxLength = 5)
+        @StringRule(minLength = 5, maxLength = 5, chars = CharSet.ENG + CharSet.NUM)
         String lot;
 
         @CustomRule(generatorClass = FlowerGenerator.class)
@@ -80,7 +80,7 @@ public class CustomRemarksTests {
     @Getter
     static class NestedDto implements IDto {
 
-        @StringRule(minLength = 1, maxLength = 5)
+        @StringRule(minLength = 1, maxLength = 1)
         String lot;
 
         @CustomRule(generatorClass = FlowerGenerator.class)
@@ -110,27 +110,22 @@ public class CustomRemarksTests {
         Integer petalCount;
     }
 
-    enum FlowerProperty implements CustomRuleRemarkArgs {
+    enum FlowerProperty {
         REGION,
         PETAL_COUNT;
 
-        @Override
-        public int requiredArgsNumber() {
-            return 1;
-        }
     }
-
 
     @Test
     void remarkForAllFields() {
 
         Dto generatedDto = DtoGenerator.builder(Dto.class)
-                .addRuleRemark(FlowerProperty.PETAL_COUNT.setArgs("99"))
-                .addRuleRemark(FlowerProperty.REGION.setArgs("Japan"))
+                .addGeneratorParameter(FlowerProperty.PETAL_COUNT.name(), "99")
+                .addGeneratorParameter(FlowerProperty.REGION.name(), "Japan")
                 .build()
                 .generateDto();
 
-        Matcher<Flower> matcher = flowerMatcher(99, "Japan");
+        Matcher<Flower> matcher = flowerMatcher(99, generatedDto.lot, "Japan");
 
         Consumer<IDto> assertions = dto ->
                 assertAll(
@@ -157,35 +152,34 @@ public class CustomRemarksTests {
 
         final String countries = "Sudan, Tudan, India, Morocco, France, UAR";
         final String countriesNested = "Japan, Kazakhstan, China, Bangladesh";
-
         Dto dto = DtoGenerator.builder(Dto.class)
-                .addRuleRemark("singleFlower",
-                        FlowerProperty.PETAL_COUNT.setArgs("1"),
-                        FlowerProperty.REGION.setArgs("Moldova"))
-                .addRuleRemark("flowerBouquet",
-                        FlowerProperty.PETAL_COUNT.setArgs("2"),
-                        FlowerProperty.REGION.setArgs("Iran"))
-                .addRuleRemark("flowerBouquetArray",
-                        FlowerProperty.PETAL_COUNT.setArgs("3"),
-                        FlowerProperty.REGION.setArgs(countries))
-                .addRuleRemark("flowerBouquetMap",
-                        FlowerProperty.PETAL_COUNT.setArgs("4, 5, 6, 7, 8, 9"),
-                        FlowerProperty.REGION.setArgs(countries))
-                .setTypeGeneratorConfig("flowerBouquetMap", MapConfig.builder().minSize(5).maxSize(5).build())
+                .addGeneratorParameter("singleFlower",
+                        FlowerProperty.PETAL_COUNT.name(), "1",
+                        FlowerProperty.REGION.name(), "Moldova")
+                .addGeneratorParameter("flowerBouquet",
+                        FlowerProperty.PETAL_COUNT.name(), "2",
+                        FlowerProperty.REGION.name(), "Iran")
+                .addGeneratorParameter("flowerBouquetArray",
+                        FlowerProperty.PETAL_COUNT.name(), "3",
+                        FlowerProperty.REGION.name(), countries)
+                .addGeneratorParameter("flowerBouquetMap",
+                        FlowerProperty.PETAL_COUNT.name(), "4, 5, 6, 7, 8, 9",
+                        FlowerProperty.REGION.name(), countries)
+                .setGeneratorConfig("flowerBouquetMap", MapConfig.builder().minSize(5).maxSize(5).build())
 
                 // nested
-                .addRuleRemark("nestedDto.singleFlower",
-                        FlowerProperty.PETAL_COUNT.setArgs("10"),
-                        FlowerProperty.REGION.setArgs("Moldova_nested"))
-                .addRuleRemark("nestedDto.flowerBouquet",
-                        FlowerProperty.PETAL_COUNT.setArgs("20"),
-                        FlowerProperty.REGION.setArgs("Iran_nested"))
-                .addRuleRemark("nestedDto.flowerBouquetArray",
-                        FlowerProperty.PETAL_COUNT.setArgs("30"),
-                        FlowerProperty.REGION.setArgs(countriesNested))
-                .addRuleRemark("nestedDto.flowerBouquetMap",
-                        FlowerProperty.PETAL_COUNT.setArgs("40"),
-                        FlowerProperty.REGION.setArgs("Somewhere_nested"))
+                .addGeneratorParameter("nestedDto.singleFlower",
+                        FlowerProperty.PETAL_COUNT.name(), "10",
+                        FlowerProperty.REGION.name(), "Moldova_nested")
+                .addGeneratorParameter("nestedDto.flowerBouquet",
+                        FlowerProperty.PETAL_COUNT.name(), "20",
+                        FlowerProperty.REGION.name(), "Iran_nested")
+                .addGeneratorParameter("nestedDto.flowerBouquetArray",
+                        FlowerProperty.PETAL_COUNT.name(), "30",
+                        FlowerProperty.REGION.name(), countriesNested)
+                .addGeneratorParameter("nestedDto.flowerBouquetMap",
+                        FlowerProperty.PETAL_COUNT.name(), "40",
+                        FlowerProperty.REGION.name(), "Somewhere_nested")
                 .build()
                 .generateDto();
 
@@ -239,24 +233,24 @@ public class CustomRemarksTests {
         Dto dto = DtoGenerator.builder(Dto.class)
 
                 // any fields
-                .addRuleRemark(FlowerProperty.PETAL_COUNT.setArgs("11, 12, 13, 14, 15, 16, 17, 18, 19, 20"))
-                .addRuleRemark(FlowerProperty.REGION.setArgs(allFieldCounty))
+                .addGeneratorParameter(FlowerProperty.PETAL_COUNT.name(), "11, 12, 13, 14, 15, 16, 17, 18, 19, 20")
+                .addGeneratorParameter(FlowerProperty.REGION.name(), allFieldCounty)
 
                 // specific fields
-                .addRuleRemark("singleFlower",
-                        FlowerProperty.REGION.setArgs("Moldova"))
-                .addRuleRemark("flowerBouquet",
-                        FlowerProperty.PETAL_COUNT.setArgs("2"))
-                .addRuleRemark("flowerBouquetMap",
-                        FlowerProperty.REGION.setArgs(countries))
-                .setTypeGeneratorConfig("flowerBouquetMap", MapConfig.builder().minSize(5).maxSize(5).build())
+                .addGeneratorParameter("singleFlower",
+                        FlowerProperty.REGION.name(), "Moldova")
+                .addGeneratorParameter("flowerBouquet",
+                        FlowerProperty.PETAL_COUNT.name(), "2")
+                .addGeneratorParameter("flowerBouquetMap",
+                        FlowerProperty.REGION.name(), countries)
+                .setGeneratorConfig("flowerBouquetMap", MapConfig.builder().minSize(5).maxSize(5).build())
 
-                .addRuleRemark("nestedDto.singleFlower",
-                        FlowerProperty.PETAL_COUNT.setArgs("10"))
-                .addRuleRemark("nestedDto.flowerBouquetArray",
-                        FlowerProperty.REGION.setArgs("Iran_nested"))
-                .addRuleRemark("nestedDto.flowerBouquetMap",
-                        FlowerProperty.REGION.setArgs("Somewhere_nested"))
+                .addGeneratorParameter("nestedDto.singleFlower",
+                        FlowerProperty.PETAL_COUNT.name(), "10")
+                .addGeneratorParameter("nestedDto.flowerBouquetArray",
+                        FlowerProperty.REGION.name(), "Iran_nested")
+                .addGeneratorParameter("nestedDto.flowerBouquetMap",
+                        FlowerProperty.REGION.name(), "Somewhere_nested")
                 .build()
                 .generateDto();
 
@@ -308,19 +302,21 @@ public class CustomRemarksTests {
     private static final String[] COUNTRIES = {"Italy", "USA", "Ukraine"};
 
     static class FlowerGenerator implements
-            CustomGeneratorRemarkableArgs<Flower>,
+            CustomGeneratorArgs<Flower>,
+            CustomGeneratorConfigMap<Flower>,
             CustomGeneratorDtoDependent<Flower, Dto> {
-
-        Map<CustomRuleRemark, CustomRuleRemarkArgs> ruleRemarks;
+        Map<String, String> configMap;
         Supplier<Dto> generatedDto;
+
+        String[] args;
 
         @Override
         public Flower generate() {
 
             int petalNumber;
 
-            if (ruleRemarks.containsKey(FlowerProperty.PETAL_COUNT)) {
-                String[] numbers = ruleRemarks.get(FlowerProperty.PETAL_COUNT).getArgs()[0].split(",");
+            if (configMap.containsKey(FlowerProperty.PETAL_COUNT.name())) {
+                String[] numbers = configMap.get(FlowerProperty.PETAL_COUNT.name()).split(",");
                 petalNumber = Integer.parseInt(RandomUtils.getRandomItem(numbers).trim());
             } else {
                 petalNumber = RandomUtils.nextInt(10, 100);
@@ -328,8 +324,8 @@ public class CustomRemarksTests {
 
             String region;
 
-            if (ruleRemarks.containsKey(FlowerProperty.REGION)) {
-                String[] regions = ruleRemarks.get(FlowerProperty.REGION).getArgs()[0].split(",");
+            if (configMap.containsKey(FlowerProperty.REGION.name())) {
+                String[] regions = configMap.get(FlowerProperty.REGION.name()).split(",");
                 region = RandomUtils.getRandomItem(regions).trim();
             } else {
                 region = RandomUtils.getRandomItem(COUNTRIES);
@@ -342,11 +338,6 @@ public class CustomRemarksTests {
         }
 
         @Override
-        public void setRuleRemarks(Map<CustomRuleRemark, CustomRuleRemarkArgs> ruleRemarks) {
-            this.ruleRemarks = ruleRemarks;
-        }
-
-        @Override
         public void setDtoSupplier(Supplier<Dto> generatedDto) {
             this.generatedDto = generatedDto;
         }
@@ -354,6 +345,16 @@ public class CustomRemarksTests {
         @Override
         public boolean isDtoReady() {
             return generatedDto.get().lot != null;
+        }
+
+        @Override
+        public void setArgs(String... args) {
+            this.args = args;
+        }
+
+        @Override
+        public void setConfigMap(Map<String, String> configMap) {
+            this.configMap = configMap;
         }
     }
 

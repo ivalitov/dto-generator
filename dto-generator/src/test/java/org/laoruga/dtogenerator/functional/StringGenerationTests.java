@@ -77,7 +77,7 @@ class StringGenerationTests {
     void generateByRegexp(String regexp) {
 
         Dto_2 dto = DtoGenerator.builder(Dto_2.class)
-                .setTypeGeneratorConfig(String.class,
+                .setGeneratorConfig(String.class,
                         StringConfig.builder()
                                 .regexp(regexp)
                                 .chars(NUM).build())
@@ -103,7 +103,7 @@ class StringGenerationTests {
     @DisplayName("Generated string by mask (type chars + wildcard)")
     void generateByLength(String charSet, Integer minLength, Integer maxLength, String regexpForAssert) {
         Dto_2 dto = DtoGenerator.builder(Dto_2.class)
-                .setTypeGeneratorConfig(String.class,
+                .setGeneratorConfig(String.class,
                         StringConfig.builder()
                                 .minLength(minLength)
                                 .maxLength(maxLength)

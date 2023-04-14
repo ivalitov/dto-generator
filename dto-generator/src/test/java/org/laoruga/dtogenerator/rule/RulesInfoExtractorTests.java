@@ -136,9 +136,9 @@ class RulesInfoExtractorTests {
         Optional<RuleInfo> iRuleInfo = rulesInfoExtractor.extractRulesInfo(field);
 
         assertTrue(iRuleInfo.isPresent());
-        assertInstanceOf(RuleInfoCollection.class, iRuleInfo.get());
+        assertInstanceOf(RuleInfoList.class, iRuleInfo.get());
 
-        RuleInfoCollection ruleInfo = (RuleInfoCollection) iRuleInfo.get();
+        RuleInfoList ruleInfo = (RuleInfoList) iRuleInfo.get();
 
         assertAll(
                 () -> assertThat(ruleInfo.getRule().annotationType(), equalTo(collectionRuleClass)),
@@ -200,11 +200,10 @@ class RulesInfoExtractorTests {
     @MethodSource("unappropriatedDataSet")
     @DisplayName("Unappropriated rule annotation")
     void unappropriatedRule(String fieldName, Class<?> dtoClass, String errMsgPart) {
-        DtoGenerator<?> generator = DtoGenerator.builder(dtoClass).build();
-        assertThrows(DtoGeneratorException.class, generator::generateDto);
-        Throwable exception = UtilsRoot.getErrorsMap(generator).get(fieldName);
-        assertThat(exception.getCause().getMessage(),
-                containsString(errMsgPart));
+        DtoGeneratorException dtoGeneratorException =
+                assertThrows(DtoGeneratorException.class, () -> DtoGenerator.builder(dtoClass).build());
+
+        assertThat(dtoGeneratorException.getMessage(), containsString(errMsgPart));
     }
 
 }

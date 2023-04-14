@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator.config.dto;
 import com.google.common.primitives.Primitives;
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.rules.DecimalRule;
 
 import java.math.BigDecimal;
@@ -22,14 +22,14 @@ public class DecimalConfig implements ConfigDto {
     private Number maxValue;
     private Number minValue;
     private Integer precision;
-    private IRuleRemark ruleRemark;
+    private RuleRemark ruleRemark;
     private Class<? extends Number> fieldType;
 
     public DecimalConfig(DecimalRule rule, Class<? extends Number> fieldType) {
         fieldType = Primitives.wrap(fieldType);
 
         this.fieldType = fieldType;
-        this.ruleRemark = rule.ruleRemark();
+        this.ruleRemark = rule.boundary();
         this.precision = rule.precision();
 
         if (fieldType == Double.class) {

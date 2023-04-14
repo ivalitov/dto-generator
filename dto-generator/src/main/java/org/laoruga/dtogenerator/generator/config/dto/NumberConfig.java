@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator.config.dto;
 import com.google.common.primitives.Primitives;
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.laoruga.dtogenerator.api.remarks.IRuleRemark;
+import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 
 import java.math.BigInteger;
@@ -30,14 +30,14 @@ public class NumberConfig implements ConfigDto {
     private Class<? extends Number> fieldType;
 
     private boolean isAtomic;
-    private IRuleRemark ruleRemark;
+    private RuleRemark ruleRemark;
 
     public NumberConfig(NumberRule rules, Class<? extends Number> fieldType) {
         fieldType = Primitives.wrap(fieldType);
 
         this.isAtomic = fieldType == AtomicInteger.class || fieldType == AtomicLong.class;
         this.fieldType = fieldType;
-        this.ruleRemark = rules.ruleRemark();
+        this.ruleRemark = rules.boundary();
 
         if (fieldType == Integer.class || fieldType == AtomicInteger.class) {
             minValue = rules.minInt();
