@@ -27,7 +27,7 @@ import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.laoruga.dtogenerator.Constants.RESTORE_STATIC_CONFIG;
-import static org.laoruga.dtogenerator.constants.BoundaryConfig.*;
+import static org.laoruga.dtogenerator.constants.Boundary.*;
 import static org.laoruga.dtogenerator.constants.Bounds.CHRONO_UNIT_SHIFT_LEFT;
 import static org.laoruga.dtogenerator.constants.Bounds.CHRONO_UNIT_SHIFT_RIGHT;
 

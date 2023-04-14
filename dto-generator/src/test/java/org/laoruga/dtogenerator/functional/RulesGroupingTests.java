@@ -26,7 +26,7 @@ import java.util.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.laoruga.dtogenerator.constants.BoundaryConfig.*;
+import static org.laoruga.dtogenerator.constants.Boundary.*;
 import static org.laoruga.dtogenerator.constants.CharSet.ENG;
 import static org.laoruga.dtogenerator.constants.CharSet.NUM;
 import static org.laoruga.dtogenerator.constants.Group.*;

@@ -3,7 +3,7 @@ package org.laoruga.dtogenerator.generator;
 import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.generators.Generator;
-import org.laoruga.dtogenerator.constants.BoundaryConfig;
+import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.generator.config.dto.BooleanConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
@@ -25,7 +25,7 @@ public class BooleanGenerator implements Generator<Boolean> {
 
     @Override
     public Boolean generate() {
-        switch ((BoundaryConfig) ruleRemark) {
+        switch ((Boundary) ruleRemark) {
 
             case MIN_VALUE:
                 return false;

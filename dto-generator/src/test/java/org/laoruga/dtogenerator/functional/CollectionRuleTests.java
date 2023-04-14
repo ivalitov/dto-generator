@@ -25,8 +25,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.laoruga.dtogenerator.Constants.RESTORE_STATIC_CONFIG;
-import static org.laoruga.dtogenerator.constants.BoundaryConfig.MAX_VALUE;
-import static org.laoruga.dtogenerator.constants.BoundaryConfig.MIN_VALUE;
+import static org.laoruga.dtogenerator.constants.Boundary.MAX_VALUE;
+import static org.laoruga.dtogenerator.constants.Boundary.MIN_VALUE;
 
 /**
  * @author Il'dar Valitov

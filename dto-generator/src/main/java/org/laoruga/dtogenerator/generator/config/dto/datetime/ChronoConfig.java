@@ -1,7 +1,7 @@
 package org.laoruga.dtogenerator.generator.config.dto.datetime;
 
 import org.laoruga.dtogenerator.api.RuleRemark;
-import org.laoruga.dtogenerator.constants.BoundaryConfig;
+import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.time.temporal.Temporal;
@@ -13,7 +13,7 @@ import java.time.temporal.Temporal;
 public interface ChronoConfig {
     Temporal adjust(Temporal temporal, RuleRemark ruleRemark);
 
-    default long selectShift(BoundaryConfig boundaryValue, long leftBound, long rightBound) {
+    default long selectShift(Boundary boundaryValue, long leftBound, long rightBound) {
         switch (boundaryValue) {
             case MIN_VALUE:
                 return leftBound;

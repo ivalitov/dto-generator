@@ -1,7 +1,7 @@
 package org.laoruga.dtogenerator.api.rules;
 
 import org.laoruga.dtogenerator.api.rules.meta.Rule;
-import org.laoruga.dtogenerator.constants.BoundaryConfig;
+import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.constants.CharSet;
 import org.laoruga.dtogenerator.constants.Group;
 
@@ -30,7 +30,7 @@ public @interface StringRule {
 
     String chars() default CharSet.DEFAULT_CHARSET;
 
-    BoundaryConfig ruleRemark() default BoundaryConfig.RANDOM_VALUE;
+    Boundary ruleRemark() default Boundary.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 

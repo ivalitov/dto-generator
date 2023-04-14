@@ -15,7 +15,7 @@ import org.laoruga.dtogenerator.config.TypeGeneratorsConfigForFiled;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorInstanceConfig;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigLazy;
-import org.laoruga.dtogenerator.constants.BoundaryConfig;
+import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.util.dummy.DummyCustomGenerator;
@@ -308,13 +308,13 @@ public class DtoGeneratorBuilder<T> {
      *    <li>NOT_DEFINED</li>
      * </ul>
      *
-     * @param boundaryConfig parameter to set
+     * @param boundary parameter to set
      * @return this
      * @throws DtoGeneratorException throws when trying to overwrite boundaryConfig
      */
-    public DtoGeneratorBuilder<T> setBoundaryConfig(@NonNull BoundaryConfig boundaryConfig) throws DtoGeneratorException {
+    public DtoGeneratorBuilder<T> setBoundary(@NonNull Boundary boundary) throws DtoGeneratorException {
 
-        remarksHolder.setRuleRemarkForAnyField(boundaryConfig);
+        remarksHolder.setRuleRemarkForAnyField(boundary);
 
         return this;
     }
@@ -326,18 +326,18 @@ public class DtoGeneratorBuilder<T> {
      * to the field - dots separated sequence of field names.
      *
      * @param fieldName      name of the field or path to the field separated by dots
-     * @param boundaryConfig parameter to set
+     * @param boundary parameter to set
      * @return this
      * @throws DtoGeneratorException throws when trying to overwrite boundaryConfig
      */
 
-    public DtoGeneratorBuilder<T> setBoundaryConfig(@NonNull String fieldName,
-                                                    @NonNull BoundaryConfig boundaryConfig) throws DtoGeneratorException {
+    public DtoGeneratorBuilder<T> setBoundary(@NonNull String fieldName,
+                                              @NonNull Boundary boundary) throws DtoGeneratorException {
 
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
                 .getRemarksHolder()
-                .setRuleRemarkForField(fieldNameAndPath.getLeft(), boundaryConfig);
+                .setRuleRemarkForField(fieldNameAndPath.getLeft(), boundary);
 
         return this;
     }

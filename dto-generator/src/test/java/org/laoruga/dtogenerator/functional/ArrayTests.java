@@ -11,7 +11,7 @@ import org.laoruga.dtogenerator.api.rules.ArrayRule;
 import org.laoruga.dtogenerator.api.rules.Entry;
 import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
-import org.laoruga.dtogenerator.constants.BoundaryConfig;
+import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
 import org.laoruga.dtogenerator.generator.config.dto.ArrayConfig;
 
@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.laoruga.dtogenerator.Constants.RESTORE_STATIC_CONFIG;
-import static org.laoruga.dtogenerator.constants.BoundaryConfig.*;
+import static org.laoruga.dtogenerator.constants.Boundary.*;
 
 /**
  * @author Il'dar Valitov
@@ -38,7 +38,7 @@ class ArrayTests {
         @ArrayRule(ruleRemark = MIN_VALUE, maxSize = 4)
         Integer[] integers;
 
-        @ArrayRule(ruleRemark = BoundaryConfig.MAX_VALUE)
+        @ArrayRule(ruleRemark = Boundary.MAX_VALUE)
         int[] ints;
 
         @ArrayRule
@@ -101,7 +101,7 @@ class ArrayTests {
 
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
-        builder.setBoundaryConfig(BoundaryConfig.MAX_VALUE);
+        builder.setBoundary(Boundary.MAX_VALUE);
         TypeGeneratorsConfigSupplier instance = builder.getConfig().getTypeGeneratorsConfig();
         instance.getArrayConfig(String[].class).setMinSize(0).setMaxSize(1);
         instance.getArrayConfig(Integer[].class).setMinSize(0).setMaxSize(2);

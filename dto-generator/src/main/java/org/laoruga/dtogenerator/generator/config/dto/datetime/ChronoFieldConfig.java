@@ -1,7 +1,7 @@
 package org.laoruga.dtogenerator.generator.config.dto.datetime;
 
 import org.laoruga.dtogenerator.api.RuleRemark;
-import org.laoruga.dtogenerator.constants.BoundaryConfig;
+import org.laoruga.dtogenerator.constants.Boundary;
 
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalField;
@@ -37,7 +37,7 @@ public class ChronoFieldConfig implements ChronoConfig {
         if (value != 0) {
             return temporal.with(field, value);
         }
-        long shiftValue = selectShift((BoundaryConfig) ruleRemark, leftBound, rightBound);
+        long shiftValue = selectShift((Boundary) ruleRemark, leftBound, rightBound);
         return temporal.with(field, shiftValue);
     }
 }

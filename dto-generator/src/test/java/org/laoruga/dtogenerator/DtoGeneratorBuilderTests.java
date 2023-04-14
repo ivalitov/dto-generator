@@ -10,7 +10,7 @@ import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.laoruga.dtogenerator.constants.BoundaryConfig.*;
+import static org.laoruga.dtogenerator.constants.Boundary.*;
 
 /**
  * @author Il'dar Valitov
@@ -32,8 +32,8 @@ class DtoGeneratorBuilderTests {
     void tryToOverwriteRemarkForField() {
         DtoGeneratorException e = assertThrows(DtoGeneratorException.class,
                 () -> DtoGenerator.builder(Dto.class)
-                        .setBoundaryConfig("string", MAX_VALUE)
-                        .setBoundaryConfig("string", MIN_VALUE));
+                        .setBoundary("string", MAX_VALUE)
+                        .setBoundary("string", MIN_VALUE));
         assertThat(e.getMessage(), containsString("Attempt to overwrite remark"));
     }
 
@@ -42,8 +42,8 @@ class DtoGeneratorBuilderTests {
     void tryToOverwriteRemarkForAllFields() {
         DtoGeneratorException e = assertThrows(DtoGeneratorException.class,
                 () -> DtoGenerator.builder(Dto.class)
-                        .setBoundaryConfig(RANDOM_VALUE)
-                        .setBoundaryConfig(NULL_VALUE));
+                        .setBoundary(RANDOM_VALUE)
+                        .setBoundary(NULL_VALUE));
         assertThat(e.getMessage(), containsString("Attempt to overwrite remark for all fields"));
     }
 

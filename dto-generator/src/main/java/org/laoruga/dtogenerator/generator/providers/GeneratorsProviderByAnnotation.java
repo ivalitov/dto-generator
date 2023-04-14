@@ -112,7 +112,7 @@ public class GeneratorsProviderByAnnotation {
         CustomGenerator<?> generatorInstance = createInstance(generatorClass);
 
         configurators.getBuilder(fieldName, generatorClass, customRule.args())
-                .boundaryConfig(customRule.ruleRemark())
+                .boundary(customRule.ruleRemark())
                 .build()
                 .configure(generatorInstance);
 

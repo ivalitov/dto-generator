@@ -7,7 +7,7 @@ import org.laoruga.dtogenerator.api.RuleRemark;
  * Created on 16.04.2022
  */
 
-public enum BoundaryConfig implements RuleRemark {
+public enum Boundary implements RuleRemark {
 
     MIN_VALUE,
     MAX_VALUE,

@@ -180,11 +180,13 @@ Known types are:
 There are several ways to configure generators, one of them is - static configuration:
 
 ```java
+        ...
         // static configuration instance is accessible this way 
         DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
 
-                // and the same static configuration instance is available directly from DtoGeneratorBuilder instance
-                DtoGenerator.builder(Dto.class).getStaticConfig();
+        // and the same static configuration instance is available directly from DtoGeneratorBuilder instance
+        DtoGenerator.builder(Dto.class).getStaticConfig();
+        ...
 ```
 
 For example, if we use next DTO class:
@@ -314,8 +316,8 @@ public class Example4 {
     public static void main(String[] args) {
 
         Dto4 dto = DtoGenerator.builder(Dto4.class)
-                .setRuleRemark(MIN_VALUE)
-                .setRuleRemark("age", MAX_VALUE)
+                .setBoundary(MIN_VALUE)
+                .setBoundary("age", MAX_VALUE)
                 .build()
                 .generateDto();
     }
@@ -446,8 +448,8 @@ public class Example6 {
 
     public static void main(String[] args) {
         Dto6 dto = DtoGenerator.builder(Dto6.class)
-                .setRuleRemark("nestedDto.comment", NULL_VALUE)
-                .setGeneratorBuilder("nestedDto.phoneType", () -> "Other")
+                .setBoundary("nestedDto.comment", NULL_VALUE)
+                .setGenerator("nestedDto.phoneType", () -> "Other")
                 .build()
                 .generateDto();
     }
@@ -487,7 +489,8 @@ You may design your custom generator for any type you want. To do this, you need
 There are two possible options to provide generator:
 
 - via `@CustomRule` annotation on the field
-- via `setGenerator()` method of `DtoGeneratorBuilder`, [linkig generator directly for the generated type](#user_generators)
+- via `setGenerator()` method of `DtoGeneratorBuilder`
+  , [linkig generator directly for the generated type](#user_generators)
 
 More info and usage examples you may see in the project with
 examples: [Dto Generator Examples project](dto-generator-examples/README.md)
@@ -510,9 +513,9 @@ public class Example8 {
      * Type we want to generate via custom generator
      */
     static class Flower {
-        
+
         int petalsNumber;
-        
+
         public Flower(int petalsNumber) {
             this.petalsNumber = petalsNumber;
         }

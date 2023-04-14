@@ -19,8 +19,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static org.laoruga.dtogenerator.constants.BoundaryConfig.MIN_VALUE;
-import static org.laoruga.dtogenerator.constants.BoundaryConfig.NULL_VALUE;
+import static org.laoruga.dtogenerator.constants.Boundary.MIN_VALUE;
+import static org.laoruga.dtogenerator.constants.Boundary.NULL_VALUE;
 import static org.laoruga.dtogenerator.constants.RulesInstance.NUMBER_RULE_ZEROS;
 import static org.laoruga.dtogenerator.util.ReflectionUtils.createInstance;
 

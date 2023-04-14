@@ -6,7 +6,7 @@ import org.laoruga.dtogenerator.CustomGeneratorsConfigMapHolder;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.generators.custom.*;
-import org.laoruga.dtogenerator.constants.BoundaryConfig;
+import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.util.Arrays;
@@ -24,14 +24,14 @@ public class CustomGeneratorConfigurator {
     private Supplier<?> dtoInstanceSupplier;
     private RemarksHolder remarksHolder;
     private CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder;
-    private BoundaryConfig boundaryConfig;
+    private Boundary boundary;
     private String fieldName;
 
     public static class Builder {
 
         public Builder merge(Builder builder) {
             if (builder.args != null) this.args = builder.args;
-            if (builder.boundaryConfig != null) this.boundaryConfig = builder.boundaryConfig;
+            if (builder.boundary != null) this.boundary = builder.boundary;
             return this;
         }
 
@@ -60,7 +60,7 @@ public class CustomGeneratorConfigurator {
                         remarksHolder.getRuleRemarkOrNull(fieldName);
 
                 ((CustomGeneratorRemark<?>) generatorInstance).setRuleRemark(
-                        maybeRuleRemark != null ? maybeRuleRemark : boundaryConfig
+                        maybeRuleRemark != null ? maybeRuleRemark : boundary
                 );
 
             }

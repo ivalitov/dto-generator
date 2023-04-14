@@ -12,7 +12,7 @@ import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.api.rules.*;
-import org.laoruga.dtogenerator.constants.BoundaryConfig;
+import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 
 import java.util.function.Consumer;
@@ -89,8 +89,8 @@ class NestedDtoGenerationTests {
     @DisplayName("Nested Dto Remark")
     void nestedDtoRemark() {
         Dto dto = DtoGenerator.builder(Dto.class)
-                .setBoundaryConfig("dtoNested.intDefaultRules", BoundaryConfig.MIN_VALUE)
-                .setBoundaryConfig("dtoNested.intRightBound", BoundaryConfig.MAX_VALUE)
+                .setBoundary("dtoNested.intDefaultRules", Boundary.MIN_VALUE)
+                .setBoundary("dtoNested.intRightBound", Boundary.MAX_VALUE)
                 .build().generateDto();
         assertNotNull(dto);
         assertThat(dto.getIntDefaultRules(), both(
@@ -131,7 +131,7 @@ class NestedDtoGenerationTests {
     @DisplayName("Multilevel Nested Dto With Remarks")
     void multiLevelNestedDtoWithRemarks() {
         DtoWithNestedLevels dto = DtoGenerator.builder(DtoWithNestedLevels.class)
-                .setBoundaryConfig(BoundaryConfig.MIN_VALUE)
+                .setBoundary(Boundary.MIN_VALUE)
                 .build().generateDto();
 
         assertNotNull(dto);
@@ -159,10 +159,10 @@ class NestedDtoGenerationTests {
         @NestedDtoRule
         private Nested_3 notDefined;
 
-        @NestedDtoRule(ruleRemark = BoundaryConfig.MAX_VALUE)
+        @NestedDtoRule(ruleRemark = Boundary.MAX_VALUE)
         private Nested_3 maxValues;
 
-        @NestedDtoRule(ruleRemark = BoundaryConfig.MIN_VALUE)
+        @NestedDtoRule(ruleRemark = Boundary.MIN_VALUE)
         private Nested_3 minValues;
     }
 
@@ -197,7 +197,7 @@ class NestedDtoGenerationTests {
     void nestedDtoAnnotationRemarksGeneralOverride() {
         DtoGeneratorBuilder<DtoAnnotationNestedRemarks> builder = DtoGenerator.builder(DtoAnnotationNestedRemarks.class);
 
-        builder.setBoundaryConfig(BoundaryConfig.MAX_VALUE);
+        builder.setBoundary(Boundary.MAX_VALUE);
 
         DtoAnnotationNestedRemarks dto = builder.build().generateDto();
 
@@ -218,12 +218,12 @@ class NestedDtoGenerationTests {
         DtoGeneratorBuilder<DtoAnnotationNestedRemarks> builder = DtoGenerator.builder(DtoAnnotationNestedRemarks.class);
 
         builder
-                .setBoundaryConfig("notDefined.aDouble", BoundaryConfig.MIN_VALUE)
-                .setBoundaryConfig("notDefined.integer", BoundaryConfig.MAX_VALUE)
-                .setBoundaryConfig("maxValues.aDouble", BoundaryConfig.MIN_VALUE)
-                .setBoundaryConfig("maxValues.integer", BoundaryConfig.MIN_VALUE)
-                .setBoundaryConfig("minValues.aDouble", BoundaryConfig.MAX_VALUE)
-                .setBoundaryConfig("minValues.integer", BoundaryConfig.MAX_VALUE);
+                .setBoundary("notDefined.aDouble", Boundary.MIN_VALUE)
+                .setBoundary("notDefined.integer", Boundary.MAX_VALUE)
+                .setBoundary("maxValues.aDouble", Boundary.MIN_VALUE)
+                .setBoundary("maxValues.integer", Boundary.MIN_VALUE)
+                .setBoundary("minValues.aDouble", Boundary.MAX_VALUE)
+                .setBoundary("minValues.integer", Boundary.MAX_VALUE);
 
         Consumer<DtoAnnotationNestedRemarks> assertions = dto ->
                 assertAll(
@@ -241,7 +241,7 @@ class NestedDtoGenerationTests {
 
         assertions.accept(dto1);
 
-        DtoAnnotationNestedRemarks dto2 = builder.setBoundaryConfig(BoundaryConfig.MAX_VALUE).build().generateDto();
+        DtoAnnotationNestedRemarks dto2 = builder.setBoundary(Boundary.MAX_VALUE).build().generateDto();
 
         // remarks priority check
         assertions.accept(dto2);
