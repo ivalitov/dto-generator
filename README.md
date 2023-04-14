@@ -390,6 +390,7 @@ public class Example5 {
     public static void main(String[] args) {
 
         Dto5 dto = DtoGenerator.builder(Dto5.class)
+                .generateKnownTypes()
                 // default type's generator builder is used to override generator for all fields annotated with @StringRule
                 .setGenerator(String.class, new MyStringGenerator())
                 // lambda expressions can be used
