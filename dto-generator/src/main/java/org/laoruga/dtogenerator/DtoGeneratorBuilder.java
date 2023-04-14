@@ -74,8 +74,8 @@ public class DtoGeneratorBuilder<T> {
     private DtoGeneratorBuilder(Supplier<?> dtoInstanceSupplier, Class<?> dtoType) {
         this.dtoInstanceSupplier = dtoInstanceSupplier;
         this.dtoType = dtoType;
-        RemarksHolder remarksHolder = new RemarksHolder();
-        CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder = new CustomGeneratorsConfigMapHolder();
+        this.remarksHolder = new RemarksHolder();
+        this.customGeneratorsConfigMapHolder = new CustomGeneratorsConfigMapHolder();
         ConfigurationHolder configurationHolder = new ConfigurationHolder(
                 new DtoGeneratorInstanceConfig(),
                 new TypeGeneratorsConfigLazy(),
@@ -96,8 +96,6 @@ public class DtoGeneratorBuilder<T> {
                 dtoInstanceSupplier
         );
         this.configuration = configurationHolder;
-        this.remarksHolder = remarksHolder;
-        this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
         this.dtoGeneratorBuildersTree = new DtoGeneratorBuildersTree(this);
     }
 
@@ -114,9 +112,11 @@ public class DtoGeneratorBuilder<T> {
                                   String[] pathFromRootDto,
                                   Supplier<?> dtoInstanceSupplier,
                                   Class<?> dtoType) {
-        final DtoGeneratorBuildersTree dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
-        final RemarksHolder remarksHolder = new RemarksHolder(copyFrom.getRemarksHolder());
-        final CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder = new CustomGeneratorsConfigMapHolder(copyFrom.getCustomGeneratorsConfigMapHolder());
+        this.dtoInstanceSupplier = dtoInstanceSupplier;
+        this.dtoType = dtoType;
+        this.dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
+        this.customGeneratorsConfigMapHolder = new CustomGeneratorsConfigMapHolder(copyFrom.getCustomGeneratorsConfigMapHolder());
+        this.remarksHolder = new RemarksHolder(copyFrom.getRemarksHolder());
         final Supplier<?> rootDtoInstanceSupplier = dtoGeneratorBuildersTree
                 .getBuilderLazy(ROOT)
                 .getFieldGeneratorsProvider()
@@ -134,8 +134,6 @@ public class DtoGeneratorBuilder<T> {
                 )
         );
 
-        this.remarksHolder = remarksHolder;
-        this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
         this.configuration = configurationCopy;
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
                 copyFrom.getFieldGeneratorsProvider(),
@@ -145,9 +143,6 @@ public class DtoGeneratorBuilder<T> {
                 dtoInstanceSupplier,
                 configurationCopy
         );
-        this.dtoGeneratorBuildersTree = dtoGeneratorBuildersTree;
-        this.dtoType = dtoType;
-        this.dtoInstanceSupplier = dtoInstanceSupplier;
     }
 
 

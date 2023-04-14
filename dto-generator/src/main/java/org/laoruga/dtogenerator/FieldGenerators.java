@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Getter
 public class FieldGenerators {
 
-    private final Map<Supplier<?>, GeneratorEntry> fieldGenerators = new HashMap<>();
+    private final Map<Supplier<?>, GeneratorEntry> fieldGeneratorsMap = new HashMap<>();
 
     private final List<NestedGeneratorEntry> nestedDtoGenerators = new LinkedList<>();
 
@@ -31,11 +31,11 @@ public class FieldGenerators {
     }
 
     public boolean isEmpty() {
-        return fieldGenerators.isEmpty() && nestedDtoGenerators.isEmpty();
+        return fieldGeneratorsMap.isEmpty() && nestedDtoGenerators.isEmpty();
     }
 
     public int size() {
-        return nestedDtoGenerators.size() + fieldGenerators.values().stream()
+        return nestedDtoGenerators.size() + fieldGeneratorsMap.values().stream()
                 .map(entry -> entry.fieldGeneratorMap.size())
                 .reduce(Integer::sum)
                 .orElse(0);
@@ -50,7 +50,7 @@ public class FieldGenerators {
         StringBuilder resultComment = new StringBuilder(size + " generators for fields:\n");
         final AtomicInteger idx = new AtomicInteger(0);
 
-        for (GeneratorEntry entry : fieldGenerators.values()) {
+        for (GeneratorEntry entry : fieldGeneratorsMap.values()) {
             resultComment.append(resultComment)
                     .append(entry.fieldGeneratorMap.keySet().stream()
                             .map(i -> idx.incrementAndGet() + ". " + i)
@@ -63,14 +63,14 @@ public class FieldGenerators {
     public void addGenerator(Supplier<?> dtoInstanceSupplier,
                              Map<Field, Generator<?>> generatorMap) {
 
-        fieldGenerators.put(dtoInstanceSupplier, new GeneratorEntry(dtoInstanceSupplier, generatorMap));
+        fieldGeneratorsMap.put(dtoInstanceSupplier, new GeneratorEntry(dtoInstanceSupplier, generatorMap));
     }
 
     public void addGenerator(Field field,
                              Generator<?> generator,
                              Supplier<?> dtoInstanceSupplier) {
-        fieldGenerators.putIfAbsent(dtoInstanceSupplier, new GeneratorEntry(dtoInstanceSupplier, new HashMap<>()));
-        fieldGenerators.get(dtoInstanceSupplier).getFieldGeneratorMap().put(field, generator);
+        fieldGeneratorsMap.putIfAbsent(dtoInstanceSupplier, new GeneratorEntry(dtoInstanceSupplier, new HashMap<>()));
+        fieldGeneratorsMap.get(dtoInstanceSupplier).getFieldGeneratorMap().put(field, generator);
     }
 
     public void addNestedGenerator(Supplier<?> dtoInstanceSupplier,

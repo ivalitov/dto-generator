@@ -79,7 +79,7 @@ public class BatchExecutor {
         }
 
         Iterator<Map.Entry<Supplier<?>, FieldGenerators.GeneratorEntry>> filedGeneratorsIterator =
-                fieldGenerators.getFieldGenerators().entrySet().iterator();
+                fieldGenerators.getFieldGeneratorsMap().entrySet().iterator();
 
         while (filedGeneratorsIterator.hasNext() && maxAttempts >= attempt.get()) {
 
@@ -123,7 +123,7 @@ public class BatchExecutor {
         FieldGenerators failedGenerators = generatorsNotExecutedDueToError.get();
 
         Iterator<Map.Entry<Supplier<?>, FieldGenerators.GeneratorEntry>> generatorsIterator =
-                failedGenerators.getFieldGenerators().entrySet().iterator();
+                failedGenerators.getFieldGeneratorsMap().entrySet().iterator();
 
         while (generatorsIterator.hasNext() && maxAttempts >= attempt.get()) {
             Map.Entry<Supplier<?>, FieldGenerators.GeneratorEntry> nextGenerator = generatorsIterator.next();

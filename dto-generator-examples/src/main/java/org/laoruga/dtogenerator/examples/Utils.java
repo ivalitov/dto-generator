@@ -3,6 +3,8 @@ package org.laoruga.dtogenerator.examples;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,7 +13,8 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 21.11.2022
  */
 @Slf4j
-public class Utils {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Utils {
 
     private static final ObjectMapper objectMapper;
 

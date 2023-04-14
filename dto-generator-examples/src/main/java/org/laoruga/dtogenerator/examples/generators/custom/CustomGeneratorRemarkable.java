@@ -40,10 +40,6 @@ public class CustomGeneratorRemarkable implements CustomGeneratorConfigMap<Perso
         return person;
     }
 
-    private static int randomInRange(String min, String max) {
-        return RandomUtils.nextInt(min, max);
-    }
-
     @Override
     public void setConfigMap(Map<String, String> configMap) {
         this.configMap = configMap;
