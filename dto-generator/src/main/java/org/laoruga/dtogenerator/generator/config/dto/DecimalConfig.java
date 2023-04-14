@@ -29,7 +29,7 @@ public class DecimalConfig implements ConfigDto {
         fieldType = Primitives.wrap(fieldType);
 
         this.fieldType = fieldType;
-        this.ruleRemark = rule.ruleRemark();
+        this.ruleRemark = rule.boundary();
         this.precision = rule.precision();
 
         if (fieldType == Double.class) {

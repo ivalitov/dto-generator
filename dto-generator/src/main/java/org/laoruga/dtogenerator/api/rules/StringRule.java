@@ -30,7 +30,7 @@ public @interface StringRule {
 
     String chars() default CharSet.DEFAULT_CHARSET;
 
-    Boundary ruleRemark() default Boundary.RANDOM_VALUE;
+    Boundary boundary() default Boundary.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 

@@ -484,8 +484,9 @@ You may design your custom generator for any type you want. To do this, you need
 |-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `CustomGenerator`             | base interface, allows to create non configurable type generators                                                                                         |
 | `CustomGeneratorArgs`         | allows to pass array of arguments to generator                                                                                                            |
+| `CustomGeneratorConfigMap`    | allows to pass key-value parameters to generator                                                                                                          |
+| `CustomGeneratorRemark `      | allows to pass remarks to generator                                                                                                                       |
 | `CustomGeneratorDtoDependent` | provides a reference to the generating DTO instance to the generator<br/>(to check if the DTO fields required for generation have been already filled in) |
-| `CustomGeneratorRemarkable`   | allows to pass objects to a custom type generator as remarks                                                                                              |
 
 There are two possible options to provide generator:
 

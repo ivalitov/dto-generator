@@ -22,7 +22,7 @@ public @interface BooleanRule {
 
     double trueProbability() default 0.5D;
 
-    Boundary ruleRemark() default Boundary.RANDOM_VALUE;
+    Boundary boundary() default Boundary.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 

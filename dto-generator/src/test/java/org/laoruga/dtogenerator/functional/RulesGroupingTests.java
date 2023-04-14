@@ -44,12 +44,12 @@ class RulesGroupingTests {
     @NoArgsConstructor
     static class Dto {
 
-        @NumberRule(group = GROUP_1, ruleRemark = MAX_VALUE)
-        @NumberRule(group = GROUP_2, ruleRemark = MIN_VALUE)
-        @NumberRule(ruleRemark = RANDOM_VALUE, minInt = 10, maxInt = 10)
+        @NumberRule(group = GROUP_1, boundary = MAX_VALUE)
+        @NumberRule(group = GROUP_2, boundary = MIN_VALUE)
+        @NumberRule(boundary = RANDOM_VALUE, minInt = 10, maxInt = 10)
         private Integer intFirst;
 
-        @NumberRule(group = GROUP_1, ruleRemark = MIN_VALUE)
+        @NumberRule(group = GROUP_1, boundary = MIN_VALUE)
         @NumberRule(group = Group.GROUP_3, minInt = 99, maxInt = 99)
         private Integer intSecond;
 
@@ -64,11 +64,11 @@ class RulesGroupingTests {
         //GR_1
         @CollectionRule(
                 group = GROUP_1, minSize = 1, maxSize = 1,
-                element = @Entry(numberRule = @NumberRule(ruleRemark = MAX_VALUE)))
+                element = @Entry(numberRule = @NumberRule(boundary = MAX_VALUE)))
         //GR_2
         @CollectionRule(
                 group = GROUP_2, minSize = 2, maxSize = 2,
-                element = @Entry(numberRule = @NumberRule(ruleRemark = MIN_VALUE)))
+                element = @Entry(numberRule = @NumberRule(boundary = MIN_VALUE)))
         //DEFAULT
         @CollectionRule(
                 minSize = 3, maxSize = 3,

@@ -29,7 +29,7 @@ public class StringConfig implements ConfigDto {
         this.minLength = stringRule.minLength();
         this.words = stringRule.words();
         this.chars = stringRule.chars();
-        this.ruleRemark = stringRule.ruleRemark();
+        this.ruleRemark = stringRule.boundary();
         this.regexp = stringRule.regexp();
     }
 

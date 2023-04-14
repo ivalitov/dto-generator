@@ -40,7 +40,7 @@ public @interface DateTimeRule {
 
     ChronoFieldShift[] chronoFieldShift() default {};
 
-    Boundary ruleRemark() default Boundary.RANDOM_VALUE;
+    Boundary boundary() default Boundary.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 

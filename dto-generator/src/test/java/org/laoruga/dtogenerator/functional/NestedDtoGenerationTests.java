@@ -159,10 +159,10 @@ class NestedDtoGenerationTests {
         @NestedDtoRule
         private Nested_3 notDefined;
 
-        @NestedDtoRule(ruleRemark = Boundary.MAX_VALUE)
+        @NestedDtoRule(boundary = Boundary.MAX_VALUE)
         private Nested_3 maxValues;
 
-        @NestedDtoRule(ruleRemark = Boundary.MIN_VALUE)
+        @NestedDtoRule(boundary = Boundary.MIN_VALUE)
         private Nested_3 minValues;
     }
 

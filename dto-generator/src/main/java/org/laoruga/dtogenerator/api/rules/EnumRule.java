@@ -22,7 +22,7 @@ public @interface EnumRule {
     // All names are used by default
     String[] possibleEnumNames() default {};
 
-    Boundary ruleRemark() default Boundary.RANDOM_VALUE;
+    Boundary boundary() default Boundary.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 

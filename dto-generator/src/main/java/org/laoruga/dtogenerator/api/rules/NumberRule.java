@@ -45,7 +45,7 @@ public @interface NumberRule {
 
     String minBigInt() default Bounds.BIG_INTEGER_MIN_VALUE;
 
-    Boundary ruleRemark() default Boundary.RANDOM_VALUE;
+    Boundary boundary() default Boundary.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 

@@ -35,10 +35,10 @@ class ArrayTests {
         @ArrayRule(minSize = 2)
         String[] strings;
 
-        @ArrayRule(ruleRemark = MIN_VALUE, maxSize = 4)
+        @ArrayRule(boundary = MIN_VALUE, maxSize = 4)
         Integer[] integers;
 
-        @ArrayRule(ruleRemark = Boundary.MAX_VALUE)
+        @ArrayRule(boundary = Boundary.MAX_VALUE)
         int[] ints;
 
         @ArrayRule

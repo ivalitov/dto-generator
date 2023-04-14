@@ -22,7 +22,7 @@ public class BooleanConfig implements ConfigDto {
 
     public BooleanConfig(BooleanRule rule) {
         this.trueProbability = rule.trueProbability();
-        this.ruleRemark = rule.ruleRemark();
+        this.ruleRemark = rule.boundary();
     }
 
     public void merge(ConfigDto from) {

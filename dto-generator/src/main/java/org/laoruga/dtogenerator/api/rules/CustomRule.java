@@ -26,5 +26,5 @@ public @interface CustomRule {
 
     String group() default Group.DEFAULT;
 
-    Boundary ruleRemark() default Boundary.NOT_DEFINED;
+    Boundary boundary() default Boundary.NOT_DEFINED;
 }

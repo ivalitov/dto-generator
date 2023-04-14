@@ -62,7 +62,7 @@ public class DateTimeConfig implements ConfigDto {
         }
 
         this.generatedType = fieldType;
-        this.ruleRemark = rule.ruleRemark();
+        this.ruleRemark = rule.boundary();
     }
 
     public DateTimeConfig addChronoConfig(ChronoUnitConfig config) {

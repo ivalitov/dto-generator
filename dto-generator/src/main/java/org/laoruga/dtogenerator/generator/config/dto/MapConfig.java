@@ -35,7 +35,7 @@ public class MapConfig implements ConfigDto {
         this.mapInstanceSupplier = rule.mapClass() != DummyMapClass.class
                 ? () -> ReflectionUtils.createInstance(rule.mapClass())
                 : null;
-        this.ruleRemark = rule.ruleRemark();
+        this.ruleRemark = rule.boundary();
     }
 
     public void merge(MapConfig from) {

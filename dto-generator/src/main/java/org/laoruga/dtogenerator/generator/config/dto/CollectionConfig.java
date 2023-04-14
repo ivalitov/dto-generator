@@ -33,7 +33,7 @@ public class CollectionConfig implements ConfigDto {
         this.collectionInstanceSupplier = rule.collectionClass() != DummyCollectionClass.class
                 ? () -> ReflectionUtils.createInstance(rule.collectionClass())
                 : null;
-        this.ruleRemark = rule.ruleRemark();
+        this.ruleRemark = rule.boundary();
     }
 
     public void merge(CollectionConfig from) {

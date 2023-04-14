@@ -37,7 +37,7 @@ public class NumberConfig implements ConfigDto {
 
         this.isAtomic = fieldType == AtomicInteger.class || fieldType == AtomicLong.class;
         this.fieldType = fieldType;
-        this.ruleRemark = rules.ruleRemark();
+        this.ruleRemark = rules.boundary();
 
         if (fieldType == Integer.class || fieldType == AtomicInteger.class) {
             minValue = rules.minInt();

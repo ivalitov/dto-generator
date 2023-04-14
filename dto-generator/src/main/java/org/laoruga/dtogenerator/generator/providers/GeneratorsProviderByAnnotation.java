@@ -112,7 +112,7 @@ public class GeneratorsProviderByAnnotation {
         CustomGenerator<?> generatorInstance = createInstance(generatorClass);
 
         configurators.getBuilder(fieldName, generatorClass, customRule.args())
-                .boundary(customRule.ruleRemark())
+                .boundary(customRule.boundary())
                 .build()
                 .configure(generatorInstance);
 
@@ -122,7 +122,7 @@ public class GeneratorsProviderByAnnotation {
     Generator<?> createNestedGenerator(NestedDtoRule nestedRule, String fieldName) {
         return new NestedDtoGenerator(
                 NestedConfig.builder()
-                        .ruleRemark(nestedRule.ruleRemark())
+                        .ruleRemark(nestedRule.boundary())
                         .dtoGeneratorBuilderTreeNode(nestedDtoGeneratorBuilderSupplier.apply(fieldName))
                         .build()
         );

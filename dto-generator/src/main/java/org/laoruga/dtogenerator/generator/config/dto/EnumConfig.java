@@ -22,7 +22,7 @@ public class EnumConfig implements ConfigDto {
 
     public EnumConfig(EnumRule enumRule) {
         possibleEnumNames = enumRule.possibleEnumNames();
-        ruleRemark = enumRule.ruleRemark();
+        ruleRemark = enumRule.boundary();
     }
 
     public void merge(ConfigDto from) {

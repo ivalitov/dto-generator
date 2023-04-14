@@ -23,5 +23,5 @@ public @interface NestedDtoRule {
 
     Class<?> generatedType() default Object.class;
 
-    Boundary ruleRemark() default Boundary.NOT_DEFINED;
+    Boundary boundary() default Boundary.NOT_DEFINED;
 }

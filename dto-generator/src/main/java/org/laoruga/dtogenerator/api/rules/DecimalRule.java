@@ -35,7 +35,7 @@ public @interface DecimalRule {
 
     String minBigDecimal() default Bounds.BIG_DECIMAL_MIN_VALUE;
 
-    Boundary ruleRemark() default Boundary.RANDOM_VALUE;
+    Boundary boundary() default Boundary.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 

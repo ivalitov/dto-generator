@@ -310,7 +310,7 @@ class OverridingOfGeneratorsTests {
         @StringRule
         String stringWithEmptyRule;
 
-        @StringRule(minLength = 3, maxLength = 3, ruleRemark = MIN_VALUE)
+        @StringRule(minLength = 3, maxLength = 3, boundary = MIN_VALUE)
         String stringWithFullRule;
 
         String stringWithoutRule;

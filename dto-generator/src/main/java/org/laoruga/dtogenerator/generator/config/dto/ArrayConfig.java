@@ -27,7 +27,7 @@ public class ArrayConfig implements ConfigDto {
         this.minSize = rule.minSize();
         this.maxSize = rule.maxSize();
         this.elementType = elementType;
-        this.ruleRemark = rule.ruleRemark();
+        this.ruleRemark = rule.boundary();
     }
 
     public void merge(ArrayConfig from) {

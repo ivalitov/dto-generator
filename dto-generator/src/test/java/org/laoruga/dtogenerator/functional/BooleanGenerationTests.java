@@ -106,7 +106,7 @@ public class BooleanGenerationTests {
 
     @RepeatedTest(2)
     @DisplayName("Boolean Rule Remark")
-    void booleanRuleRemark() {
+    void booleanboundary() {
 
         Dto dto = DtoGenerator.builder(Dto.class).setBoundary(MIN_VALUE).build().generateDto();
 

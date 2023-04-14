@@ -27,7 +27,7 @@ public @interface ArrayRule {
 
     int minSize() default 1;
 
-    Boundary ruleRemark() default Boundary.RANDOM_VALUE;
+    Boundary boundary() default Boundary.RANDOM_VALUE;
 
     String group() default Group.DEFAULT;
 
