@@ -58,6 +58,8 @@ public class DtoGeneratorBuilder<T> {
     private final DtoGeneratorBuildersTree dtoGeneratorBuildersTree;
     @Getter(AccessLevel.PROTECTED)
     private final RemarksHolder remarksHolder;
+    @Getter(AccessLevel.PROTECTED)
+    private final CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder;
     private final Class<?> dtoType;
     private final Supplier<?> dtoInstanceSupplier;
 
@@ -73,18 +75,21 @@ public class DtoGeneratorBuilder<T> {
         this.dtoInstanceSupplier = dtoInstanceSupplier;
         this.dtoType = dtoType;
         RemarksHolder remarksHolder = new RemarksHolder();
+        CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder = new CustomGeneratorsConfigMapHolder();
         ConfigurationHolder configurationHolder = new ConfigurationHolder(
                 new DtoGeneratorInstanceConfig(),
                 new TypeGeneratorsConfigLazy(),
                 new TypeGeneratorsConfigForFiled(),
                 new CustomGeneratorsConfigurationHolder(
                         dtoInstanceSupplier,
-                        remarksHolder
+                        remarksHolder,
+                        customGeneratorsConfigMapHolder
                 )
         );
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
                 configurationHolder,
                 remarksHolder,
+                customGeneratorsConfigMapHolder,
                 new FieldFilter(),
                 new String[]{ROOT},
                 this::getDtoGeneratorBuildersTree,
@@ -92,6 +97,7 @@ public class DtoGeneratorBuilder<T> {
         );
         this.configuration = configurationHolder;
         this.remarksHolder = remarksHolder;
+        this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
         this.dtoGeneratorBuildersTree = new DtoGeneratorBuildersTree(this);
     }
 
@@ -108,6 +114,7 @@ public class DtoGeneratorBuilder<T> {
                                   Class<?> dtoType) {
         final DtoGeneratorBuildersTree dtoGeneratorBuildersTree = copyFrom.getDtoGeneratorBuildersTree();
         final RemarksHolder remarksHolder = new RemarksHolder(copyFrom.getRemarksHolder());
+        final CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder = new CustomGeneratorsConfigMapHolder(copyFrom.getCustomGeneratorsConfigMapHolder());
         final Supplier<?> rootDtoInstanceSupplier = dtoGeneratorBuildersTree
                 .getBuilderLazy(ROOT)
                 .getFieldGeneratorsProvider()
@@ -118,6 +125,7 @@ public class DtoGeneratorBuilder<T> {
                 new CustomGeneratorsConfigurationHolder(
                         rootDtoInstanceSupplier,
                         remarksHolder,
+                        customGeneratorsConfigMapHolder,
                         copyFrom.getConfiguration()
                                 .getCustomGeneratorsConfigurators()
                                 .getByGeneratorType()
@@ -125,10 +133,12 @@ public class DtoGeneratorBuilder<T> {
         );
 
         this.remarksHolder = remarksHolder;
+        this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
         this.configuration = configurationCopy;
         this.fieldGeneratorsProvider = new FieldGeneratorsProvider(
                 copyFrom.getFieldGeneratorsProvider(),
                 remarksHolder,
+                customGeneratorsConfigMapHolder,
                 pathFromRootDto,
                 dtoInstanceSupplier,
                 configurationCopy
@@ -304,9 +314,7 @@ public class DtoGeneratorBuilder<T> {
      */
     public DtoGeneratorBuilder<T> setBoundaryConfig(@NonNull BoundaryConfig boundaryConfig) throws DtoGeneratorException {
 
-        getRemarksHolder()
-                .getBasicRemarks()
-                .setRuleRemarkForAnyField(boundaryConfig);
+        remarksHolder.setRuleRemarkForAnyField(boundaryConfig);
 
         return this;
     }
@@ -329,7 +337,6 @@ public class DtoGeneratorBuilder<T> {
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
         dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
                 .getRemarksHolder()
-                .getBasicRemarks()
                 .setRuleRemarkForField(fieldNameAndPath.getLeft(), boundaryConfig);
 
         return this;
@@ -401,16 +408,14 @@ public class DtoGeneratorBuilder<T> {
             );
         }
 
-        CustomGeneratorConfigMapHolder customRemarks = getRemarksHolder().getCustomRemarks();
-
-        customRemarks.addParameterForGeneratorType(
+        customGeneratorsConfigMapHolder.addParameterForGeneratorType(
                 customGeneratorClass,
                 parameterName,
                 parameterValue
         );
 
         for (int i = 0; i < nameValuePairs.length; i = i + 2) {
-            customRemarks.addParameterForGeneratorType(
+            customGeneratorsConfigMapHolder.addParameterForGeneratorType(
                     customGeneratorClass,
                     nameValuePairs[i],
                     nameValuePairs[i + 1]
@@ -445,14 +450,14 @@ public class DtoGeneratorBuilder<T> {
 
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
 
-        CustomGeneratorConfigMapHolder customRemarks = dtoGeneratorBuildersTree.getBuilderLazy(fieldNameAndPath.getRight())
-                .getRemarksHolder()
-                .getCustomRemarks();
+        CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder = dtoGeneratorBuildersTree
+                .getBuilderLazy(fieldNameAndPath.getRight())
+                .getCustomGeneratorsConfigMapHolder();
 
-        customRemarks.addParameterForField(fieldNameAndPath.getLeft(), parameterName, parameterValue);
+        customGeneratorsConfigMapHolder.addParameterForField(fieldNameAndPath.getLeft(), parameterName, parameterValue);
 
         for (int i = 0; i < nameValuePairs.length; i = i + 2) {
-            customRemarks.addParameterForField(fieldNameAndPath.getLeft(), nameValuePairs[i], nameValuePairs[i + 1]);
+            customGeneratorsConfigMapHolder.addParameterForField(fieldNameAndPath.getLeft(), nameValuePairs[i], nameValuePairs[i + 1]);
         }
 
         return this;

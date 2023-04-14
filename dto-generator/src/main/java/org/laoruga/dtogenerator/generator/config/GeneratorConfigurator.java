@@ -33,20 +33,22 @@ public class GeneratorConfigurator {
 
     @Getter(AccessLevel.PUBLIC)
     private final ConfigurationHolder configuration;
+
     @Getter(AccessLevel.PUBLIC)
-    private final RemarksHolder remarksHolder;
+    RemarksHolder remarksHolder;
 
     public static final Consumer<ConfigDto> EMPTY_SPECIFIC_CONFIG = configDto -> {
         log.debug("Specific config is absent.");
     };
 
-    protected GeneratorConfigurator(ConfigurationHolder configuration, RemarksHolder remarksHolder) {
+    protected GeneratorConfigurator(ConfigurationHolder configuration,
+                                    RemarksHolder remarksHolder) {
         this.configuration = configuration;
         this.remarksHolder = remarksHolder;
     }
 
     public RuleRemark getRuleRemarkOrNull(String fieldName) {
-        return remarksHolder.getBasicRemarks().getRuleRemarkOrNull(fieldName);
+        return remarksHolder.getRuleRemarkOrNull(fieldName);
     }
 
     protected ConfigDto mergeGeneratorConfigurations(Supplier<ConfigDto> newConfigInstanceSupplier,

@@ -38,9 +38,11 @@ public class FieldGeneratorsProvider {
     private final RulesInfoExtractor rulesInfoExtractor;
     private final GeneratorProvidersMediator generatorProvidersMediator;
     private final RemarksHolder remarksHolder;
+    private final CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder;
 
     FieldGeneratorsProvider(ConfigurationHolder configuration,
                             RemarksHolder remarksHolder,
+                            CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder,
                             FieldFilter fieldsFilter,
                             String[] pathFromDtoRoot,
                             Supplier<DtoGeneratorBuildersTree> dtoGeneratorBuildersTree,
@@ -54,9 +56,11 @@ public class FieldGeneratorsProvider {
                 configuration,
                 userGeneratorSuppliers,
                 remarksHolder,
-                nestedDtoGeneratorBuilderSupplier());
+                nestedDtoGeneratorBuilderSupplier()
+        );
         this.dtoInstanceSupplier = dtoInstanceSupplier;
         this.remarksHolder = remarksHolder;
+        this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
     }
 
     /**
@@ -64,6 +68,7 @@ public class FieldGeneratorsProvider {
      */
     FieldGeneratorsProvider(FieldGeneratorsProvider copyFrom,
                             RemarksHolder remarksHolder,
+                            CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder,
                             String[] pathFromDtoRoot,
                             Supplier<?> dtoInstanceSupplier,
                             ConfigurationHolder configurationCopy) {
@@ -77,8 +82,10 @@ public class FieldGeneratorsProvider {
                 configurationCopy,
                 userGeneratorSuppliers,
                 remarksHolder,
-                nestedDtoGeneratorBuilderSupplier());
+                nestedDtoGeneratorBuilderSupplier()
+        );
         this.remarksHolder = remarksHolder;
+        this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
     }
 
     /**

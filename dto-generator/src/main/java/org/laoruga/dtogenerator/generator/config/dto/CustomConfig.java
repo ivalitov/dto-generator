@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.api.remarks.RuleRemark;
 
@@ -25,7 +24,6 @@ public class CustomConfig implements ConfigDto {
     private CustomGenerator<?> customGenerator;
     private Supplier<?> rootDtoInstanceSupplier;
     private String[] args;
-    private RemarksHolder remarksHolder;
     private String fieldName;
 
     private static final RuntimeException NOT_IMPLEMENTED = new NotImplementedException(
@@ -38,7 +36,8 @@ public class CustomConfig implements ConfigDto {
         if (from.getClass() == CustomConfig.class) {
             CustomConfig customConfigFrom = (CustomConfig) from;
             if (customConfigFrom.customGenerator != null) this.customGenerator = ((CustomConfig) from).customGenerator;
-            if (customConfigFrom.rootDtoInstanceSupplier != null) this.rootDtoInstanceSupplier = ((CustomConfig) from).rootDtoInstanceSupplier;
+            if (customConfigFrom.rootDtoInstanceSupplier != null)
+                this.rootDtoInstanceSupplier = ((CustomConfig) from).rootDtoInstanceSupplier;
             if (customConfigFrom.args != null) this.args = ((CustomConfig) from).args;
             if (customConfigFrom.fieldName != null) this.fieldName = ((CustomConfig) from).fieldName;
         } else {
@@ -72,11 +71,6 @@ public class CustomConfig implements ConfigDto {
 
     public CustomConfig setDtoInstanceSupplier(Supplier<?> rootDtoInstanceSupplier) {
         this.rootDtoInstanceSupplier = rootDtoInstanceSupplier;
-        return this;
-    }
-
-    public CustomConfig setRemarksHolder(RemarksHolder remarksHolder) {
-        this.remarksHolder = remarksHolder;
         return this;
     }
 

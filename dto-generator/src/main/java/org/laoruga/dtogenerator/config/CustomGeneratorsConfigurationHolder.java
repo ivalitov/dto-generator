@@ -2,6 +2,7 @@ package org.laoruga.dtogenerator.config;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.laoruga.dtogenerator.CustomGeneratorsConfigMapHolder;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
@@ -19,14 +20,17 @@ public class CustomGeneratorsConfigurationHolder {
 
     private final Supplier<?> dtoInstanceSupplier;
     private final RemarksHolder remarksHolder;
+    private final CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder;
     private final Map<String, CustomGeneratorConfigurator.Builder> byFieldName;
     @Getter(AccessLevel.PUBLIC)
     private final Map<Class<? extends CustomGenerator<?>>, CustomGeneratorConfigurator.Builder> byGeneratorType;
 
     public CustomGeneratorsConfigurationHolder(Supplier<?> dtoInstanceSupplier,
-                                               RemarksHolder remarksHolder) {
+                                               RemarksHolder remarksHolder,
+                                               CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder) {
         this.dtoInstanceSupplier = dtoInstanceSupplier;
         this.remarksHolder = remarksHolder;
+        this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
         this.byFieldName = new HashMap<>();
         this.byGeneratorType = new HashMap<>();
     }
@@ -36,9 +40,11 @@ public class CustomGeneratorsConfigurationHolder {
      */
     public CustomGeneratorsConfigurationHolder(Supplier<?> dtoInstanceSupplier,
                                                RemarksHolder remarksHolder,
+                                               CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder,
                                                Map<Class<? extends CustomGenerator<?>>, CustomGeneratorConfigurator.Builder> byGeneratorType) {
         this.dtoInstanceSupplier = dtoInstanceSupplier;
         this.remarksHolder = remarksHolder;
+        this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
         this.byGeneratorType = byGeneratorType;
         this.byFieldName = new HashMap<>();
     }
@@ -53,7 +59,7 @@ public class CustomGeneratorsConfigurationHolder {
     }
 
     public synchronized void setConfiguratorBuilder(Class<? extends CustomGenerator<?>> customGeneratorClass,
-                                       CustomGeneratorConfigurator.Builder configuratorBuilder) {
+                                                    CustomGeneratorConfigurator.Builder configuratorBuilder) {
         if (byGeneratorType.containsKey(customGeneratorClass)) {
             throw new DtoGeneratorException("Custom generator configurator already set for generator: " +
                     "'" + customGeneratorClass + "'");
@@ -94,7 +100,8 @@ public class CustomGeneratorsConfigurationHolder {
                 .fieldName(fieldName)
                 .args(EMPTY_ARRAY)
                 .dtoInstanceSupplier(dtoInstanceSupplier)
-                .remarksHolder(remarksHolder);
+                .remarksHolder(remarksHolder)
+                .customGeneratorsConfigMapHolder(customGeneratorsConfigMapHolder);
     }
 
     public void setArgs(Class<? extends CustomGenerator<?>> generatorClass, String[] argsOrNull) {

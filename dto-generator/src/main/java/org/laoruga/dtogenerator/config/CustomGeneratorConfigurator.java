@@ -2,6 +2,7 @@ package org.laoruga.dtogenerator.config;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+import org.laoruga.dtogenerator.CustomGeneratorsConfigMapHolder;
 import org.laoruga.dtogenerator.RemarksHolder;
 import org.laoruga.dtogenerator.api.generators.custom.*;
 import org.laoruga.dtogenerator.api.remarks.RuleRemark;
@@ -22,6 +23,7 @@ public class CustomGeneratorConfigurator {
     private String[] args;
     private Supplier<?> dtoInstanceSupplier;
     private RemarksHolder remarksHolder;
+    private CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder;
     private BoundaryConfig boundaryConfig;
     private String fieldName;
 
@@ -48,18 +50,14 @@ public class CustomGeneratorConfigurator {
 
 
                 ((CustomGeneratorConfigMap<?>) generatorInstance).setConfigMap(
-                        remarksHolder
-                                .getCustomRemarks()
-                                .getConfigMap(fieldName, generatorInstance.getClass())
+                        customGeneratorsConfigMapHolder.getConfigMap(fieldName, generatorInstance.getClass())
                 );
 
 
             } else if (generatorInstance instanceof CustomGeneratorRemarks) {
 
                 RuleRemark maybeRuleRemark =
-                        remarksHolder
-                                .getBasicRemarks()
-                                .getRuleRemarkOrNull(fieldName);
+                        remarksHolder.getRuleRemarkOrNull(fieldName);
 
                 ((CustomGeneratorRemarks<?>) generatorInstance).setRuleRemark(
                         maybeRuleRemark != null ? maybeRuleRemark : boundaryConfig

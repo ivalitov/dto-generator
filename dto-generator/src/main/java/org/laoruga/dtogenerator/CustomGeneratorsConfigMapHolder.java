@@ -14,12 +14,12 @@ import java.util.stream.Collectors;
  * Created on 19.05.2022
  */
 
-public class CustomGeneratorConfigMapHolder {
+public class CustomGeneratorsConfigMapHolder {
 
     private final Map<String, Map<String, String>> customRuleRemarksMapByField;
     private final Map<Class<? extends CustomGenerator<?>>, Map<String, String>> customRuleRemarksMapByGenerator;
 
-    public CustomGeneratorConfigMapHolder() {
+    public CustomGeneratorsConfigMapHolder() {
         this(new HashMap<>());
     }
 
@@ -28,7 +28,7 @@ public class CustomGeneratorConfigMapHolder {
      *
      * @param toCopy - source
      */
-    CustomGeneratorConfigMapHolder(CustomGeneratorConfigMapHolder toCopy) {
+    CustomGeneratorsConfigMapHolder(CustomGeneratorsConfigMapHolder toCopy) {
         this(
                 toCopy.customRuleRemarksMapByGenerator.entrySet()
                         .stream()
@@ -42,7 +42,7 @@ public class CustomGeneratorConfigMapHolder {
 
     }
 
-    private CustomGeneratorConfigMapHolder(
+    private CustomGeneratorsConfigMapHolder(
             Map<Class<? extends CustomGenerator<?>>, Map<String, String>> customRuleRemarksMapByGenerator) {
         this.customRuleRemarksMapByField = new HashMap<>();
         this.customRuleRemarksMapByGenerator = customRuleRemarksMapByGenerator;
