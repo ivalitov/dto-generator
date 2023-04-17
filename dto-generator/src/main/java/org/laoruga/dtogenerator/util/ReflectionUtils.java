@@ -208,27 +208,6 @@ public final class ReflectionUtils {
         }
     }
 
-    public static Annotation getSingleRuleFromEntry(Entry mapRule) throws DtoGeneratorValidationException {
-        Class<? extends Annotation> clazz = mapRule.annotationType();
-        Annotation found = null;
-        for (Method method : clazz.getMethods()) {
-            if (method.getName().endsWith("Rule")) {
-                Annotation[] values =
-                        invokeMethodReturningArray(mapRule, method.getName(), Annotation.class);
-                if (values.length >= 1) {
-                    if (values.length > 1 || found != null) {
-                        throw new DtoGeneratorValidationException("More than one annotation found in: '" + mapRule + "'");
-                    }
-                    found = values[0];
-                }
-            }
-        }
-        if (found == null) {
-            throw new DtoGeneratorValidationException("Empty '" + Entry.class.getName() + "' annotation.");
-        }
-        return found;
-    }
-
     public static Annotation getSingleRuleFromEntry(Entry mapRule, Class<?> requiredType) throws DtoGeneratorValidationException {
         Class<? extends Annotation> clazz = mapRule.annotationType();
         Annotation found = null;
@@ -275,7 +254,29 @@ public final class ReflectionUtils {
         return getFieldType(
                 fields,
                 initialIdx + 1,
-                ReflectionUtils.getField(initialType, fields[initialIdx]).getType()
+                ReflectionUtils.getFieldReclusive(initialType, fields[initialIdx], true).getType()
         );
     }
+
+    private static Field getFieldReclusive(Class<?> fromClass, String fieldName, boolean upper) {
+        Field field;
+
+        if (fromClass == Object.class) {
+            field = null;
+        } else {
+            try {
+                field = fromClass.getDeclaredField(fieldName);
+            } catch (NoSuchFieldException e) {
+                return getFieldReclusive(fromClass.getSuperclass(), fieldName, false);
+            }
+        }
+
+        if (upper && field == null) {
+            throw new DtoGeneratorException("Field '" + fieldName + "'" +
+                    " not found in the class: '" + fromClass.getName() + "'");
+        }
+
+        return field;
+    }
+
 }

@@ -1,18 +1,25 @@
 package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Epic;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
+import org.laoruga.dtogenerator.generator.config.dto.ArrayConfig;
+import org.laoruga.dtogenerator.generator.config.dto.BooleanConfig;
+import org.laoruga.dtogenerator.generator.config.dto.NumberConfig;
+import org.laoruga.dtogenerator.generator.config.dto.StringConfig;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.ChronoUnitConfig;
+import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -92,11 +99,11 @@ class InheritedDtoTests {
         Map<String, Long> superSuperMap;
         @DecimalRule
         Double superSuperDouble;
-//        @NestedDtoRule
-//        DtoNested superDtoNested;
+        @NestedDtoRule
+        DtoNested superSuperDtoNested;
     }
 
-    static class DtoNested {
+    static class DtoNested extends DtoNestedAncestor {
 
         @ArrayRule
         String[] nestedArray;
@@ -107,40 +114,149 @@ class InheritedDtoTests {
     static class DtoNestedAncestor {
 
         @ArrayRule
-        Integer[] nestedAncestorIntArray;
-        @BooleanRule
+        int[] nestedAncestorIntArray;
+        @StringRule
         String nestedAncestorString;
     }
 
-    // TODO inheritance and nested DTOs
-    @Disabled
     @Test
-    @DisplayName("Generation WithInheritance And Nested DTOs")
+    @DisplayName("Super Classes Generation With Inheritance And Nested DTOs")
     void generationWithInheritanceAndNestedDTOs() {
-        final LocalDateTime NOW = LocalDateTime.now();
-        DtoGeneratorBuilder<Dto_2> builder = DtoGenerator.builder(Dto_2.class);
-        builder.setGenerator("-superDateTime", () -> NOW);
-        builder.setGenerator("-superDtoNested.nestedArray", () -> NOW);
-        builder.setGenerator("--superDtoNested.nestedArray", () -> NOW);
-        builder.setGenerator("--superDtoNested.-nestedAncestor", () -> NOW);
-        Dto_2 dto = builder.build().generateDto();
+        Dto_2 dto = DtoGenerator.builder(Dto_2.class).build().generateDto();
 
         assertNotNull(dto);
+
+        // Upper class
         assertAll(
                 () -> assertNotNull(dto.upperInt),
                 () -> assertNotNull(dto.upperString),
                 () -> assertNotNull(dto.upperDtoNested.nestedArray),
-                () -> assertNotNull(dto.upperDtoNested.nestedBoolean)
+                () -> assertNotNull(dto.upperDtoNested.nestedBoolean),
+                () -> assertNotNull(dto.upperDtoNested.nestedAncestorIntArray),
+                () -> assertNotNull(dto.upperDtoNested.nestedAncestorString)
         );
+
+        // First Super Class
         assertAll(
                 () -> assertNotNull(dto.superList),
                 () -> assertNotNull(dto.superDateTime),
                 () -> assertNotNull(dto.superDtoNested.nestedArray),
-                () -> assertNotNull(dto.superDtoNested.nestedBoolean)
+                () -> assertNotNull(dto.superDtoNested.nestedBoolean),
+                () -> assertNotNull(dto.superDtoNested.nestedAncestorIntArray),
+                () -> assertNotNull(dto.superDtoNested.nestedAncestorString)
         );
+
+        // Second Super Class
         assertAll(
                 () -> assertNotNull(dto.superSuperMap),
-                () -> assertNotNull(dto.superSuperDouble)
+                () -> assertNotNull(dto.superSuperDouble),
+                () -> assertNotNull(dto.superSuperDtoNested.nestedArray),
+                () -> assertNotNull(dto.superSuperDtoNested.nestedBoolean),
+                () -> assertNotNull(dto.superSuperDtoNested.nestedAncestorIntArray),
+                () -> assertNotNull(dto.superSuperDtoNested.nestedAncestorString)
+        );
+    }
+
+    @Test
+    @DisplayName("Upper Class Configuring")
+    void upperClassConfiguring() {
+
+        final int[] INT_ARRAY = {1, 2, 3, 4, 5};
+        final String STRING = "FOX";
+
+        Dto_2 dto = DtoGenerator.builder(Dto_2.class)
+                .setGeneratorConfig(Integer.class, NumberConfig.builder().maxValue(1).minValue(1).build())
+                .setGeneratorConfig(String.class, StringConfig.builder().words(STRING).build())
+                .setGenerator("upperDtoNested.nestedBoolean", () -> false)
+                .setGenerator("upperDtoNested.nestedAncestorIntArray", () -> INT_ARRAY)
+                .build().generateDto();
+
+        assertAll(
+                () -> assertThat("User's Type Config",
+                        dto.upperInt, equalTo(1)),
+                () -> assertThat("User's Type Config",
+                        dto.upperString, equalTo("FOX")),
+                () -> assertThat("User's Type Config for Array Element (Nested DTO)",
+                        Arrays.asList(dto.upperDtoNested.nestedArray), everyItem(equalTo(STRING))),
+                () -> assertThat("User's Generator For Field (Nested DTO)",
+                        dto.upperDtoNested.nestedBoolean, is(false)),
+                () -> assertThat("User's Generator For Super Field of Nested DTO",
+                        dto.upperDtoNested.nestedAncestorIntArray, equalTo(INT_ARRAY)),
+                () -> assertThat("User's Type Config (Super Field of Nested DTO)",
+                        dto.upperDtoNested.nestedAncestorString, equalTo(STRING))
+        );
+
+    }
+
+    @Test
+    @DisplayName("Super Class Configuring")
+    void superClassConfiguring() {
+
+        final List<String> STRING_LIST = new LinkedList<>();
+        final int[] INT_ARRAY = {1, 2, 3, 4, 5};
+
+        Dto_2 dto = DtoGenerator.builder(Dto_2.class)
+                .setGeneratorConfig(LocalDateTime.class, DateTimeConfig.builder().addChronoConfig(
+                        ChronoUnitConfig.newAbsolute(10, ChronoUnit.DAYS)).build()
+                )
+                .setGeneratorConfig(Boolean.class, BooleanConfig.builder().trueProbability(1D).build())
+                .setGeneratorConfig("superDtoNested.nestedArray",
+                        ArrayConfig.builder().minSize(0).maxSize(0).build()
+                )
+                .setGenerator("superList", () -> STRING_LIST)
+                .setGenerator("superDtoNested.nestedAncestorIntArray", () -> INT_ARRAY)
+                .build().generateDto();
+
+        // First Super Class
+        assertAll(
+                () -> assertThat("User's Generator For Field",
+                        dto.superList, sameInstance(STRING_LIST)),
+                () -> assertThat("User's Type Config",
+                        dto.superDateTime.toLocalDate(), equalTo(LocalDate.now().plusDays(10))),
+                () -> assertThat("User's Config For Nested Field",
+                        dto.superDtoNested.nestedArray.length, equalTo(0)),
+                () -> assertThat("User's Type Config For Nested Field",
+                        dto.superDtoNested.nestedBoolean, is(true)),
+                () -> assertThat("User's Generator For Super Field of Super Nested",
+                        dto.superDtoNested.nestedAncestorIntArray, equalTo(INT_ARRAY)),
+                () -> assertNotNull(dto.superDtoNested.nestedAncestorString)
+        );
+
+    }
+
+    @Test
+    @DisplayName("Super Class Of Super Class Configuring")
+    void superClassOfSuperClassConfiguring() {
+
+        final Map<String, Long> MAP = new HashMap<>();
+        final Double DOUBLE = 77D;
+        final int[] INT_ARRAY = {1, 2, 3, 4, 5};
+
+        Dto_2 dto = DtoGenerator.builder(Dto_2.class)
+                .setGenerator("superSuperMap", () -> MAP)
+                .setGenerator(Double.class, () -> DOUBLE)
+                .setGenerator("superSuperDtoNested.nestedAncestorIntArray", () -> INT_ARRAY)
+                .setGeneratorConfig(Boolean.class, BooleanConfig.builder().trueProbability(0D).build())
+                .setGeneratorConfig("superSuperDtoNested.nestedArray",
+                        ArrayConfig.builder().minSize(0).maxSize(0).build()
+                )
+                .setGeneratorConfig(String.class, StringConfig.builder().minLength(1).maxLength(1).build())
+                .build().generateDto();
+
+        // Second Super Class
+        assertAll(
+                () -> assertThat("User's Generator For Field (Second Super Class)",
+                        dto.superSuperMap, sameInstance(MAP)),
+                () -> assertThat("User's Generator For Type (Second Super Class)",
+                        dto.superSuperDouble, is(DOUBLE)),
+                () -> assertThat("User's Config For Nested Field (Second Super Class)",
+                        dto.superSuperDtoNested.nestedArray.length, is(0)),
+                () -> assertThat("User's Type Config For Nested Field",
+                        dto.superSuperDtoNested.nestedBoolean, is(false)),
+                () -> assertThat("User's Generator For Super Field of Super Nested",
+                        dto.superSuperDtoNested.nestedAncestorIntArray, equalTo(INT_ARRAY)),
+                () -> assertThat("User's Generator For Type (Nested Dto of Second Super Class)",
+                        dto.superSuperDtoNested.nestedAncestorString, hasLength(1))
         );
     }
 

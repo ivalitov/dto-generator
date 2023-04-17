@@ -24,6 +24,14 @@ public class StringConfig implements ConfigDto {
     private RuleRemark ruleRemark;
     private String regexp;
 
+    public static class StringConfigBuilder {
+        public StringConfigBuilder words(String... words) {
+            this.words = words;
+            return this;
+        }
+    }
+
+
     public StringConfig(StringRule stringRule) {
         this.maxLength = stringRule.maxLength();
         this.minLength = stringRule.minLength();
