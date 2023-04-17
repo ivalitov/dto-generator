@@ -28,9 +28,4 @@ public class NestedConfig implements ConfigDto {
         this.ruleRemark = ruleRemark;
         return this;
     }
-
-    @Override
-    public RuleRemark getRuleRemark() {
-        return ruleRemark;
-    }
 }
