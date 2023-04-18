@@ -201,7 +201,9 @@ public final class ReflectionUtils {
     @SuppressWarnings("unchecked")
     public static <T> T callStaticMethod(String methodName, Class<?> sourceClass, Class<T> returnType) {
         try {
-            return (T) sourceClass.getMethod(methodName).invoke(sourceClass);
+            Method method = sourceClass.getDeclaredMethod(methodName);
+            method.setAccessible(true);
+            return (T) method.invoke(sourceClass);
         } catch (Exception e) {
             throw new DtoGeneratorException("Error during invocation of static method: '" + methodName + "'" +
                     " of class: '" + sourceClass.getName() + "", e);
