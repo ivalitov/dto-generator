@@ -1,3 +1,3 @@
 # DTO Generator
 
-See readme in the root of the project: https://github.com/ivalitov/dto-generator
+See readme at the root of the project: https://github.com/ivalitov/dto-generator
