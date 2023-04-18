@@ -260,7 +260,7 @@ public final class ReflectionUtils {
             try {
                 field = fromClass.getDeclaredField(fieldName);
             } catch (NoSuchFieldException e) {
-                return getFieldReclusive(fromClass.getSuperclass(), fieldName, false);
+                field = getFieldReclusive(fromClass.getSuperclass(), fieldName, false);
             }
         }
 

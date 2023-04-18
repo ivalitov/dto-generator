@@ -180,6 +180,21 @@ class ReflectionUtilsTests {
 
     }
 
+    @DisplayName("Get Field But Field Not Found")
+    @Test
+    @Tag("NEGATIVE_TEST")
+    void getFieldButFieldNotFound() {
+
+        final String PATH = "son.grandson.wisdom";
+
+        DtoGeneratorException exception = assertThrows(DtoGeneratorException.class,
+                () -> ReflectionUtils.getFieldType("treeHouse.absent".split("\\."), 0, Mark.class)
+        );
+
+        assertThat(exception.getMessage(),
+                containsString("Field 'absent' not found in the class: '" + TreeHouse.class.getName() +"'"));
+    }
+
     @DisplayName("Call Static Method")
     @Test
     void callStaticMethod() {
@@ -209,21 +224,6 @@ class ReflectionUtilsTests {
     }
 
     @Test
-    @DisplayName("Extract Singe Generic Type")
-    @Tag("NEGATIVE_TEST")
-    void unableToExtractSingeGenericTypeWithoutGeneric() {
-
-        Field field = ReflectionUtils.getField(this.getClass(), "string");
-
-        DtoGeneratorException exception = assertThrows(
-                DtoGeneratorException.class,
-                () -> ReflectionUtils.getSingleGenericType(field)
-        );
-
-        assertThat(exception.getMessage(), containsString("Next type must have single generic type"));
-    }
-
-    @Test
     @DisplayName("Get Array Element Type")
     void getArrayElementType() {
 
@@ -238,6 +238,21 @@ class ReflectionUtilsTests {
                 )
         );
 
+    }
+
+    @Test
+    @DisplayName("Extract Singe Generic Type")
+    @Tag("NEGATIVE_TEST")
+    void unableToExtractSingeGenericTypeWithoutGeneric() {
+
+        Field field = ReflectionUtils.getField(this.getClass(), "string");
+
+        DtoGeneratorException exception = assertThrows(
+                DtoGeneratorException.class,
+                () -> ReflectionUtils.getSingleGenericType(field)
+        );
+
+        assertThat(exception.getMessage(), containsString("Next type must have single generic type"));
     }
 
     @Test
