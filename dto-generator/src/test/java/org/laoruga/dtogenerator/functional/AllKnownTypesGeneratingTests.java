@@ -85,8 +85,8 @@ class AllKnownTypesGeneratingTests {
 
         TypeGeneratorsConfigSupplier staticConfig = builder.getStaticConfig().getTypeGeneratorsConfig();
 
-        staticConfig.getCollectionConfig(List.class).setMinSize(1);
-        staticConfig.getCollectionConfig(List.class).setMaxSize(1);
+        staticConfig.getCollectionConfig(List.class).setMinSize(2);
+        staticConfig.getCollectionConfig(List.class).setMaxSize(2);
 
         staticConfig.getCollectionConfig(Set.class).setMinSize(1);
         staticConfig.getCollectionConfig(Set.class).setMaxSize(1);
@@ -110,7 +110,7 @@ class AllKnownTypesGeneratingTests {
                         .and(lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
                 () -> assertThat(dto.localDateTime, notNullValue()),
                 () -> assertThat(dto.clientType, notNullValue()),
-                () -> assertThat(dto.listOfString.size(), equalTo(1)),
+                () -> assertThat(dto.listOfString.size(), equalTo(2)),
                 () -> assertThat(dto.setOfLong.size(), equalTo(1)),
                 () -> assertThat(dto.aDouble, notNullValue()),
                 () -> assertThat(dto.aBoolean, notNullValue()),
@@ -134,7 +134,7 @@ class AllKnownTypesGeneratingTests {
                         .and(lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
                 () -> assertThat(innerDto.localDateTime, notNullValue()),
                 () -> assertThat(innerDto.clientType, notNullValue()),
-                () -> assertThat(innerDto.listOfString.size(), equalTo(1)),
+                () -> assertThat(innerDto.listOfString.size(), equalTo(2)),
                 () -> assertThat(innerDto.setOfLong.size(), equalTo(1)),
                 () -> assertThat(innerDto.aDouble, notNullValue()),
                 () -> assertThat(innerDto.aBoolean, notNullValue()),

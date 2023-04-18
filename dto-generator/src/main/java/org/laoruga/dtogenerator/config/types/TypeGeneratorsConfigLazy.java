@@ -12,10 +12,7 @@ import org.laoruga.dtogenerator.generator.config.dto.*;
 import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
 
 import java.time.temporal.Temporal;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -92,6 +89,17 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
+    /**
+     * Configuration apples to:
+     * <li>provided class or interface</li>
+     * <li>classes and interfaces that extends or implements provided type</li>
+     * provided type.
+     *<p/>
+     * For example, config set for {@link List} will apply to {@link LinkedList}, {@link ArrayList} etc.
+     *
+     * @param generatedType class or interface to configure
+     * @return configuration instantiated lazy
+     */
     public CollectionConfig getCollectionConfig(Class<? extends Collection> generatedType) {
         return (CollectionConfig) getConfigLazy(
                 generatedType,
@@ -99,13 +107,30 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
-    public ArrayConfig getArrayConfig(Class<?> arrayType) {
+    /**
+     * Configuration apples to provided array class.
+     *
+     * @param generatedType class or interface to configure
+     *                      for example: int[].class, Integer[].class
+     *                      (these are two different types which processed independently)
+     * @return configuration instantiated lazy
+     */
+    public ArrayConfig getArrayConfig(Class<?> generatedType) {
         return (ArrayConfig) getConfigLazy(
-                arrayType,
+                generatedType,
                 ArrayConfig::new
         );
     }
 
+    /**
+     * Configuration apples to:
+     * <li>provided class or interface</li>
+     * <li>classes and interfaces that extends or implements provided type provided type</li>
+     * provided type.
+     *
+     * @param generatedType class or interface to configure
+     * @return configuration instantiated lazy
+     */
     @Override
     public MapConfig getMapConfig(Class<? extends Map> generatedType) {
         return (MapConfig) getConfigLazy(

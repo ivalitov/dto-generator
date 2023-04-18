@@ -28,7 +28,7 @@ Description of all features, examples, configurations is still in progress.
 
 ## Generation API
 
-So-called `@Rule` annotations are used to provide configuration on the field:
+Various `@Rule` annotations are used to provide configuration on the field:
 
 - `@StringRule`
 - `@NumberRule`
@@ -42,7 +42,7 @@ So-called `@Rule` annotations are used to provide configuration on the field:
 - `@MapRule`
 
 If a DTO class contains within its fields another DTOs, which fields must be generated as well,
-the following annotation is used to tell to the generator about it [see more below](#nested_dto):
+following annotation is used to tell to the generator to process its fields too. [see more below](#nested_dto):
 
 - `@NestedDtoRule`
 
@@ -57,7 +57,7 @@ If you want to create your own generator of specific type, next annotation is us
 3. [Known Type's Generation](#known_types_generation)
 4. [Configuration management](#config_management)
 5. [Rule's Remarks](#rules_remarks)
-6. [User's Builders](#user_generators)
+6. [User's Generators](#user_generators)
 7. [Nested DTO](#nested_dto)
 8. [Custom Rules](#custom_rule)
 9. [Requirements for POJO classes](#pojo_requirements)
