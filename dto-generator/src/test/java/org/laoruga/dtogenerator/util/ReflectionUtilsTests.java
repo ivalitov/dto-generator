@@ -10,7 +10,6 @@ import org.laoruga.dtogenerator.api.rules.NumberRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Stream;
@@ -18,7 +17,6 @@ import java.util.stream.Stream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.laoruga.dtogenerator.rule.RulesInfoHelper.validateType;
 
 /**
  * @author Il'dar Valitov
@@ -185,14 +183,12 @@ class ReflectionUtilsTests {
     @Tag("NEGATIVE_TEST")
     void getFieldButFieldNotFound() {
 
-        final String PATH = "son.grandson.wisdom";
-
         DtoGeneratorException exception = assertThrows(DtoGeneratorException.class,
-                () -> ReflectionUtils.getFieldType("treeHouse.absent".split("\\."), 0, Mark.class)
+                () -> ReflectionUtils.getFieldType(new String[]{"treeHouse", "absent"}, 0, Mark.class)
         );
 
         assertThat(exception.getMessage(),
-                containsString("Field 'absent' not found in the class: '" + TreeHouse.class.getName() +"'"));
+                containsString("Field 'absent' not found in the class: '" + TreeHouse.class.getName() + "'"));
     }
 
     @DisplayName("Call Static Method")
