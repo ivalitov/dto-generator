@@ -62,7 +62,7 @@ public final class ReflectionUtils {
         Matcher matcher = SINGLE_GENERIC_TYPE_REGEXP.matcher(typeName);
 
         if (!matcher.find()) {
-            throw new DtoGeneratorException("Cannot find generic type using next regex pattern: "
+            throw new DtoGeneratorException("Unexpected error. Cannot find generic type using next regex pattern: "
                     + SINGLE_GENERIC_TYPE_REGEXP.pattern() + " in type: '" + typeName + "'");
         }
         return getClass(matcher.group(1), typeName);
@@ -176,17 +176,6 @@ public final class ReflectionUtils {
         return true;
     }
 
-    /**
-     * @param fieldType       - type of field to assign collectionClass instance
-     * @param collectionClass - type to be assigned to the field
-     */
-    public static void assertTypeCompatibility(Class<?> fieldType, Class<?> collectionClass) {
-        if (!fieldType.isAssignableFrom(collectionClass)) {
-            throw new DtoGeneratorException("CollectionClass from rules: '" + collectionClass + "' can't" +
-                    " be assign to the field: " + fieldType);
-        }
-    }
-
 
     @SuppressWarnings("unchecked")
     public static <T> T[] invokeMethodReturningArray(Object sourceClass, String fieldName, Class<T> returnedType) {
@@ -210,7 +199,7 @@ public final class ReflectionUtils {
         }
     }
 
-    public static Annotation getSingleRuleFromEntry(Entry mapRule, Class<?> requiredType) throws DtoGeneratorValidationException {
+    public static Annotation getSingleRuleFromEntryOrDefaultForType(Entry mapRule, Class<?> requiredType) throws DtoGeneratorValidationException {
         Class<? extends Annotation> clazz = mapRule.annotationType();
         Annotation found = null;
         for (Method method : clazz.getMethods()) {
@@ -226,14 +215,16 @@ public final class ReflectionUtils {
             }
         }
 
-        if (found == null) {
-            Optional<Class<? extends Annotation>> rulesClass = GeneratedTypes.getRulesClass(Primitives.wrap(requiredType));
-            if (rulesClass.isPresent() && RulesInstance.INSTANCES_MAP.containsKey(rulesClass.get())) {
-                found = RulesInstance.INSTANCES_MAP.get(rulesClass.get());
-            } else {
-                throw new DtoGeneratorValidationException("Empty '@" + Entry.class.getSimpleName() + "' annotation," +
-                        " but failed to select @Rules annotation by type: '" + requiredType + "'");
-            }
+        if (found != null) {
+            return found;
+        }
+
+        Optional<Class<? extends Annotation>> rulesClass = GeneratedTypes.getRulesClass(Primitives.wrap(requiredType));
+        if (rulesClass.isPresent() && RulesInstance.INSTANCES_MAP.containsKey(rulesClass.get())) {
+            found = RulesInstance.INSTANCES_MAP.get(rulesClass.get());
+        } else {
+            throw new DtoGeneratorValidationException("Empty '@" + Entry.class.getSimpleName() + "' annotation," +
+                    " but failed to select @Rules annotation by type: '" + requiredType + "'");
         }
 
         return found;
