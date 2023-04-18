@@ -94,7 +94,6 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
      * <ul>
      * <li>provided class or interface</li>
      * <li>classes and interfaces that extends or implements provided type</li>
-     * provided type.
      * </ul>
      * For example, config set for {@link List} will apply to {@link LinkedList}, {@link ArrayList} etc.
      *
@@ -127,8 +126,7 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
      * Configuration apples to:
      * <ul>
      * <li>provided class or interface</li>
-     * <li>classes and interfaces that extends or implements provided type provided type</li>
-     * provided type.
+     * <li>classes and interfaces that extends or implements provided type</li>
      * </ul>
      *
      * @param generatedType class or interface to configure
