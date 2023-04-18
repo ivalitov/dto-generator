@@ -343,14 +343,10 @@ The result dto will look like:
 You may override generators of known types or set generator for any type you want:
 
 1. Override/set generator of specified type
-2. Override/set for specified field by its name
+2. Override/set for specified field by field name
 
-In order to have more control on your custom generators, your generator may implement
-interfaces [see more below](#custom_rule):
-
-- `CustomGeneratorArgs`
-- `CustomGeneratorDtoDependent`
-- `CustomGeneratorRemarkable`
+In order to have more control on your custom generators, your generator may implement CustomGenerator
+interfaces [see more below](#custom_rule).
 
 ```java
 public class Example5 {
@@ -422,7 +418,12 @@ The result dto may look like:
 
 ### 7. Nested DTO
 
-In order to override or remark fields within nested DTO, use path to DTO separated by dots.
+If DTO field annotated with  ```@NestedDtoRule``` annotation, its value will be generated according to configuration
+and annotations of its fields.
+In order to override configuration or generators of fields within nested DTO, use "path" to the field separated by dots.
+
+Inheritance is supported and if you want to get access to field of parent class, use exactly the same "path"
+as there is no inheritance and the field belongs to the child class itself.
 
 For example:
 
@@ -491,8 +492,7 @@ You may design your custom generator for any type you want. To do this, you need
 There are two possible options to provide generator:
 
 - via `@CustomRule` annotation on the field
-- via `setGenerator()` method of `DtoGeneratorBuilder`
-  , [linkig generator directly for the generated type](#user_generators)
+- via `setGenerator()` method of `DtoGeneratorBuilder`, [linkig generator directly for the generated type](#user_generators)
 
 More info and usage examples you may see in the project with
 examples: [Dto Generator Examples project](dto-generator-examples/README.md)
