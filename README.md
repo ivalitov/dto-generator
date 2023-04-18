@@ -31,7 +31,7 @@ Description of all features, examples, configurations is still in progress.
 Various `@Rule` annotations are used to provide configuration on the field:
 
 - `@StringRule`
-- `@NumberRule`
+- `@IntegerRule`
 - `@DecimalRule`
 - `@DoubleRule`
 - `@DateTimeRule`
@@ -75,7 +75,7 @@ public class Dto {
     @StringRule(words = {"Kate", "John", "Garcia"})
     public String name;
 
-    @NumberRule(minInt = 18, maxInt = 45)
+    @IntegerRule(minInt = 18, maxInt = 45)
     public Integer age;
 
     @EnumRule(possibleEnumNames = {"DRIVER_LICENCE", "PASSPORT"})
@@ -142,8 +142,8 @@ public class Example7 {
         @StringRule(words = {"Peter", "Clint"}, group = "BOY")
         public String name;
 
-        @NumberRule(minInt = 18, maxInt = 30, group = "YOUNG")
-        @NumberRule(minInt = 31, maxInt = 60, group = "MATURE")
+        @IntegerRule(minInt = 18, maxInt = 30, group = "YOUNG")
+        @IntegerRule(minInt = 31, maxInt = 60, group = "MATURE")
         public Integer age;
 
     }
@@ -304,7 +304,7 @@ public class Example4 {
         @StringRule(minLength = 1, maxLength = 150)
         public String name;
 
-        @NumberRule(minInt = 18, maxInt = 45)
+        @IntegerRule(minInt = 18, maxInt = 45)
         public Integer age;
 
         @CollectionRule(minSize = 1, maxSize = 20, element = @Entry(stringRule =

@@ -6,7 +6,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.*;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.Entry;
-import org.laoruga.dtogenerator.api.rules.NumberRule;
+import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
@@ -320,7 +320,7 @@ class ReflectionUtilsTests {
 
     @CollectionRule(element = @Entry(
             stringRule = @StringRule,
-            numberRule = @NumberRule
+            numberRule = @IntegerRule
     ))
     List<String> stringList;
 

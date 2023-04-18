@@ -33,7 +33,7 @@ class FieldsGroupingTests {
         @StringRule(group = REQUIRED)
         String reqStr;
 
-        @NumberRule(group = REQUIRED)
+        @IntegerRule(group = REQUIRED)
         Integer reqInt;
 
         @NestedDtoRule(group = REQUIRED)
@@ -45,13 +45,13 @@ class FieldsGroupingTests {
         @StringRule
         String defaultStr;
 
-        @NumberRule
+        @IntegerRule
         Integer defaultInt;
 
         @NestedDtoRule
         DtoInner defaultInnerDto;
 
-        @NumberRule(group = GROUP_1)
+        @IntegerRule(group = GROUP_1)
         Integer firstGroupInt;
 
         @NestedDtoRule(group = GROUP_1)
@@ -60,7 +60,7 @@ class FieldsGroupingTests {
         @CustomRule(group = GROUP_1, generatorClass = MapGen.class)
         Map<String, String> firstGroupMap;
 
-        @NumberRule(group = GROUP_2)
+        @IntegerRule(group = GROUP_2)
         Integer secondGroupInt;
 
         @BooleanRule(group = REQUIRED)
@@ -77,25 +77,25 @@ class FieldsGroupingTests {
         @StringRule(group = REQUIRED)
         String reqStr;
 
-        @NumberRule(group = REQUIRED)
+        @IntegerRule(group = REQUIRED)
         Integer reqInt;
 
         @StringRule
         String defaultStr;
 
-        @NumberRule
+        @IntegerRule
         Integer defaultInt;
 
         @CustomRule(generatorClass = MapGen.class)
         Map<String, String> defaultMap;
 
-        @NumberRule(group = GROUP_1)
+        @IntegerRule(group = GROUP_1)
         Integer firstGroupInt;
 
         @CustomRule(generatorClass = MapGen.class, group = GROUP_1)
         Map<String, String> firstGroupMap;
 
-        @NumberRule(group = GROUP_2)
+        @IntegerRule(group = GROUP_2)
         Integer secondGroupInt;
     }
 

@@ -15,7 +15,7 @@ public interface TypeGeneratorsConfigSupplier {
 
     StringConfig getStringConfig();
 
-    NumberCommonConfig getNumberConfig();
+    IntegerCommonConfig getNumberConfig();
 
     DecimalCommonConfig getDecimalConfig();
 

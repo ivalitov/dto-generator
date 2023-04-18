@@ -6,7 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.NumberRule;
+import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
@@ -26,7 +26,7 @@ import static org.laoruga.dtogenerator.constants.Group.GROUP_1;
 class NegativeTests {
 
     static class DtoNegative1 {
-        @NumberRule
+        @IntegerRule
         String string;
     }
 
@@ -40,7 +40,7 @@ class NegativeTests {
         return Stream.of(
                 Arguments.of("string",
                         NegativeTests.DtoNegative1.class,
-                        "'class java.lang.String' does not match to rules annotation: '@NumberRule'"),
+                        "'class java.lang.String' does not match to rules annotation: '@IntegerRule'"),
                 Arguments.of("loong",
                         NegativeTests.DtoNegative2.class,
                         "'class java.lang.Long' does not match to rules annotation: '@StringRule'"));

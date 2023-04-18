@@ -23,7 +23,7 @@ public final class RulesInstance {
 
     @BooleanRule
     @StringRule
-    @NumberRule
+    @IntegerRule
     @DecimalRule
     @EnumRule
     @DateTimeRule
@@ -39,7 +39,7 @@ public final class RulesInstance {
      */
     public static final BooleanRule BOOLEAN_RULE;
     public static final StringRule STRING_RULE;
-    public static final NumberRule NUMBER_RULE;
+    public static final IntegerRule NUMBER_RULE;
     public static final EnumRule ENUM_RULE;
     public static final DecimalRule DECIMAL_RULE;
     public static final DateTimeRule DATE_TIME_RULE;
@@ -53,7 +53,7 @@ public final class RulesInstance {
      * Other
      */
 
-    public static final NumberRule NUMBER_RULE_ZEROS;
+    public static final IntegerRule NUMBER_RULE_ZEROS;
 
     public static final Map<Class<? extends Annotation>, Annotation> INSTANCES_MAP;
 
@@ -64,8 +64,8 @@ public final class RulesInstance {
 
             BOOLEAN_RULE = getAnnotationInstance(annotations, instances, BooleanRule.class);
             STRING_RULE = getAnnotationInstance(annotations, instances, StringRule.class);
-            NUMBER_RULE = getAnnotationInstance(annotations, instances, NumberRule.class);
-            NUMBER_RULE_ZEROS = getAnnotationInstance(annotations, instances, NumberRule.class);
+            NUMBER_RULE = getAnnotationInstance(annotations, instances, IntegerRule.class);
+            NUMBER_RULE_ZEROS = getAnnotationInstance(annotations, instances, IntegerRule.class);
             ENUM_RULE = getAnnotationInstance(annotations, instances, EnumRule.class);
             DECIMAL_RULE = getAnnotationInstance(annotations, instances, DecimalRule.class);
             DATE_TIME_RULE = getAnnotationInstance(annotations, instances, DateTimeRule.class);

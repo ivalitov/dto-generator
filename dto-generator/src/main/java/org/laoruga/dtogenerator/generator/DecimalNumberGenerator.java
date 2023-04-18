@@ -13,14 +13,14 @@ import org.laoruga.dtogenerator.util.RandomUtils;
  */
 
 @AllArgsConstructor
-public class DecimalGenerator implements Generator<Number> {
+public class DecimalNumberGenerator implements Generator<Number> {
 
     private final Number maxValue;
     private final Number minValue;
     private final int precision;
     private final RuleRemark ruleRemark;
 
-    public DecimalGenerator(DecimalConfig config) {
+    public DecimalNumberGenerator(DecimalConfig config) {
         maxValue = config.getMaxValue();
         minValue = config.getMinValue();
         precision = config.getPrecision();

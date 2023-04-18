@@ -25,6 +25,56 @@ public class DecimalConfig implements ConfigDto {
     private RuleRemark ruleRemark;
     private Class<? extends Number> fieldType;
 
+    /**
+     * Builder Class.
+     * Types of min and max values have to be the same as generated type, this config intended for.
+     */
+    public static class DecimalConfigBuilder {
+
+        public DecimalConfigBuilder maxValue(Double maxValue) {
+            check(maxValue, minValue);
+            this.maxValue = maxValue;
+            return this;
+        }
+
+        public DecimalConfigBuilder minValue(Double minValue) {
+            check(minValue, maxValue);
+            this.minValue = minValue;
+            return this;
+        }
+
+        public DecimalConfigBuilder maxValue(Float maxValue) {
+            check(maxValue, minValue);
+            this.maxValue = maxValue;
+            return this;
+        }
+
+        public DecimalConfigBuilder minValue(Float minValue) {
+            check(minValue, maxValue);
+            this.minValue = minValue;
+            return this;
+        }
+
+        public DecimalConfigBuilder maxValue(BigDecimal maxValue) {
+            check(maxValue, minValue);
+            this.maxValue = maxValue;
+            return this;
+        }
+
+        public DecimalConfigBuilder minValue(BigDecimal minValue) {
+            check(minValue, maxValue);
+            this.minValue = minValue;
+            return this;
+        }
+
+        private void check(Number valueToSet, Number another) {
+            if (another != null && another.getClass() != valueToSet.getClass()) {
+                throw new IllegalArgumentException("Wrong bound type: '" + valueToSet + "'. " +
+                        "Bound with type '" + another + "' expexted.");
+            }
+        }
+    }
+
     public DecimalConfig(DecimalRule rule, Class<? extends Number> fieldType) {
         fieldType = Primitives.wrap(fieldType);
 

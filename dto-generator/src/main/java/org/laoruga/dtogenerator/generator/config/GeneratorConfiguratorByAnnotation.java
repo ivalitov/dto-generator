@@ -67,14 +67,14 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
                 throw new IllegalArgumentException("Unexpected state. Field type '" + fieldType
                         + "' doesn't extend Number.class");
 
-            } else if (NumberRule.class == rulesClass) {
+            } else if (IntegerRule.class == rulesClass) {
 
                 if (Number.class.isAssignableFrom(Primitives.wrap(fieldType))) {
                     @SuppressWarnings("unchecked")
                     Class<? extends Number> fieldTypeNumber = (Class<? extends Number>) fieldType;
 
                     return mergeGeneratorConfigurations(
-                            () -> new NumberConfig((NumberRule) rules, fieldTypeNumber),
+                            () -> new IntegerConfig((IntegerRule) rules, fieldTypeNumber),
                             integerGeneratorSpecificConfig(fieldType, fieldName),
                             fieldType,
                             fieldName);

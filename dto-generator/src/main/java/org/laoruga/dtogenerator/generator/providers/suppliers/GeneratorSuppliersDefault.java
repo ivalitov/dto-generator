@@ -40,13 +40,13 @@ public final class GeneratorSuppliersDefault {
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
-                        NumberRule.class,
-                        config -> new NumberGenerator((NumberConfig) config)));
+                        IntegerRule.class,
+                        config -> new IntegerNumberGenerator((IntegerConfig) config)));
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
                         DecimalRule.class,
-                        config -> new DecimalGenerator((DecimalConfig) config)));
+                        config -> new DecimalNumberGenerator((DecimalConfig) config)));
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(

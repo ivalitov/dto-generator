@@ -29,10 +29,10 @@ public class DtoAllKnownTypes {
     @StringRule(minLength = 1)
     String string;
 
-    @NumberRule
+    @IntegerRule
     Integer integer;
 
-    @NumberRule
+    @IntegerRule
     Long aLong;
 
     @DecimalRule

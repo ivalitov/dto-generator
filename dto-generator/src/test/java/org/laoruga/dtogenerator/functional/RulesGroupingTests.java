@@ -44,16 +44,16 @@ class RulesGroupingTests {
     @NoArgsConstructor
     static class Dto {
 
-        @NumberRule(group = GROUP_1, boundary = MAX_VALUE)
-        @NumberRule(group = GROUP_2, boundary = MIN_VALUE)
-        @NumberRule(boundary = RANDOM_VALUE, minInt = 10, maxInt = 10)
+        @IntegerRule(group = GROUP_1, boundary = MAX_VALUE)
+        @IntegerRule(group = GROUP_2, boundary = MIN_VALUE)
+        @IntegerRule(boundary = RANDOM_VALUE, minInt = 10, maxInt = 10)
         private Integer intFirst;
 
-        @NumberRule(group = GROUP_1, boundary = MIN_VALUE)
-        @NumberRule(group = Group.GROUP_3, minInt = 99, maxInt = 99)
+        @IntegerRule(group = GROUP_1, boundary = MIN_VALUE)
+        @IntegerRule(group = Group.GROUP_3, minInt = 99, maxInt = 99)
         private Integer intSecond;
 
-        @NumberRule(minInt = 0, maxInt = 0)
+        @IntegerRule(minInt = 0, maxInt = 0)
         private Integer defaultGroup;
     }
 
@@ -64,20 +64,20 @@ class RulesGroupingTests {
         //GR_1
         @CollectionRule(
                 group = GROUP_1, minSize = 1, maxSize = 1,
-                element = @Entry(numberRule = @NumberRule(boundary = MAX_VALUE)))
+                element = @Entry(numberRule = @IntegerRule(boundary = MAX_VALUE)))
         //GR_2
         @CollectionRule(
                 group = GROUP_2, minSize = 2, maxSize = 2,
-                element = @Entry(numberRule = @NumberRule(boundary = MIN_VALUE)))
+                element = @Entry(numberRule = @IntegerRule(boundary = MIN_VALUE)))
         //DEFAULT
         @CollectionRule(
                 minSize = 3, maxSize = 3,
-                element = @Entry(numberRule = @NumberRule(minInt = 10, maxInt = 10)))
+                element = @Entry(numberRule = @IntegerRule(minInt = 10, maxInt = 10)))
         private List<Integer> intList;
 
         @CollectionRule(
                 minSize = 6, maxSize = 6,
-                element = @Entry(numberRule = @NumberRule))
+                element = @Entry(numberRule = @IntegerRule))
         private List<Integer> intListDefault;
     }
 
@@ -87,7 +87,7 @@ class RulesGroupingTests {
 
         @MapRule(minSize = 10)
         @MapRule(group = GROUP_1,
-                maxSize = 1, value = @Entry(numberRule = @NumberRule(minInt = 1, maxInt = 1)))
+                maxSize = 1, value = @Entry(numberRule = @IntegerRule(minInt = 1, maxInt = 1)))
         Map<String, Integer> stringIntegerMap;
 
         @MapRule(minSize = 3, maxSize = 3)
@@ -239,15 +239,15 @@ class RulesGroupingTests {
 
         @CollectionRule(
                 group = GROUP_1, minSize = 1, maxSize = 1,
-                element = @Entry(numberRule = @NumberRule(minInt = 1, maxInt = 1)))
+                element = @Entry(numberRule = @IntegerRule(minInt = 1, maxInt = 1)))
 
         @CollectionRule(
                 minSize = 2, maxSize = 2,
-                element = @Entry(numberRule = @NumberRule(minInt = 2, maxInt = 3)))
+                element = @Entry(numberRule = @IntegerRule(minInt = 2, maxInt = 3)))
         private Set<Integer> set;
 
-        @NumberRule(group = GROUP_1, minLong = 1, maxLong = 1)
-        @NumberRule(minLong = 2, maxLong = 2)
+        @IntegerRule(group = GROUP_1, minLong = 1, maxLong = 1)
+        @IntegerRule(minLong = 2, maxLong = 2)
         private Long aLong;
 
         @DateTimeRule(group = GROUP_1)
@@ -263,8 +263,8 @@ class RulesGroupingTests {
                 element = @Entry(decimalRule = @DecimalRule(minDouble = 2, maxDouble = 2)))
         private List<Double> list;
 
-        @NumberRule(group = GROUP_1, minInt = 1, maxInt = 1)
-        @NumberRule(minInt = 2, maxInt = 2)
+        @IntegerRule(group = GROUP_1, minInt = 1, maxInt = 1)
+        @IntegerRule(minInt = 2, maxInt = 2)
         private int integer;
 
         @DecimalRule(group = GROUP_1, minDouble = 1, maxDouble = 1)
@@ -316,20 +316,20 @@ class RulesGroupingTests {
         String[] strings;
 
         @ArrayRule(minSize = 1, maxSize = 1,
-                element = @Entry(numberRule = @NumberRule))
+                element = @Entry(numberRule = @IntegerRule))
         @ArrayRule(group = GROUP_2,
                 minSize = 2, maxSize = 2,
-                element = @Entry(numberRule = @NumberRule))
+                element = @Entry(numberRule = @IntegerRule))
         Integer[] integers;
 
         @ArrayRule(minSize = 1, maxSize = 1,
-                element = @Entry(numberRule = @NumberRule))
+                element = @Entry(numberRule = @IntegerRule))
         @ArrayRule(group = GROUP_2,
                 minSize = 2, maxSize = 2,
-                element = @Entry(numberRule = @NumberRule))
+                element = @Entry(numberRule = @IntegerRule))
         @ArrayRule(group = GROUP_3,
                 minSize = 3, maxSize = 3,
-                element = @Entry(numberRule = @NumberRule))
+                element = @Entry(numberRule = @IntegerRule))
         long[] longs;
 
     }

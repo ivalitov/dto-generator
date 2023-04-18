@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
-import org.laoruga.dtogenerator.api.rules.NumberRule;
+import org.laoruga.dtogenerator.api.rules.IntegerRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.generator.config.dto.StringConfig;
 
@@ -63,7 +63,7 @@ class DtoInheritanceTests {
         @StringRule(words = "stringNested")
         String stringNested;
 
-        @NumberRule(minInt = 1, maxInt = 1)
+        @IntegerRule(minInt = 1, maxInt = 1)
         Integer integerNested;
     }
 

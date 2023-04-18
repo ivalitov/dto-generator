@@ -40,11 +40,11 @@ class RulesInfoExtractorTests {
     static class Dto {
         @StringRule(minLength = 1, maxLength = 1, chars = CharSet.NUM)
         String string;
-        @NumberRule
+        @IntegerRule
         int integer;
         @DecimalRule
         Double decimal;
-        @NumberRule
+        @IntegerRule
         long loong;
         @DateTimeRule
         LocalDateTime localDateTime;
@@ -52,7 +52,7 @@ class RulesInfoExtractorTests {
         @CollectionRule(element = @Entry(dateTimeRule = @DateTimeRule))
         List<LocalDateTime> listOfDates;
 
-        @CollectionRule(element = @Entry(numberRule = @NumberRule))
+        @CollectionRule(element = @Entry(numberRule = @IntegerRule))
         Set<Integer> setOfInts;
 
         @CollectionRule(
@@ -72,9 +72,9 @@ class RulesInfoExtractorTests {
     static Stream<Arguments> generalRulesDataSet() {
         return Stream.of(
                 Arguments.of(Dto.class, "string", StringRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
-                Arguments.of(Dto.class, "integer", NumberRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
+                Arguments.of(Dto.class, "integer", IntegerRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
                 Arguments.of(Dto.class, "decimal", DecimalRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
-                Arguments.of(Dto.class, "loong", NumberRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
+                Arguments.of(Dto.class, "loong", IntegerRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
                 Arguments.of(Dto.class, "localDateTime", DateTimeRule.class, Group.DEFAULT, false, UtilsRoot.getExtractorInstance()),
                 Arguments.of(Dto.class, "stringMultipleRules", StringRule.class, Group.GROUP_3, true, UtilsRoot.getExtractorInstance(Group.GROUP_3))
         );
@@ -111,7 +111,7 @@ class RulesInfoExtractorTests {
                         UtilsRoot.getExtractorInstance(),
                         Group.DEFAULT,
                         false),
-                Arguments.of(Dto.class, "setOfInts", CollectionRule.class, NumberRule.class,
+                Arguments.of(Dto.class, "setOfInts", CollectionRule.class, IntegerRule.class,
                         UtilsRoot.getExtractorInstance(),
                         Group.DEFAULT,
                         false),
@@ -168,13 +168,13 @@ class RulesInfoExtractorTests {
 
     static class DtoNegative3 {
         @StringRule
-        @NumberRule
+        @IntegerRule
         Long loong;
     }
 
     static class DtoNegative4 {
-        @NumberRule
-        @NumberRule
+        @IntegerRule
+        @IntegerRule
         @StringRule
         @StringRule
         Long loong;
@@ -183,7 +183,7 @@ class RulesInfoExtractorTests {
     static class DtoNegative7 {
         @StringRule
         @StringRule
-        @NumberRule
+        @IntegerRule
         String string;
     }
 
