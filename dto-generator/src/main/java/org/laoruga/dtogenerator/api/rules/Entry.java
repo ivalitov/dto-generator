@@ -16,7 +16,7 @@ public @interface Entry {
 
     EnumRule[] enumRule() default {};
 
-    IntegerRule[] numberRule() default {};
+    IntegralRule[] numberRule() default {};
 
     DecimalRule[] decimalRule() default {};
 

@@ -38,7 +38,7 @@ class NestedDtoGenerationTests {
     @Getter
     @NoArgsConstructor
     static class Dto {
-        @IntegerRule()
+        @IntegralRule()
         private Integer intDefaultRules;
         @NestedDtoRule()
         private IntegerGenerationTests.DtoInteger dtoNested;
@@ -47,7 +47,7 @@ class NestedDtoGenerationTests {
     @Getter
     @NoArgsConstructor
     static class DtoWithNestedLevels {
-        @IntegerRule()
+        @IntegralRule()
         private Integer simpleInt;
         @NestedDtoRule()
         private Nested_1 nested_1;
@@ -59,7 +59,7 @@ class NestedDtoGenerationTests {
     @NoArgsConstructor
     static class Nested_1 {
 
-        @IntegerRule(minInt = 1, maxInt = 2)
+        @IntegralRule(minInt = 1, maxInt = 2)
         private Integer oneTwo;
         @NestedDtoRule()
         private Nested_2 nested_2;
@@ -68,7 +68,7 @@ class NestedDtoGenerationTests {
     @Getter
     @NoArgsConstructor
     static class Nested_2 {
-        @IntegerRule()
+        @IntegralRule()
         private Integer intDefaultRules;
         @StringRule()
         private String stringDefaultRules;
@@ -168,7 +168,7 @@ class NestedDtoGenerationTests {
 
     static class Nested_3 {
 
-        @IntegerRule
+        @IntegralRule
         private Integer integer;
 
         @DecimalRule
@@ -249,7 +249,7 @@ class NestedDtoGenerationTests {
 
     static class DtoWithNestedWithCustom {
 
-        @IntegerRule
+        @IntegralRule
         private Integer integer;
 
         @NestedDtoRule

@@ -16,7 +16,7 @@ import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 import org.laoruga.dtogenerator.functional.data.dto.dtoclient.ClientType;
 import org.laoruga.dtogenerator.generator.config.dto.DecimalConfig;
-import org.laoruga.dtogenerator.generator.config.dto.IntegerConfig;
+import org.laoruga.dtogenerator.generator.config.dto.IntegralConfig;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -157,10 +157,10 @@ class AllKnownTypesGeneratingTests {
         DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class).generateKnownTypes();
 
         builder
-                .setGeneratorConfig("integer", IntegerConfig.builder().maxValue(7).minValue(7).build())
+                .setGeneratorConfig("integer", IntegralConfig.builder().maxValue(7).minValue(7).build())
                 .setGeneratorConfig("aDouble", DecimalConfig.builder().maxValue(8D).minValue(8D).build())
-                .setGeneratorConfig("atomicLong", IntegerConfig.builder().maxValue(9L).minValue(9L).build())
-                .setGeneratorConfig("bigInteger", IntegerConfig.builder()
+                .setGeneratorConfig("atomicLong", IntegralConfig.builder().maxValue(9L).minValue(9L).build())
+                .setGeneratorConfig("bigInteger", IntegralConfig.builder()
                         .maxValue(new BigInteger("10"))
                         .minValue(new BigInteger("10")).build())
                 .setGeneratorConfig("bigDecimal", DecimalConfig.builder()

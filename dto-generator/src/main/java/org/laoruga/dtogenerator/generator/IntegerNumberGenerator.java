@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.laoruga.dtogenerator.api.RuleRemark;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.constants.Boundary;
-import org.laoruga.dtogenerator.generator.config.dto.IntegerConfig;
+import org.laoruga.dtogenerator.generator.config.dto.IntegralConfig;
 import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,7 +23,7 @@ public class IntegerNumberGenerator implements Generator<Number> {
     private final boolean isAtomic;
     private final RuleRemark ruleRemark;
 
-    public IntegerNumberGenerator(IntegerConfig configDto) {
+    public IntegerNumberGenerator(IntegralConfig configDto) {
         maxValue = configDto.getMaxValue();
         minValue = configDto.getMinValue();
         isAtomic = configDto.isAtomic();

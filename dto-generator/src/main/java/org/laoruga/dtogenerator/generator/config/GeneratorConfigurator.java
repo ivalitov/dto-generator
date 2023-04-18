@@ -181,7 +181,7 @@ public class GeneratorConfigurator {
         return (config) -> {
             if (config.getRuleRemark() == NULL_VALUE && fieldType.isPrimitive()) {
                 reportPrimitiveCannotBeNull(fieldName);
-                config.merge(new IntegerConfig(NUMBER_RULE_ZEROS, (Class<? extends Number>) fieldType)
+                config.merge(new IntegralConfig(NUMBER_RULE_ZEROS, (Class<? extends Number>) fieldType)
                         .setRuleRemark(MIN_VALUE));
             }
         };

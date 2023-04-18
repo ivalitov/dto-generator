@@ -4,7 +4,7 @@ import com.google.common.primitives.Primitives;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.laoruga.dtogenerator.api.RuleRemark;
-import org.laoruga.dtogenerator.api.rules.IntegerRule;
+import org.laoruga.dtogenerator.api.rules.IntegralRule;
 
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class IntegerConfig implements ConfigDto {
+public class IntegralConfig implements ConfigDto {
 
     private Number maxValue;
     private Number minValue;
@@ -36,63 +36,63 @@ public class IntegerConfig implements ConfigDto {
      * Builder Class.
      * Types of min and max values have to be the same as generated type, this config intended for.
      */
-    public static class IntegerConfigBuilder {
+    public static class IntegralConfigBuilder {
 
-        public IntegerConfigBuilder maxValue(Integer maxValue) {
+        public IntegralConfigBuilder maxValue(Integer maxValue) {
             check(maxValue, minValue);
             this.maxValue = maxValue;
             return this;
         }
 
-        public IntegerConfigBuilder minValue(Integer minValue) {
+        public IntegralConfigBuilder minValue(Integer minValue) {
             check(minValue, maxValue);
             this.minValue = minValue;
             return this;
         }
 
-        public IntegerConfigBuilder maxValue(Long maxValue) {
+        public IntegralConfigBuilder maxValue(Long maxValue) {
             check(maxValue, minValue);
             this.maxValue = maxValue;
             return this;
         }
 
-        public IntegerConfigBuilder minValue(Long minValue) {
+        public IntegralConfigBuilder minValue(Long minValue) {
             check(minValue, maxValue);
             this.minValue = minValue;
             return this;
         }
 
-        public IntegerConfigBuilder maxValue(Short maxValue) {
+        public IntegralConfigBuilder maxValue(Short maxValue) {
             check(maxValue, minValue);
             this.maxValue = maxValue;
             return this;
         }
 
-        public IntegerConfigBuilder minValue(Short minValue) {
+        public IntegralConfigBuilder minValue(Short minValue) {
             check(minValue, maxValue);
             this.minValue = minValue;
             return this;
         }
 
-        public IntegerConfigBuilder maxValue(Byte maxValue) {
+        public IntegralConfigBuilder maxValue(Byte maxValue) {
             check(maxValue, minValue);
             this.maxValue = maxValue;
             return this;
         }
 
-        public IntegerConfigBuilder minValue(Byte minValue) {
+        public IntegralConfigBuilder minValue(Byte minValue) {
             check(minValue, maxValue);
             this.minValue = minValue;
             return this;
         }
 
-        public IntegerConfigBuilder maxValue(BigInteger maxValue) {
+        public IntegralConfigBuilder maxValue(BigInteger maxValue) {
             check(maxValue, minValue);
             this.maxValue = maxValue;
             return this;
         }
 
-        public IntegerConfigBuilder minValue(BigInteger minValue) {
+        public IntegralConfigBuilder minValue(BigInteger minValue) {
             check(minValue, maxValue);
             this.minValue = minValue;
             return this;
@@ -107,7 +107,7 @@ public class IntegerConfig implements ConfigDto {
 
     }
 
-    public IntegerConfig(IntegerRule rules, Class<? extends Number> fieldType) {
+    public IntegralConfig(IntegralRule rules, Class<? extends Number> fieldType) {
         fieldType = Primitives.wrap(fieldType);
 
         this.isAtomic = fieldType == AtomicInteger.class || fieldType == AtomicLong.class;
@@ -144,11 +144,11 @@ public class IntegerConfig implements ConfigDto {
 
     public void merge(ConfigDto configDto) {
 
-        boolean commonConfig = configDto.getClass() == IntegerCommonConfig.class;
+        boolean commonConfig = configDto.getClass() == IntegralCommonConfig.class;
 
-        IntegerConfig configFrom = commonConfig
-                ? ((IntegerCommonConfig) configDto).getConfigOrNull(fieldType)
-                : (IntegerConfig) configDto;
+        IntegralConfig configFrom = commonConfig
+                ? ((IntegralCommonConfig) configDto).getConfigOrNull(fieldType)
+                : (IntegralConfig) configDto;
 
         if (commonConfig) {
             if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();

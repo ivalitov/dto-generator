@@ -40,9 +40,9 @@ public final class TypeGeneratorsDefaultConfigSupplier {
                 false);
 
         add(configSupplier,
-                IntegerRule.GENERATED_TYPES,
+                IntegralRule.GENERATED_TYPES,
                 RulesInstance.NUMBER_RULE,
-                IntegerConfig.class,
+                IntegralConfig.class,
                 true);
 
         add(configSupplier,

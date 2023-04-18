@@ -38,13 +38,13 @@
 //    private List<ClientInfoDto> clients;
 //
 //    @CollectionRule(
-//            element = @Entry(numberRule = @IntegerRule)
+//            element = @Entry(numberRule = @IntegralRule)
 //    )
 //    private List<Integer> arrayListIntegerRules;
 //
 //    @CollectionRule(
 //            minSize = 5, maxSize = 5, collectionClass = LinkedList.class,
-//            element = @Entry(numberRule = @IntegerRule(minInt = 1, maxInt = 2)))
+//            element = @Entry(numberRule = @IntegralRule(minInt = 1, maxInt = 2)))
 //    private List<Integer> linkedListExplicitRules;
 //
 //}

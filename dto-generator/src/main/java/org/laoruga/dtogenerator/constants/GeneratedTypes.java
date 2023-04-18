@@ -20,7 +20,7 @@ public class GeneratedTypes {
         Map<Class<? extends Annotation>, Class<?>[]> generatedTypes = new HashMap<>();
 
         generatedTypes.put(StringRule.class, new Class[]{StringRule.GENERATED_TYPE});
-        generatedTypes.put(IntegerRule.class, IntegerRule.GENERATED_TYPES);
+        generatedTypes.put(IntegralRule.class, IntegralRule.GENERATED_TYPES);
         generatedTypes.put(DecimalRule.class, DecimalRule.GENERATED_TYPES);
         generatedTypes.put(DateTimeRule.class, new Class[]{DateTimeRule.GENERATED_TYPE});
         generatedTypes.put(EnumRule.class, new Class[]{EnumRule.GENERATED_TYPE});

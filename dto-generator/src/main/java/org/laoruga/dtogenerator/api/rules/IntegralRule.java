@@ -19,8 +19,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({FIELD, TYPE_USE})
 @Rule
-@Repeatable(IntegerRules.class)
-public @interface IntegerRule {
+@Repeatable(IntegralRules.class)
+public @interface IntegralRule {
 
     Class<?>[] GENERATED_TYPES = new Class<?>[]
             {Byte.class, Short.class, Integer.class, Long.class, BigInteger.class, AtomicInteger.class, AtomicLong.class};
