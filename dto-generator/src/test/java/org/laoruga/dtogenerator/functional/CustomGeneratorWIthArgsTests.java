@@ -236,12 +236,14 @@ public class CustomGeneratorWIthArgsTests {
                 );
 
         return Stream.of(
+
                 DynamicTest.dynamicTest("Args set for TYPE with 'setGenerator(..)' method",
                         () -> assertions.accept(
                                 DtoGenerator.builder(Dto.class)
                                         .setGenerator(WitchesBrew.class, new WitchesBrewGenerator_2(), constant)
                                         .build().generateDto()
                         )),
+
                 DynamicTest.dynamicTest("Args set for FIELD NAME with 'setGenerator(..)' method",
                         () -> assertions.accept(
                                 DtoGenerator.builder(Dto.class)
@@ -251,6 +253,7 @@ public class CustomGeneratorWIthArgsTests {
                                         .setGenerator("nestedDto.witchesBrewWithArgs", new WitchesBrewGenerator_2(),constant)
                                         .build().generateDto()
                         )),
+
                 DynamicTest.dynamicTest("Args set for TYPE with 'setGeneratorArgs(..)' method for generator overridden by TYPE",
                         () -> assertions.accept(
                                 DtoGenerator.builder(Dto.class)
@@ -258,6 +261,7 @@ public class CustomGeneratorWIthArgsTests {
                                         .setGenerator(WitchesBrew.class, new WitchesBrewGenerator_2())
                                         .build().generateDto()
                         )),
+
                 DynamicTest.dynamicTest("Args set for TYPE with 'setGeneratorArgs(..)' method for generator overridden by FIELD NAME",
                         () -> assertions.accept(
                                 DtoGenerator.builder(Dto.class)
@@ -268,6 +272,7 @@ public class CustomGeneratorWIthArgsTests {
                                         .setGeneratorArgs(WitchesBrewGenerator_2.class, constant)
                                         .build().generateDto()
                         )),
+
                 DynamicTest.dynamicTest("Args set for FIELD NAME with 'setGeneratorArgs(..)' method for generator overridden by FIELD NAME",
                         () -> assertions.accept(
                                 DtoGenerator.builder(Dto.class)
@@ -278,6 +283,7 @@ public class CustomGeneratorWIthArgsTests {
                                         .setGeneratorArgs("nestedDto.witchesBrewWithArgs", constant)
                                         .build().generateDto()
                         )),
+
                 DynamicTest.dynamicTest("Args set for FIELD NAME with 'setGeneratorArgs(..)' method for generator overridden by FIELD NAME",
                         () -> assertions.accept(
                                 DtoGenerator.builder(Dto.class)

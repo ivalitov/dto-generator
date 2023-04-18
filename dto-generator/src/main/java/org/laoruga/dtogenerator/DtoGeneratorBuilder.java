@@ -261,6 +261,7 @@ public class DtoGeneratorBuilder<T> {
      *
      * @param generatedType one of supported types
      * @param configDto     configuration to set
+     * @param <U>           generated class type
      * @return this
      */
     public <U> DtoGeneratorBuilder<T> setGeneratorConfig(@NonNull Class<U> generatedType,
