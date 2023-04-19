@@ -27,10 +27,10 @@ public class DtoAllKnownTypesNested {
     @StringRule
     String string;
 
-    @NumberRule
+    @IntegralRule
     Integer integer;
 
-    @NumberRule
+    @IntegralRule
     Long aLong;
 
     @DecimalRule

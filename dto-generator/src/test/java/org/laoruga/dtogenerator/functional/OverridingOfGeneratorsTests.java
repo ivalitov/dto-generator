@@ -13,7 +13,7 @@ import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.UtilsRoot;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.DecimalRule;
-import org.laoruga.dtogenerator.api.rules.NumberRule;
+import org.laoruga.dtogenerator.api.rules.IntegralRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.config.dto.DtoGeneratorStaticConfig;
 import org.laoruga.dtogenerator.config.types.TypeGeneratorsConfigSupplier;
@@ -129,7 +129,7 @@ class OverridingOfGeneratorsTests {
                 .setRuleRemark(MIN_VALUE)
                 .setChars("x");
 
-        gensConfig.getNumberConfig()
+        gensConfig.getIntegralConfig()
                 .setMinIntValue(-100)
                 .setMaxIntValue(1)
                 .setRuleRemark(MAX_VALUE);
@@ -139,7 +139,7 @@ class OverridingOfGeneratorsTests {
                 .setMaxDoubleValue(100D)
                 .setRuleRemarkDouble(MIN_VALUE);
 
-        gensConfig.getNumberConfig()
+        gensConfig.getIntegralConfig()
                 .setMinLongValue(-100L)
                 .setMaxLongValue(3L)
                 .setRuleRemark(MAX_VALUE);
@@ -177,7 +177,7 @@ class OverridingOfGeneratorsTests {
                 .setRuleRemark(MIN_VALUE)
                 .setChars("x");
 
-        gensConfig.getNumberConfig()
+        gensConfig.getIntegralConfig()
                 .setMinIntValue(-100)
                 .setMaxIntValue(1)
                 .setRuleRemark(MAX_VALUE);
@@ -187,7 +187,7 @@ class OverridingOfGeneratorsTests {
                 .setMaxDoubleValue(100D)
                 .setRuleRemark(MIN_VALUE);
 
-        gensConfig.getNumberConfig()
+        gensConfig.getIntegralConfig()
                 .setMinLongValue(-100L)
                 .setMaxLongValue(3L)
                 .setRuleRemark(MAX_VALUE);
@@ -315,10 +315,10 @@ class OverridingOfGeneratorsTests {
 
         String stringWithoutRule;
 
-        @NumberRule(minInt = 2)
+        @IntegralRule(minInt = 2)
         Integer integerWithRule;
 
-        @NumberRule
+        @IntegralRule
         Integer integerWithEmptyRule;
 
         @CollectionRule
@@ -348,8 +348,8 @@ class OverridingOfGeneratorsTests {
 
         userConfig.getCollectionConfig(Collection.class).setMaxSize(1);
 
-        userConfig.getNumberConfig().setMinIntValue(0);
-        staticConfig.getNumberConfig().setMaxIntValue(0);
+        userConfig.getIntegralConfig().setMinIntValue(0);
+        staticConfig.getIntegralConfig().setMaxIntValue(0);
 
         DtoDifferent dto = builder.build().generateDto();
 
@@ -376,8 +376,8 @@ class OverridingOfGeneratorsTests {
         DtoGeneratorBuilder<DtoDifferent> builder2 = DtoGenerator.builder(DtoDifferent.class);
 
         TypeGeneratorsConfigSupplier userConfig2 = builder2.getConfig().getTypeGeneratorsConfig();
-        userConfig2.getNumberConfig().setMinIntValue(5);
-        userConfig2.getNumberConfig().setMaxIntValue(5);
+        userConfig2.getIntegralConfig().setMinIntValue(5);
+        userConfig2.getIntegralConfig().setMaxIntValue(5);
         userConfig2.getStringConfig().setChars("i");
         userConfig2.getCollectionConfig(Collection.class).setMaxSize(1);
         userConfig2.getCollectionConfig(Collection.class).setMinSize(1);
@@ -443,10 +443,10 @@ class OverridingOfGeneratorsTests {
         @StringRule(group = GROUP_2, minLength = 2, maxLength = 2)
         String string;
 
-        @NumberRule
+        @IntegralRule
         Integer integer;
 
-        @NumberRule(group = GROUP_1)
+        @IntegralRule(group = GROUP_1)
         Long aLong;
 
         @CollectionRule(minSize = 1, maxSize = 1)

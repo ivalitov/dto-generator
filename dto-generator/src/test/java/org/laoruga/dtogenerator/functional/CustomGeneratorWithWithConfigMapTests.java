@@ -341,16 +341,4 @@ public class CustomGeneratorWithWithConfigMapTests {
         );
     }
 
-//    @Test
-//    @Feature("NEGATIVE_TEST")
-//    void violationOfNumberOfRemarkArgs() {
-//
-//        assertThrows(
-//                DtoGeneratorException.class,
-//                () -> DtoGenerator.builder(Dto.class).addRuleRemark(BrewFeature.BERRY_FLAVOURED),
-//                "Remark 'BERRY_FLAVOURED' expected at least '1' arg(s). Passed '0' arg(s)."
-//        );
-//
-//    }
-
 }

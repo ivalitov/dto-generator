@@ -40,8 +40,8 @@ public final class GeneratorSuppliersDefault {
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
-                        NumberRule.class,
-                        config -> new NumberGenerator((NumberConfig) config)));
+                        IntegralRule.class,
+                        config -> new NumberGenerator((IntegralConfig) config)));
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(

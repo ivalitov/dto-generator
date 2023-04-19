@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.NumberRule;
+import org.laoruga.dtogenerator.api.rules.IntegralRule;
 import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 
@@ -34,15 +34,15 @@ class IntegerGenerationTests {
     @Getter
     @NoArgsConstructor
     static class DtoInteger {
-        @NumberRule
+        @IntegralRule
         private Integer intDefaultRules;
-        @NumberRule
+        @IntegralRule
         private int intPrimitiveDefaultRules;
-        @NumberRule(minInt = minValueLeftBound)
+        @IntegralRule(minInt = minValueLeftBound)
         private Integer intLeftBound;
-        @NumberRule(maxInt = maxValueRightBound)
+        @IntegralRule(maxInt = maxValueRightBound)
         private int intRightBound;
-        @NumberRule(minInt = minValueLeftAndRightBounds, maxInt = maxValueLeftAndRightBounds)
+        @IntegralRule(minInt = minValueLeftAndRightBounds, maxInt = maxValueLeftAndRightBounds)
         private int intLeftAndRightBounds;
         private int intPrimitiveDefault;
         private int intPrimitive = intPrimitiveVal;

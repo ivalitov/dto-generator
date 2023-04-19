@@ -4,7 +4,7 @@ import com.google.common.primitives.Primitives;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.laoruga.dtogenerator.api.RuleRemark;
-import org.laoruga.dtogenerator.api.rules.NumberRule;
+import org.laoruga.dtogenerator.api.rules.IntegralRule;
 
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class NumberConfig implements ConfigDto {
+public class IntegralConfig implements ConfigDto {
 
     private Number maxValue;
     private Number minValue;
@@ -32,7 +32,7 @@ public class NumberConfig implements ConfigDto {
     private boolean isAtomic;
     private RuleRemark ruleRemark;
 
-    public NumberConfig(NumberRule rules, Class<? extends Number> fieldType) {
+    public IntegralConfig(IntegralRule rules, Class<? extends Number> fieldType) {
         fieldType = Primitives.wrap(fieldType);
 
         this.isAtomic = fieldType == AtomicInteger.class || fieldType == AtomicLong.class;
@@ -69,11 +69,11 @@ public class NumberConfig implements ConfigDto {
 
     public void merge(ConfigDto configDto) {
 
-        boolean commonConfig = configDto.getClass() == NumberCommonConfig.class;
+        boolean commonConfig = configDto.getClass() == IntegralConfigCommonConfig.class;
 
-        NumberConfig configFrom = commonConfig
-                ? ((NumberCommonConfig) configDto).getConfigOrNull(fieldType)
-                : (NumberConfig) configDto;
+        IntegralConfig configFrom = commonConfig
+                ? ((IntegralConfigCommonConfig) configDto).getConfigOrNull(fieldType)
+                : (IntegralConfig) configDto;
 
         if (commonConfig) {
             if (configDto.getRuleRemark() != null) this.ruleRemark = configDto.getRuleRemark();
