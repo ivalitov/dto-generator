@@ -59,6 +59,81 @@ public class IntegralConfig implements ConfigDto {
         }
     }
 
+    /**
+     * Builder Class.
+     * Types of min and max values have to be the same as generated type, this config intended for.
+     */
+    public static class IntegralConfigBuilder {
+
+        public IntegralConfigBuilder maxValue(Integer maxValue) {
+            check(maxValue, minValue);
+            this.maxValue = maxValue;
+            return this;
+        }
+
+        public IntegralConfigBuilder minValue(Integer minValue) {
+            check(minValue, maxValue);
+            this.minValue = minValue;
+            return this;
+        }
+
+        public IntegralConfigBuilder maxValue(Long maxValue) {
+            check(maxValue, minValue);
+            this.maxValue = maxValue;
+            return this;
+        }
+
+        public IntegralConfigBuilder minValue(Long minValue) {
+            check(minValue, maxValue);
+            this.minValue = minValue;
+            return this;
+        }
+
+        public IntegralConfigBuilder maxValue(Short maxValue) {
+            check(maxValue, minValue);
+            this.maxValue = maxValue;
+            return this;
+        }
+
+        public IntegralConfigBuilder minValue(Short minValue) {
+            check(minValue, maxValue);
+            this.minValue = minValue;
+            return this;
+        }
+
+        public IntegralConfigBuilder maxValue(Byte maxValue) {
+            check(maxValue, minValue);
+            this.maxValue = maxValue;
+            return this;
+        }
+
+        public IntegralConfigBuilder minValue(Byte minValue) {
+            check(minValue, maxValue);
+            this.minValue = minValue;
+            return this;
+        }
+
+        public IntegralConfigBuilder maxValue(BigInteger maxValue) {
+            check(maxValue, minValue);
+            this.maxValue = maxValue;
+            return this;
+        }
+
+        public IntegralConfigBuilder minValue(BigInteger minValue) {
+            check(minValue, maxValue);
+            this.minValue = minValue;
+            return this;
+        }
+
+        private void check(Number valueToSet, Number another) {
+            if (another != null && another.getClass() != valueToSet.getClass()) {
+                throw new IllegalArgumentException("Wrong bound type: '" + valueToSet + "'. " +
+                        "Bound with type '" + another + "' expexted.");
+            }
+        }
+
+    }
+
     public Number getMaxValue() {
         return maxValue;
     }
