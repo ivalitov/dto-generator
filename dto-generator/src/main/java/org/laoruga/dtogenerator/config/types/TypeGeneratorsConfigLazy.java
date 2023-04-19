@@ -61,10 +61,10 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
-    public NumberCommonConfig getNumberConfig() {
-        return (NumberCommonConfig) getConfigLazy(
+    public IntegralConfigCommonConfig getNumberConfig() {
+        return (IntegralConfigCommonConfig) getConfigLazy(
                 IntegralRule.GENERATED_TYPES,
-                NumberCommonConfig::new
+                IntegralConfigCommonConfig::new
         );
     }
 

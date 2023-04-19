@@ -42,7 +42,7 @@ public final class TypeGeneratorsDefaultConfigSupplier {
         add(configSupplier,
                 IntegralRule.GENERATED_TYPES,
                 RulesInstance.NUMBER_RULE,
-                NumberConfig.class,
+                IntegralConfig.class,
                 true);
 
         add(configSupplier,

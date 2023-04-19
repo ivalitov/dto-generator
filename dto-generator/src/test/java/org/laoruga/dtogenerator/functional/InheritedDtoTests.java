@@ -8,7 +8,7 @@ import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.api.rules.datetime.DateTimeRule;
 import org.laoruga.dtogenerator.generator.config.dto.ArrayConfig;
 import org.laoruga.dtogenerator.generator.config.dto.BooleanConfig;
-import org.laoruga.dtogenerator.generator.config.dto.NumberConfig;
+import org.laoruga.dtogenerator.generator.config.dto.IntegralConfig;
 import org.laoruga.dtogenerator.generator.config.dto.StringConfig;
 import org.laoruga.dtogenerator.generator.config.dto.datetime.ChronoUnitConfig;
 import org.laoruga.dtogenerator.generator.config.dto.datetime.DateTimeConfig;
@@ -165,7 +165,7 @@ class InheritedDtoTests {
         final String STRING = "FOX";
 
         Dto_2 dto = DtoGenerator.builder(Dto_2.class)
-                .setGeneratorConfig(Integer.class, NumberConfig.builder().maxValue(1).minValue(1).build())
+                .setGeneratorConfig(Integer.class, IntegralConfig.builder().maxValue(1).minValue(1).build())
                 .setGeneratorConfig(String.class, StringConfig.builder().words(STRING).build())
                 .setGenerator("upperDtoNested.nestedBoolean", () -> false)
                 .setGenerator("upperDtoNested.nestedAncestorIntArray", () -> INT_ARRAY)

@@ -74,7 +74,7 @@ public class GeneratorConfiguratorByAnnotation extends GeneratorConfigurator {
                     Class<? extends Number> fieldTypeNumber = (Class<? extends Number>) fieldType;
 
                     return mergeGeneratorConfigurations(
-                            () -> new NumberConfig((IntegralRule) rules, fieldTypeNumber),
+                            () -> new IntegralConfig((IntegralRule) rules, fieldTypeNumber),
                             integerGeneratorSpecificConfig(fieldType, fieldName),
                             fieldType,
                             fieldName);
