@@ -139,7 +139,7 @@ class ListGenerationTests {
 
         // static
         builder.getStaticConfig().getTypeGeneratorsConfig().getCollectionConfig(List.class).setMaxSize(1);
-        builder.getStaticConfig().getTypeGeneratorsConfig().getNumberConfig().setMaxIntValue(1).setMinIntValue(1);
+        builder.getStaticConfig().getTypeGeneratorsConfig().getIntegralConfig().setMaxIntValue(1).setMinIntValue(1);
 
         // instance
         builder.setGeneratorConfig("linkedListOfStrings", CollectionConfig.builder().maxSize(2).minSize(2).build())

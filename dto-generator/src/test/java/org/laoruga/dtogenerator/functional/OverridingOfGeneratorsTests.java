@@ -129,7 +129,7 @@ class OverridingOfGeneratorsTests {
                 .setRuleRemark(MIN_VALUE)
                 .setChars("x");
 
-        gensConfig.getNumberConfig()
+        gensConfig.getIntegralConfig()
                 .setMinIntValue(-100)
                 .setMaxIntValue(1)
                 .setRuleRemark(MAX_VALUE);
@@ -139,7 +139,7 @@ class OverridingOfGeneratorsTests {
                 .setMaxDoubleValue(100D)
                 .setRuleRemarkDouble(MIN_VALUE);
 
-        gensConfig.getNumberConfig()
+        gensConfig.getIntegralConfig()
                 .setMinLongValue(-100L)
                 .setMaxLongValue(3L)
                 .setRuleRemark(MAX_VALUE);
@@ -177,7 +177,7 @@ class OverridingOfGeneratorsTests {
                 .setRuleRemark(MIN_VALUE)
                 .setChars("x");
 
-        gensConfig.getNumberConfig()
+        gensConfig.getIntegralConfig()
                 .setMinIntValue(-100)
                 .setMaxIntValue(1)
                 .setRuleRemark(MAX_VALUE);
@@ -187,7 +187,7 @@ class OverridingOfGeneratorsTests {
                 .setMaxDoubleValue(100D)
                 .setRuleRemark(MIN_VALUE);
 
-        gensConfig.getNumberConfig()
+        gensConfig.getIntegralConfig()
                 .setMinLongValue(-100L)
                 .setMaxLongValue(3L)
                 .setRuleRemark(MAX_VALUE);
@@ -348,8 +348,8 @@ class OverridingOfGeneratorsTests {
 
         userConfig.getCollectionConfig(Collection.class).setMaxSize(1);
 
-        userConfig.getNumberConfig().setMinIntValue(0);
-        staticConfig.getNumberConfig().setMaxIntValue(0);
+        userConfig.getIntegralConfig().setMinIntValue(0);
+        staticConfig.getIntegralConfig().setMaxIntValue(0);
 
         DtoDifferent dto = builder.build().generateDto();
 
@@ -376,8 +376,8 @@ class OverridingOfGeneratorsTests {
         DtoGeneratorBuilder<DtoDifferent> builder2 = DtoGenerator.builder(DtoDifferent.class);
 
         TypeGeneratorsConfigSupplier userConfig2 = builder2.getConfig().getTypeGeneratorsConfig();
-        userConfig2.getNumberConfig().setMinIntValue(5);
-        userConfig2.getNumberConfig().setMaxIntValue(5);
+        userConfig2.getIntegralConfig().setMinIntValue(5);
+        userConfig2.getIntegralConfig().setMaxIntValue(5);
         userConfig2.getStringConfig().setChars("i");
         userConfig2.getCollectionConfig(Collection.class).setMaxSize(1);
         userConfig2.getCollectionConfig(Collection.class).setMinSize(1);
