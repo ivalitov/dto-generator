@@ -26,7 +26,6 @@ import static org.laoruga.dtogenerator.constants.Group.*;
 class FieldsGroupingTests {
 
     @Getter
-    @ToString
     static class Dto {
 
         // this annotation do not mean anything
@@ -112,8 +111,6 @@ class FieldsGroupingTests {
         Dto dto = DtoGenerator.builder(Dto.class)
                 .includeGroups(REQUIRED)
                 .build().generateDto();
-
-        log.info(dto.toString());
 
         assertNotNull(dto);
         assertAll(
