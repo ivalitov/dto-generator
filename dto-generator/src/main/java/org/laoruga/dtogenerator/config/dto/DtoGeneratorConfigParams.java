@@ -14,5 +14,6 @@ public class DtoGeneratorConfigParams implements DtoGeneratorConfig {
     private Integer maxDependentGenerationCycles;
     private Integer maxCollectionGenerationCycles;
     private Boolean generateAllKnownTypes;
+    private Boolean generateUsersTypes;
 
 }

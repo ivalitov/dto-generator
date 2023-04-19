@@ -50,7 +50,7 @@ public class ExecutorOfDtoDependentGenerator extends ExecutorOfGenerator {
         boolean dtoReady = Arrays.stream(dtoDependentGenerators)
                 .allMatch(CustomGeneratorDtoDependent::isDtoReady);
 
-        log.debug("Object " + (dtoReady ? "is" : "isn't") + " ready to generate dependent field value");
+        log.info("Object " + (dtoReady ? "is" : "isn't") + " ready to generate dependent field value");
 
         return dtoReady;
     }

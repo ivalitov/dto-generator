@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
+import org.laoruga.dtogenerator.config.dto.DtoGeneratorConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.generator.providers.GeneratorProvidersMediator;
@@ -101,13 +102,13 @@ public class FieldGeneratorsProvider {
     @SuppressWarnings("unchecked")
     Optional<Generator<?>> getGenerator(Field field) {
 
-        Optional<Generator<?>> maybeGeneratorForField =
+        Optional<Generator<?>> maybeUserGeneratorForField =
                 generatorProvidersMediator.getGeneratorOverriddenForField(field);
 
-        // generator set explicitly
-        if (maybeGeneratorForField.isPresent()) {
+        // if generator set explicitly for field
+        if (maybeUserGeneratorForField.isPresent()) {
 
-            Generator<?> generatorForField = maybeGeneratorForField.get();
+            Generator<?> generatorForField = maybeUserGeneratorForField.get();
 
             if (generatorForField instanceof CustomGenerator) {
                 configuration
@@ -125,16 +126,31 @@ public class FieldGeneratorsProvider {
 
         Optional<RuleInfo> maybeRulesInfo = getRuleInfo(field);
 
-        // field annotated with rules
+        // if field annotated with rules
         if (maybeRulesInfo.isPresent()) {
             return Optional.of(
                     generatorProvidersMediator.getGeneratorByAnnotation(maybeRulesInfo.get())
             );
         }
 
+        DtoGeneratorConfig generatorConfig = configuration.getDtoGeneratorConfig();
+
+        // if there needs to generate any known type
         // attempt to generate value using field type
-        if (getConfiguration().getDtoGeneratorConfig().getGenerateAllKnownTypes()) {
+        if (generatorConfig.getGenerateAllKnownTypes()) {
             return generatorProvidersMediator.getGeneratorByType(field, field.getType());
+        }
+
+        // if there needs to generate user's type only
+        if (generatorConfig.getGenerateUsersTypes()) {
+
+            Optional<Generator<?>> maybeUserGeneratorForType =
+                    generatorProvidersMediator.getUserGeneratorByType(field, field.getType());
+
+            if (maybeUserGeneratorForType.isPresent()) {
+                return maybeUserGeneratorForType;
+            }
+
         }
 
         return Optional.empty();
