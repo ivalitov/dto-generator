@@ -4,7 +4,7 @@ import com.google.common.primitives.Primitives;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.laoruga.dtogenerator.api.RuleRemark;
-import org.laoruga.dtogenerator.api.rules.NumberRule;
+import org.laoruga.dtogenerator.api.rules.IntegralRule;
 
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,7 +32,7 @@ public class NumberConfig implements ConfigDto {
     private boolean isAtomic;
     private RuleRemark ruleRemark;
 
-    public NumberConfig(NumberRule rules, Class<? extends Number> fieldType) {
+    public NumberConfig(IntegralRule rules, Class<? extends Number> fieldType) {
         fieldType = Primitives.wrap(fieldType);
 
         this.isAtomic = fieldType == AtomicInteger.class || fieldType == AtomicLong.class;

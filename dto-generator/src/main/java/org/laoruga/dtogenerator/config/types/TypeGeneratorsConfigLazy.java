@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.laoruga.dtogenerator.api.rules.DecimalRule;
 import org.laoruga.dtogenerator.api.rules.EnumRule;
-import org.laoruga.dtogenerator.api.rules.NumberRule;
+import org.laoruga.dtogenerator.api.rules.IntegralRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.*;
@@ -63,7 +63,7 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
 
     public NumberCommonConfig getNumberConfig() {
         return (NumberCommonConfig) getConfigLazy(
-                NumberRule.GENERATED_TYPES,
+                IntegralRule.GENERATED_TYPES,
                 NumberCommonConfig::new
         );
     }

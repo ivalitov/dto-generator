@@ -105,11 +105,11 @@ class ListGenerationTests {
         private List<Boolean> listOfBoolean;
 
         @CollectionRule(minSize = 2, maxSize = 2, element = @Entry(numberRule =
-        @NumberRule(minInt = 777, maxInt = 777)))
+        @IntegralRule(minInt = 777, maxInt = 777)))
         private List<AtomicInteger> listOfAtomicInteger;
 
         @CollectionRule(collectionClass = LinkedList.class, minSize = 10, element = @Entry(numberRule =
-        @NumberRule(minInt = 1, maxInt = 1)))
+        @IntegralRule(minInt = 1, maxInt = 1)))
         private List<Integer> listOfInteger;
 
     }
@@ -243,7 +243,7 @@ class ListGenerationTests {
     static class Dto3 {
 
         @CollectionRule(element = @Entry(numberRule =
-        @NumberRule))
+        @IntegralRule))
         List<String> some;
 
     }
@@ -260,7 +260,7 @@ class ListGenerationTests {
 
         assertThat(errorMessage, containsString("'1' error(s)"));
         assertThat(errorMessage,
-                containsString("'class java.lang.String' does not match to rules annotation: '@NumberRule'"));
+                containsString("'class java.lang.String' does not match to rules annotation: '@IntegralRule'"));
     }
 
     @Getter

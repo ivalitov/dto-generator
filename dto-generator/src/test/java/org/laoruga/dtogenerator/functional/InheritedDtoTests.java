@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class InheritedDtoTests {
 
     static class Dto extends DtoSuper {
-        @NumberRule()
+        @IntegralRule()
         Integer upperInt;
         @StringRule()
         String upperString;
@@ -75,7 +75,7 @@ class InheritedDtoTests {
     }
 
     static class Dto_2 extends DtoSuper_2 {
-        @NumberRule()
+        @IntegralRule()
         Integer upperInt;
         @StringRule()
         String upperString;

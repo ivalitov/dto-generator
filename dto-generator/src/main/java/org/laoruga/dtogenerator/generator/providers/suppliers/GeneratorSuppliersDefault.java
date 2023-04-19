@@ -40,7 +40,7 @@ public final class GeneratorSuppliersDefault {
 
         generatorSuppliers.addSuppliersInfo(
                 GeneratorSupplierInfo.createInstances(
-                        NumberRule.class,
+                        IntegralRule.class,
                         config -> new NumberGenerator((NumberConfig) config)));
 
         generatorSuppliers.addSuppliersInfo(

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
-import org.laoruga.dtogenerator.api.rules.NumberRule;
+import org.laoruga.dtogenerator.api.rules.IntegralRule;
 import org.laoruga.dtogenerator.constants.Bounds;
 import org.laoruga.dtogenerator.generator.config.dto.NumberCommonConfig;
 import org.laoruga.dtogenerator.generator.config.dto.NumberConfig;
@@ -32,37 +32,37 @@ public class NumberTests {
 
     static class Dto {
 
-        @NumberRule
+        @IntegralRule
         Integer intObject;
 
-        @NumberRule(minInt = 1)
+        @IntegralRule(minInt = 1)
         int intPrimitive;
 
-        @NumberRule
+        @IntegralRule
         Long longObject;
 
-        @NumberRule(maxLong = 5L)
+        @IntegralRule(maxLong = 5L)
         long longPrimitive;
 
-        @NumberRule
+        @IntegralRule
         Short shortObject;
 
-        @NumberRule(minShort = -5, maxShort = -5)
+        @IntegralRule(minShort = -5, maxShort = -5)
         short shortPrimitive;
 
-        @NumberRule
+        @IntegralRule
         Byte byteObject;
 
-        @NumberRule(maxByte = 10)
+        @IntegralRule(maxByte = 10)
         byte bytePrimitive;
 
-        @NumberRule(minInt = 1, maxInt = 1)
+        @IntegralRule(minInt = 1, maxInt = 1)
         AtomicInteger atomicInteger;
 
-        @NumberRule(minLong = 2, maxLong = 2)
+        @IntegralRule(minLong = 2, maxLong = 2)
         AtomicLong atomicLong;
 
-        @NumberRule(minBigInt = "9999999999999999999", maxBigInt = "9999999999999999999")
+        @IntegralRule(minBigInt = "9999999999999999999", maxBigInt = "9999999999999999999")
         BigInteger bigInteger;
 
     }
