@@ -2,7 +2,6 @@ package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Epic;
 import lombok.Getter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,7 +69,6 @@ class FieldsGroupingTests {
     }
 
     @Getter
-    @ToString
     static class DtoInner {
 
         @StringRule(group = REQUIRED)
