@@ -33,7 +33,6 @@ Various `@Rule` annotations are used to provide configuration on the field:
 - `@StringRule`
 - `@IntegralRule`
 - `@DecimalRule`
-- `@DoubleRule`
 - `@DateTimeRule`
 - `@BooleanRule`
 - `@EnumRule`
