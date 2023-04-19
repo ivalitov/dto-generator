@@ -1,7 +1,6 @@
 package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Epic;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,6 @@ import static org.laoruga.dtogenerator.constants.Group.*;
 @Slf4j
 class FieldsGroupingTests {
 
-    @Getter
     static class Dto {
 
         // this annotation do not mean anything
@@ -68,7 +66,6 @@ class FieldsGroupingTests {
         Boolean defaultBoolean;
     }
 
-    @Getter
     static class DtoInner {
 
         @StringRule(group = REQUIRED)
@@ -112,27 +109,27 @@ class FieldsGroupingTests {
 
         assertNotNull(dto);
         assertAll(
-                () -> assertNotNull(dto.getReqStr()),
-                () -> assertNotNull(dto.getReqInt()),
-                () -> assertNotNull(dto.getReqMap()),
-                () -> assertNotNull(dto.getReqInnerDto()),
-                () -> assertNotNull(dto.getReqInnerDto().getReqInt()),
-                () -> assertNotNull(dto.getReqInnerDto().getReqStr()),
-                () -> assertNotNull(dto.getReqBoolean()),
-                () -> assertNull(dto.getReqInnerDto().getDefaultMap()),
-                () -> assertNull(dto.getReqInnerDto().getDefaultInt()),
-                () -> assertNull(dto.getReqInnerDto().getDefaultStr()),
-                () -> assertNull(dto.getReqInnerDto().getFirstGroupMap()),
-                () -> assertNull(dto.getReqInnerDto().getFirstGroupInt()),
-                () -> assertNull(dto.getReqInnerDto().getSecondGroupInt()),
-                () -> assertNull(dto.getDefaultStr()),
-                () -> assertNull(dto.getDefaultInt()),
-                () -> assertNull(dto.getDefaultInnerDto()),
-                () -> assertNull(dto.getFirstGroupInt()),
-                () -> assertNull(dto.getFirstGroupMap()),
-                () -> assertNull(dto.getFirstGroupInnerDto()),
-                () -> assertNull(dto.getSecondGroupInt()),
-                () -> assertNull(dto.getDefaultBoolean())
+                () -> assertNotNull(dto.reqStr),
+                () -> assertNotNull(dto.reqInt),
+                () -> assertNotNull(dto.reqMap),
+                () -> assertNotNull(dto.reqInnerDto),
+                () -> assertNotNull(dto.reqInnerDto.reqInt),
+                () -> assertNotNull(dto.reqInnerDto.reqStr),
+                () -> assertNotNull(dto.reqBoolean),
+                () -> assertNull(dto.reqInnerDto.defaultMap),
+                () -> assertNull(dto.reqInnerDto.defaultInt),
+                () -> assertNull(dto.reqInnerDto.defaultStr),
+                () -> assertNull(dto.reqInnerDto.firstGroupMap),
+                () -> assertNull(dto.reqInnerDto.firstGroupInt),
+                () -> assertNull(dto.reqInnerDto.secondGroupInt),
+                () -> assertNull(dto.defaultStr),
+                () -> assertNull(dto.defaultInt),
+                () -> assertNull(dto.defaultInnerDto),
+                () -> assertNull(dto.firstGroupInt),
+                () -> assertNull(dto.firstGroupMap),
+                () -> assertNull(dto.firstGroupInnerDto),
+                () -> assertNull(dto.secondGroupInt),
+                () -> assertNull(dto.defaultBoolean)
         );
     }
 
@@ -145,17 +142,17 @@ class FieldsGroupingTests {
 
         assertNotNull(dto);
         assertAll(
-                () -> assertNull(dto.getReqStr()),
-                () -> assertNull(dto.getReqInt()),
-                () -> assertNull(dto.getReqInnerDto()),
-                () -> assertNull(dto.getReqMap()),
-                () -> assertNull(dto.getDefaultStr()),
-                () -> assertNull(dto.getDefaultInt()),
-                () -> assertNull(dto.getDefaultInnerDto()),
-                () -> assertNotNull(dto.getFirstGroupInt()),
-                () -> assertNotNull(dto.getFirstGroupMap()),
-                () -> assertNotNull(dto.getFirstGroupInnerDto()),
-                () -> assertNull(dto.getSecondGroupInt())
+                () -> assertNull(dto.reqStr),
+                () -> assertNull(dto.reqInt),
+                () -> assertNull(dto.reqInnerDto),
+                () -> assertNull(dto.reqMap),
+                () -> assertNull(dto.defaultStr),
+                () -> assertNull(dto.defaultInt),
+                () -> assertNull(dto.defaultInnerDto),
+                () -> assertNotNull(dto.firstGroupInt),
+                () -> assertNotNull(dto.firstGroupMap),
+                () -> assertNotNull(dto.firstGroupInnerDto),
+                () -> assertNull(dto.secondGroupInt)
         );
     }
 
@@ -169,25 +166,25 @@ class FieldsGroupingTests {
         assertNotNull(dto);
 
         assertAll(
-                () -> assertNotNull(dto.getReqStr()),
-                () -> assertNotNull(dto.getReqInt()),
-                () -> assertNotNull(dto.getReqMap()),
-                () -> assertNotNull(dto.getReqInnerDto()),
-                () -> assertNotNull(dto.getReqInnerDto().getReqStr()),
-                () -> assertNotNull(dto.getReqInnerDto().getReqInt()),
-                () -> assertNull(dto.getReqInnerDto().getDefaultStr()),
-                () -> assertNull(dto.getReqInnerDto().getDefaultInt()),
-                () -> assertNull(dto.getReqInnerDto().getDefaultMap()),
-                () -> assertNotNull(dto.getReqInnerDto().getFirstGroupInt()),
-                () -> assertNotNull(dto.getReqInnerDto().getFirstGroupMap()),
-                () -> assertNull(dto.getReqInnerDto().getSecondGroupInt()),
-                () -> assertNull(dto.getDefaultStr()),
-                () -> assertNull(dto.getDefaultInt()),
-                () -> assertNull(dto.getDefaultInnerDto()),
-                () -> assertNotNull(dto.getFirstGroupInt()),
-                () -> assertNotNull(dto.getFirstGroupInnerDto()),
-                () -> assertNotNull(dto.getFirstGroupMap()),
-                () -> assertNull(dto.getSecondGroupInt())
+                () -> assertNotNull(dto.reqStr),
+                () -> assertNotNull(dto.reqInt),
+                () -> assertNotNull(dto.reqMap),
+                () -> assertNotNull(dto.reqInnerDto),
+                () -> assertNotNull(dto.reqInnerDto.reqStr),
+                () -> assertNotNull(dto.reqInnerDto.reqInt),
+                () -> assertNull(dto.reqInnerDto.defaultStr),
+                () -> assertNull(dto.reqInnerDto.defaultInt),
+                () -> assertNull(dto.reqInnerDto.defaultMap),
+                () -> assertNotNull(dto.reqInnerDto.firstGroupInt),
+                () -> assertNotNull(dto.reqInnerDto.firstGroupMap),
+                () -> assertNull(dto.reqInnerDto.secondGroupInt),
+                () -> assertNull(dto.defaultStr),
+                () -> assertNull(dto.defaultInt),
+                () -> assertNull(dto.defaultInnerDto),
+                () -> assertNotNull(dto.firstGroupInt),
+                () -> assertNotNull(dto.firstGroupInnerDto),
+                () -> assertNotNull(dto.firstGroupMap),
+                () -> assertNull(dto.secondGroupInt)
         );
     }
 }
