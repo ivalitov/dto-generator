@@ -285,18 +285,17 @@ class IgnoringFieldsTests {
                 () -> assertThat(dto.integer, not(equalTo(integer))),
                 () -> assertThat(dto.setOfLong, equalTo(setOfLong)),
                 () -> assertThat(dto.clientType, equalTo(clientType)),
-                () -> assertThat(dto.nestedDto, notNullValue())
+                () -> assertThat(dto.nestedDto, not(sameInstance(nested)))
         );
 
         NestedDto_2 nestedDto = dto.nestedDto;
 
         assertAll(
-                () -> assertThat(nestedDto.aLong, equalTo(aLong)),
+                () -> assertThat(nestedDto.aLong, nullValue()),
                 () -> assertThat(nestedDto.aDouble, not(equalTo(aDouble))),
-                () -> assertThat(nestedDto.clientType, equalTo(clientType)),
-                () -> assertThat(nestedDto.arrayOfString, equalTo(arrayOfString))
+                () -> assertThat(nestedDto.clientType, nullValue()),
+                () -> assertThat(nestedDto.arrayOfString, nullValue())
         );
-
     }
 
 }
