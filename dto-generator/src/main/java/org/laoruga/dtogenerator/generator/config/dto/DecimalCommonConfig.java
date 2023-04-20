@@ -42,6 +42,10 @@ public class DecimalCommonConfig implements ConfigDto {
         return setRuleRemark(Double.class, value);
     }
 
+    public DecimalCommonConfig setPrecisionDouble(int value) {
+        return setPrecision(Double.class, value);
+    }
+
     /*
      * Float
      */
@@ -56,6 +60,10 @@ public class DecimalCommonConfig implements ConfigDto {
 
     public DecimalCommonConfig setRuleRemarkFloat(RuleRemark value) {
         return setRuleRemark(Float.class, value);
+    }
+
+    public DecimalCommonConfig setPrecisionFloat(int value) {
+        return setPrecision(Float.class, value);
     }
 
     /*
@@ -90,6 +98,10 @@ public class DecimalCommonConfig implements ConfigDto {
         return setRuleRemark(BigDecimal.class, value);
     }
 
+    public DecimalCommonConfig setPrecisionBigDecimal(int value) {
+        return setPrecision(BigDecimal.class, value);
+    }
+
     /*
      * Common setters
      */
@@ -109,6 +121,12 @@ public class DecimalCommonConfig implements ConfigDto {
     private DecimalCommonConfig setRuleRemark(Class<?> type, RuleRemark ruleRemark) {
         map.putIfAbsent(type, new DecimalConfig());
         map.get(type).setRuleRemark(ruleRemark);
+        return this;
+    }
+
+    private DecimalCommonConfig setPrecision(Class<?> type, int precision) {
+        map.putIfAbsent(type, new DecimalConfig());
+        map.get(type).setPrecision(precision);
         return this;
     }
 

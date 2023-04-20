@@ -111,7 +111,7 @@ public class DecimalConfig implements ConfigDto {
         if (configFrom != null) {
             if (configFrom.getMaxValue() != null) this.maxValue = configFrom.getMaxValue();
             if (configFrom.getMinValue() != null) this.minValue = configFrom.getMinValue();
-            if (configFrom.getPrecision() != null) this.minValue = configFrom.getPrecision();
+            if (configFrom.getPrecision() != null) this.precision = configFrom.getPrecision();
             if (configFrom.getRuleRemark() != null) this.ruleRemark = configFrom.getRuleRemark();
         }
     }
