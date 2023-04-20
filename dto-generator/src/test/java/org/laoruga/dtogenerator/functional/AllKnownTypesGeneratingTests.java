@@ -49,13 +49,13 @@ class AllKnownTypesGeneratingTests {
         List<String> listOfString;
         Set<Long> setOfLong;
         @NestedDtoRule
-        InnerDto innerDto;
+        NestedDto nestedDto;
 
         // unknown type
         Date date;
     }
 
-    static class InnerDto {
+    static class NestedDto {
 
         String string;
         Integer integer;
@@ -117,28 +117,27 @@ class AllKnownTypesGeneratingTests {
                 () -> assertThat(dto.date, nullValue())
         );
 
-        InnerDto innerDto = dto.innerDto;
+        NestedDto nestedDto = dto.nestedDto;
 
         assertAll(
-                () -> assertThat(innerDto.string.length(), both(
+                () -> assertThat(nestedDto.string.length(), both(
                         greaterThanOrEqualTo(RulesInstance.STRING_RULE.minLength()))
                         .and(lessThanOrEqualTo(RulesInstance.STRING_RULE.maxLength()))),
-                () -> assertThat(innerDto.integer, both(
+                () -> assertThat(nestedDto.integer, both(
                         greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minInt()))
                         .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxInt()))),
-                () -> assertThat(innerDto.aLong, both(
+                () -> assertThat(nestedDto.aLong, both(
                         greaterThanOrEqualTo(RulesInstance.NUMBER_RULE.minLong()))
                         .and(lessThanOrEqualTo(RulesInstance.NUMBER_RULE.maxLong()))),
-                () -> assertThat(innerDto.aDouble, both(
+                () -> assertThat(nestedDto.aDouble, both(
                         greaterThanOrEqualTo(RulesInstance.DECIMAL_RULE.minDouble()))
                         .and(lessThanOrEqualTo(RulesInstance.DECIMAL_RULE.maxDouble()))),
-                () -> assertThat(innerDto.localDateTime, notNullValue()),
-                () -> assertThat(innerDto.clientType, notNullValue()),
-                () -> assertThat(innerDto.listOfString.size(), equalTo(2)),
-                () -> assertThat(innerDto.setOfLong.size(), equalTo(1)),
-                () -> assertThat(innerDto.aDouble, notNullValue()),
-                () -> assertThat(innerDto.aBoolean, notNullValue()),
-                () -> assertThat(innerDto.date, nullValue())
+                () -> assertThat(nestedDto.localDateTime, notNullValue()),
+                () -> assertThat(nestedDto.clientType, notNullValue()),
+                () -> assertThat(nestedDto.listOfString.size(), equalTo(2)),
+                () -> assertThat(nestedDto.setOfLong.size(), equalTo(1)),
+                () -> assertThat(nestedDto.aBoolean, notNullValue()),
+                () -> assertThat(nestedDto.date, nullValue())
 
         );
     }

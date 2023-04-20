@@ -18,4 +18,8 @@ public interface DtoGeneratorConfig {
 
     void setGenerateAllKnownTypes(Boolean generateAllKnownTypes);
 
+    Boolean getGenerateUsersTypes();
+
+    void setGenerateUsersTypes(Boolean generateUsersTypes);
+
 }

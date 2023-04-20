@@ -18,9 +18,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created on 19.02.2023
  */
 @NoArgsConstructor
-public class NumberCommonConfig implements ConfigDto {
+public class IntegralConfigCommonConfig implements ConfigDto {
 
-    private final Map<Class<?>, NumberConfig> map = new HashMap<>();
+    private final Map<Class<?>, IntegralConfig> map = new HashMap<>();
 
     @Getter
     @Setter
@@ -31,15 +31,15 @@ public class NumberCommonConfig implements ConfigDto {
      * Integer
      */
 
-    public NumberCommonConfig setMaxIntValue(int value) {
+    public IntegralConfigCommonConfig setMaxIntValue(int value) {
         return setMaxValue(Integer.class, AtomicInteger.class, value);
     }
 
-    public NumberCommonConfig setMinIntValue(int value) {
+    public IntegralConfigCommonConfig setMinIntValue(int value) {
         return setMinValue(Integer.class, AtomicInteger.class, value);
     }
 
-    public NumberCommonConfig setRuleRemarkInt(RuleRemark value) {
+    public IntegralConfigCommonConfig setRuleRemarkInt(RuleRemark value) {
         return setRuleRemark(Integer.class, AtomicInteger.class, value);
     }
 
@@ -47,15 +47,15 @@ public class NumberCommonConfig implements ConfigDto {
      * Long
      */
 
-    public NumberCommonConfig setMaxLongValue(long value) {
+    public IntegralConfigCommonConfig setMaxLongValue(long value) {
         return setMaxValue(Long.class, AtomicLong.class, value);
     }
 
-    public NumberCommonConfig setMinLongValue(long value) {
+    public IntegralConfigCommonConfig setMinLongValue(long value) {
         return setMinValue(Long.class, AtomicLong.class, value);
     }
 
-    public NumberCommonConfig setRuleRemarkLong(RuleRemark value) {
+    public IntegralConfigCommonConfig setRuleRemarkLong(RuleRemark value) {
         return setRuleRemark(Long.class, AtomicLong.class, value);
     }
 
@@ -63,16 +63,16 @@ public class NumberCommonConfig implements ConfigDto {
      * Short
      */
 
-    public NumberCommonConfig setMaxShortValue(short value) {
+    public IntegralConfigCommonConfig setMaxShortValue(short value) {
         return setMaxValue(Short.class, value);
 
     }
 
-    public NumberCommonConfig setMinShortValue(short value) {
+    public IntegralConfigCommonConfig setMinShortValue(short value) {
         return setMinValue(Short.class, value);
     }
 
-    public NumberCommonConfig setRuleRemarkShort(RuleRemark value) {
+    public IntegralConfigCommonConfig setRuleRemarkShort(RuleRemark value) {
         return setRuleRemark(Short.class, value);
     }
 
@@ -80,15 +80,15 @@ public class NumberCommonConfig implements ConfigDto {
      * Byte
      */
 
-    public NumberCommonConfig setMaxByteValue(byte value) {
+    public IntegralConfigCommonConfig setMaxByteValue(byte value) {
         return setMaxValue(Byte.class, value);
     }
 
-    public NumberCommonConfig setMinByteValue(byte value) {
+    public IntegralConfigCommonConfig setMinByteValue(byte value) {
         return setMinValue(Byte.class, value);
     }
 
-    public NumberCommonConfig setRuleRemarkByte(RuleRemark value) {
+    public IntegralConfigCommonConfig setRuleRemarkByte(RuleRemark value) {
         return setRuleRemark(Byte.class, value);
     }
 
@@ -96,23 +96,23 @@ public class NumberCommonConfig implements ConfigDto {
      * BigInteger
      */
 
-    public NumberCommonConfig setMaxBigIntValue(BigInteger value) {
+    public IntegralConfigCommonConfig setMaxBigIntValue(BigInteger value) {
         return setMaxValue(BigInteger.class, value);
     }
 
-    public NumberCommonConfig setMaxBigIntValue(String value) {
+    public IntegralConfigCommonConfig setMaxBigIntValue(String value) {
         return setMaxBigIntValue(new BigInteger(value));
     }
 
-    public NumberCommonConfig setMinBigIntValue(BigInteger value) {
+    public IntegralConfigCommonConfig setMinBigIntValue(BigInteger value) {
         return setMinValue(BigInteger.class, value);
     }
 
-    public NumberCommonConfig setMinBigIntValue(String value) {
+    public IntegralConfigCommonConfig setMinBigIntValue(String value) {
         return setMinBigIntValue(new BigInteger(value));
     }
 
-    public NumberCommonConfig setRuleRemarkBigInteger(RuleRemark value) {
+    public IntegralConfigCommonConfig setRuleRemarkBigInteger(RuleRemark value) {
         return setRuleRemark(BigInteger.class, value);
     }
 
@@ -120,20 +120,20 @@ public class NumberCommonConfig implements ConfigDto {
      * Common setters one type
      */
 
-    private NumberCommonConfig setMaxValue(Class<?> type, Number maxValue) {
-        map.putIfAbsent(type, new NumberConfig());
+    private IntegralConfigCommonConfig setMaxValue(Class<?> type, Number maxValue) {
+        map.putIfAbsent(type, new IntegralConfig());
         map.get(type).setMaxValue(maxValue);
         return this;
     }
 
-    private NumberCommonConfig setMinValue(Class<?> type, Number minValue) {
-        map.putIfAbsent(type, new NumberConfig());
+    private IntegralConfigCommonConfig setMinValue(Class<?> type, Number minValue) {
+        map.putIfAbsent(type, new IntegralConfig());
         map.get(type).setMinValue(minValue);
         return this;
     }
 
-    private NumberCommonConfig setRuleRemark(Class<?> type, RuleRemark ruleRemark) {
-        map.putIfAbsent(type, new NumberConfig());
+    private IntegralConfigCommonConfig setRuleRemark(Class<?> type, RuleRemark ruleRemark) {
+        map.putIfAbsent(type, new IntegralConfig());
         map.get(type).setRuleRemark(ruleRemark);
         return this;
     }
@@ -142,9 +142,9 @@ public class NumberCommonConfig implements ConfigDto {
      * Common setters two types
      */
 
-    public NumberCommonConfig setMaxValue(Class<?> type, Class<?> secondType, Number maxIntValue) {
+    public IntegralConfigCommonConfig setMaxValue(Class<?> type, Class<?> secondType, Number maxIntValue) {
         if (!map.containsKey(type)) {
-            NumberConfig configDto = new NumberConfig();
+            IntegralConfig configDto = new IntegralConfig();
             map.putIfAbsent(type, configDto);
             map.putIfAbsent(secondType, configDto);
         }
@@ -152,9 +152,9 @@ public class NumberCommonConfig implements ConfigDto {
         return this;
     }
 
-    public NumberCommonConfig setMinValue(Class<?> type, Class<?> secondType, Number minIntValue) {
+    public IntegralConfigCommonConfig setMinValue(Class<?> type, Class<?> secondType, Number minIntValue) {
         if (!map.containsKey(type)) {
-            NumberConfig configDto = new NumberConfig();
+            IntegralConfig configDto = new IntegralConfig();
             map.putIfAbsent(type, configDto);
             map.putIfAbsent(secondType, configDto);
         }
@@ -162,9 +162,9 @@ public class NumberCommonConfig implements ConfigDto {
         return this;
     }
 
-    public NumberCommonConfig setRuleRemark(Class<?> type, Class<?> secondType, RuleRemark ruleRemark) {
+    public IntegralConfigCommonConfig setRuleRemark(Class<?> type, Class<?> secondType, RuleRemark ruleRemark) {
         if (!map.containsKey(type)) {
-            NumberConfig configDto = new NumberConfig();
+            IntegralConfig configDto = new IntegralConfig();
             map.putIfAbsent(type, configDto);
             map.putIfAbsent(secondType, configDto);
         }
@@ -176,7 +176,7 @@ public class NumberCommonConfig implements ConfigDto {
      * Getter
      */
 
-    NumberConfig getConfigOrNull(Class<? extends Number> generateType) {
+    IntegralConfig getConfigOrNull(Class<? extends Number> generateType) {
         return map.get(generateType);
     }
 

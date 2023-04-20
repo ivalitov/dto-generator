@@ -46,6 +46,7 @@ public class DtoGeneratorFileConfig extends DtoGeneratorConfigParams {
         setMaxDependentGenerationCycles(Integer.parseInt(getProperty("maxDependentGenerationCycles")));
         setMaxCollectionGenerationCycles(Integer.parseInt(getProperty("maxCollectionGenerationCycles")));
         setGenerateAllKnownTypes(Boolean.parseBoolean(getProperty("generateAllKnownTypes")));
+        setGenerateUsersTypes(Boolean.parseBoolean(getProperty("generateUsersTypes")));
     }
 
     private String getProperty(String name) {
