@@ -104,6 +104,11 @@ public class GeneratorProvidersMediator {
                 .getGenerator(field, generatedType);
     }
 
+    public Optional<Generator<?>> getUserGeneratorByType(Field field, Class<?> generatedType) {
+        return generatorsProviderByType
+                .getUserGenerator(field, generatedType);
+    }
+
     public void setGeneratorByType(Class<?> field, Generator<?> generatedType) {
         generatorsProviderByType
                 .setGenerator(field, generatedType);

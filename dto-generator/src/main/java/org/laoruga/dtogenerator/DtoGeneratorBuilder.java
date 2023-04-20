@@ -224,7 +224,7 @@ public class DtoGeneratorBuilder<T> {
         dtoGeneratorBuildersTree
                 .getBuilderLazy(fieldNameAndPath.getRight())
                 .getFieldGeneratorsProvider()
-                .setGeneratorBuilderForField(fieldNameAndPath.getLeft(), typeGenerator);
+                .setGeneratorForField(fieldNameAndPath.getLeft(), typeGenerator);
 
         return this;
     }
@@ -494,6 +494,31 @@ public class DtoGeneratorBuilder<T> {
         if (groups != null && groups.length != 0) {
             fieldGeneratorsProvider.addGroups(groups);
         }
+        return this;
+    }
+
+    /*
+     * Ignoring Fields
+     */
+
+    public DtoGeneratorBuilder<T> ignoreField(String fieldName) {
+
+        Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
+
+        dtoGeneratorBuildersTree
+                .getBuilderLazy(fieldNameAndPath.getRight())
+                .getFieldGeneratorsProvider()
+                .addFieldToIgnore(fieldNameAndPath.getLeft());
+
+        return this;
+    }
+
+    public DtoGeneratorBuilder<T> ignoreField(String... fieldNames) {
+
+        for (String fieldName : fieldNames) {
+            ignoreField(fieldName);
+        }
+
         return this;
     }
 

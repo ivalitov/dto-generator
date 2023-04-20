@@ -31,6 +31,18 @@ public class DtoGeneratorInstanceConfig implements DtoGeneratorConfig {
     }
 
     @Override
+    public Boolean getGenerateUsersTypes() {
+        return getInstanceOrStatic(
+                INSTANCE_CONFIG.getGenerateUsersTypes(),
+                STATIC_CONFIG.getGenerateUsersTypes());
+    }
+
+    @Override
+    public void setGenerateUsersTypes(Boolean generateUsersTypes) {
+        INSTANCE_CONFIG.setGenerateUsersTypes(generateUsersTypes);
+    }
+
+    @Override
     public Integer getMaxDependentGenerationCycles() {
         return getInstanceOrStatic(
                 INSTANCE_CONFIG.getMaxDependentGenerationCycles(),

@@ -499,7 +499,7 @@ class OverridingOfGeneratorsTests {
                 () -> assertThat(dto_1.getADouble(), equalTo(1D)),
 
                 // dto 2
-                () -> assertThat(dto_2.getString(), nullValue()),
+                () -> assertThat(dto_2.getString(), notNullValue()),
                 () -> assertThat(dto_2.getInteger(), notNullValue()),
                 () -> assertThat(dto_2.getALong(), nullValue()),
                 () -> assertThat(dto_2.getListOfString().get(0), notNullValue()),

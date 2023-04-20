@@ -52,9 +52,7 @@ public class GeneratorsProviderByType {
     }
 
     @SuppressWarnings("unchecked")
-    public Optional<Generator<?>> getGenerator(Field field, Class<?> generatedType) {
-
-        generatedType = Primitives.wrap(generatedType);
+    public Optional<Generator<?>> getUserGenerator(Field field, Class<?> generatedType) {
 
         Optional<Generator<?>> maybeUserGenerator =
                 userGeneratorSuppliers.getGenerator(generatedType);
@@ -72,6 +70,21 @@ public class GeneratorsProviderByType {
                         .build()
                         .configure((CustomGenerator<?>) generator);
             }
+
+        }
+
+        return maybeUserGenerator;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public Optional<Generator<?>> getGenerator(Field field, Class<?> generatedType) {
+
+        generatedType = Primitives.wrap(generatedType);
+
+        Optional<Generator<?>> maybeUserGenerator = getUserGenerator(field, generatedType);
+
+        if (maybeUserGenerator.isPresent()) {
 
             return maybeUserGenerator;
         }

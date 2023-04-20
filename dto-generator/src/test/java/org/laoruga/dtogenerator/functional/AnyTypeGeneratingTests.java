@@ -225,11 +225,13 @@ class AnyTypeGeneratingTests {
     }
 
     @Test
-    void customGeneratorByTypeForUnknownType() {
+    void customGeneratorByType() {
 
-        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class).generateKnownTypes();
+        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
-        builder.setGenerator(Tomato.class, new TomatoGenerator(), "RED", "GREEN", "BLUE", "33", "25", "100");
+        builder
+                .setGenerator(Tomato.class, new TomatoGenerator(), "RED", "GREEN", "BLUE", "33", "25", "100")
+                .setGenerator("stringAsKnownType", () -> "some-string-value");
 
         Dto dto = builder.build().generateDto();
 
@@ -237,16 +239,18 @@ class AnyTypeGeneratingTests {
                 () -> assertThat(dto.harvestDate, nullValue()),
                 () -> assertThat(dto.stringAsKnownType, notNullValue()),
                 () -> assertThat(dto.tomato.comment, equalTo(dto.stringAsKnownType)),
-                () -> assertThat(dto.listOfIntegerAsKnownType, notNullValue())
+                () -> assertThat(dto.listOfIntegerAsKnownType, nullValue())
         );
     }
 
     @Test
-    void customGeneratorByFieldForUnknownType() {
+    void customGeneratorByField() {
 
-        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class).generateKnownTypes();
+        DtoGeneratorBuilder<Dto> builder = DtoGenerator.builder(Dto.class);
 
-        builder.setGenerator("tomato", new TomatoGenerator(), "RED", "100");
+        builder
+                .setGenerator("tomato", new TomatoGenerator(), "RED", "100")
+                .setGenerator("stringAsKnownType", () -> "some-string-value");
 
         Dto dto = builder.build().generateDto();
 
@@ -256,7 +260,7 @@ class AnyTypeGeneratingTests {
                 () -> assertThat(dto.tomato.comment, equalTo(dto.stringAsKnownType)),
                 () -> assertThat(dto.tomato.color, equalTo(Color.RED)),
                 () -> assertThat(dto.tomato.weight, equalTo(100)),
-                () -> assertThat(dto.listOfIntegerAsKnownType, notNullValue())
+                () -> assertThat(dto.listOfIntegerAsKnownType, nullValue())
         );
     }
 

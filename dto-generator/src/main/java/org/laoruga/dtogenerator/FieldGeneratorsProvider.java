@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGenerator;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
+import org.laoruga.dtogenerator.config.dto.DtoGeneratorConfig;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.ConfigDto;
 import org.laoruga.dtogenerator.generator.providers.GeneratorProvidersMediator;
@@ -15,8 +16,7 @@ import org.laoruga.dtogenerator.rule.RuleInfo;
 import org.laoruga.dtogenerator.rule.RulesInfoExtractor;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -39,6 +39,7 @@ public class FieldGeneratorsProvider {
     private final GeneratorProvidersMediator generatorProvidersMediator;
     private final RemarksHolder remarksHolder;
     private final CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder;
+    private final Set<String> ignoredFields;
 
     FieldGeneratorsProvider(ConfigurationHolder configuration,
                             RemarksHolder remarksHolder,
@@ -61,6 +62,7 @@ public class FieldGeneratorsProvider {
         this.dtoInstanceSupplier = dtoInstanceSupplier;
         this.remarksHolder = remarksHolder;
         this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
+        this.ignoredFields = new HashSet<>();
     }
 
     /**
@@ -86,6 +88,7 @@ public class FieldGeneratorsProvider {
         );
         this.remarksHolder = remarksHolder;
         this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
+        this.ignoredFields = new HashSet<>();
     }
 
     /**
@@ -101,19 +104,26 @@ public class FieldGeneratorsProvider {
     @SuppressWarnings("unchecked")
     Optional<Generator<?>> getGenerator(Field field) {
 
-        Optional<Generator<?>> maybeGeneratorForField =
+        final String fieldName = field.getName();
+
+        if (ignoredFields.contains(fieldName)) {
+            log.debug("Field '" + fieldName + "' ignored.");
+            return Optional.empty();
+        }
+
+        Optional<Generator<?>> maybeUserGeneratorForField =
                 generatorProvidersMediator.getGeneratorOverriddenForField(field);
 
-        // generator set explicitly
-        if (maybeGeneratorForField.isPresent()) {
+        // if generator set explicitly for field
+        if (maybeUserGeneratorForField.isPresent()) {
 
-            Generator<?> generatorForField = maybeGeneratorForField.get();
+            Generator<?> generatorForField = maybeUserGeneratorForField.get();
 
             if (generatorForField instanceof CustomGenerator) {
                 configuration
                         .getCustomGeneratorsConfigurators()
                         .getBuilder(
-                                field.getName(),
+                                fieldName,
                                 (Class<? extends CustomGenerator<?>>) generatorForField.getClass()
                         )
                         .build()
@@ -125,22 +135,38 @@ public class FieldGeneratorsProvider {
 
         Optional<RuleInfo> maybeRulesInfo = getRuleInfo(field);
 
-        // field annotated with rules
+        // if field annotated with rules
         if (maybeRulesInfo.isPresent()) {
             return Optional.of(
                     generatorProvidersMediator.getGeneratorByAnnotation(maybeRulesInfo.get())
             );
         }
 
+        final Class<?> fieldType = field.getType();
+        final DtoGeneratorConfig generatorConfig = configuration.getDtoGeneratorConfig();
+
+        // if there needs to generate any known type
         // attempt to generate value using field type
-        if (getConfiguration().getDtoGeneratorConfig().getGenerateAllKnownTypes()) {
-            return generatorProvidersMediator.getGeneratorByType(field, field.getType());
+        if (generatorConfig.getGenerateAllKnownTypes()) {
+            return generatorProvidersMediator.getGeneratorByType(field, fieldType);
+        }
+
+        // if there needs to generate user's type only
+        if (generatorConfig.getGenerateUsersTypes()) {
+
+            Optional<Generator<?>> maybeUserGeneratorForType =
+                    generatorProvidersMediator.getUserGeneratorByType(field, fieldType);
+
+            if (maybeUserGeneratorForType.isPresent()) {
+                return maybeUserGeneratorForType;
+            }
+
         }
 
         return Optional.empty();
     }
 
-    void setGeneratorBuilderForField(String fieldName, Generator<?> generator) throws DtoGeneratorException {
+    void setGeneratorForField(String fieldName, Generator<?> generator) throws DtoGeneratorException {
         generatorProvidersMediator.setGeneratorForField(fieldName, generator);
     }
 
@@ -150,6 +176,10 @@ public class FieldGeneratorsProvider {
 
     void addGroups(String[] groups) {
         rulesInfoExtractor.getFieldsGroupFilter().includeGroups(groups);
+    }
+
+    void addFieldToIgnore(String field) {
+        ignoredFields.add(field);
     }
 
     private Function<String, DtoGeneratorBuildersTree.Node> nestedDtoGeneratorBuilderSupplier() {
