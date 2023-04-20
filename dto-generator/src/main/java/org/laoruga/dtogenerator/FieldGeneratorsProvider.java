@@ -16,8 +16,7 @@ import org.laoruga.dtogenerator.rule.RuleInfo;
 import org.laoruga.dtogenerator.rule.RulesInfoExtractor;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -40,6 +39,7 @@ public class FieldGeneratorsProvider {
     private final GeneratorProvidersMediator generatorProvidersMediator;
     private final RemarksHolder remarksHolder;
     private final CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder;
+    private final Set<String> ignoredFields;
 
     FieldGeneratorsProvider(ConfigurationHolder configuration,
                             RemarksHolder remarksHolder,
@@ -62,6 +62,7 @@ public class FieldGeneratorsProvider {
         this.dtoInstanceSupplier = dtoInstanceSupplier;
         this.remarksHolder = remarksHolder;
         this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
+        this.ignoredFields = new HashSet<>();
     }
 
     /**
@@ -87,6 +88,7 @@ public class FieldGeneratorsProvider {
         );
         this.remarksHolder = remarksHolder;
         this.customGeneratorsConfigMapHolder = customGeneratorsConfigMapHolder;
+        this.ignoredFields = new HashSet<>();
     }
 
     /**
@@ -102,6 +104,13 @@ public class FieldGeneratorsProvider {
     @SuppressWarnings("unchecked")
     Optional<Generator<?>> getGenerator(Field field) {
 
+        final String fieldName = field.getName();
+
+        if (ignoredFields.contains(fieldName)) {
+            log.debug("Field '" + fieldName + "' ignored.");
+            return Optional.empty();
+        }
+
         Optional<Generator<?>> maybeUserGeneratorForField =
                 generatorProvidersMediator.getGeneratorOverriddenForField(field);
 
@@ -114,7 +123,7 @@ public class FieldGeneratorsProvider {
                 configuration
                         .getCustomGeneratorsConfigurators()
                         .getBuilder(
-                                field.getName(),
+                                fieldName,
                                 (Class<? extends CustomGenerator<?>>) generatorForField.getClass()
                         )
                         .build()
@@ -133,19 +142,20 @@ public class FieldGeneratorsProvider {
             );
         }
 
-        DtoGeneratorConfig generatorConfig = configuration.getDtoGeneratorConfig();
+        final Class<?> fieldType = field.getType();
+        final DtoGeneratorConfig generatorConfig = configuration.getDtoGeneratorConfig();
 
         // if there needs to generate any known type
         // attempt to generate value using field type
         if (generatorConfig.getGenerateAllKnownTypes()) {
-            return generatorProvidersMediator.getGeneratorByType(field, field.getType());
+            return generatorProvidersMediator.getGeneratorByType(field, fieldType);
         }
 
         // if there needs to generate user's type only
         if (generatorConfig.getGenerateUsersTypes()) {
 
             Optional<Generator<?>> maybeUserGeneratorForType =
-                    generatorProvidersMediator.getUserGeneratorByType(field, field.getType());
+                    generatorProvidersMediator.getUserGeneratorByType(field, fieldType);
 
             if (maybeUserGeneratorForType.isPresent()) {
                 return maybeUserGeneratorForType;
@@ -156,7 +166,7 @@ public class FieldGeneratorsProvider {
         return Optional.empty();
     }
 
-    void setGeneratorBuilderForField(String fieldName, Generator<?> generator) throws DtoGeneratorException {
+    void setGeneratorForField(String fieldName, Generator<?> generator) throws DtoGeneratorException {
         generatorProvidersMediator.setGeneratorForField(fieldName, generator);
     }
 
@@ -166,6 +176,10 @@ public class FieldGeneratorsProvider {
 
     void addGroups(String[] groups) {
         rulesInfoExtractor.getFieldsGroupFilter().includeGroups(groups);
+    }
+
+    void addFieldToIgnore(String field) {
+        ignoredFields.add(field);
     }
 
     private Function<String, DtoGeneratorBuildersTree.Node> nestedDtoGeneratorBuilderSupplier() {
