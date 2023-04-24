@@ -9,8 +9,8 @@ import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.Extensions;
 import org.laoruga.dtogenerator.api.rules.IntegralRule;
 import org.laoruga.dtogenerator.constants.Bounds;
-import org.laoruga.dtogenerator.generator.config.dto.IntegralConfigCommonConfig;
 import org.laoruga.dtogenerator.generator.config.dto.IntegralConfig;
+import org.laoruga.dtogenerator.generator.config.dto.IntegralConfigCommonConfig;
 
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicInteger;

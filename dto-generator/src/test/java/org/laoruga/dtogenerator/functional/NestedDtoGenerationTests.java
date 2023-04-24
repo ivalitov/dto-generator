@@ -13,6 +13,7 @@ import org.laoruga.dtogenerator.DtoGeneratorBuilder;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorDtoDependent;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.Boundary;
+import org.laoruga.dtogenerator.constants.Bounds;
 import org.laoruga.dtogenerator.constants.RulesInstance;
 
 import java.util.function.Consumer;
@@ -182,13 +183,13 @@ class NestedDtoGenerationTests {
 
         assertAll(
                 // there is few possibility of false negative result
-                () -> assertThat(dto.notDefined.aDouble, not(equalTo(Double.MAX_VALUE))),
+                () -> assertThat(dto.notDefined.aDouble, not(equalTo(Bounds.DOUBLE_MAX_VALUE))),
                 () -> assertThat(dto.notDefined.integer, not(equalTo(Integer.MAX_VALUE))),
 
-                () -> assertThat(dto.maxValues.aDouble, equalTo(Double.MAX_VALUE)),
+                () -> assertThat(dto.maxValues.aDouble, equalTo(Bounds.DOUBLE_MAX_VALUE)),
                 () -> assertThat(dto.maxValues.integer, equalTo(Integer.MAX_VALUE)),
 
-                () -> assertThat(dto.minValues.aDouble, equalTo(Double.MIN_VALUE)),
+                () -> assertThat(dto.minValues.aDouble, equalTo(Bounds.DOUBLE_MIN_VALUE)),
                 () -> assertThat(dto.minValues.integer, equalTo(Integer.MIN_VALUE))
         );
     }
@@ -202,13 +203,13 @@ class NestedDtoGenerationTests {
         DtoAnnotationNestedRemarks dto = builder.build().generateDto();
 
         assertAll(
-                () -> assertThat(dto.notDefined.aDouble, equalTo(Double.MAX_VALUE)),
+                () -> assertThat(dto.notDefined.aDouble, equalTo(Bounds.DOUBLE_MAX_VALUE)),
                 () -> assertThat(dto.notDefined.integer, equalTo(Integer.MAX_VALUE)),
 
-                () -> assertThat(dto.maxValues.aDouble, equalTo(Double.MAX_VALUE)),
+                () -> assertThat(dto.maxValues.aDouble, equalTo(Bounds.DOUBLE_MAX_VALUE)),
                 () -> assertThat(dto.maxValues.integer, equalTo(Integer.MAX_VALUE)),
 
-                () -> assertThat(dto.minValues.aDouble, equalTo(Double.MAX_VALUE)),
+                () -> assertThat(dto.minValues.aDouble, equalTo(Bounds.DOUBLE_MAX_VALUE)),
                 () -> assertThat(dto.minValues.integer, equalTo(Integer.MAX_VALUE))
         );
     }
@@ -227,13 +228,13 @@ class NestedDtoGenerationTests {
 
         Consumer<DtoAnnotationNestedRemarks> assertions = dto ->
                 assertAll(
-                        () -> assertThat(dto.notDefined.aDouble, equalTo(Double.MIN_VALUE)),
+                        () -> assertThat(dto.notDefined.aDouble, equalTo(Bounds.DOUBLE_MIN_VALUE)),
                         () -> assertThat(dto.notDefined.integer, equalTo(Integer.MAX_VALUE)),
 
-                        () -> assertThat(dto.maxValues.aDouble, equalTo(Double.MIN_VALUE)),
+                        () -> assertThat(dto.maxValues.aDouble, equalTo(Bounds.DOUBLE_MIN_VALUE)),
                         () -> assertThat(dto.maxValues.integer, equalTo(Integer.MIN_VALUE)),
 
-                        () -> assertThat(dto.minValues.aDouble, equalTo(Double.MAX_VALUE)),
+                        () -> assertThat(dto.minValues.aDouble, equalTo(Bounds.DOUBLE_MAX_VALUE)),
                         () -> assertThat(dto.minValues.integer, equalTo(Integer.MAX_VALUE))
                 );
 

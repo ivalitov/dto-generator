@@ -28,8 +28,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.laoruga.dtogenerator.Constants.RESTORE_STATIC_CONFIG;
 import static org.laoruga.dtogenerator.constants.Boundary.*;
-import static org.laoruga.dtogenerator.constants.Bounds.CHRONO_UNIT_SHIFT_LEFT;
-import static org.laoruga.dtogenerator.constants.Bounds.CHRONO_UNIT_SHIFT_RIGHT;
 
 /**
  * @author Il'dar Valitov
@@ -38,6 +36,9 @@ import static org.laoruga.dtogenerator.constants.Bounds.CHRONO_UNIT_SHIFT_RIGHT;
 @ExtendWith(Extensions.RestoreStaticConfig.class)
 @Epic("DATE_TIME_RULES")
 public class DateTimeTests {
+
+    static final long CHRONO_UNIT_SHIFT_LEFT = -365;
+    static final long CHRONO_UNIT_SHIFT_RIGHT = 365;
 
     static class Dto {
 

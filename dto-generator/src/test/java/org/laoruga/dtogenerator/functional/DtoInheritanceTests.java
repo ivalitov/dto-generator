@@ -7,8 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
-import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.IntegralRule;
+import org.laoruga.dtogenerator.api.rules.NestedDtoRule;
 import org.laoruga.dtogenerator.api.rules.StringRule;
 import org.laoruga.dtogenerator.generator.config.dto.StringConfig;
 
