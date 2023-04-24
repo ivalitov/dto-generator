@@ -23,13 +23,13 @@ public @interface DecimalRule {
 
     int precision() default 2;
 
-    double maxDouble() default Double.MAX_VALUE;
+    double maxDouble() default Bounds.DOUBLE_MAX_VALUE;
 
-    double minDouble() default Double.MIN_VALUE;
+    double minDouble() default Bounds.DOUBLE_MIN_VALUE;
 
-    float maxFloat() default Float.MAX_VALUE;
+    float maxFloat() default Bounds.FLOAT_MAX_VALUE;
 
-    float minFloat() default Float.MIN_VALUE;
+    float minFloat() default Bounds.FLOAT_MIN_VALUE;
 
     String maxBigDecimal() default Bounds.BIG_DECIMAL_MAX_VALUE;
 

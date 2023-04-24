@@ -195,7 +195,7 @@ public class DecimalTests {
         Dto dto = builder.build().generateDto();
 
         assertAll(
-                () -> assertThat("Annotation + field", dto.doubleObject, equalTo(Double.MIN_VALUE)),
+                () -> assertThat("Annotation + field", dto.doubleObject, equalTo(Bounds.DOUBLE_MIN_VALUE)),
                 () -> assertThat("Static + field", dto.doublePrimitive, equalTo(100D)),
                 () -> assertThat("Instance + field", dto.floatObject, equalTo(321F)),
                 () -> assertThat("Static + field", dto.floatPrimitive, equalTo(-321F)),
@@ -266,10 +266,10 @@ public class DecimalTests {
         Dto_2 dto = builder.build().generateDto();
 
         assertAll(
-                () -> assertThat(dto.doubleObject, equalTo(Double.MAX_VALUE)),
-                () -> assertThat(dto.doublePrimitive, equalTo(Double.MAX_VALUE)),
-                () -> assertThat(dto.floatObject, equalTo(Float.MAX_VALUE)),
-                () -> assertThat(dto.floatPrimitive, equalTo(Float.MAX_VALUE)),
+                () -> assertThat(dto.doubleObject, equalTo(Bounds.DOUBLE_MAX_VALUE)),
+                () -> assertThat(dto.doublePrimitive, equalTo(Bounds.DOUBLE_MAX_VALUE)),
+                () -> assertThat(dto.floatObject, equalTo(Bounds.FLOAT_MAX_VALUE)),
+                () -> assertThat(dto.floatPrimitive, equalTo(Bounds.FLOAT_MAX_VALUE)),
                 () -> assertThat(dto.bigDecimal, equalTo(new BigDecimal(Bounds.BIG_DECIMAL_MAX_VALUE)))
         );
     }
