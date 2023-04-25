@@ -2,6 +2,7 @@ package org.laoruga.dtogenerator;
 
 import lombok.NonNull;
 import org.laoruga.dtogenerator.api.RuleRemark;
+import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.util.HashMap;
@@ -43,7 +44,7 @@ public class RemarksHolder {
     void setRuleRemarkForField(@NonNull String filedName,
                                @NonNull RuleRemark ruleRemark) {
         if (ruleRemarksMapByField.containsKey(filedName)) {
-            throw new DtoGeneratorException("Attempt to overwrite remark from: '" + getRuleRemarkOrNull(filedName) + "'" +
+            throw new DtoGeneratorException("Attempt to overwrite remark from: '" + getBoundaryOrNull(filedName) + "'" +
                     " to: '" + ruleRemark + "' for field '" + filedName + "'.");
         }
         ruleRemarksMapByField.put(filedName, ruleRemark);
@@ -57,10 +58,17 @@ public class RemarksHolder {
         ruleRemarkForAnyField.set(ruleRemark);
     }
 
-    public RuleRemark getRuleRemarkOrNull(String fieldName) {
-        if (ruleRemarksMapByField.containsKey(fieldName)) {
-            return ruleRemarksMapByField.get(fieldName);
+    public Boundary getBoundaryOrNull(String fieldName) {
+        try {
+
+            if (ruleRemarksMapByField.containsKey(fieldName)) {
+                return (Boundary) ruleRemarksMapByField.get(fieldName);
+            }
+
+            return (Boundary) ruleRemarkForAnyField.get();
+
+        } catch (ClassCastException e) {
+            throw new DtoGeneratorException("Unexpected error", e);
         }
-        return ruleRemarkForAnyField.get();
     }
 }

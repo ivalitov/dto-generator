@@ -1,19 +1,16 @@
 package org.laoruga.dtogenerator.api.generators.custom;
 
-import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.api.rules.CustomRule;
-
 /**
  * Custom generators based on this interface are able to have an array of String arguments.
  * There are several ways of passing arguments:
  *
  * <ul>
- *     <li>via {@link CustomRule#args} method on the annotated field</li>
- *     <li>for specific field via {@link DtoGeneratorBuilder#setGeneratorArgs(String, String...)}</li>
- *     <li>for generators of specific type via {@link DtoGeneratorBuilder#setGeneratorArgs(Class, String...)} (String, String...)}</li>
- *     <li>along with generator via {@link DtoGeneratorBuilder#setGenerator(String, CustomGeneratorArgs, String...)}
+ *     <li>via {@link org.laoruga.dtogenerator.api.rules.CustomRule#args} method on the annotated field</li>
+ *     <li>for specific field via {@link org.laoruga.dtogenerator.DtoGeneratorBuilder#setGeneratorArgs(String, String...)}</li>
+ *     <li>for generators of specific type via {@link org.laoruga.dtogenerator.DtoGeneratorBuilder#setGeneratorArgs(Class, String...)} (String, String...)}</li>
+ *     <li>along with generator via {@link org.laoruga.dtogenerator.DtoGeneratorBuilder#setGenerator(String, CustomGeneratorArgs, String...)}
  *     or
- *     {@link DtoGeneratorBuilder#setGenerator(Class, CustomGeneratorArgs, String...)}</li>
+ *     {@link org.laoruga.dtogenerator.DtoGeneratorBuilder#setGenerator(Class, CustomGeneratorArgs, String...)}</li>
  * </ul>
  * If no arguments are passed, empty array is injecting.
  *

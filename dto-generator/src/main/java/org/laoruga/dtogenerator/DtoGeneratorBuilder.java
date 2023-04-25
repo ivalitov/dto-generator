@@ -7,7 +7,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorArgs;
 import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorConfigMap;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemark;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorBoundary;
 import org.laoruga.dtogenerator.config.Configuration;
 import org.laoruga.dtogenerator.config.ConfigurationHolder;
 import org.laoruga.dtogenerator.config.CustomGeneratorsConfigurationHolder;
@@ -297,7 +297,7 @@ public class DtoGeneratorBuilder<T> {
      */
 
     /**
-     * Sets boundary configuration parameter for all supported generators and all user's {@link CustomGeneratorRemark}.
+     * Sets boundary configuration parameter for all supported generators and all user's {@link CustomGeneratorBoundary}.
      * <p>
      * BoundaryConfig parameters:
      * <ul>
@@ -460,6 +460,19 @@ public class DtoGeneratorBuilder<T> {
     }
 
     /**
+     * Adds key-value parameters to all {@link CustomGeneratorConfigMap} generators.
+     *
+     * @param parameterName  first parameter name
+     * @param parameterValue first parameter value
+     * @return this
+     */
+    public DtoGeneratorBuilder<T> addGeneratorParameter(@NonNull String parameterName,
+                                                        @NonNull String parameterValue) {
+        addGeneratorParameter(DummyCustomGenerator.class, parameterName, parameterValue);
+        return this;
+    }
+
+    /**
      * Adds key-value parameters to {@link CustomGeneratorConfigMap} of specific field.
      * <p>
      * If the field is in a nested object, 'fieldName' argument has to have a "path" leads
@@ -490,18 +503,6 @@ public class DtoGeneratorBuilder<T> {
                     .addParameterForField(fieldNameAndPath.getLeft(), nameValuePairs[i], nameValuePairs[i + 1]);
         }
 
-        return this;
-    }
-
-    /**
-     * Adds key-value parameters to all {@link CustomGeneratorConfigMap} generators.
-     *
-     * @param parameterName  first parameter name
-     * @param parameterValue first parameter value
-     * @return this
-     */
-    public DtoGeneratorBuilder<T> addGeneratorParameter(@NonNull String parameterName, @NonNull String parameterValue) {
-        addGeneratorParameter(DummyCustomGenerator.class, parameterName, parameterValue);
         return this;
     }
 

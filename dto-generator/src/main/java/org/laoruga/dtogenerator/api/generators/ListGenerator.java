@@ -7,5 +7,8 @@ package org.laoruga.dtogenerator.api.generators;
 
 public interface ListGenerator extends Generator<Object> {
 
+    /**
+     * @return generator of list elements
+     */
     Generator<?> getElementGenerator();
 }
