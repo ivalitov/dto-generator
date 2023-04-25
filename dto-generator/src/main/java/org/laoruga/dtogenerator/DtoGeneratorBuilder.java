@@ -37,8 +37,8 @@ import static org.laoruga.dtogenerator.util.StringUtils.splitPath;
  *     <li>change default generators configuration of specific field - {@link DtoGeneratorBuilder#setGeneratorConfig(String, ConfigDto)}</li>
  *     <li>inject arguments to specific {@link CustomGeneratorArgs} instances - {@link DtoGeneratorBuilder#setGeneratorArgs(Class, String...)}</li>
  *     <li>inject arguments to {@link CustomGeneratorArgs} of specific field - {@link DtoGeneratorBuilder#setGeneratorArgs(String, String...)}</li>
- *     <li>inject key-value parameters to specific {@link CustomGeneratorConfigMap} instances - {@link DtoGeneratorBuilder#addGeneratorParameter(Class, String, String, String...)}</li>
- *     <li>inject key-value parameters to {@link CustomGeneratorConfigMap} generator of specific field - {@link DtoGeneratorBuilder#addGeneratorParameter(String, String, String, String...)}</li>
+ *     <li>inject key-value parameters to specific {@link CustomGeneratorConfigMap} instances - {@link DtoGeneratorBuilder#addGeneratorParameter(Class, String, String)}</li>
+ *     <li>inject key-value parameters to {@link CustomGeneratorConfigMap} generator of specific field - {@link DtoGeneratorBuilder#addGeneratorParameter(String, String, String)}</li>
  *     <li>inject key-value parameters to all {@link CustomGeneratorConfigMap} generators - {@link DtoGeneratorBuilder#addGeneratorParameter(String, String)}</li>
  *     <li>filter generators by their groups- {@link DtoGeneratorBuilder#includeGroups(String...)}</li>
  *     <li>change configuration of current {@link DtoGeneratorBuilder} instance - {@link DtoGeneratorBuilder#getConfig()}</li>
@@ -394,19 +394,11 @@ public class DtoGeneratorBuilder<T> {
      * @param customGeneratorClass parameters will be injected to generators of this type
      * @param parameterName        first parameter name
      * @param parameterValue       first parameter value
-     * @param nameValuePairs       next parameters kay-value pairs
      * @return this
      */
     public DtoGeneratorBuilder<T> addGeneratorParameter(@NonNull Class<? extends CustomGeneratorConfigMap<?>> customGeneratorClass,
                                                         @NonNull String parameterName,
-                                                        @NonNull String parameterValue,
-                                                        @NonNull String... nameValuePairs) {
-
-        if (nameValuePairs.length % 2 > 0) {
-            throw new IllegalArgumentException("Even parameters number expected (key-value pairs), but passed: " +
-                    Arrays.asList(nameValuePairs)
-            );
-        }
+                                                        @NonNull String parameterValue) {
 
         customGeneratorsConfigMapHolder.addParameterForGeneratorType(
                 customGeneratorClass,
@@ -414,13 +406,55 @@ public class DtoGeneratorBuilder<T> {
                 parameterValue
         );
 
-        for (int i = 0; i < nameValuePairs.length; i = i + 2) {
-            customGeneratorsConfigMapHolder.addParameterForGeneratorType(
-                    customGeneratorClass,
-                    nameValuePairs[i],
-                    nameValuePairs[i + 1]
+        return this;
+    }
+
+
+    /**
+     * Adds key-value parameters to {@link CustomGeneratorConfigMap} instances of specific type.
+     *
+     * @param customGeneratorClass    parameters will be injected to generators of this type
+     * @param parameterNameValuePairs parameter kay-value pairs
+     * @return this
+     */
+    public DtoGeneratorBuilder<T> addGeneratorParameter(@NonNull Class<? extends CustomGeneratorConfigMap<?>> customGeneratorClass,
+                                                        @NonNull String... parameterNameValuePairs) {
+
+        if (parameterNameValuePairs.length % 2 > 0) {
+            throw new IllegalArgumentException("Even parameters number expected (key-value pairs), but passed: " +
+                    Arrays.asList(parameterNameValuePairs)
             );
         }
+
+        for (int i = 0; i < parameterNameValuePairs.length; i = i + 2) {
+            addGeneratorParameter(customGeneratorClass, parameterNameValuePairs[i], parameterNameValuePairs[i + 1]);
+        }
+
+        return this;
+    }
+
+
+    /**
+     * Adds key-value parameters to {@link CustomGeneratorConfigMap} of specific field.
+     * <p>
+     * If the field is in a nested object, 'fieldName' argument has to have a "path" leads
+     * to the field - dots separated sequence of field names.
+     *
+     * @param fieldName      name of the field or path to the field separated by dots
+     * @param parameterName  parameter name
+     * @param parameterValue parameter value
+     * @return this
+     */
+    public DtoGeneratorBuilder<T> addGeneratorParameter(@NonNull String fieldName,
+                                                        @NonNull String parameterName,
+                                                        @NonNull String parameterValue) {
+
+        Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
+
+        dtoGeneratorBuildersTree
+                .getBuilderLazy(fieldNameAndPath.getRight())
+                .getCustomGeneratorsConfigMapHolder()
+                .addParameterForField(fieldNameAndPath.getLeft(), parameterName, parameterValue);
 
         return this;
     }
@@ -432,14 +466,10 @@ public class DtoGeneratorBuilder<T> {
      * to the field - dots separated sequence of field names.
      *
      * @param fieldName      name of the field or path to the field separated by dots
-     * @param parameterName  first parameter name
-     * @param parameterValue first parameter value
      * @param nameValuePairs next parameters kay-value pairs
      * @return this
      */
     public DtoGeneratorBuilder<T> addGeneratorParameter(@NonNull String fieldName,
-                                                        @NonNull String parameterName,
-                                                        @NonNull String parameterValue,
                                                         @NonNull String... nameValuePairs) {
 
         if (nameValuePairs.length % 2 > 0) {
@@ -450,14 +480,14 @@ public class DtoGeneratorBuilder<T> {
 
         Pair<String, String[]> fieldNameAndPath = splitPath(fieldName);
 
-        CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder = dtoGeneratorBuildersTree
-                .getBuilderLazy(fieldNameAndPath.getRight())
-                .getCustomGeneratorsConfigMapHolder();
-
-        customGeneratorsConfigMapHolder.addParameterForField(fieldNameAndPath.getLeft(), parameterName, parameterValue);
+        CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder =
+                dtoGeneratorBuildersTree
+                        .getBuilderLazy(fieldNameAndPath.getRight())
+                        .getCustomGeneratorsConfigMapHolder();
 
         for (int i = 0; i < nameValuePairs.length; i = i + 2) {
-            customGeneratorsConfigMapHolder.addParameterForField(fieldNameAndPath.getLeft(), nameValuePairs[i], nameValuePairs[i + 1]);
+            customGeneratorsConfigMapHolder
+                    .addParameterForField(fieldNameAndPath.getLeft(), nameValuePairs[i], nameValuePairs[i + 1]);
         }
 
         return this;

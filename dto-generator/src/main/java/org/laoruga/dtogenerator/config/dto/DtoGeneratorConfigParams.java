@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class DtoGeneratorConfigParams implements DtoGeneratorConfig {
 
-    private Integer maxDependentGenerationCycles;
+    private Integer maxFailuresNumberDuringDtoGeneration;
     private Integer maxCollectionGenerationCycles;
     private Boolean generateAllKnownTypes;
     private Boolean generateUsersTypes;

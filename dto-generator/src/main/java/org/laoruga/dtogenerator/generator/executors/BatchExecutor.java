@@ -40,7 +40,7 @@ public class BatchExecutor {
 
             maxAttempts = DtoGeneratorStaticConfig.getInstance()
                     .getDtoGeneratorConfig()
-                    .getMaxDependentGenerationCycles();
+                    .getMaxFailuresNumberDuringDtoGeneration();
 
             boolean success = fieldGenerators.isEmpty();
 

@@ -6,9 +6,9 @@ package org.laoruga.dtogenerator.config.dto;
  */
 public interface DtoGeneratorConfig {
 
-    Integer getMaxDependentGenerationCycles();
+    Integer getMaxFailuresNumberDuringDtoGeneration();
 
-    void setMaxDependentGenerationCycles(Integer maxDependentGenerationCycles);
+    void setMaxFailuresNumberDuringDtoGeneration(Integer maxFailuresNumberDuringDtoGeneration);
 
     Integer getMaxCollectionGenerationCycles();
 
