@@ -320,7 +320,7 @@ class ReflectionUtilsTests {
 
     @CollectionRule(element = @Entry(
             stringRule = @StringRule,
-            numberRule = @IntegralRule
+            integralRule = @IntegralRule
     ))
     List<String> stringList;
 

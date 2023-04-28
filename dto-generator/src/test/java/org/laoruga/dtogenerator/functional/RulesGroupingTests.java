@@ -64,20 +64,20 @@ class RulesGroupingTests {
         //GR_1
         @CollectionRule(
                 group = GROUP_1, minSize = 1, maxSize = 1,
-                element = @Entry(numberRule = @IntegralRule(boundary = MAX_VALUE)))
+                element = @Entry(integralRule = @IntegralRule(boundary = MAX_VALUE)))
         //GR_2
         @CollectionRule(
                 group = GROUP_2, minSize = 2, maxSize = 2,
-                element = @Entry(numberRule = @IntegralRule(boundary = MIN_VALUE)))
+                element = @Entry(integralRule = @IntegralRule(boundary = MIN_VALUE)))
         //DEFAULT
         @CollectionRule(
                 minSize = 3, maxSize = 3,
-                element = @Entry(numberRule = @IntegralRule(minInt = 10, maxInt = 10)))
+                element = @Entry(integralRule = @IntegralRule(minInt = 10, maxInt = 10)))
         private List<Integer> intList;
 
         @CollectionRule(
                 minSize = 6, maxSize = 6,
-                element = @Entry(numberRule = @IntegralRule))
+                element = @Entry(integralRule = @IntegralRule))
         private List<Integer> intListDefault;
     }
 
@@ -87,7 +87,7 @@ class RulesGroupingTests {
 
         @MapRule(minSize = 10)
         @MapRule(group = GROUP_1,
-                maxSize = 1, value = @Entry(numberRule = @IntegralRule(minInt = 1, maxInt = 1)))
+                maxSize = 1, value = @Entry(integralRule = @IntegralRule(minInt = 1, maxInt = 1)))
         Map<String, Integer> stringIntegerMap;
 
         @MapRule(minSize = 3, maxSize = 3)
@@ -239,11 +239,11 @@ class RulesGroupingTests {
 
         @CollectionRule(
                 group = GROUP_1, minSize = 1, maxSize = 1,
-                element = @Entry(numberRule = @IntegralRule(minInt = 1, maxInt = 1)))
+                element = @Entry(integralRule = @IntegralRule(minInt = 1, maxInt = 1)))
 
         @CollectionRule(
                 minSize = 2, maxSize = 2,
-                element = @Entry(numberRule = @IntegralRule(minInt = 2, maxInt = 3)))
+                element = @Entry(integralRule = @IntegralRule(minInt = 2, maxInt = 3)))
         private Set<Integer> set;
 
         @IntegralRule(group = GROUP_1, minLong = 1, maxLong = 1)
@@ -308,28 +308,28 @@ class RulesGroupingTests {
 
     static class ArraysDto {
 
-        @ArrayRule(minSize = 1, maxSize = 1,
+        @ArrayRule(minLength = 1, maxLength = 1,
                 element = @Entry(stringRule = @StringRule))
         @ArrayRule(group = GROUP_1,
-                minSize = 2, maxSize = 2,
+                minLength = 2, maxLength = 2,
                 element = @Entry(stringRule = @StringRule))
         String[] strings;
 
-        @ArrayRule(minSize = 1, maxSize = 1,
-                element = @Entry(numberRule = @IntegralRule))
+        @ArrayRule(minLength = 1, maxLength = 1,
+                element = @Entry(integralRule = @IntegralRule))
         @ArrayRule(group = GROUP_2,
-                minSize = 2, maxSize = 2,
-                element = @Entry(numberRule = @IntegralRule))
+                minLength = 2, maxLength = 2,
+                element = @Entry(integralRule = @IntegralRule))
         Integer[] integers;
 
-        @ArrayRule(minSize = 1, maxSize = 1,
-                element = @Entry(numberRule = @IntegralRule))
+        @ArrayRule(minLength = 1, maxLength = 1,
+                element = @Entry(integralRule = @IntegralRule))
         @ArrayRule(group = GROUP_2,
-                minSize = 2, maxSize = 2,
-                element = @Entry(numberRule = @IntegralRule))
+                minLength = 2, maxLength = 2,
+                element = @Entry(integralRule = @IntegralRule))
         @ArrayRule(group = GROUP_3,
-                minSize = 3, maxSize = 3,
-                element = @Entry(numberRule = @IntegralRule))
+                minLength = 3, maxLength = 3,
+                element = @Entry(integralRule = @IntegralRule))
         long[] longs;
 
     }

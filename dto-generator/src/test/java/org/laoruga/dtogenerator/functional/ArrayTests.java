@@ -32,10 +32,10 @@ class ArrayTests {
 
     static class Dto {
 
-        @ArrayRule(minSize = 2)
+        @ArrayRule(minLength = 2)
         String[] strings;
 
-        @ArrayRule(boundary = MIN_VALUE, maxSize = 4)
+        @ArrayRule(boundary = MIN_VALUE, maxLength = 4)
         Integer[] integers;
 
         @ArrayRule(boundary = Boundary.MAX_VALUE)
@@ -44,7 +44,7 @@ class ArrayTests {
         @ArrayRule
         Long[] longsObjects;
 
-        @ArrayRule(element = @Entry(numberRule =
+        @ArrayRule(element = @Entry(integralRule =
         @IntegralRule(minLong = 1, maxLong = 10)))
         long[] longs;
 

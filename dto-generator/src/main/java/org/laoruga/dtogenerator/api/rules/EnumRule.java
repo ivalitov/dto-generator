@@ -11,6 +11,13 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * Put on the enum field to select random enum constant.
+ *
+ * @see Boundary
+ * @see Group
+ */
+
 @Retention(RUNTIME)
 @Target(FIELD)
 @Rule
@@ -19,11 +26,29 @@ public @interface EnumRule {
 
     Class<?> GENERATED_TYPE = Enum.class;
 
-    // All names are used by default
+    /**
+     * You may specify enum constant names, from which one will be chosen randomly.
+     * If not defined, a random constant will be chosen from all enum values.
+     *
+     * @return enum constant names to select from
+     */
     String[] possibleEnumNames() default {};
 
+    /**
+     * Meaning of the boundary params:
+     * <pre>
+     * {@link Boundary#MIN_VALUE} - random value having minimal length
+     * {@link Boundary#MAX_VALUE} - random value having maximal length
+     * {@link Boundary#RANDOM_VALUE} - random value
+     * {@link Boundary#NULL_VALUE} - null value
+     * </pre>
+     **/
     Boundary boundary() default Boundary.RANDOM_VALUE;
 
+    /**
+     * @return group of the generators
+     * @see Group
+     */
     String group() default Group.DEFAULT;
 
 }

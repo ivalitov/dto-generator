@@ -52,7 +52,7 @@ class RulesInfoExtractorTests {
         @CollectionRule(element = @Entry(dateTimeRule = @DateTimeRule))
         List<LocalDateTime> listOfDates;
 
-        @CollectionRule(element = @Entry(numberRule = @IntegralRule))
+        @CollectionRule(element = @Entry(integralRule = @IntegralRule))
         Set<Integer> setOfInts;
 
         @CollectionRule(

@@ -49,7 +49,7 @@ public class CustomGeneratorTests {
         @Entry(customRule = @CustomRule(generatorClass = WitchesBrewGenerator.class)))
         List<WitchesBrew> witchesBrewList;
 
-        @ArrayRule(minSize = 10, element =
+        @ArrayRule(minLength = 10, element =
         @Entry(customRule = @CustomRule(generatorClass = WitchesBrewGenerator.class)))
         WitchesBrew[] witchesBrewArray;
 
@@ -78,7 +78,7 @@ public class CustomGeneratorTests {
         @Entry(customRule = @CustomRule(generatorClass = WitchesBrewGenerator.class)))
         List<WitchesBrew> witchesBrewList;
 
-        @ArrayRule(minSize = 10, element =
+        @ArrayRule(minLength = 10, element =
         @Entry(customRule = @CustomRule(generatorClass = WitchesBrewGenerator.class)))
         WitchesBrew[] witchesBrewArray;
 

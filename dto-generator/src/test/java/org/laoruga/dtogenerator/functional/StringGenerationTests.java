@@ -2,23 +2,24 @@ package org.laoruga.dtogenerator.functional;
 
 import io.qameta.allure.Epic;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.api.rules.StringRule;
+import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 import org.laoruga.dtogenerator.generator.config.dto.StringConfig;
 
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.laoruga.dtogenerator.constants.CharSet.*;
 
 /**
@@ -30,7 +31,6 @@ import static org.laoruga.dtogenerator.constants.CharSet.*;
 class StringGenerationTests {
 
     @Getter
-    @NoArgsConstructor
     static class Dto {
         @StringRule(regexp = "[+]89 [(]\\d{3}[)] \\d{3}[-]\\d{2}-\\d{2}")
         private String phoneNum;
@@ -39,9 +39,13 @@ class StringGenerationTests {
     }
 
     @Getter
-    @NoArgsConstructor
     static class Dto_2 {
         @StringRule
+        private String string;
+    }
+
+    static class Dto_3 {
+        @StringRule(words = {"one", "two", "three"})
         private String string;
     }
 
@@ -114,6 +118,33 @@ class StringGenerationTests {
                         .and(greaterThanOrEqualTo(minLength))),
                 () -> assertThat(dto.getString(), matchesRegex("^" + regexpForAssert + "$"))
         );
+    }
+
+    @Tag("NEGATIVE_TEST")
+    @Test
+    @DisplayName("Wrong Bounds")
+    void wrongBounds() {
+        DtoGenerator<Dto> builder_1 = DtoGenerator.builder(Dto.class)
+                .setGeneratorConfig("phoneNum", StringConfig.builder().maxLength(2).build())
+                .setGeneratorConfig("phoneNumLetters", StringConfig.builder().minLength(50).build())
+                .build();
+
+        assertThrows(DtoGeneratorException.class, builder_1::generateDto);
+
+        DtoGenerator<Dto> builder_2 = DtoGenerator.builder(Dto.class)
+                .setGeneratorConfig("phoneNumLetters", StringConfig.builder().minLength(50).build())
+                .build();
+
+        assertThrows(DtoGeneratorException.class, builder_2::generateDto);
+
+
+        assertThrows(DtoGeneratorException.class, () -> DtoGenerator.builder(Dto_3.class)
+                .setGeneratorConfig("string", StringConfig.builder().minLength(5).build())
+                .build());
+
+        assertThrows(DtoGeneratorException.class, () -> DtoGenerator.builder(Dto_3.class)
+                .setGeneratorConfig("string", StringConfig.builder().maxLength(1).build())
+                .build());
     }
 
 }

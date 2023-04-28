@@ -63,7 +63,7 @@ public class CustomGeneratorsWithRemarksDtoDependentTests {
         @Entry(customRule = @CustomRule(generatorClass = FlowerGenerator.class)))
         List<Flower> flowerBouquet;
 
-        @ArrayRule(minSize = 10, element =
+        @ArrayRule(minLength = 10, element =
         @Entry(customRule = @CustomRule(generatorClass = FlowerGenerator.class)))
         Flower[] flowerBouquetArray;
 
@@ -90,7 +90,7 @@ public class CustomGeneratorsWithRemarksDtoDependentTests {
         @Entry(customRule = @CustomRule(generatorClass = FlowerGenerator.class)))
         List<Flower> flowerBouquet;
 
-        @ArrayRule(minSize = 10, element =
+        @ArrayRule(minLength = 10, element =
         @Entry(customRule = @CustomRule(generatorClass = FlowerGenerator.class)))
         Flower[] flowerBouquetArray;
 

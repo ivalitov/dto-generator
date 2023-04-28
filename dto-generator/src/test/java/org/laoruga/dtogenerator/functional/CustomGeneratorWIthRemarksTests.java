@@ -57,7 +57,7 @@ public class CustomGeneratorWIthRemarksTests {
         @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class, boundary = MAX_VALUE)))
         List<Octopus> octopusList;
 
-        @ArrayRule(minSize = 10, element =
+        @ArrayRule(minLength = 10, element =
         @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class)))
         Octopus[] octopusArray;
 
@@ -90,7 +90,7 @@ public class CustomGeneratorWIthRemarksTests {
         @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class)))
         List<Octopus> octopusList;
 
-        @ArrayRule(minSize = 10, element =
+        @ArrayRule(minLength = 10, element =
         @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class, boundary = MIN_VALUE)))
         Octopus[] octopusArray;
 
