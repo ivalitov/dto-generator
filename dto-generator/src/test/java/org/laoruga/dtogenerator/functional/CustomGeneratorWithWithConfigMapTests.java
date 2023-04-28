@@ -212,7 +212,7 @@ public class CustomGeneratorWithWithConfigMapTests {
                 .addGeneratorParameter(WitchesBrewGenerator.class,
                         "BERRY_FLAVOURED", "strawberry"
                 )
-                .addGeneratorParameter(WitchDescriptionGenerator.class,
+                .addGeneratorParameters(WitchDescriptionGenerator.class,
                         "GRUMPY", "always",
                         "MADNESS", "fast")
                 .build().generateDto();

@@ -417,8 +417,8 @@ public class DtoGeneratorBuilder<T> {
      * @param parameterNameValuePairs parameter kay-value pairs
      * @return this
      */
-    public DtoGeneratorBuilder<T> addGeneratorParameter(@NonNull Class<? extends CustomGeneratorConfigMap<?>> customGeneratorClass,
-                                                        @NonNull String... parameterNameValuePairs) {
+    public DtoGeneratorBuilder<T> addGeneratorParameters(@NonNull Class<? extends CustomGeneratorConfigMap<?>> customGeneratorClass,
+                                                         @NonNull String... parameterNameValuePairs) {
 
         if (parameterNameValuePairs.length % 2 > 0) {
             throw new IllegalArgumentException("Even parameters number expected (key-value pairs), but passed: " +
@@ -482,8 +482,8 @@ public class DtoGeneratorBuilder<T> {
      * @param nameValuePairs next parameters kay-value pairs
      * @return this
      */
-    public DtoGeneratorBuilder<T> addGeneratorParameter(@NonNull String fieldName,
-                                                        @NonNull String... nameValuePairs) {
+    public DtoGeneratorBuilder<T> addGeneratorParameters(@NonNull String fieldName,
+                                                         @NonNull String... nameValuePairs) {
 
         if (nameValuePairs.length % 2 > 0) {
             throw new IllegalArgumentException("Even parameters number expected (key-value pairs), but passed: " +
@@ -544,7 +544,7 @@ public class DtoGeneratorBuilder<T> {
         return this;
     }
 
-    public DtoGeneratorBuilder<T> ignoreField(String... fieldNames) {
+    public DtoGeneratorBuilder<T> ignoreFields(String... fieldNames) {
 
         for (String fieldName : fieldNames) {
             ignoreField(fieldName);
