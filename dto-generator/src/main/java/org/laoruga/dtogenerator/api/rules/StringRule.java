@@ -17,15 +17,18 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Put on the string field to generate random string value using one of the approaches:
  * <ul>
  *     <li>1. selecting random word from specified array of words.
- *     To do that, set words array through {@link StringRule#words()} method.</li>
+ *     To do that, set words array through {@link StringRule#words()} method.
+ *     </li>
  *
  *     <li>2. generating string that matched to a given regular expression.
- *     To do that, set regular expression through {@link StringRule#regexp()} method.</li>
+ *     To do that, set regular expression through {@link StringRule#regexp()} method.
+ *     </li>
  *
  *     <li>3. generating string of random length within specified bounds and containing specified symbols.
  *     To do that, do not set words and regular expression data.
  *     User methods {@link StringRule#chars()}, {@link StringRule#minLength()}, {@link StringRule#maxLength()} to
- *     configure generating string./li>
+ *     configure generating string.
+ *     </li>
  * </ul>
  *
  * @see Boundary

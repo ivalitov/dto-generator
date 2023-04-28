@@ -42,6 +42,8 @@ public @interface EnumRule {
      * {@link Boundary#RANDOM_VALUE} - random value
      * {@link Boundary#NULL_VALUE} - null value
      * </pre>
+     *
+     * @return boundary parameter
      **/
     Boundary boundary() default Boundary.RANDOM_VALUE;
 

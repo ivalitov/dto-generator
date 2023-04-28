@@ -44,6 +44,7 @@ public @interface BooleanRule {
      * {@link Boundary#RANDOM_VALUE} - depended on {@link BooleanRule#trueProbability()}
      * {@link Boundary#NULL_VALUE} - null value or false if generated field is primitive
      * </pre>
+     *
      * @return boundary parameter
      */
     Boundary boundary() default Boundary.RANDOM_VALUE;
