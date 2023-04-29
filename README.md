@@ -20,11 +20,11 @@ There are various ways to provide configuration:
 - do not set anything relying on default configuration;
 - use all the above approaches together.
 
-This is useful for a test automation when high variability of data is required.
+This may be useful for a test automation when high variability of data is required.
 
 ## Documentation
 
-Description of all features, examples, configurations is still in progress.
+Description of all features, examples, configurations in progress.
 
 ## Generation API
 
@@ -41,11 +41,11 @@ Various `@Rule` annotations are used to provide configuration on the field:
 - `@MapRule`
 
 If a DTO class contains within its fields another DTOs, which fields must be generated as well,
-following annotation is used to tell to the generator to process its fields too. [see more below](#nested_dto):
+following annotation is used to tell to the generator to process nested DTO fields too. [see more below](#nested_dto):
 
 - `@NestedDtoRule`
 
-If you want to create your own generator of specific type, next annotation is used [see more below](#custom_rule):
+If you want to use your own generator for specific field, next annotation is used [see more below](#custom_rule):
 
 - `@CustomRule`
 
@@ -55,7 +55,7 @@ If you want to create your own generator of specific type, next annotation is us
 2. [Grouping of Rules](#rules_grouping)
 3. [Known Type's Generation](#known_types_generation)
 4. [Configuration management](#config_management)
-5. [Rule's Remarks](#rules_remarks)
+5. [Rule's Remarks](#boundary)
 6. [User's Generators](#user_generators)
 7. [Nested DTO](#nested_dto)
 8. [Custom Rules](#custom_rule)
@@ -128,7 +128,7 @@ As the result we'll have an object containing random data, generated based on ge
 ### 2. Grouping of Rules
 
 You may put multiple `@Rule` annotations on the one field, each one has to belong to different group.
-Then you have to select which group or groups do you prefer to use for DTO generation.
+Then, you may select group or groups that you prefer to use in DTO generation.
 
 For example, next config:
 
@@ -156,7 +156,7 @@ public class Example7 {
 }
 ```
 
-will produce, for instance:
+will produce something like:
 
 ```json
 {
@@ -170,11 +170,11 @@ will produce, for instance:
 ### 3. Known Types Generation
 
 Configuration parameter `generateAllKnownTypes` allows to generate field values of known types, without the need
-to put *@Rules* annotation on fields.
+to put *@Rules* annotation on the fields.
 Known types are:
 
-- types for which `@Rule` annotations exists or type';
-- types for which generator was specified via `setGenerator()` method of `DtoGeneratorBuilder`;
+- types for which `@Rule` annotations exists;
+- types for which generator was specified via `setGenerator(...)` methods of `DtoGeneratorBuilder`;
 
 There are several ways to configure generators, one of them is - static configuration:
 
@@ -183,8 +183,8 @@ There are several ways to configure generators, one of them is - static configur
         // static configuration instance is accessible this way 
         DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig().setGenerateAllKnownTypes(true);
 
-        // and the same static configuration instance is available directly from DtoGeneratorBuilder instance
-        DtoGenerator.builder(Dto.class).getStaticConfig();
+        // and the same static configuration instance is available directly from DtoGeneratorBuilder
+        DtoGenerator.builder(Dto.class).getStaticConfig().setGenerateAllKnownTypes(true);
         ...
 ```
 
@@ -279,14 +279,14 @@ The result string due to configuration will always be the next:
 }
 ```
 
-<a name="rules_remarks"></a>
+<a name="boundary"></a>
 
-### 5. Rule Remarks
+### 5. Boundary
 
-Rule remarks - refinements for known type generators, to generate boundary values.
-It is possible to assign remark either to the entire DTO or only to certain fields.
+Boundary is used to generate boundary values.
+It is possible to assign boundary parameter either to the every or only to certain DTO fields.
 
-Rule's remarks:
+Boundary values:
 
 - MIN_VALUE
 - MAX_VALUE

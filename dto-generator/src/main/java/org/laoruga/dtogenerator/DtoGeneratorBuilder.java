@@ -173,7 +173,7 @@ public class DtoGeneratorBuilder<T> {
      */
 
     public <U> DtoGeneratorBuilder<T> setGenerator(@NonNull Class<U> generatedType,
-                                                   @NonNull Generator<? super U> typeGenerator) {
+                                                   @NonNull Generator<? extends U> typeGenerator) {
 
         fieldGeneratorsProvider.setGenerator(generatedType, typeGenerator);
         return this;
@@ -191,7 +191,7 @@ public class DtoGeneratorBuilder<T> {
 
     @SuppressWarnings("unchecked")
     public <U> DtoGeneratorBuilder<T> setGenerator(@NonNull Class<U> generatedType,
-                                                   @NonNull CustomGeneratorArgs<? super U> typeGenerator,
+                                                   @NonNull CustomGeneratorArgs<? extends U> typeGenerator,
                                                    String... args) {
 
         setGenerator(generatedType, typeGenerator);
