@@ -51,6 +51,14 @@ public @interface CustomRule {
     String[] args() default {};
 
     /**
+     * You may set key-value parameters if generator implements
+     * {@link org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorConfigMap CustomGeneratorConfigMap} interface.
+     * @return key-value parameters for {@link org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorConfigMap CustomGeneratorConfigMap}
+     * generator
+     */
+    String[] keyValueParams() default {};
+
+    /**
      * @return group of the generators
      * @see Group
      */

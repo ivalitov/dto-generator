@@ -7,6 +7,7 @@ import org.laoruga.dtogenerator.util.dummy.DummyCustomGenerator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -16,11 +17,11 @@ import java.util.stream.Collectors;
 
 public class CustomGeneratorsConfigMapHolder {
 
-    private final Map<String, Map<String, String>> customRuleRemarksMapByField;
-    private final Map<Class<? extends CustomGenerator<?>>, Map<String, String>> customRuleRemarksMapByGenerator;
+    private final Map<String, Map<String, String>> configMapsByField;
+    private final Map<Class<? extends CustomGenerator<?>>, Map<String, String>> configMapsByGenerator;
 
     public CustomGeneratorsConfigMapHolder() {
-        this(new HashMap<>());
+        this(new ConcurrentHashMap<>());
     }
 
     /**
@@ -30,12 +31,12 @@ public class CustomGeneratorsConfigMapHolder {
      */
     CustomGeneratorsConfigMapHolder(CustomGeneratorsConfigMapHolder toCopy) {
         this(
-                toCopy.customRuleRemarksMapByGenerator.entrySet()
+                toCopy.configMapsByGenerator.entrySet()
                         .stream()
                         .collect(
                                 Collectors.toMap(
                                         Map.Entry::getKey,
-                                        entry -> new HashMap<>(entry.getValue())
+                                        entry -> new ConcurrentHashMap<>(entry.getValue())
                                 )
                         )
         );
@@ -44,8 +45,8 @@ public class CustomGeneratorsConfigMapHolder {
 
     private CustomGeneratorsConfigMapHolder(
             Map<Class<? extends CustomGenerator<?>>, Map<String, String>> customRuleRemarksMapByGenerator) {
-        this.customRuleRemarksMapByField = new HashMap<>();
-        this.customRuleRemarksMapByGenerator = customRuleRemarksMapByGenerator;
+        this.configMapsByField = new HashMap<>();
+        this.configMapsByGenerator = customRuleRemarksMapByGenerator;
     }
 
     /*
@@ -55,27 +56,26 @@ public class CustomGeneratorsConfigMapHolder {
     void addParameterForField(@NonNull String filedName,
                               @NonNull String remarkName,
                               @NonNull String remarkValue) {
-        customRuleRemarksMapByField.putIfAbsent(filedName, new HashMap<>());
-        customRuleRemarksMapByField.get(filedName).put(remarkName, remarkValue);
+        configMapsByField.putIfAbsent(filedName, new HashMap<>());
+        configMapsByField.get(filedName).put(remarkName, remarkValue);
     }
 
     void addParameterForGeneratorType(@NonNull Class<? extends CustomGenerator<?>> generatorClass,
                                       @NonNull String key,
                                       @NonNull String value) {
-        customRuleRemarksMapByGenerator.putIfAbsent(generatorClass, new HashMap<>());
-        customRuleRemarksMapByGenerator.get(generatorClass).put(key, value);
+        configMapsByGenerator.putIfAbsent(generatorClass, new HashMap<>());
+        configMapsByGenerator.get(generatorClass).put(key, value);
     }
 
-    public Map<String, String> getConfigMap(String fieldName,
-                                            Class<?> generatorClass) {
+    public Map<String, String> fillConfigMap(String fieldName,
+                                             Class<?> generatorClass,
+                                             Map<String, String> configMap) {
 
-        Map<String, String> resultConfigMap = new HashMap<>();
+        getConfigMap(DummyCustomGenerator.class).ifPresent(configMap::putAll);
+        getConfigMap(generatorClass).ifPresent(configMap::putAll);
+        getConfigMap(fieldName).ifPresent(configMap::putAll);
 
-        getConfigMap(DummyCustomGenerator.class).ifPresent(resultConfigMap::putAll);
-        getConfigMap(generatorClass).ifPresent(resultConfigMap::putAll);
-        getConfigMap(fieldName).ifPresent(resultConfigMap::putAll);
-
-        return resultConfigMap;
+        return configMap;
     }
 
     /*
@@ -84,13 +84,13 @@ public class CustomGeneratorsConfigMapHolder {
 
     private Optional<Map<String, String>> getConfigMap(Class<?> customGeneratorClass) {
         return Optional.ofNullable(
-                customRuleRemarksMapByGenerator.get(customGeneratorClass)
+                configMapsByGenerator.get(customGeneratorClass)
         );
     }
 
     private Optional<Map<String, String>> getConfigMap(String fieldName) {
         return Optional.ofNullable(
-                customRuleRemarksMapByField.get(fieldName)
+                configMapsByField.get(fieldName)
         );
     }
 

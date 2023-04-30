@@ -479,7 +479,7 @@ To do this, you need to implement one or more `CustomGenerator*` interfaces:
 |-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `CustomGenerator`             | base interface, allows to create non configurable type generators                                                                                         |
 | `CustomGeneratorArgs`         | allows to pass array of arguments to generator via `setGeneratorArgs(...)` methods or `@CustomRule` annotation                                            |
-| `CustomGeneratorConfigMap`    | allows to pass key-value parameters to generator via `addGeneratorParameter(...)` methods                                                                 |
+| `CustomGeneratorConfigMap`    | allows to pass key-value parameters to generator via `addGeneratorParameter(...)` methods or `@CustomRule` annotation                                     |
 | `CustomGeneratorBoundary `    | allows to pass boundary param to generator via `setBoundary(...)` methods or `@CustomRule` annotation                                                     |
 | `CustomGeneratorDtoDependent` | provides a reference to the generating DTO instance to the generator<br/>(to check if the DTO fields required for generation have been already filled in) |
 

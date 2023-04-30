@@ -348,6 +348,8 @@ public class DtoGeneratorBuilder<T> {
 
     /**
      * Injects arguments array to {@link CustomGeneratorArgs} instances of passed type.
+     * <p>
+     * Replaces arguments passed from @CustomRule annotation.
      *
      * @param customGeneratorClass args will be injected to generators of this type
      * @param args                 args
@@ -365,6 +367,8 @@ public class DtoGeneratorBuilder<T> {
 
     /**
      * Injects arguments array to generator for specific field.
+     * <p>
+     * Replaces arguments passed from @CustomRule annotation or args passed for specific generator's type.
      * <p>
      * If the field is in a nested object, 'fieldName' argument has to have a "path" leads
      * to the field - dots separated sequence of field names.

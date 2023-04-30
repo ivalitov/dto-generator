@@ -9,6 +9,8 @@ import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.exceptions.DtoGeneratorException;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -20,6 +22,7 @@ import java.util.function.Supplier;
 public class CustomGeneratorConfigurator {
 
     private String[] args;
+    private String[] keyValueParams;
     private Supplier<?> dtoInstanceSupplier;
     private RemarksHolder remarksHolder;
     private CustomGeneratorsConfigMapHolder customGeneratorsConfigMapHolder;
@@ -34,6 +37,17 @@ public class CustomGeneratorConfigurator {
             return this;
         }
 
+        public Builder keyValueParams(String[] keyValueParams) {
+
+            if (keyValueParams.length % 2 > 0) {
+                throw new IllegalArgumentException("Even parameters number expected (key-value pairs), but passed: " +
+                        Arrays.asList(keyValueParams)
+                );
+            }
+
+            this.keyValueParams = keyValueParams;
+            return this;
+        }
     }
 
     public void configure(CustomGenerator<?> generatorInstance) {
@@ -47,11 +61,17 @@ public class CustomGeneratorConfigurator {
             }
             if (generatorInstance instanceof CustomGeneratorConfigMap) {
 
+                Map<String, String> configMap = new HashMap<>();
+
+                if (keyValueParams.length != 0) {
+                    for (int i = 0; i < keyValueParams.length; i = i + 2) {
+                        configMap.put(keyValueParams[i], keyValueParams[i + 1]);
+                    }
+                }
 
                 ((CustomGeneratorConfigMap<?>) generatorInstance).setConfigMap(
-                        customGeneratorsConfigMapHolder.getConfigMap(fieldName, generatorInstance.getClass())
+                        customGeneratorsConfigMapHolder.fillConfigMap(fieldName, generatorInstance.getClass(), configMap)
                 );
-
 
             } else if (generatorInstance instanceof CustomGeneratorBoundary) {
 
