@@ -417,8 +417,7 @@ The result dto may look like:
 
 ### 7. Nested DTO
 
-If DTO field annotated with  ```@NestedDtoRule``` annotation, its value will be generated according to configuration
-and annotations of its fields.
+Put ```@NestedDtoRule``` on the DTO field to tell DtoGenerator to process its fields also as DTO fields.
 In order to override configuration or generators of fields within nested DTO, use "path" to the field separated by dots.
 
 Inheritance is supported and if you want to get access to field of parent class, use exactly the same "path"
@@ -473,27 +472,21 @@ Will result something like:
 
 ### 8. Custom Rules
 
-```diff
-- This is an experimental feature, the way of passing configuration into generators may be changed in the future version
-```
-
-You may design your custom generator for any type you want. To do this, you need to implement one or more
-`CustomGenerator*` interfaces:
+You may design your custom generator for any type you want and use it with `@CustomRule` annotation.
+To do this, you need to implement one or more `CustomGenerator*` interfaces:
 
 | Interface                     | Feature                                                                                                                                                   |
 |-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `CustomGenerator`             | base interface, allows to create non configurable type generators                                                                                         |
-| `CustomGeneratorArgs`         | allows to pass array of arguments to generator                                                                                                            |
-| `CustomGeneratorConfigMap`    | allows to pass key-value parameters to generator                                                                                                          |
-| `CustomGeneratorBoundary `    | allows to pass boundary param to generator                                                                                                                |
+| `CustomGeneratorArgs`         | allows to pass array of arguments to generator via `setGeneratorArgs(...)` methods or `@CustomRule` annotation                                            |
+| `CustomGeneratorConfigMap`    | allows to pass key-value parameters to generator via `addGeneratorParameter(...)` methods                                                                 |
+| `CustomGeneratorBoundary `    | allows to pass boundary param to generator via `setBoundary(...)` methods or `@CustomRule` annotation                                                     |
 | `CustomGeneratorDtoDependent` | provides a reference to the generating DTO instance to the generator<br/>(to check if the DTO fields required for generation have been already filled in) |
 
-There are two possible options to provide generator:
+Custom generators can also be set with `setGenerator(...)` method of `DtoGeneratorBuilder`
+, [linkig generator directly for the generated type](#user_generators)
 
-- via `@CustomRule` annotation on the field
-- via `setGenerator()` method of `DtoGeneratorBuilder`, [linkig generator directly for the generated type](#user_generators)
-
-More info and usage examples you may see in the project with
+More usage examples you may see in the project with
 examples: [Dto Generator Examples project](dto-generator-examples/README.md)
 
 Example of custom generator with args:
@@ -546,13 +539,12 @@ public class Example8 {
 
 ### 9. Requirements for DTO classes
 
-Requirements, when using DTO instantiation via class:
+When DTO instantiated by class:
 
 ``` DtoGenerator.builder(Foo.class).build().generateDto(); ```
 
-1. DTO class must have default constructor (don't have any constructors) or declared no-args constructor with any
-   visibility
-2. DTO class cannot be an inner class (non-static nested class)
+1. DTO class must have declared no-args constructor with any or default constructor (don't have any constructors);
+2. DTO class cannot be an inner class (non-static nested class).
 
 Supported:
 

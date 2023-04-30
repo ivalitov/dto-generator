@@ -180,30 +180,6 @@ public class DtoGeneratorBuilder<T> {
     }
 
     /**
-     * Overrides {@link CustomGeneratorArgs} generator related to generated type.
-     *
-     * @param generatedType type of generated class
-     * @param typeGenerator generator of provided generated type
-     * @param args          params for custom generators with args {@link CustomGeneratorArgs}
-     * @param <U>           generated type
-     * @return - this
-     */
-
-    @SuppressWarnings("unchecked")
-    public <U> DtoGeneratorBuilder<T> setGenerator(@NonNull Class<U> generatedType,
-                                                   @NonNull CustomGeneratorArgs<? extends U> typeGenerator,
-                                                   String... args) {
-
-        setGenerator(generatedType, typeGenerator);
-        setGeneratorArgs(
-                (Class<? extends CustomGeneratorArgs<?>>) typeGenerator.getClass(),
-                args
-        );
-
-        return this;
-    }
-
-    /**
      * Overrides generator for the provided field only.
      * <p>
      * If the field is in a nested object, 'fieldName' argument has to have a "path" leads
@@ -225,6 +201,30 @@ public class DtoGeneratorBuilder<T> {
                 .getBuilderLazy(fieldNameAndPath.getRight())
                 .getFieldGeneratorsProvider()
                 .setGeneratorForField(fieldNameAndPath.getLeft(), typeGenerator);
+
+        return this;
+    }
+
+    /**
+     * Overrides {@link CustomGeneratorArgs} generator related to generated type.
+     *
+     * @param generatedType type of generated class
+     * @param typeGenerator generator of provided generated type
+     * @param args          params for custom generators with args {@link CustomGeneratorArgs}
+     * @param <U>           generated type
+     * @return - this
+     */
+
+    @SuppressWarnings("unchecked")
+    public <U> DtoGeneratorBuilder<T> setGenerator(@NonNull Class<U> generatedType,
+                                                   @NonNull CustomGeneratorArgs<? extends U> typeGenerator,
+                                                   String... args) {
+
+        setGenerator(generatedType, typeGenerator);
+        setGeneratorArgs(
+                (Class<? extends CustomGeneratorArgs<?>>) typeGenerator.getClass(),
+                args
+        );
 
         return this;
     }
