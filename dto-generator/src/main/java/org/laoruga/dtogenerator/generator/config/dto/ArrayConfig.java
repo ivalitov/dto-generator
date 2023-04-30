@@ -24,8 +24,8 @@ public class ArrayConfig implements ConfigDto {
     private RuleRemark ruleRemark;
 
     public ArrayConfig(ArrayRule rule, Class<?> elementType) {
-        this.minSize = rule.minSize();
-        this.maxSize = rule.maxSize();
+        this.minSize = rule.minLength();
+        this.maxSize = rule.maxLength();
         this.elementType = elementType;
         this.ruleRemark = rule.boundary();
     }

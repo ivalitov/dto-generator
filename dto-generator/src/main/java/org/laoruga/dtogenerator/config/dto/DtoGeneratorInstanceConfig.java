@@ -16,8 +16,8 @@ public class DtoGeneratorInstanceConfig implements DtoGeneratorConfig {
     private final DtoGeneratorConfig STATIC_CONFIG = DtoGeneratorStaticConfig.getInstance().getDtoGeneratorConfig();
 
     @Override
-    public void setMaxDependentGenerationCycles(Integer maxDependentGenerationCycles) {
-        INSTANCE_CONFIG.setMaxDependentGenerationCycles(maxDependentGenerationCycles);
+    public void setMaxFailuresNumberDuringDtoGeneration(Integer maxFailuresNumberDuringDtoGeneration) {
+        INSTANCE_CONFIG.setMaxFailuresNumberDuringDtoGeneration(maxFailuresNumberDuringDtoGeneration);
     }
 
     @Override
@@ -43,10 +43,10 @@ public class DtoGeneratorInstanceConfig implements DtoGeneratorConfig {
     }
 
     @Override
-    public Integer getMaxDependentGenerationCycles() {
+    public Integer getMaxFailuresNumberDuringDtoGeneration() {
         return getInstanceOrStatic(
-                INSTANCE_CONFIG.getMaxDependentGenerationCycles(),
-                STATIC_CONFIG.getMaxDependentGenerationCycles());
+                INSTANCE_CONFIG.getMaxFailuresNumberDuringDtoGeneration(),
+                STATIC_CONFIG.getMaxFailuresNumberDuringDtoGeneration());
     }
 
     @Override

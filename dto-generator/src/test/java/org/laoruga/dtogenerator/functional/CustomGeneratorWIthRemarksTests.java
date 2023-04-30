@@ -7,8 +7,7 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Test;
 import org.laoruga.dtogenerator.DtoGenerator;
 import org.laoruga.dtogenerator.DtoGeneratorBuilder;
-import org.laoruga.dtogenerator.api.RuleRemark;
-import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorRemark;
+import org.laoruga.dtogenerator.api.generators.custom.CustomGeneratorBoundary;
 import org.laoruga.dtogenerator.api.rules.*;
 import org.laoruga.dtogenerator.constants.Boundary;
 import org.laoruga.dtogenerator.util.RandomUtils;
@@ -58,7 +57,7 @@ public class CustomGeneratorWIthRemarksTests {
         @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class, boundary = MAX_VALUE)))
         List<Octopus> octopusList;
 
-        @ArrayRule(minSize = 10, element =
+        @ArrayRule(minLength = 10, element =
         @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class)))
         Octopus[] octopusArray;
 
@@ -91,7 +90,7 @@ public class CustomGeneratorWIthRemarksTests {
         @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class)))
         List<Octopus> octopusList;
 
-        @ArrayRule(minSize = 10, element =
+        @ArrayRule(minLength = 10, element =
         @Entry(customRule = @CustomRule(generatorClass = OctopusGenerator.class, boundary = MIN_VALUE)))
         Octopus[] octopusArray;
 
@@ -111,15 +110,14 @@ public class CustomGeneratorWIthRemarksTests {
         }
     }
 
-    static class OctopusGenerator implements CustomGeneratorRemark<Octopus> {
+    static class OctopusGenerator implements CustomGeneratorBoundary<Octopus> {
 
-        RuleRemark ruleRemark;
+        Boundary boundary;
 
         @Override
         public Octopus generate() {
             int tentacles = 0;
-            if (ruleRemark.getClass() == Boundary.class) {
-                switch ((Boundary) ruleRemark) {
+                switch (boundary) {
                     case MIN_VALUE:
                         tentacles = 1;
                         break;
@@ -133,49 +131,45 @@ public class CustomGeneratorWIthRemarksTests {
                     case NULL_VALUE:
                         return null;
                     default:
-                        throw new IllegalStateException("Unexpected value: " + (Boundary) ruleRemark);
+                        throw new IllegalStateException("Unexpected value: " + boundary);
                 }
-            }
             return new Octopus(tentacles);
         }
 
         @Override
-        public void setRuleRemark(RuleRemark ruleRemark) {
-            this.ruleRemark = ruleRemark;
+        public void setBoundary(Boundary boundary) {
+            this.boundary = boundary;
         }
     }
 
-    static class OctopusKindGenerator implements CustomGeneratorRemark<String> {
+    static class OctopusKindGenerator implements CustomGeneratorBoundary<String> {
 
-        RuleRemark ruleRemark;
+        Boundary boundary;
 
         @Override
         public String generate() {
 
             String kind = "";
-
-            if (ruleRemark.getClass() == Boundary.class) {
-                switch ((Boundary) ruleRemark) {
-                    case MIN_VALUE:
-                        kind = KIND_MIN;
-                        break;
-                    case MAX_VALUE:
-                        kind = KIND_MAX;
-                        break;
-                    case NOT_DEFINED:
-                    case RANDOM_VALUE:
-                        kind = RandomUtils.nextString(10);
-                        break;
-                    case NULL_VALUE:
-                        kind = null;
-                }
+            switch (boundary) {
+                case MIN_VALUE:
+                    kind = KIND_MIN;
+                    break;
+                case MAX_VALUE:
+                    kind = KIND_MAX;
+                    break;
+                case NOT_DEFINED:
+                case RANDOM_VALUE:
+                    kind = RandomUtils.nextString(10);
+                    break;
+                case NULL_VALUE:
+                    kind = null;
             }
             return kind;
         }
 
         @Override
-        public void setRuleRemark(RuleRemark ruleRemark) {
-            this.ruleRemark = ruleRemark;
+        public void setBoundary(Boundary boundary) {
+            this.boundary = boundary;
         }
     }
 
