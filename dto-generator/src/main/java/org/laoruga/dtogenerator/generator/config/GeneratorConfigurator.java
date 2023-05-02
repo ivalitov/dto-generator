@@ -48,7 +48,7 @@ public class GeneratorConfigurator {
     }
 
     public RuleRemark getRuleRemarkOrNull(String fieldName) {
-        return remarksHolder.getRuleRemarkOrNull(fieldName);
+        return remarksHolder.getBoundaryOrNull(fieldName);
     }
 
     protected ConfigDto mergeGeneratorConfigurations(Supplier<ConfigDto> newConfigInstanceSupplier,

@@ -63,7 +63,7 @@ public class CustomGeneratorsWithRemarksDtoDependentTests {
         @Entry(customRule = @CustomRule(generatorClass = FlowerGenerator.class)))
         List<Flower> flowerBouquet;
 
-        @ArrayRule(minSize = 10, element =
+        @ArrayRule(minLength = 10, element =
         @Entry(customRule = @CustomRule(generatorClass = FlowerGenerator.class)))
         Flower[] flowerBouquetArray;
 
@@ -90,7 +90,7 @@ public class CustomGeneratorsWithRemarksDtoDependentTests {
         @Entry(customRule = @CustomRule(generatorClass = FlowerGenerator.class)))
         List<Flower> flowerBouquet;
 
-        @ArrayRule(minSize = 10, element =
+        @ArrayRule(minLength = 10, element =
         @Entry(customRule = @CustomRule(generatorClass = FlowerGenerator.class)))
         Flower[] flowerBouquetArray;
 
@@ -153,31 +153,31 @@ public class CustomGeneratorsWithRemarksDtoDependentTests {
         final String countries = "Sudan, Tudan, India, Morocco, France, UAR";
         final String countriesNested = "Japan, Kazakhstan, China, Bangladesh";
         Dto dto = DtoGenerator.builder(Dto.class)
-                .addGeneratorParameter("singleFlower",
+                .addGeneratorParameters("singleFlower",
                         FlowerProperty.PETAL_COUNT.name(), "1",
                         FlowerProperty.REGION.name(), "Moldova")
-                .addGeneratorParameter("flowerBouquet",
+                .addGeneratorParameters("flowerBouquet",
                         FlowerProperty.PETAL_COUNT.name(), "2",
                         FlowerProperty.REGION.name(), "Iran")
-                .addGeneratorParameter("flowerBouquetArray",
+                .addGeneratorParameters("flowerBouquetArray",
                         FlowerProperty.PETAL_COUNT.name(), "3",
                         FlowerProperty.REGION.name(), countries)
-                .addGeneratorParameter("flowerBouquetMap",
+                .addGeneratorParameters("flowerBouquetMap",
                         FlowerProperty.PETAL_COUNT.name(), "4, 5, 6, 7, 8, 9",
                         FlowerProperty.REGION.name(), countries)
                 .setGeneratorConfig("flowerBouquetMap", MapConfig.builder().minSize(5).maxSize(5).build())
 
                 // nested
-                .addGeneratorParameter("nestedDto.singleFlower",
+                .addGeneratorParameters("nestedDto.singleFlower",
                         FlowerProperty.PETAL_COUNT.name(), "10",
                         FlowerProperty.REGION.name(), "Moldova_nested")
-                .addGeneratorParameter("nestedDto.flowerBouquet",
+                .addGeneratorParameters("nestedDto.flowerBouquet",
                         FlowerProperty.PETAL_COUNT.name(), "20",
                         FlowerProperty.REGION.name(), "Iran_nested")
-                .addGeneratorParameter("nestedDto.flowerBouquetArray",
+                .addGeneratorParameters("nestedDto.flowerBouquetArray",
                         FlowerProperty.PETAL_COUNT.name(), "30",
                         FlowerProperty.REGION.name(), countriesNested)
-                .addGeneratorParameter("nestedDto.flowerBouquetMap",
+                .addGeneratorParameters("nestedDto.flowerBouquetMap",
                         FlowerProperty.PETAL_COUNT.name(), "40",
                         FlowerProperty.REGION.name(), "Somewhere_nested")
                 .build()

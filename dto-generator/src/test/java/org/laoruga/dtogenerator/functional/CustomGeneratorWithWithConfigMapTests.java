@@ -212,9 +212,8 @@ public class CustomGeneratorWithWithConfigMapTests {
                 .addGeneratorParameter(WitchesBrewGenerator.class,
                         "BERRY_FLAVOURED", "strawberry"
                 )
-                .addGeneratorParameter(WitchDescriptionGenerator.class,
-                        "GRUMPY", "always")
-                .addGeneratorParameter(WitchDescriptionGenerator.class,
+                .addGeneratorParameters(WitchDescriptionGenerator.class,
+                        "GRUMPY", "always",
                         "MADNESS", "fast")
                 .build().generateDto();
 
@@ -339,6 +338,35 @@ public class CustomGeneratorWithWithConfigMapTests {
                         Sets.newHashSet("BERRY_FLAVOURED blueberry", "YOUTH sun"))
                 )
         );
+    }
+
+    static class Dto_2 {
+
+        @CustomRule(generatorClass = WitchesBrewGenerator.class, keyValueParams = {"MADNESS", "yes", "YOUTH", "no"})
+        WitchesBrew witchesBrew;
+
+    }
+
+    @Test
+    void keyValueParamsFromAnnotation() {
+
+        Dto_2 dto = DtoGenerator.builder(Dto_2.class).build().generateDto();
+
+        assertThat(dto.witchesBrew.ingredients, containsInAnyOrder("YOUTH no", "MADNESS yes"));
+
+    }
+
+    @Test
+    void keyValueParamsFromAnnotationAndBuilder() {
+
+        Dto_2 dto = DtoGenerator.builder(Dto_2.class)
+                .addGeneratorParameter("witchesBrew", "BERRY_FLAVOURED", "ok")
+                .addGeneratorParameter(WitchesBrewGenerator.class, "YOUTH", "perhaps")
+                .addGeneratorParameters(WitchesBrewGenerator.class, "AGING", "nope")
+                .build().generateDto();
+
+        assertThat(dto.witchesBrew.ingredients,
+                containsInAnyOrder("YOUTH perhaps", "MADNESS yes", "BERRY_FLAVOURED ok", "AGING nope"));
     }
 
 }

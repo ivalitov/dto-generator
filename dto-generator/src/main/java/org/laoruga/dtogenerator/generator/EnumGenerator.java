@@ -11,6 +11,8 @@ import org.laoruga.dtogenerator.util.RandomUtils;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Il'dar Valitov
@@ -20,39 +22,64 @@ import java.util.Comparator;
 @AllArgsConstructor
 public class EnumGenerator implements Generator<Enum> {
 
-    private final String[] possibleEnumNames;
-    private final Class<? extends Enum<?>> enumClass;
+    private final String[] sortedEnumNamesSelection;
+    private final Map<String, Enum<?>> allEnumValues;
     private final RuleRemark ruleRemark;
+    private int numberOfEnumConstantsOfMinLength = 0;
+    private int numberOfEnumConstantsOfMaxLength = 0;
 
     public EnumGenerator(EnumConfig enumConfig) {
         if (enumConfig.getEnumClass() == null) {
             throw new DtoGeneratorException("Enum class wasn't set for generator.");
         }
-        if (enumConfig.getPossibleEnumNames().length == 0) {
-            enumConfig.setPossibleEnumNames(Arrays
-                    .stream(enumConfig.getEnumClass().getEnumConstants())
-                    .map(Enum::name).toArray(String[]::new));
-        }
-        possibleEnumNames = enumConfig.getPossibleEnumNames();
-        enumClass = enumConfig.getEnumClass();
+        allEnumValues = Arrays
+                .stream(enumConfig.getEnumClass().getEnumConstants())
+                .collect(Collectors.toMap(Enum::name, v -> v));
         ruleRemark = enumConfig.getRuleRemark();
+
+        String[] enumConstantNames;
+        if (enumConfig.getPossibleEnumNames().length == 0) {
+            enumConstantNames = Arrays
+                    .stream(enumConfig.getEnumClass().getEnumConstants())
+                    .map(Enum::name)
+                    .toArray(String[]::new);
+        } else {
+            enumConstantNames = enumConfig.getPossibleEnumNames();
+            validateEnumNames(enumConstantNames, enumConfig.getEnumClass());
+        }
+
+        sortedEnumNamesSelection = Arrays.stream(enumConstantNames)
+                .sorted(Comparator.comparing(String::length))
+                .toArray(String[]::new);
     }
 
     @Override
     @SneakyThrows
     public Enum<?> generate() {
-        String[] sortedEnumNames = Arrays.stream(possibleEnumNames)
-                .sorted(Comparator.comparing(String::length))
-                .toArray(String[]::new);
-        String enumInstanceName;
+        String enumConstantName;
         switch ((Boundary) ruleRemark) {
 
             case MIN_VALUE:
-                enumInstanceName = sortedEnumNames[0];
+
+                if (numberOfEnumConstantsOfMinLength == 0) {
+                    numberOfEnumConstantsOfMinLength = countNumberOfEnumConstantsOfMinLength();
+                }
+
+                int randomIdx = RandomUtils.nextInt(0, numberOfEnumConstantsOfMinLength - 1);
+                enumConstantName = sortedEnumNamesSelection[randomIdx];
                 break;
 
             case MAX_VALUE:
-                enumInstanceName = sortedEnumNames[sortedEnumNames.length - 1];
+
+                if (numberOfEnumConstantsOfMaxLength == 0) {
+                    numberOfEnumConstantsOfMaxLength = countNumberOfEnumConstantsOfMaxLength();
+                }
+
+                randomIdx = RandomUtils.nextInt(
+                        sortedEnumNamesSelection.length - numberOfEnumConstantsOfMaxLength,
+                        sortedEnumNamesSelection.length - 1);
+                enumConstantName = sortedEnumNamesSelection[randomIdx];
+
                 break;
 
             case NULL_VALUE:
@@ -60,20 +87,48 @@ public class EnumGenerator implements Generator<Enum> {
 
             case RANDOM_VALUE:
             case NOT_DEFINED:
-                int count = sortedEnumNames.length;
-                enumInstanceName = sortedEnumNames[RandomUtils.RANDOM.nextInt(count)];
+                enumConstantName = sortedEnumNamesSelection[RandomUtils.nextInt(0, sortedEnumNamesSelection.length - 1)];
                 break;
 
             default:
                 throw new IllegalStateException("Unexpected value " + ruleRemark);
         }
-        for (Enum<?> enumConstant : enumClass.getEnumConstants()) {
-            if (enumConstant.name().equals(enumInstanceName)) {
-                return enumConstant;
-            }
-        }
-        throw new DtoGeneratorException("Enum instance with name: " +
-                "'" + enumInstanceName + "' not found in Class: '" + enumClass + "'");
+
+        return allEnumValues.get(enumConstantName);
     }
 
+    private void validateEnumNames(String[] enumConstantNames, Class<? extends Enum<?>> enumClass) {
+        for (String selectedEnumName : enumConstantNames) {
+            if (!allEnumValues.containsKey(selectedEnumName)) {
+                throw new DtoGeneratorException("Enum constant with name: " +
+                        "'" + selectedEnumName + "' not found in the Class: '" + enumClass + "'");
+            }
+        }
+    }
+
+    private int countNumberOfEnumConstantsOfMinLength() {
+        int number = 1;
+        int minLength = sortedEnumNamesSelection[0].length();
+        for (int i = 1; i < sortedEnumNamesSelection.length; i++) {
+            if (sortedEnumNamesSelection[i].length() == minLength) {
+                number++;
+            } else {
+                break;
+            }
+        }
+        return number;
+    }
+
+    private int countNumberOfEnumConstantsOfMaxLength() {
+        int number = 1;
+        int maxLength = sortedEnumNamesSelection[sortedEnumNamesSelection.length - 1].length();
+        for (int i = sortedEnumNamesSelection.length - 2; i >= 0; i--) {
+            if (sortedEnumNamesSelection[i].length() == maxLength) {
+                number++;
+            } else {
+                break;
+            }
+        }
+        return number;
+    }
 }

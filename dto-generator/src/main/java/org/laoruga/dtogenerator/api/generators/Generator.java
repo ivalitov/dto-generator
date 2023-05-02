@@ -7,5 +7,8 @@ package org.laoruga.dtogenerator.api.generators;
 
 public interface Generator<T> {
 
+    /**
+     * @return new generated value
+     */
     T generate();
 }

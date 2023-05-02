@@ -1,7 +1,6 @@
 package org.laoruga.dtogenerator.generator.providers.suppliers;
 
 import com.google.common.primitives.Primitives;
-import org.laoruga.dtogenerator.api.generators.Generator;
 import org.laoruga.dtogenerator.api.rules.ArrayRule;
 import org.laoruga.dtogenerator.api.rules.CollectionRule;
 import org.laoruga.dtogenerator.api.rules.EnumRule;
@@ -119,10 +118,4 @@ public final class GeneratorSuppliers {
         }
     }
 
-    public void addSuppliersInfo(Class<?> generatedType, Generator<?> generator) {
-        GeneratorSupplierInfo info = GeneratorSupplierInfo.createInstance(
-                null, generatedType, configDto -> generator
-        );
-        addSuppliersInfo(info);
-    }
 }

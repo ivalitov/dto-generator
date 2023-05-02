@@ -43,7 +43,7 @@ public class DtoGeneratorFileConfig extends DtoGeneratorConfigParams {
     }
 
     private void initConfigDto() {
-        setMaxDependentGenerationCycles(Integer.parseInt(getProperty("maxDependentGenerationCycles")));
+        this.setMaxFailuresNumberDuringDtoGeneration(Integer.parseInt(getProperty("maxFailuresNumberDuringDtoGeneration")));
         setMaxCollectionGenerationCycles(Integer.parseInt(getProperty("maxCollectionGenerationCycles")));
         setGenerateAllKnownTypes(Boolean.parseBoolean(getProperty("generateAllKnownTypes")));
         setGenerateUsersTypes(Boolean.parseBoolean(getProperty("generateUsersTypes")));

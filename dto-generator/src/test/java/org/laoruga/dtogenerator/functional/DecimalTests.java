@@ -12,6 +12,8 @@ import org.laoruga.dtogenerator.constants.Bounds;
 import org.laoruga.dtogenerator.generator.config.dto.DecimalConfig;
 
 import java.math.BigDecimal;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -193,7 +195,7 @@ public class DecimalTests {
         Dto dto = builder.build().generateDto();
 
         assertAll(
-                () -> assertThat("Annotation + field", dto.doubleObject, equalTo(Double.MIN_VALUE)),
+                () -> assertThat("Annotation + field", dto.doubleObject, equalTo(Bounds.DOUBLE_MIN_VALUE)),
                 () -> assertThat("Static + field", dto.doublePrimitive, equalTo(100D)),
                 () -> assertThat("Instance + field", dto.floatObject, equalTo(321F)),
                 () -> assertThat("Static + field", dto.floatPrimitive, equalTo(-321F)),
@@ -264,10 +266,10 @@ public class DecimalTests {
         Dto_2 dto = builder.build().generateDto();
 
         assertAll(
-                () -> assertThat(dto.doubleObject, equalTo(Double.MAX_VALUE)),
-                () -> assertThat(dto.doublePrimitive, equalTo(Double.MAX_VALUE)),
-                () -> assertThat(dto.floatObject, equalTo(Float.MAX_VALUE)),
-                () -> assertThat(dto.floatPrimitive, equalTo(Float.MAX_VALUE)),
+                () -> assertThat(dto.doubleObject, equalTo(Bounds.DOUBLE_MAX_VALUE)),
+                () -> assertThat(dto.doublePrimitive, equalTo(Bounds.DOUBLE_MAX_VALUE)),
+                () -> assertThat(dto.floatObject, equalTo(Bounds.FLOAT_MAX_VALUE)),
+                () -> assertThat(dto.floatPrimitive, equalTo(Bounds.FLOAT_MAX_VALUE)),
                 () -> assertThat(dto.bigDecimal, equalTo(new BigDecimal(Bounds.BIG_DECIMAL_MAX_VALUE)))
         );
     }
@@ -306,6 +308,78 @@ public class DecimalTests {
                 () -> assertThat(dto.floatObject, equalTo(-3F)),
                 () -> assertThat(dto.floatPrimitive, equalTo(-4F)),
                 () -> assertThat(dto.bigDecimal, equalTo(new BigDecimal("-5")))
+        );
+    }
+
+    static class Dto_3 {
+
+        @DecimalRule(minDouble = 10, maxDouble = 10.99999999999, precision = 3)
+        double threeSymbols;
+
+    }
+
+    @Test
+    void precisionTest() {
+
+        DtoGeneratorBuilder<Dto_3> builder = DtoGenerator.builder(Dto_3.class);
+        DtoGenerator<Dto_3> generator = builder.build();
+
+        Pattern pattern = Pattern.compile("10[.,][0-9]{3}\\b");
+
+        long count = IntStream.range(1, 100).boxed()
+                .map(i -> String.valueOf(generator.generateDto().threeSymbols))
+                .filter(i -> pattern.matcher(i).matches())
+                .count();
+
+        assertAll(
+                () -> assertThat(count, greaterThan(30L))
+        );
+    }
+
+    @Test
+    void precisionTestOverriddenConfigViaBuilder() {
+
+        DtoGeneratorBuilder<Dto_3> builder = DtoGenerator.builder(Dto_3.class);
+        builder.setGeneratorConfig(Double.class,
+                DecimalConfig.builder()
+                        .minValue(11D)
+                        .maxValue(11.9999999D)
+                        .precision(5).build());
+
+        DtoGenerator<Dto_3> generator = builder.build();
+
+        Pattern pattern = Pattern.compile("11[.,][0-9]{5}\\b");
+
+        long count = IntStream.range(1, 100).boxed()
+                .map(i -> String.valueOf(generator.generateDto().threeSymbols))
+                .filter(i -> pattern.matcher(i).matches())
+                .count();
+
+        assertAll(
+                () -> assertThat(count, greaterThan(30L))
+        );
+    }
+
+    @Test
+    void precisionTestOverriddenConfigViaTypeConfigs() {
+        DtoGeneratorBuilder<Dto_3> builder = DtoGenerator.builder(Dto_3.class);
+
+        builder.getConfig().getTypeGeneratorsConfig().getDecimalConfig()
+                .setMaxDoubleValue(12D)
+                .setMinDoubleValue(12.99999999D)
+                .setPrecisionDouble(4);
+
+        DtoGenerator<Dto_3> generator = builder.build();
+
+        Pattern pattern = Pattern.compile("12[.,][0-9]{4}\\b");
+
+        long count = IntStream.range(1, 100).boxed()
+                .map(i -> String.valueOf(generator.generateDto().threeSymbols))
+                .filter(i -> pattern.matcher(i).matches())
+                .count();
+
+        assertAll(
+                () -> assertThat(count, greaterThan(30L))
         );
     }
 

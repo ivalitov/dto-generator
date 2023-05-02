@@ -53,10 +53,7 @@ class IgnoringFieldsTests {
 
         Dto dto = DtoGenerator.builder(Dto.class)
                 .generateKnownTypes()
-                .ignoreField("string")
-                .ignoreField("integer")
-                .ignoreField("nestedDto.aLong")
-                .ignoreField("nestedDto.aDouble")
+                .ignoreFields("string", "integer", "nestedDto.aLong", "nestedDto.aDouble")
                 .build()
                 .generateDto();
 

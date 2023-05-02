@@ -54,6 +54,7 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
      * Lazy getters
      */
 
+    @Override
     public StringConfig getStringConfig() {
         return (StringConfig) getConfigLazy(
                 StringRule.GENERATED_TYPE,
@@ -61,6 +62,7 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
+    @Override
     public IntegralConfigCommonConfig getIntegralConfig() {
         return (IntegralConfigCommonConfig) getConfigLazy(
                 IntegralRule.GENERATED_TYPES,
@@ -68,6 +70,7 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
+    @Override
     public DecimalCommonConfig getDecimalConfig() {
         return (DecimalCommonConfig) getConfigLazy(
                 DecimalRule.GENERATED_TYPES,
@@ -75,6 +78,7 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
+    @Override
     public EnumConfig getEnumConfig() {
         return (EnumConfig) getConfigLazy(
                 EnumRule.GENERATED_TYPE,
@@ -82,6 +86,7 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
+    @Override
     public DateTimeConfig getDateTimeConfig(Class<? extends Temporal> dateTimeType) {
         return (DateTimeConfig) getConfigLazy(
                 dateTimeType,
@@ -89,17 +94,7 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
-    /**
-     * Configuration apples to:
-     * <ul>
-     * <li>provided class or interface</li>
-     * <li>classes and interfaces that extends or implements provided type</li>
-     * </ul>
-     * For example, config set for {@link List} will apply to {@link LinkedList}, {@link ArrayList} etc.
-     *
-     * @param generatedType class or interface to configure
-     * @return configuration instantiated lazy
-     */
+    @Override
     public CollectionConfig getCollectionConfig(Class<? extends Collection> generatedType) {
         return (CollectionConfig) getConfigLazy(
                 generatedType,
@@ -107,14 +102,7 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
-    /**
-     * Configuration apples to provided array class.
-     *
-     * @param generatedType class or interface to configure
-     *                      for example: int[].class, Integer[].class
-     *                      (these are two different types which processed independently)
-     * @return configuration instantiated lazy
-     */
+    @Override
     public ArrayConfig getArrayConfig(Class<?> generatedType) {
         return (ArrayConfig) getConfigLazy(
                 generatedType,
@@ -122,16 +110,6 @@ public class TypeGeneratorsConfigLazy implements TypeGeneratorsConfigSupplier {
         );
     }
 
-    /**
-     * Configuration apples to:
-     * <ul>
-     * <li>provided class or interface</li>
-     * <li>classes and interfaces that extends or implements provided type</li>
-     * </ul>
-     *
-     * @param generatedType class or interface to configure
-     * @return configuration instantiated lazy
-     */
     @Override
     public MapConfig getMapConfig(Class<? extends Map> generatedType) {
         return (MapConfig) getConfigLazy(

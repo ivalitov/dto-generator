@@ -4,13 +4,12 @@
 
     <groupId>org.laoruga</groupId>
     <artifactId>dto-generator-parent</artifactId>
-    <version>0.4.2-alpha-SNAPSHOT</version>
+    <version>1.0.1-beta-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
     <name>DTO Generator</name>
-    <description>DTO Generator makes it easy to create POJOs containing random data generated according to given rules
-    </description>
+    <description>Java library for simple and flexible data generation inside java objects (DTO/POJO)</description>
     <url>https://github.com/ivalitov/dto-generator</url>
 
     <modules>
@@ -58,7 +57,6 @@
         <connection>scm:git:git@github.com:ivalitov/dto-generator.git</connection>
         <developerConnection>scm:git:git@github.com:ivalitov/dto-generator.git</developerConnection>
         <url>https://github.com/ivalitov/dto-generator</url>
-        <tag>0.3.5-alpha</tag>
     </scm>
 
     <dependencies>

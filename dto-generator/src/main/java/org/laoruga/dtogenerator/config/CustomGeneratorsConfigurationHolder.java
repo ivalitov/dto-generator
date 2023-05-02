@@ -78,8 +78,11 @@ public class CustomGeneratorsConfigurationHolder {
 
     public CustomGeneratorConfigurator.Builder getBuilder(String fieldName,
                                                           Class<? extends CustomGenerator<?>> generatorClass,
-                                                          String[] args) {
-        CustomGeneratorConfigurator.Builder newBuilder = newDefaultBuilder(fieldName).args(args);
+                                                          String[] args,
+                                                          String[] keyValueParams) {
+        CustomGeneratorConfigurator.Builder newBuilder = newDefaultBuilder(fieldName)
+                .args(args)
+                .keyValueParams(keyValueParams);
         getBuilder(generatorClass).ifPresent(newBuilder::merge);
         getBuilder(fieldName).ifPresent(newBuilder::merge);
         return newBuilder;

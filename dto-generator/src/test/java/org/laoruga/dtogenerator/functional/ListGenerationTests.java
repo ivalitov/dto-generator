@@ -104,11 +104,11 @@ class ListGenerationTests {
         @BooleanRule(trueProbability = 1)))
         private List<Boolean> listOfBoolean;
 
-        @CollectionRule(minSize = 2, maxSize = 2, element = @Entry(numberRule =
+        @CollectionRule(minSize = 2, maxSize = 2, element = @Entry(integralRule =
         @IntegralRule(minInt = 777, maxInt = 777)))
         private List<AtomicInteger> listOfAtomicInteger;
 
-        @CollectionRule(collectionClass = LinkedList.class, minSize = 10, element = @Entry(numberRule =
+        @CollectionRule(collectionClass = LinkedList.class, minSize = 10, element = @Entry(integralRule =
         @IntegralRule(minInt = 1, maxInt = 1)))
         private List<Integer> listOfInteger;
 
@@ -242,7 +242,7 @@ class ListGenerationTests {
 
     static class Dto3 {
 
-        @CollectionRule(element = @Entry(numberRule =
+        @CollectionRule(element = @Entry(integralRule =
         @IntegralRule))
         List<String> some;
 
