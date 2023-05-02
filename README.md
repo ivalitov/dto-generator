@@ -112,13 +112,7 @@ As the result we'll have an object containing random data, generated based on ge
   "age": 33,
   "docType": "PASSPORT",
   "lastVisit": [
-    2023,
-    2,
-    7,
-    18,
-    32,
-    55,
-    209000000
+    2023, 2, 7, 18, 32, 55, 209000000
   ]
 }
 ```
